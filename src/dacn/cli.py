@@ -17,9 +17,7 @@ def main():
         args.output.mkdir(parents=True, exist_ok=True)
         result = {
             "warning": "Synthetic demo only; not medical model performance",
-            "metrics": compute_binary_metrics(
-                [0, 0, 1, 1], [0.1, 0.4, 0.6, 0.9], threshold=0.5
-            ),
+            "metrics": compute_binary_metrics([0, 0, 1, 1], [0.1, 0.4, 0.6, 0.9], threshold=0.5),
         }
         (args.output / "metrics.json").write_text(
             json.dumps(result, indent=2) + "\n", encoding="utf-8"
