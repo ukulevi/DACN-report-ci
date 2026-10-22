@@ -1,6 +1,8 @@
 """Shared lightweight interfaces (no heavy framework dependency)."""
+
 from dataclasses import dataclass
 from typing import Protocol
+
 import numpy as np
 from numpy.typing import NDArray
 
