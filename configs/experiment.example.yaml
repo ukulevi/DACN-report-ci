@@ -1,0 +1,19 @@
+project: dacn-medical-ad
+seed: 42
+data:
+  dataset: TO_BE_SELECTED
+  root: data
+  modality: TO_BE_SELECTED
+  split_unit: patient
+model:
+  name: ddpm
+  image_size: 128
+  timesteps: 1000
+scoring:
+  method: reconstruction_error
+  samples: 1
+evaluation:
+  higher_is_anomalous: true
+  threshold_source: validation
+output:
+  dir: runs/experiment
