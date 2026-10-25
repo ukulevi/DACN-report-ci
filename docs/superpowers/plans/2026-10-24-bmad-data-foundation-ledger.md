@@ -60,3 +60,9 @@ the log — cost if wrong: validation remains software-level, not clinical annot
 Integration: preserve local feature branch and working files in Downloads per the
 user's delegated preparation scope. No merge/push or Git identity configuration.
 No deferred minor findings. All three implementation tasks complete.
+
+Follow-up 2026-10-25: user explicitly requested publishing a PR and creating Linear
+tracking. PR https://github.com/tanh1c/DACN/pull/11 opened; workbook included unchanged.
+Linear project DACN created in Traffic-agent-assistant after user selected that team:
+6 milestones, 25 issues and 31 dependency relations, initial project update. Data tasks
+assigned to verified user Chí Vĩ; B/C remain unassigned pending teammate onboarding.

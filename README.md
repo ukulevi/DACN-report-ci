@@ -10,6 +10,7 @@ giả lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, kh�
 ## Bắt đầu ở đây
 
 - [Kế hoạch 6 tuần và việc cần làm ngay](docs/PROJECT_PLAN.md)
+- [Project Linear, milestone và backlog công việc](docs/PROJECT_TRACKING.md)
 - [Audit: leakage trong bản BMAD tải về](docs/DATA_AUDIT.md)
 - [Protocol data và lệnh chạy](docs/DATA_PROTOCOL.md)
 - [Câu hỏi nghiên cứu, adaptation, thực nghiệm](docs/RESEARCH.md)
