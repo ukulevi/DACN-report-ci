@@ -5,6 +5,14 @@ Archive 401.031.573 byte; SHA256
 `eb7a5aae9ea1752b16d3a76b47595ffd956c0b210444da76853455d4d7be61c8`.
 Chi tiết source receipt nằm ở `data/raw/source_receipt.json` trên máy, không trong Git.
 
+## Giới hạn provenance của split nguồn
+
+Artifact được audit là đúng file Drive `Brain_AD.zip` (ID `1xuapqiL1s18eMeKMd-Vi1Cqp2wp7Pghp`, SHA256 ở trên). Phiên bản script, lệnh chạy và lịch sử thư mục output đã tạo ra archive này **chưa xác minh được** từ artifact/repository; không có căn cứ để gắn nó với một commit preprocessing cụ thể.
+
+Để giải thích hành vi của mã nguồn công khai, tại ngày 26/10/2026 đã kiểm tra [`bras.py` ở commit `5b6d583898b0a53c72aaebfa9a3f075c126e1bd5`](https://github.com/DorisBao/BMAD/blob/5b6d583898b0a53c72aaebfa9a3f075c126e1bd5/data_processing/brain/bras.py). Script chọn cohort abnormal validation từ `list(set(...))` rồi tạo test bằng phần bù: một lần chạy sạch cho hai cohort rời nhau, nhưng lựa chọn validation không ổn định giữa lần chạy. Script cũng ghi vào thư mục output hiện có mà không dọn file cũ. File sót từ lần tạo trước là một lời giải thích **có thể có**, chưa được xác nhận cho overlap trong archive này.
+
+Vì vậy, phát hiện overlap bên dưới áp dụng cho đúng archive đã pin, không chứng minh split chính thức trong paper BMAD hoặc mọi bản phát hành BMAD đều bị leakage. Archive cùng SHA256 là đầu vào nguồn duy nhất có thể tái lập ở đây; `patient-disjoint-v1` là split dẫn xuất từ artifact này.
+
 ## Phát hiện trên dữ liệu thật
 
 1. Layout train là `train/good/*.png`, mask evaluation nằm trong `label/`.
