@@ -11,7 +11,11 @@ giả lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, kh�
 ## Bắt đầu ở đây
 
 - [Kế hoạch 6 tuần và việc cần làm ngay](docs/PROJECT_PLAN.md)
+- [Đề bài và yêu cầu dự án](docs/PROJECT_REQUIREMENTS.md)
 - [Project Linear, milestone và backlog công việc](docs/PROJECT_TRACKING.md)
+- [Worklog](docs/WORKLOG.md)
+- [Lessons learned](docs/LESSONS_LEARNED.md)
+- [Theo dõi thí nghiệm và kết quả](docs/RESULT_TRACKING.md)
 - [Audit: leakage trong bản BMAD tải về](docs/DATA_AUDIT.md)
 - [Protocol data và lệnh chạy](docs/DATA_PROTOCOL.md)
 - [Hugging Face + Modal: lưu dataset và chạy experiment](docs/HUGGINGFACE_MODAL.md)

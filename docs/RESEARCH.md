@@ -51,8 +51,11 @@ trước; chưa chốt công thức trong đợt chuẩn bị này. Không dùng
 - Primary: **pixel average precision (AP)** trên toàn bộ pixel vùng ảnh gốc 240×240,
   loại padding, gồm cả normal và abnormal slice. Đây là global micro AP, không phải
   trung bình AP từng ảnh và không phải diện tích PR theo trapezoid.
-- Secondary: pixel AUROC; image AUROC/AP với image score cố định là trung bình top
-  1% pixel score trong ảnh gốc (ít nhất 1 pixel). Mọi thay đổi aggregation chỉ dựa val.
+- Báo cáo yêu cầu đồ án: **ROC-AUC, Precision, Recall, F1-score**. Báo rõ mức
+  image/pixel và cách aggregation; image score cố định là trung bình top 1% pixel
+  score trong ảnh gốc (ít nhất 1 pixel). Báo ngưỡng dùng cho Precision/Recall/F1;
+  chọn ngưỡng trên validation theo quy tắc đã khai báo và khóa trước test.
+- Secondary: pixel AUROC, image AUROC/AP. Mọi thay đổi aggregation chỉ dựa val.
 - Dice: chọn một ngưỡng pixel toàn cục tối ưu Dice micro trên val; khóa trước test.
   Báo Dice micro toàn tập, Dice macro trên các slice mask dương, và false-positive
   pixel rate trên mask rỗng. Không để Dice=1 của ảnh normal che chất lượng lesion.

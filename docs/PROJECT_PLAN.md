@@ -1,6 +1,9 @@
 # Kế hoạch đồ án 6 tuần — BMAD Brain / ANDi-FLAIR
 
 Theo dõi việc thực thi và issue theo tuần trong [PROJECT_TRACKING](PROJECT_TRACKING.md).
+Yêu cầu đề tài được lưu ở [PROJECT_REQUIREMENTS](PROJECT_REQUIREMENTS.md); kết quả
+run và thay đổi repo được ghi lần lượt trong [RESULT_TRACKING](RESULT_TRACKING.md)
+và [WORKLOG](WORKLOG.md).
 
 **Quyết định ngày 24/10/2026:** tái triển khai ANDi cho MRI FLAIR 2D, so sánh với
 denoising autoencoder (DAE), rồi nghiên cứu đánh đổi chất lượng–thời gian khi giảm

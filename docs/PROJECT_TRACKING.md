@@ -37,6 +37,11 @@ Mỗi ngày cập nhật ngắn: kết quả có bằng chứng, blocker, việc
 đối chiếu gate milestone, cập nhật project health (on track / at risk / off track)
 theo bằng chứng; số issue Done không thay thế chất lượng thực nghiệm.
 
+Linear giữ trạng thái task. Ghi thay đổi repo trong [WORKLOG](WORKLOG.md), bài học
+có bằng chứng trong [LESSONS_LEARNED](LESSONS_LEARNED.md), và từng run cùng số đo
+trong [RESULT_TRACKING](RESULT_TRACKING.md); các log này không thay thế run manifest
+hay issue Linear.
+
 Để xem tiến độ, lọc issues trong project theo milestone, status, assignee hoặc nhãn
 dacn:data / baseline / diffusion / evaluation / reporting / coordination. Extension
 calibration mang nhãn dacn:optional và không chặn freeze MVP.
