@@ -32,12 +32,11 @@ BraTS2021_slice/
   test/{good,Ungood}/label/<patient>_<slice>.png
 ```
 
-ID giữ dạng chuỗi để không mất số 0 đầu. Mã
-[`bras.py`](https://github.com/DorisBao/BMAD/blob/main/data_processing/brain/bras.py)
-ghép `img_id` từ tên BraTS với chỉ số lát cắt, lưu ảnh và segmentation bằng
-`plt.imsave(..., cmap="bone")`. Không chạy script đó nguyên xi để tái tạo split:
-có lựa chọn bằng thứ tự tập hợp và đường dẫn máy tác giả. Archive + hash là phiên bản
-nguồn của đồ án; kiểm tra ID không tự chứng minh nguồn bệnh nhân ngoài dữ liệu công bố.
+ID giữ dạng chuỗi để không mất số 0 đầu. Mã preprocessing được xem để hiểu cách đặt ID và lưu ảnh: [`bras.py` ở commit `5b6d583898b0a53c72aaebfa9a3f075c126e1bd5`](https://github.com/DorisBao/BMAD/blob/5b6d583898b0a53c72aaebfa9a3f075c126e1bd5/data_processing/brain/bras.py). Đây là snapshot công khai dùng để đối chiếu, **không xác nhận** archive Drive được tạo từ revision này.
+
+Script lấy cohort abnormal validation từ `list(set(...))` rồi tạo test bằng phần bù. Hai cohort rời nhau trong một lần chạy sạch, nhưng ID validation có thể đổi giữa lần chạy. Script ghi vào thư mục output hiện có mà không dọn file cũ; file tồn dư có thể tạo overlap, nhưng chưa xác minh đây là nguyên nhân của archive đang dùng.
+
+Phiên bản script, lệnh chạy và lịch sử output tạo ra `Brain_AD.zip` chưa xác minh được. Do đó, phát hiện overlap chỉ áp dụng cho archive có ID và SHA256 ở trên; không kết luận split chính thức của BMAD bị leakage. Archive cùng SHA256 là đầu vào nguồn duy nhất tái lập được; mọi số liệu từ `patient-disjoint-v1` đều thuộc split dẫn xuất này. Xem [DATA_AUDIT](DATA_AUDIT.md) để biết giới hạn provenance.
 
 ## Quy tắc split đã sửa
 
