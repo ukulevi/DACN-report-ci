@@ -1,0 +1,31 @@
+# Research contract; current CLI takes flags and does NOT load this YAML.
+status: planned_training_not_implemented
+dataset:
+  name: BMAD-Brain
+  version: bmad-flair-patient-disjoint-v1
+  archive_sha256: eb7a5aae9ea1752b16d3a76b47595ffd956c0b210444da76853455d4d7be61c8
+  root: data/raw/bmad/BraTS2021_slice
+  prepared: data/processed/bmad-flair-patient-disjoint-v1
+  encoding: bmad-bone
+  split_policy: patient-disjoint-v1
+  modality: FLAIR_PNG_luminance
+  image_size: 256
+  original_size: 240
+  normalization: uint8_div_127.5_minus_1
+research:
+  baseline: coarse_noise_DAE
+  reference: ANDi_FLAIR_adaptation
+  diffusion_steps_initial: 1000
+  scoring_interval_initial: [75, 200]
+  endpoint_semantics: verify_against_pinned_ANDi_code_before_implementation
+  sparse_k: [8, 16, 32]
+  final_train_seeds_target: [17, 42, 2026]
+  optional_extension: normal_only_score_calibration
+evaluation:
+  primary: global_pixel_average_precision
+  crop_padding: true
+  image_score: mean_top_1_percent
+  threshold_source: validation_only
+  test_locked_until: model_and_protocol_freeze
+  bootstrap_unit: patient
+  same_device_latency: true

@@ -1,17 +1,18 @@
-# Parallel work ownership
+# Vai trò và cách phối hợp
 
-| Owner | Workstream | Primary paths | Deliverable |
-|---|---|---|---|
-| Tuấn Anh | Diffusion / integration / new algorithm | `src/dacn/models/diffusion/`, `configs/diffusion/`, `docs/RESEARCH.md` | DDPM/DDIM reproducible benchmark, novel method, ablations |
-| Hải Tuấn | Traditional/generative baselines | `src/dacn/models/baselines/`, `configs/baselines/` | Isolation Forest, AE, VAE, GAN anomaly score benchmark |
-| Chí Vĩ | Medical data & evaluation | `src/dacn/data/`, `src/dacn/evaluation/`, `docs/DATA_PROTOCOL.md` | Legal dataset ingestion, leakage-free splits, metrics and visualization |
+Phân công cũ trong repo chỉ là tham khảo. Theo trao đổi ngày 24/10/2026, người dùng
+phụ trách nguồn tham khảo và data; hai vai trò còn lại phân theo năng lực/thời gian.
 
-All three co-own tests, documentation and review. Shared interfaces in `src/dacn/contracts.py` require one review from each affected workstream before modification. Assign actual GitHub handles when team joins.
+| Vai trò | Trách nhiệm | Người review |
+|---|---|---|
+| Bạn — Data | Quyền sử dụng/nguồn, version, manifest, decode, QC, mô tả dataset | B |
+| B — DAE & evaluation | Baseline, metric, threshold, bootstrap, log thí nghiệm | C |
+| C — Diffusion | ANDi-FLAIR, timestep scoring, checkpoint, demo tích hợp | Bạn (protocol), B (code) |
 
-## First four sprints (proposed, one week each)
-- Sprint 1: agree a single medical modality/task, dataset access, patient splits, contracts, and compute budget; smoke-test CI.
-- Sprint 2: baseline training + comparable metric pipeline; reproduce reference DDPM denoising on a tiny subset.
-- Sprint 3: DDPM vs DDIM scores, inference-speed trade-offs, reproducible initial report.
-- Sprint 4: run one well-specified novel-method hypothesis and ablations, hold out test set until selection is frozen.
+Mỗi thay đổi split, label, preprocessing tạo version mới và có người thứ hai review.
+Không đẩy ảnh, manifest chứa ID hoặc checkpoint vào Git. Không dùng chung secrets.
+Mọi run có config, seed, commit, dataset hash, checkpoint hash và môi trường.
 
-Each weekly sync: 10 min blockers, 15 min results with configs and run links, 10 min decisions. Document decisions as Issues/PRs.
+Quyết định nghiên cứu ghi trong `docs/RESEARCH.md`; tiến độ theo `docs/PROJECT_PLAN.md`.
+Không âm thầm đổi thiết kế sau khi xem kết quả test. Việc bàn giao gồm lệnh chạy,
+đầu vào, đầu ra, bằng chứng kiểm tra và giới hạn còn tồn tại.

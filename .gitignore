@@ -33,3 +33,5 @@ models/**
 *.npy
 mlruns/
 wandb/
+
+*.egg-info/
