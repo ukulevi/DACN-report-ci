@@ -1,5 +1,5 @@
 # Research contract; current CLI takes flags and does NOT load this YAML.
-status: planned_training_not_implemented
+status: dae_pilot_implemented_andi_pending
 dataset:
   name: BMAD-Brain
   version: bmad-flair-patient-disjoint-v1

@@ -13,6 +13,8 @@ dependencies = ["numpy>=1.24,<3", "scikit-learn>=1.3,<2", "PyYAML>=6,<7"]
 data = ["pillow>=10", "gdown>=5,<7"]
 train = ["torch>=2.2", "torchvision>=0.17", "tqdm>=4.66", "pillow>=10"]
 medical = ["nibabel>=5", "pydicom>=2.4"]
+hub = ["huggingface_hub>=0.28,<3", "python-dotenv>=1,<2"]
+cloud = ["modal>=0.73"]
 dev = ["pytest>=8", "ruff>=0.6", "build>=1"]
 
 [project.scripts]

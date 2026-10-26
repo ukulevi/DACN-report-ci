@@ -132,3 +132,18 @@ metadata từng run. Mọi thay đổi decode/split/normalization phải tăng v
 
 Bạn chịu trách nhiệm nguồn/QC; B/C không tự chia lại từng ảnh. Review ảnh bằng train
 và val; dùng test duy nhất cho QC dữ liệu và lần đánh giá mô hình đã khóa.
+
+## Export lên Hugging Face
+
+`dacn data publish-hf` tạo NPZ shard từ prepared samples trước khi upload. Export
+không chứa `manifest.csv`, `qc_report.json`, patient ID nguồn, tên file nguồn
+hoặc exclusion ledger. `index.csv` dùng UUID ngẫu nhiên cho sample và patient group;
+group UUID phục vụ patient-bootstrap, giữ ổn định trong revision Hub đã pin, còn
+bản đồ về ID nguồn không được upload. Exporter chỉ chấp nhận thư mục có đúng các
+shard/index sinh ra. Repo Hub mặc định private. Dùng revision SHA do lệnh trả về
+để pin dataset cho từng run.
+
+Dataset là ảnh y tế đã render; private storage không thay thế điều kiện sử dụng.
+BMAD nêu CC BY-NC-SA nhưng BraTS có thể áp thêm điều kiện. Không bật public trước
+khi nhóm xác nhận có quyền chia sẻ bản dẫn xuất. Chi tiết Modal, secret và lưu
+checkpoint/kết quả nằm ở [HUGGINGFACE_MODAL](HUGGINGFACE_MODAL.md).
