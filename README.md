@@ -19,6 +19,7 @@ giả lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, kh�
 - [Audit: leakage trong bản BMAD tải về](docs/DATA_AUDIT.md)
 - [Protocol data và lệnh chạy](docs/DATA_PROTOCOL.md)
 - [Hugging Face + Modal: lưu dataset và chạy experiment](docs/HUGGINGFACE_MODAL.md)
+- [Dataset đã xác minh: revision và cách tải cho nhóm](docs/DATASET_HANDOFF.md)
 - [Câu hỏi nghiên cứu, adaptation, thực nghiệm](docs/RESEARCH.md)
 - [Paper và thứ tự đọc](docs/REFERENCES.md)
 - [Vai trò tạm thời](docs/TEAM.md)

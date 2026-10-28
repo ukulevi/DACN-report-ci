@@ -16,6 +16,18 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-10-26 — Pin and verify an existing Hub dataset before uploading again
+- Observation/evidence: The organization already contained a private dataset with
+  the same archive and canonical manifest hashes. All downloaded arrays matched
+  local prepared data. Rebuilding the exporter generates fresh random UUIDs.
+- Lesson: A second upload is unnecessary when the pinned existing dataset is
+  correct; it would create another revision and change pseudonymous group IDs.
+- Practice adopted: Inspect the target first, verify its full snapshot and hashes,
+  and preserve its revision for handoff. Use canonical LF manifest hashes when
+  comparing exporter metadata across platforms; keep file-byte hashes distinct.
+- Source/run: `DATASET_HANDOFF.md`, HF revision
+  `fbb884dfe144be5c71e205a73701507163557ea4`.
+
 ### 2026-10-26 — Keep plans separate from measured findings
 - Observation/evidence: The repository documents an ANDi-FLAIR plan, but the
   README states that the diffusion trainer and measured model-performance

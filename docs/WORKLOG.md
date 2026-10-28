@@ -20,6 +20,24 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-26 — Verify private Hugging Face dataset and handoff
+- Issue/PR: [TRA-95](https://linear.app/traffic-agent-assistant/issue/TRA-95),
+  [PR #14](https://github.com/tanh1c/DACN/pull/14).
+- Changes: Synced current main and reused the reviewed HF/Modal NPZ exporter.
+  Confirmed the team's private dataset already exists; retained its UUID mapping
+  and revision `fbb884dfe144be5c71e205a73701507163557ea4`. Added loading instructions
+  and safe aggregate provenance in `DATASET_HANDOFF.md`.
+- Evidence/checks: Downloaded all 95 remote files, verified their Git/LFS checksums
+  and the complete export validator; all 11,248 image/mask/label records matched
+  prepared data exactly. Group distributions424/50/767 matched. Current-main suite:
+  49 tests passed; Ruff check and format check passed (40 files). No new Hub upload
+  or training run was performed; authentication was approved using browser OAuth.
+- Follow-up checks: The first PR CI attempt flagged Python-fence formatting in
+  the new Markdown guide. Corrected the snippet and reran Ruff check/format
+  successfully (41 files); the data verification evidence is unchanged.
+- Next: B/C verify the pinned dataset on their own machine and record acceptance
+  in TRA-74 before the GPU pilot. Keep held-out test sealed for model selection.
+
 ### 2026-10-26 — Review fixes and merge Hugging Face/Modal pipeline
 - Issue/PR: [PR #12](https://github.com/tanh1c/DACN/pull/12).
 - Changes: Reject duplicate or unreferenced shard offsets; include a hashed
