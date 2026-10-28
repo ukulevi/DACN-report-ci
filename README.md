@@ -1,11 +1,11 @@
 # DACN — Phát hiện bất thường MRI bằng diffusion
 
-Đồ án chuyên ngành 3 người, kế hoạch 6 tuần: **ANDi thích nghi cho BMAD FLAIR 2D**,
-đối chứng DAE, nghiên cứu giảm timestep để cân bằng chất lượng và thời gian suy luận.
+Đồ án chuyên ngành 3 người: **DDPM partial reconstruction cho BMAD FLAIR 2D**,
+khảo sát timestep bắt đầu tái tạo và score sai khác pixel/local SSIM; DAE là đối chứng khi khả thi.
 
 Hiện có pipeline kiểm tra/chuẩn bị dữ liệu, export dataset riêng tư lên Hugging Face,
 trainer baseline DAE coarse-noise, và runner lưu kết quả Modal vào Hugging Face.
-**Chưa có trainer ANDi và chưa có số liệu hiệu năng mô hình.** Demo cũ chỉ dùng số
+**Chưa có trainer DDPM reconstruction và chưa có số liệu hiệu năng mô hình.** Demo cũ chỉ dùng số
 giả lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, không dùng chẩn đoán.
 
 ## Bắt đầu ở đây
@@ -56,7 +56,7 @@ so trực tiếp với số paper gốc. Không chọn tham số dựa trên tes
 `data/`, `runs/`, `checkpoints/`, `.venv/`, `.env` bị Git ignore. Hub export mặc định
 private, bỏ patient ID nguồn và source manifest, chỉ giữ UUID nhóm ẩn danh để
 bootstrap theo patient; kiểm tra điều kiện BMAD/BraTS trước khi chia sẻ ra ngoài.
-Modal gọi DAE qua `dacn.training.dae:train`; phần ANDi vẫn đang chờ triển khai.
+Modal gọi DAE qua `dacn.training.dae:train`; DDPM reconstruction vẫn đang chờ triển khai.
 DAE mặc định chạy pilot 3 epoch, chỉ chọn checkpoint bằng validation pixel AP; chưa
 đánh giá test và chưa tạo kết quả hiệu năng cho báo cáo.
 

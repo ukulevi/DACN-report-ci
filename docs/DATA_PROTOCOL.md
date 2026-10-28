@@ -59,7 +59,7 @@ Chính sách `patient-disjoint-v1` được quyết định trước huấn luy�
 
 50 slice của 10 patient bị loại khỏi test; tổng sử dụng 11.248 ảnh. Đây là
 **BMAD-derived patient-disjoint split**, không phải split BMAD chính thức. Không
-so trực tiếp số cuối với paper BMAD. So sánh DAE/ANDi và các ablation trên cùng bản này.
+so trực tiếp số cuối với paper BMAD. So sánh DDPM, DAE nếu chạy và các score trên cùng bản này.
 
 ## Decode và preprocessing v1
 

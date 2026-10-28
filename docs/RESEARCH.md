@@ -1,84 +1,39 @@
-# Thiết kế nghiên cứu và thực nghiệm
+# Thiết kế nghiên cứu: DDPM partial reconstruction
 
-## Câu hỏi nghiên cứu
+## Quyết định và câu hỏi
 
-**RQ1:** ANDi thích nghi cho BMAD FLAIR 2D đạt chất lượng định vị và chi phí thế nào
-so với DAE với coarse noise? **RQ2:** giữ nguyên checkpoint ANDi, dùng ít timestep
-hơn để tính anomaly score có giữ được AP với thời gian thấp hơn không?
+Ngày 28/10/2026 nhóm chọn đề xuất DDPM reconstruction thay kế hoạch ANDi-FLAIR trước đây. ANDi là related work/extension, không là đường găng. Đây là kế hoạch, không phải kết quả hay tuyên bố phương pháp mới.
 
-**Giả thuyết, chưa phải kết quả:** một tập timestep thưa có thể giữ phần lớn tín hiệu
-định vị. ANDi đã nghiên cứu độ nhạy khoảng timestep; không gọi việc chọn timestep là
-ý tưởng mới chỉ vì chưa thử trên BMAD. Đóng góp phù hợp đồ án là tái triển khai có
-kiểm soát, benchmark hiệu quả và phân tích giới hạn. Chỉ dùng từ “cải thiện” sau số đo.
+**RQ1:** Mức nhiễu khởi đầu `t*` ảnh hưởng thế nào tới anomaly detection và localization, thời gian và VRAM trên BMAD Brain FLAIR 2D?
+**RQ2:** Trên cùng ảnh tái tạo, pixel absolute difference và local SSIM difference thay đổi kết quả như thế nào? Khi đủ nguồn lực, so với DAE coarse-noise.
 
-## Adaptation phải ghi rõ
+Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều có thể xóa tổn thương nhưng cũng làm sai mô bình thường. Chỉ xác nhận hoặc bác bỏ bằng artifact thực tế. Partial diffusion đã có tiền lệ trong [AnoDDPM](https://openaccess.thecvf.com/content/CVPR2022W/NTIRE/papers/Wyatt_AnoDDPM_Anomaly_Detection_With_Denoising_Diffusion_Probabilistic_Models_Using_Simplex_CVPRW_2022_paper.pdf).
 
-| ANDi gốc | Thiết lập đồ án |
-|---|---|
-| BraTS, bốn chuỗi MRI | BMAD Brain, một kênh từ độ sáng PNG FLAIR |
-| Pipeline intensity riêng của tác giả | PNG đã render theo slice; Pillow RGB→L; padding 240→256; x/127.5−1 |
-| Config công bố 128×128 | Giữ chi tiết 240×240, pad 256; đo chi phí bằng pilot |
-| Có lọc median 3D trong đánh giá | Không dựng volume giả từ các slice thưa; bản chính không hậu xử lý, nếu thử lọc 2D phải khai báo riêng |
-| Training/scoring và khoảng timestep trong repo | Tái triển khai đúng công thức trước; ghi mọi sai khác về noise, schedule, backbone, step indexing |
+## Hợp đồng mô hình và thực nghiệm
 
-Đây là **ANDi-FLAIR adaptation**, không phải tái lập chính xác con số paper.
-Đọc [repo ANDi](https://github.com/AlexanderFrotscher/ANDi) và
-[paper](https://arxiv.org/html/2312.01904v1) trước khi viết scorer.
-Mốc khởi đầu trong config tác giả: diffusion 1.000 step, scoring `start=75, stop=200`,
-training pyramid noise và evaluation Gaussian noise. Cần kiểm tra quy ước endpoint
-và công thức variance/geometric aggregation theo code đã pin commit.
+- Input: một kênh PNG FLAIR đã render, pad 240→256, normalized [-1, 1] theo [DATA_PROTOCOL](DATA_PROTOCOL.md). Train chỉ trên normal slice; normal ở đây là slice không có tumor annotation, không đồng nghĩa bệnh nhân khỏe mạnh.
+- Train DDPM; dùng forward noising đến `t*` và reverse sampler tạo ảnh tái tạo pseudo-healthy. Chốt objective, kiến trúc, noise, tổng bước, schedule, quy ước chỉ số, sampler, số reverse steps và clipping trong DAC-8 trước các run chọn model. `t*` chỉ là mức nhiễu bắt đầu, không đồng nghĩa số bước reverse hay số timestep tổng hợp của ANDi. Ghi sai khác so với nguồn tham khảo.
+- Cùng checkpoint, ảnh, tiền xử lý, `t*`, sampler và seed khi so hai score. Lưu reconstruction/score artifacts trong không gian private, không đưa ảnh y tế lên Git/Linear. Ghi seed train và noise/sampling riêng; lặp noise seed nếu pilot cho phép.
+- **Pixel difference:** map `abs(input - reconstruction)`, không lấy MAE toàn ảnh trước khi tính pixel metrics. **Local SSIM:** map `1 - local SSIM`; chốt window, data range, xử lý biên và range đầu vào trước so sánh. Score cao là bất thường.
+- Đề xuất ban đầu: `t*` = 100, 200, 300 nếu tổng bước và schedule đã chốt làm chúng hợp lệ; 50, 500 là mở rộng theo pilot. Chưa có giá trị tối ưu. Cố định danh sách thí nghiệm, lựa chọn model và budget trước khi chạy validation sweep.
+- Tạo cùng reconstruction một lần cho mỗi input, timestep, checkpoint và seed rồi so pixel/SSIM trên cùng output. Không train lại mỗi score/timestep. Ghi latency reconstruction và score riêng, tổng end-to-end, VRAM và số ảnh thực đo.
+- DAE là baseline khi khả thi, không chặn diffusion MVP. Feature difference chỉ làm khi còn thời gian và đã chốt encoder, nguồn/training, layer, map, license và chi phí. ANDi, VAE và Isolation Forest là related work/extension tùy chọn.
 
-## Ma trận thí nghiệm
+## Protocol đánh giá
 
-| ID | Phương pháp | Biến thay đổi | Vai trò |
-|---|---|---|---|
-| E0 | DAE + coarse noise | Baseline riêng, tune noise rất hạn chế trên val | Đối chứng rẻ |
-| E1 | ANDi-FLAIR full interval | Cấu hình gốc thích nghi | Đối chứng chính |
-| E2a–c | ANDi-FLAIR sparse K=8,16,32 | Chỉ tập timestep scoring; giữ checkpoint | Trả lời RQ2 |
-| E3 (tùy chọn) | Normal calibration | Chỉ cách chuẩn hóa score | Chỉ làm khi E0–E2 đã ổn |
-| E4 (tùy chọn) | Sparse + calibration | Kết hợp hai thành phần | Bắt buộc có E1/E2/E3 để tách tác động |
+- Split `patient-disjoint-v1` và revision Hub cố định theo DATA_PROTOCOL. Validation có nhãn dùng chọn checkpoint/config/threshold: mô tả là normal-only training với labeled validation selection. Không dùng held-out test để lựa chọn hoặc tuning.
+- Pixel AP chính: global micro average precision trên vùng ảnh gốc 240×240, crop padding, gồm ảnh normal/abnormal. Report pixel/image ROC-AUC, Precision, Recall, F1; thêm pixel AP, Dice, latency, VRAM khi phù hợp. Image score là mean top 1% pixel score. Chốt threshold image và pixel riêng trên validation; pixel Dice micro-optimal trên validation là quy tắc dự kiến, phải freeze trước test.
+- Đề xuất chọn timestep/score chính theo pixel AP validation; trước sweep cần chốt
+  tie-break và budget. Chốt riêng quy tắc image threshold (ví dụ tối đa image F1
+  trên validation) trước khi dùng validation để lựa chọn, rồi ghi giá trị đã khóa.
+- Chốt foreground/post-processing cho từng method, công bố khác biệt; cùng vùng metric cho mọi phương pháp. Kiểm tra trên validation tỷ lệ lesion pixel bị loại bởi foreground erosion của DAE trước so sánh; không thay protocol dựa trên test.
+- Ghi macro Dice trên slice lesion và false-positive pixel rate ở mask rỗng; báo prevalence. Dùng cùng tập validation và quy tắc ROI cho đối chứng. Pixel metrics dựa trên cùng output tái tạo, score và threshold đã đăng ký.
+- Validation chỉ 83 slice/50 patient groups: hạn chế sweep, không xem một lần chọn trên validation như kết luận chắc chắn. Cố gắng 3 train seeds khi ngân sách cho phép; ghi số thực chạy. Bootstrap theo patient group, ghi số replicate/seed và xử lý replicate thiếu lớp; không coi slice/pixel là bệnh nhân độc lập.
+- Latency: cùng GPU, batch, precision và resolution; đề xuất warm-up 20 batch,
+  đo ít nhất 100 slice khi khả thi và GPU synchronize, báo median/p95 ms/ảnh và
+  peak VRAM. Nêu rõ nếu không đạt số lượng này và tách scoring khỏi I/O.
+- Sau review, freeze model, seed policy, `t*`, sampler, scores, preprocessing, thresholds và metric trước đánh giá held-out test. Mọi thay đổi sau test phải công khai; không tuning lại trên test.
 
-Chọn timestep đều trong cùng khoảng, ghi danh sách số nguyên thực dùng, không chỉ
-ghi K. Cùng một noise seed trên các timestep chung để so sánh paired. Không đánh đồng
-số timestep với latency: phải đo cả truyền dữ liệu và chi phí aggregation.
-Calibration nếu thực hiện: fit trên phần normal của train/validation được chỉ định
-trước; chưa chốt công thức trong đợt chuẩn bị này. Không dùng test để fit hay chọn nó.
+## Kết quả và giới hạn
 
-## Protocol đánh giá cần triển khai ở tuần 2
-
-- Train chỉ normal slice; mask không đi vào model/scorer. Validation có nhãn dùng
-  chọn cấu hình và ngưỡng, nên gọi training normal-only với labeled model selection.
-- Primary: **pixel average precision (AP)** trên toàn bộ pixel vùng ảnh gốc 240×240,
-  loại padding, gồm cả normal và abnormal slice. Đây là global micro AP, không phải
-  trung bình AP từng ảnh và không phải diện tích PR theo trapezoid.
-- Báo cáo yêu cầu đồ án: **ROC-AUC, Precision, Recall, F1-score**. Báo rõ mức
-  image/pixel và cách aggregation; image score cố định là trung bình top 1% pixel
-  score trong ảnh gốc (ít nhất 1 pixel). Báo ngưỡng dùng cho Precision/Recall/F1;
-  chọn ngưỡng trên validation theo quy tắc đã khai báo và khóa trước test.
-- Secondary: pixel AUROC, image AUROC/AP. Mọi thay đổi aggregation chỉ dựa val.
-- Dice: chọn một ngưỡng pixel toàn cục tối ưu Dice micro trên val; khóa trước test.
-  Báo Dice micro toàn tập, Dice macro trên các slice mask dương, và false-positive
-  pixel rate trên mask rỗng. Không để Dice=1 của ảnh normal che chất lượng lesion.
-- Báo prevalence ở mức slice và pixel; nhãn ảnh cần đối chiếu với mask theo audit.
-- Lặp 3 seed train cho cấu hình cuối nếu pilot cho phép; báo mean/std, số seed thực
-  chạy. E2 dùng checkpoint tương ứng E1, không huấn luyện riêng để lấy lợi thế.
-- CI 95% bằng bootstrap theo patient, giữ các slice cùng patient trong một đơn vị
-  resample. Ghi seed và số lần bootstrap; bỏ/ghi nhận replicate thiếu một lớp ở AUROC.
-  Không coi các pixel hay slice là các bệnh nhân độc lập.
-- Latency trên cùng GPU, batch, precision và resolution; warm-up 20 batch, đo ít
-  nhất 100 slice, GPU synchronize; báo median/p95 ms/ảnh và peak VRAM. Tách model
-  scoring khỏi I/O và báo thêm end-to-end nếu dùng demo.
-
-Validation chỉ 83 slice: pre-register sweep nhỏ E0–E2, không chạy search vô hạn.
-Test chỉ mở cho đánh giá sau khi khóa cấu hình. QC cấu trúc/nhãn trước đó không phải
-đánh giá mô hình; mọi sửa nhãn phải dựa quy tắc nguồn và công bố, không dựa score.
-
-## Hình/bảng cho báo cáo
-
-1. Bảng nguồn và split từ audit; flow ảnh → preprocessing → model → score → metric.
-2. Bảng E0/E1/E2 (AP, AUROC, Dice, ms/ảnh, VRAM, seeds).
-3. Đồ thị pixel AP–latency; cùng checkpoint và thiết bị.
-4. Heatmap thành công/thất bại được chọn theo quy tắc công khai, gồm lesion nhỏ và
-   false positives. Chỉ trình bày test sau khi khóa mô hình.
-5. Giới hạn: PNG mất intensity gốc, validation nhỏ, normal slice từ người có u,
-   khác domain và chưa có kiểm chứng lâm sàng/ngoài bộ dữ liệu.
+Theo dõi mọi run thực bắt đầu, cả lỗi/gián đoạn, trong RESULT_TRACKING với manifest khi có. Hình validation: ảnh đầu vào/noisy/reconstruction/map và trường hợp lỗi; test chỉ xem sau freeze. PNG không giữ intensity MRI gốc; train normal slice có thể thuộc bệnh nhân u; chưa chứng minh generalization hoặc tính lâm sàng. Dùng shared private artifacts và chỉ đưa số aggregate an toàn vào Linear.

@@ -1,5 +1,12 @@
 # Lessons learned
 
+### 2026-10-28 — Record run lifecycle before GPU work
+
+- Observation/evidence: the Modal runner writes `run_manifest.json` after the
+  trainer returns; an exception or abrupt stop can occur before that write.
+- Practice: establish a durable started record and failure/interruption handling
+  before pilots, with a documented manual fallback for abrupt termination.
+
 Record reusable lessons supported by repository evidence or an actual run. Keep
 plans and hypotheses out of this log unless they have become a lesson; link the
 source or run when possible. Append new entries at the top.

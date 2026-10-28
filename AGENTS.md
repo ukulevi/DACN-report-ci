@@ -8,10 +8,10 @@ and the relevant protocol in `docs/`.
 
 - The project is **Diffusion Models for Anomaly Detection**. Keep diffusion
   modeling and anomaly scoring central to implementation and reporting.
-- The current implementation plan is an ANDi adaptation for BMAD Brain FLAIR 2D,
-  trained primarily on normal samples. The DAE is the current baseline. VAE and
-  Isolation Forest comparisons are optional and must not silently expand the
-  agreed scope.
+- The current plan is partial DDPM reconstruction for BMAD Brain FLAIR 2D,
+  trained on normal slices, with pixel difference and local SSIM anomaly scores.
+  DAE is a comparison when feasible; feature difference, ANDi, VAE, and Isolation
+  Forest are optional and must not silently expand the agreed scope.
 - Higher anomaly scores must mean more anomalous. Keep held-out test data out of
   model selection, threshold selection, calibration, and hyperparameter tuning.
 - Distinguish assignment requirements, hypotheses, plans, measured results, and

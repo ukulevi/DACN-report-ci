@@ -110,8 +110,8 @@ the function completes.
 
 The T4 and six-hour timeout are hard ceilings, not a guarantee that a run fits a
 free-credit balance. This is a BMAD FLAIR adaptation of the published DAE
-baseline, not an exact reproduction of its four-modality experiment. The ANDi
-trainer remains unimplemented.
+baseline, not an exact reproduction of its four-modality experiment. The DDPM
+partial-reconstruction trainer and scorer remain unimplemented.
 
 ## Platform references
 

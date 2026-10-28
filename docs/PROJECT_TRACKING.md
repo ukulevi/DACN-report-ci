@@ -1,84 +1,64 @@
 # Theo dõi dự án bằng Linear
 
 **Project:** [DACN — Diffusion Models for Anomaly Detection](https://linear.app/dacn-khmt/project/dacn-diffusion-models-for-anomaly-detection-39ad392101f4)
-**Team:** DACN-KHMT (key: DAC)
-**Target:** 04/12/2026
-**Status tại 28/10/2026:** In Progress; health at risk vì chưa chốt owner B/C và chưa có GPU pilot.
 
-Linear là nguồn trạng thái công việc hiện hành; GitHub là nơi review và lưu code. Bảng bên dưới là snapshot lúc khởi tạo workspace chính.
+**Team:** DACN-KHMT; **target:** 04/12/2026.
+**Snapshot:** 28/10/2026; trạng thái hiện hành xem trực tiếp Linear.
 
-## Mục tiêu và phạm vi
+## Quyết định và phạm vi
 
-- ANDi adaptation cho BMAD Brain FLAIR 2D, train chủ yếu trên normal samples; anomaly scores cao hơn nghĩa là bất thường hơn.
-- DAE là baseline. So sánh full-interval scoring với sparse timestep K=8/16/32 trên cùng checkpoint.
-- Dùng split patient-disjoint đã pin; chọn model/ngưỡng bằng validation. Chỉ mở held-out test sau khi freeze protocol.
-- Báo cáo image-level và pixel-level ROC-AUC, Precision, Recall, F1; pixel AP, Dice, latency, VRAM khi phù hợp. Ghi aggregation, split, threshold rule và số seed.
-- VAE và Isolation Forest là ý tưởng tùy chọn, không tự mở rộng MVP.
-- Dataset/checkpoint repo là private. Không ghi token, patient ID, source path hay dữ liệu y tế riêng tư vào Linear.
+- Quyết định 28/10: DDPM partial reconstruction train normal slice, nghiên cứu starting timestep và pixel difference/local SSIM. ANDi là related work hoặc optional extension.
+- Bắt đầu với ứng viên t = 100, 200, 300 nếu hợp lệ với schedule đã chốt; 50/500 tùy budget. Đây là phương án, không phải timestep tối ưu đã đo.
+- DAE đối chứng khi khả thi; feature difference/ANDi/VAE/Isolation Forest là tùy chọn. Chưa có kết quả model được xác minh.
+- Dataset revision `fbb884dfe144be5c71e205a73701507163557ea4`; giữ patient-disjoint, train normal-only, chọn model/score/threshold trên validation, freeze trước held-out test.
+- Metric image/pixel ROC-AUC, Precision, Recall, F1, pixel AP, Dice, latency và VRAM theo protocol; không ghi patient ID, ảnh riêng tư hoặc secrets vào Linear.
 
 ## Mốc tuần
 
-| Milestone | Hạn | Gate |
+| Mốc | Hạn | Gate |
 |---|---|---|
-| W1 — Data, protocol & GPU pilot | 30/10/2026 | Dataset/data contract tái lập; ANDi adaptation được review; pilot đo GPU/VRAM/throughput/chi phí thực tế |
-| W2 — DAE & ANDi running | 06/11/2026 | Có DAE, ANDi scorer, evaluator validation-only, checkpoint và manifest |
-| W3 — Full vs sparse timestep | 13/11/2026 | So sánh K=8/16/32 cùng checkpoint; chốt tối đa một biến thể chính |
-| W4 — Repeatability & pre-test freeze | 20/11/2026 | Lặp cấu hình cuối; freeze model, score, threshold và protocol trước test |
-| W5 — Held-out evaluation & analysis | 27/11/2026 | Test theo freeze; thống kê theo patient; phân tích lỗi và giới hạn |
-| W6 — Report, demo & defense | 04/12/2026 | Báo cáo, slide, demo tái chạy và gói bảo vệ nhất quán với artifact |
+| W1 — Data, DDPM & score protocol | 30/10 | Chốt data, owner, DDPM/score contract và chuẩn bị run recording. |
+| W2 — DDPM smoke, scoring & pilot | 06/11 | DDPM smoke, evaluator, pixel/SSIM; GPU pilot giới hạn và DAE nếu khả thi. |
+| W3 — Timestep & anomaly-score study | 13/11 | Review gate, so t/score trên validation cùng checkpoint; benchmark. |
+| W4 — Repeatability & pre-test freeze | 20/11 | Lặp khi khả thi; review và freeze model, t, sampler, score, ngưỡng trước test. |
+| W5 — Held-out evaluation & analysis | 27/11 | Test theo freeze, uncertainty nếu khả thi, phân tích lỗi. |
+| W6 — Report, demo & defense | 04/12 | Bàn giao report, slide, demo; viết khung báo cáo sớm. |
 
-Các task đầu tuần được rebaseline theo ngày tạo workspace: C01 sang 30/10; D01/R01 sang 29/10. Hạn cuối 04/12 không đổi.
+## Phân công và workflow
 
-## Phân công và nhịp phối hợp
+A phụ trách điều phối/data; B evaluation, pixel/SSIM, DAE khi khả thi; C DDPM, reconstruction và integration. B/C chưa gắn với danh tính Linear. Mỗi người cập nhật evidence, blocker và bước tới; Done cần acceptance criteria và review. Các run bắt đầu, lỗi hoặc ngắt được ghi trong RESULT_TRACKING; model result chỉ đến từ artifact thực.
 
-- Project lead/data: các task nguồn, handoff data, phân tích giới hạn và điều phối đã gán cho người dùng Linear hiện tại.
-- B: DAE và evaluation; C: ANDi/diffusion và integration. Chưa gán issue B/C tới khi xác nhận đúng danh tính Linear.
-- C01 chốt thành viên, vai trò, owner rồi mới gán ticket. Không giao việc cho bot.
-- Trước weekly sync, mỗi người cập nhật bằng chứng đã làm, blocker/decision cần hỗ trợ và bước kế tiếp. Giữ tối đa một issue chính ở In Progress mỗi người.
-
-## Workflow và tiêu chí Done
-
-- Backlog: chưa sẵn sàng bắt đầu; Todo: có thể nhận sau khi kiểm tra blockers; In Progress: đang làm; In Review: có PR/artifact cho teammate review.
-- Done chỉ khi acceptance criteria đạt và có bằng chứng. PR mở chưa được xem là Done.
-- Blocker dùng quan hệ blocked-by; khi vướng, ghi lý do, người cần xử lý và ngày cần gỡ.
-- Mọi run bắt đầu, kể cả thất bại/gián đoạn, phải có manifest và được ghi trong docs/RESULT_TRACKING.md. Kế hoạch chạy không phải kết quả.
+Runner DAC-11 có thể làm trước pilot DAC-10. DAE DAC-13 không chặn gate DDPM DAC-15. DAC-30 có issue riêng cho pixel/SSIM. Các mốc là mục tiêu và cần điều chỉnh nếu pilot cho thấy không đủ tài nguyên.
 
 ## Backlog snapshot
 
-Tổng 25 issue: 1 Done, 5 Todo, 19 Backlog; 31 quan hệ blocked-by. F01 Done dựa trên PR #11 đã merge vào main. B/C còn để unassigned tới khi xác nhận thành viên. Project update ban đầu: [health at risk](https://linear.app/dacn-khmt/project/dacn-diffusion-models-for-anomaly-detection-39ad392101f4/activity#project-update-2b5db0fb).
+| Linear | Công việc | W | Hạn | Vai trò dự kiến | Status | Blocked by |
+|---|---|---:|---|---|---|---|
+| [DAC-5](https://linear.app/dacn-khmt/issue/DAC-5/f01-review-va-tich-hop-pr-nen-tang-bmaddata) | Review và tích hợp PR nền tảng BMAD/data | 1 | 2026-10-27 | Data lead; teammate reviewer | Done | — |
+| [DAC-6](https://linear.app/dacn-khmt/issue/DAC-6/c01-them-thanh-vien-va-chot-vai-tro-bc-tren-linear) | Thêm thành viên và chốt vai trò B/C trên Linear | 1 | 2026-10-30 | Project lead | Todo | — |
+| [DAC-7](https://linear.app/dacn-khmt/issue/DAC-7/d01-chot-nguon-djieu-kien-su-dung-va-dataset-card-bmad) | Chốt nguồn, điều kiện sử dụng và dataset card BMAD | 1 | 2026-10-29 | Data lead | Todo | — |
+| [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score) | Chốt hợp đồng DDPM partial reconstruction và score | 1 | 2026-10-29 | C — Diffusion; B reviews evaluation | Todo | — |
+| [DAC-9](https://linear.app/dacn-khmt/issue/DAC-9/d02-ban-giao-data-contract-va-kiem-chung-tren-may-thanh-vien) | Bàn giao data contract và kiểm chứng trên máy thành viên | 1 | 2026-10-30 | Data lead; B and C verify access locally | Todo | DAC-7, DAC-5 |
+| [DAC-10](https://linear.app/dacn-khmt/issue/DAC-10/i01-djo-gpu-pilot-va-quyet-djinh-ngan-sach-train) | Đo GPU pilot và quyết định ngân sách train | 2 | 2026-11-04 | B + C; data lead supports access | Todo | DAC-11, DAC-9, DAC-8 |
+| [DAC-11](https://linear.app/dacn-khmt/issue/DAC-11/i02-run-lifecycle-checkpoint-resume-va-manifest) | Run lifecycle, checkpoint resume và manifest | 2 | 2026-11-02 | C — Diffusion/integration | Backlog | — |
+| [DAC-12](https://linear.app/dacn-khmt/issue/DAC-12/e01-trien-khai-evaluator-pixelimage-va-threshold-validation) | Triển khai evaluator pixel/image và threshold validation | 2 | 2026-11-03 | B — Evaluation; C reviews scorer interface | Backlog | DAC-9 |
+| [DAC-13](https://linear.app/dacn-khmt/issue/DAC-13/b01-dae-coarse-noise-baseline-train-overfit-va-checkpoint) | DAE coarse-noise baseline: train, overfit và checkpoint | 2 | 2026-11-06 | B — Baseline; optional comparison if resources permit | Backlog | DAC-9, DAC-10, DAC-11 |
+| [DAC-14](https://linear.app/dacn-khmt/issue/DAC-14/a01-ddpm-trainer-va-partial-reconstruction) | DDPM trainer và partial reconstruction | 2 | 2026-11-05 | C — Diffusion | Backlog | DAC-8, DAC-11, DAC-9 |
+| [DAC-15](https://linear.app/dacn-khmt/issue/DAC-15/e02-review-gate-ddpm-reconstruction-va-evaluator) | Review gate: DDPM reconstruction và evaluator | 3 | 2026-11-09 | B + C; protocol review together | Backlog | DAC-30, DAC-14, DAC-12 |
+| [DAC-16](https://linear.app/dacn-khmt/issue/DAC-16/a02-so-sanh-timestep-bat-djau-ddpm-reconstruction) | So sánh timestep bắt đầu DDPM reconstruction | 3 | 2026-11-10 | C — Diffusion; B reviews evaluation | Backlog | DAC-15 |
+| [DAC-17](https://linear.app/dacn-khmt/issue/DAC-17/e03-benchmark-timestep-scores-latency-va-vram) | Benchmark timestep, scores, latency và VRAM | 3 | 2026-11-11 | B — Evaluation; C supplies reconstruction details | Backlog | DAC-30, DAC-16 |
+| [DAC-18](https://linear.app/dacn-khmt/issue/DAC-18/r02-chon-timestepscore-va-khoa-validation-budget) | Chọn timestep/score và khóa validation budget | 3 | 2026-11-13 | B + C; whole team reviews | Backlog | DAC-17 |
+| [DAC-19](https://linear.app/dacn-khmt/issue/DAC-19/r03-lap-cau-hinh-cuoi-va-xac-nhan-repeatability) | Lặp cấu hình cuối và xác nhận repeatability | 4 | 2026-11-18 | B + C | Backlog | DAC-18 |
+| [DAC-20](https://linear.app/dacn-khmt/issue/DAC-20/o01-optional-feature-difference-hoac-andi) | Optional: feature difference hoặc ANDi | 4 | 2026-11-18 | C + B — optional extension | Backlog | DAC-18 |
+| [DAC-21](https://linear.app/dacn-khmt/issue/DAC-21/f02-freeze-model-threshold-va-protocol-truoc-test) | Freeze model, threshold và protocol trước test | 4 | 2026-11-20 | Whole team; project lead records the freeze | Backlog | DAC-19 |
+| [DAC-22](https://linear.app/dacn-khmt/issue/DAC-22/e04-chay-held-out-test-theo-manifest-dja-freeze) | Chạy held-out test theo manifest đã freeze | 5 | 2026-11-23 | B — Evaluation | Backlog | DAC-21 |
+| [DAC-23](https://linear.app/dacn-khmt/issue/DAC-23/e05-patient-bootstrap-ci-va-bang-thong-ke-ket-qua) | Patient-bootstrap CI và bảng thống kê kết quả | 5 | 2026-11-25 | B — Evaluation | Backlog | DAC-22 |
+| [DAC-24](https://linear.app/dacn-khmt/issue/DAC-24/d03-phan-tich-loi-lesion-size-va-gioi-han-du-lieu) | Phân tích lỗi, lesion size và giới hạn dữ liệu | 5 | 2026-11-26 | Data lead; B supplies aggregate evaluation output | Backlog | DAC-22 |
+| [DAC-25](https://linear.app/dacn-khmt/issue/DAC-25/r04-bang-ddpm-timestepscore-va-phan-tich) | Bảng DDPM timestep/score và phân tích | 5 | 2026-11-27 | B + C; data lead reviews protocol/claims | Backlog | DAC-24, DAC-23 |
+| [DAC-26](https://linear.app/dacn-khmt/issue/DAC-26/w01-hoan-thien-bao-cao-va-citations) | Hoàn thiện báo cáo và citations | 6 | 2026-12-01 | Whole team; data lead owns source/citation checks | Backlog | DAC-25 |
+| [DAC-27](https://linear.app/dacn-khmt/issue/DAC-27/w02-slide-bao-ve-cau-chuyen-ket-qua-va-gioi-han) | Slide bảo vệ: câu chuyện, kết quả và giới hạn | 6 | 2026-12-02 | Whole team | Backlog | DAC-26 |
+| [DAC-28](https://linear.app/dacn-khmt/issue/DAC-28/w03-demo-va-huong-dan-tai-chay-tren-may-moi) | Demo và hướng dẫn tái chạy trên máy mới | 6 | 2026-12-02 | C — integration; B reviews the evaluation path | Backlog | DAC-25 |
+| [DAC-29](https://linear.app/dacn-khmt/issue/DAC-29/w04-dry-run-bao-ve-va-djong-goi-nop-djo-an) | Dry-run bảo vệ và đóng gói nộp đồ án | 6 | 2026-12-04 | Whole team; project lead coordinates | Backlog | DAC-28, DAC-27 |
+| [DAC-30](https://linear.app/dacn-khmt/issue/DAC-30/s01-pixel-difference-va-local-ssim-anomaly-maps) | Pixel difference và local SSIM anomaly maps | 2 | 2026-11-06 | B — Evaluation; C reviews reconstruction interface | Backlog | DAC-14, DAC-12 |
 
-| Key / Linear | Công việc | Tuần | Hạn | Owner role | Status |
-|---|---|---:|---|---|---|
-| [F01 / DAC-5](https://linear.app/dacn-khmt/issue/DAC-5/f01-review-va-tich-hop-pr-nen-tang-bmaddata) | Review và tích hợp PR nền tảng BMAD/data | 1 | 27/10/2026 | Data + reviewer | Done |
-| [C01 / DAC-6](https://linear.app/dacn-khmt/issue/DAC-6/c01-them-thanh-vien-va-chot-vai-tro-bc-tren-linear) | Thêm thành viên và chốt vai trò B/C trên Linear | 1 | 30/10/2026 | Điều phối | Todo |
-| [D01 / DAC-7](https://linear.app/dacn-khmt/issue/DAC-7/d01-chot-nguon-djieu-kien-su-dung-va-dataset-card-bmad) | Chốt nguồn, điều kiện sử dụng và dataset card BMAD | 1 | 29/10/2026 | Data | Todo |
-| [R01 / DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-djoc-andi-va-pin-hop-djong-adaptation-flair-2d) | Đọc ANDi và pin hợp đồng adaptation FLAIR 2D | 1 | 29/10/2026 | C — Diffusion; B review | Todo |
-| [D02 / DAC-9](https://linear.app/dacn-khmt/issue/DAC-9/d02-ban-giao-data-contract-va-kiem-chung-tren-may-thanh-vien) | Bàn giao data contract và kiểm chứng trên máy thành viên | 1 | 30/10/2026 | Data; B/C verify | Todo |
-| [I01 / DAC-10](https://linear.app/dacn-khmt/issue/DAC-10/i01-djo-gpu-pilot-va-quyet-djinh-ngan-sach-train) | Đo GPU pilot và quyết định ngân sách train | 1 | 30/10/2026 | B + C; data hỗ trợ | Todo |
-| [I02 / DAC-11](https://linear.app/dacn-khmt/issue/DAC-11/i02-runner-tai-lap-checkpoint-resume-va-run-manifest) | Runner tái lập, checkpoint resume và run manifest | 2 | 02/11/2026 | C — Diffusion/integration | Backlog |
-| [E01 / DAC-12](https://linear.app/dacn-khmt/issue/DAC-12/e01-trien-khai-evaluator-pixelimage-va-threshold-validation) | Triển khai evaluator pixel/image và threshold validation | 2 | 03/11/2026 | B — Evaluation | Backlog |
-| [B01 / DAC-13](https://linear.app/dacn-khmt/issue/DAC-13/b01-dae-coarse-noise-baseline-train-overfit-va-checkpoint) | DAE coarse-noise baseline: train, overfit và checkpoint | 2 | 04/11/2026 | B — Baseline | Backlog |
-| [A01 / DAC-14](https://linear.app/dacn-khmt/issue/DAC-14/a01-andi-flair-trien-khai-trainer-va-full-interval-scorer) | ANDi-FLAIR trainer và full-interval scorer | 2 | 05/11/2026 | C — Diffusion | Backlog |
-| [E02 / DAC-15](https://linear.app/dacn-khmt/issue/DAC-15/e02-djanh-gia-daeandi-djoi-chung-va-review-gate-tuan-2) | Đánh giá DAE/ANDi và review gate tuần 2 | 2 | 06/11/2026 | B + C | Backlog |
-| [A02 / DAC-16](https://linear.app/dacn-khmt/issue/DAC-16/a02-sparse-timestep-scoring-k81632-cung-checkpoint) | Sparse timestep K=8/16/32 cùng checkpoint | 3 | 10/11/2026 | C — Diffusion | Backlog |
-| [E03 / DAC-17](https://linear.app/dacn-khmt/issue/DAC-17/e03-benchmark-latencyvram-va-bieu-djo-ap-thoi-gian) | Benchmark latency/VRAM và đồ thị AP–thời gian | 3 | 11/11/2026 | B — Evaluation; C hỗ trợ | Backlog |
-| [R02 / DAC-18](https://linear.app/dacn-khmt/issue/DAC-18/r02-chon-bien-the-chinh-va-khoa-search-budget-validation) | Chọn biến thể chính và khóa search budget validation | 3 | 13/11/2026 | B + C | Backlog |
-| [R03 / DAC-19](https://linear.app/dacn-khmt/issue/DAC-19/r03-lap-cau-hinh-cuoi-va-xac-nhan-repeatability) | Lặp cấu hình cuối và xác nhận repeatability | 4 | 18/11/2026 | B + C | Backlog |
-| [O01 / DAC-20](https://linear.app/dacn-khmt/issue/DAC-20/o01-optional-normal-only-score-calibration-va-ablation) | Optional: normal-only calibration và ablation | 4 | 18/11/2026 | C — extension | Backlog |
-| [F02 / DAC-21](https://linear.app/dacn-khmt/issue/DAC-21/f02-freeze-model-threshold-va-protocol-truoc-test) | Freeze model, threshold và protocol trước test | 4 | 20/11/2026 | Cả nhóm | Backlog |
-| [E04 / DAC-22](https://linear.app/dacn-khmt/issue/DAC-22/e04-chay-held-out-test-theo-manifest-dja-freeze) | Chạy held-out test theo manifest đã freeze | 5 | 23/11/2026 | B — Evaluation | Backlog |
-| [E05 / DAC-23](https://linear.app/dacn-khmt/issue/DAC-23/e05-patient-bootstrap-ci-va-bang-thong-ke-ket-qua) | Patient-bootstrap CI và bảng thống kê kết quả | 5 | 25/11/2026 | B — Evaluation | Backlog |
-| [D03 / DAC-24](https://linear.app/dacn-khmt/issue/DAC-24/d03-phan-tich-loi-lesion-size-va-gioi-han-du-lieu) | Phân tích lỗi, lesion size và giới hạn dữ liệu | 5 | 26/11/2026 | Data | Backlog |
-| [R04 / DAC-25](https://linear.app/dacn-khmt/issue/DAC-25/r04-chot-bang-e0e1e2-va-djo-thi-ablation) | Chốt bảng E0/E1/E2 và đồ thị ablation | 5 | 27/11/2026 | B + C; Data review | Backlog |
-| [W01 / DAC-26](https://linear.app/dacn-khmt/issue/DAC-26/w01-hoan-thien-bao-cao-va-citations) | Hoàn thiện báo cáo và citations | 6 | 01/12/2026 | Cả nhóm; Data/source review | Backlog |
-| [W02 / DAC-27](https://linear.app/dacn-khmt/issue/DAC-27/w02-slide-bao-ve-cau-chuyen-ket-qua-va-gioi-han) | Slide bảo vệ: câu chuyện, kết quả và giới hạn | 6 | 02/12/2026 | Cả nhóm | Backlog |
-| [W03 / DAC-28](https://linear.app/dacn-khmt/issue/DAC-28/w03-demo-va-huong-dan-tai-chay-tren-may-moi) | Demo và hướng dẫn tái chạy trên máy mới | 6 | 02/12/2026 | C — integration; B review | Backlog |
-| [W04 / DAC-29](https://linear.app/dacn-khmt/issue/DAC-29/w04-dry-run-bao-ve-va-dong-goi-nop-djo-an) | Dry-run bảo vệ và đóng gói nộp đồ án | 6 | 04/12/2026 | Cả nhóm / điều phối | Backlog |
-
-## Liên kết dự án
-
-- Repository: https://github.com/tanh1c/DACN
-- Dataset card: https://huggingface.co/datasets/dacn-bmad-team/bmad-flair-patient-disjoint-v1
-- Dataset revision: fbb884dfe144be5c71e205a73701507163557ea4
-- Runbook: docs/HUGGINGFACE_MODAL.md
-- Result tracking: docs/RESULT_TRACKING.md
+`LINEAR_BACKLOG.csv` là snapshot tương ứng, không thay thế trạng thái live. Các tài liệu và PR cần teammate review theo CONTRIBUTING.

@@ -40,19 +40,18 @@ characterize complex data distributions.
   anomaly scores come from a documented denoising/reconstruction discrepancy
   or another explicitly justified diffusion-based strategy.
 - **Current benchmark scope:** BMAD Brain FLAIR 2D, using the patient-disjoint
-  split and data protocol documented in this repository. The current plan is an
-  ANDi-FLAIR adaptation; it is not claimed to be an exact reproduction of the
-  source paper.
+  split and data protocol documented in this repository. The current plan is
+  partial DDPM reconstruction, varying the starting noise timestep and comparing
+  pixel difference with local SSIM anomaly maps.
 - **Score convention:** larger scores indicate more anomalous samples/pixels.
 - **Required report metrics:** ROC-AUC, Precision, Recall, and F1-score. State
   whether each is image-level or pixel-level, its aggregation and threshold
   protocol. Select thresholds on validation only and freeze them before test.
 - **Project-specific metrics:** retain pixel AP, image-level metrics, Dice,
   latency, and peak VRAM from `docs/RESEARCH.md` where applicable.
-- **Baselines:** the current plan uses a denoising autoencoder as the practical
-  baseline. VAE and Isolation Forest comparisons are optional ideas from the
-  brief, not mandatory parallel implementations; check project scope and time
-  before adding them.
+- **Baselines and extensions:** a denoising autoencoder is a comparison when
+  feasible. Feature difference, ANDi, VAE and Isolation Forest are optional;
+  do not expand the agreed scope without a decision.
 
 The assignment brief defines the goal. `docs/PROJECT_PLAN.md` and
 `docs/RESEARCH.md` define the current implementation and evaluation scope. If a

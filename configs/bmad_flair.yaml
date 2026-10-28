@@ -1,5 +1,5 @@
 # Research contract; current CLI takes flags and does NOT load this YAML.
-status: dae_pilot_implemented_andi_pending
+status: dae_pilot_implemented_ddpm_reconstruction_pending
 dataset:
   name: BMAD-Brain
   version: bmad-flair-patient-disjoint-v1
@@ -13,14 +13,14 @@ dataset:
   original_size: 240
   normalization: uint8_div_127.5_minus_1
 research:
-  baseline: coarse_noise_DAE
-  reference: ANDi_FLAIR_adaptation
-  diffusion_steps_initial: 1000
-  scoring_interval_initial: [75, 200]
-  endpoint_semantics: verify_against_pinned_ANDi_code_before_implementation
-  sparse_k: [8, 16, 32]
+  primary_method: ddpm_partial_reconstruction
+  baseline_if_feasible: coarse_noise_DAE
+  diffusion_schedule: to_be_decided_before_validation_sweep
+  starting_timesteps_candidates: [100, 200, 300]
+  additional_timesteps_if_budget_allows: [50, 500]
+  score_maps: [pixel_absolute_difference, local_one_minus_ssim]
   final_train_seeds_target: [17, 42, 2026]
-  optional_extension: normal_only_score_calibration
+  optional_extensions: [feature_difference, ANDi, VAE, isolation_forest]
 evaluation:
   primary: global_pixel_average_precision
   crop_padding: true

@@ -1,5 +1,10 @@
 # Thiết kế nghiên cứu: ANDi trên MRI FLAIR 2D
 
+> Lưu trữ lịch sử: phương pháp ANDi trong thiết kế này đã được thay thế ngày
+> 28/10/2026 bằng DDPM partial reconstruction. Xem `docs/RESEARCH.md` và
+> `docs/PROJECT_PLAN.md` để biết scope hiện hành. Nội dung data audit vẫn có giá trị
+> trong phạm vi và giới hạn được mô tả tại `docs/DATA_PROTOCOL.md`.
+
 Ngày quyết định: 24/10/2026. Người dùng giao quyền lựa chọn và thực hiện phương án đề xuất.
 
 ## Mục tiêu và phạm vi

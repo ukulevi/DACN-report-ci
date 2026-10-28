@@ -1,5 +1,9 @@
 # BMAD Data Foundation Implementation Plan
 
+> Historical plan: the ANDi research direction in this document was superseded
+> on 28/10/2026 by the DDPM reconstruction plan in `docs/RESEARCH.md`. Data
+> foundation records remain historical evidence, not the current method scope.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Bàn giao kế hoạch 6 tuần và pipeline kiểm tra/chuẩn bị BMAD Brain FLAIR 2D.

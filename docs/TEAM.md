@@ -7,7 +7,7 @@ phụ trách nguồn tham khảo và data; hai vai trò còn lại phân theo n�
 |---|---|---|
 | Bạn — Data | Quyền sử dụng/nguồn, version, manifest, decode, QC, mô tả dataset | B |
 | B — DAE & evaluation | Baseline, metric, threshold, bootstrap, log thí nghiệm | C |
-| C — Diffusion | ANDi-FLAIR, timestep scoring, checkpoint, demo tích hợp | Bạn (protocol), B (code) |
+| C — Diffusion | DDPM partial reconstruction, noise timestep, checkpoint, demo tích hợp | Bạn (protocol), B (code/score) |
 
 Mỗi thay đổi split, label, preprocessing tạo version mới và có người thứ hai review.
 Không đẩy ảnh, manifest chứa ID hoặc checkpoint vào Git. Không dùng chung secrets.
