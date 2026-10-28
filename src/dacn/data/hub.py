@@ -152,6 +152,16 @@ opaque patient-group UUIDs, and aggregate metadata. It omits the source manifest
 original patient IDs, source filenames, and QC exclusion ledger. Group UUIDs allow
 patient-level bootstrap without revealing the source ID mapping.
 
+## Intended use and sample meaning
+
+This dataset is intended for academic research on medical image anomaly detection
+and localization. A sample is one rendered 2D FLAIR slice, not a complete MRI
+volume. A `normal` label means the slice has no tumor annotation in its mask; it
+does not mean that the person is healthy. The training split contains normal
+slices only. Use validation for model, score, and threshold selection under a
+pre-registered protocol; reserve test for the final evaluation after the protocol
+is frozen. This dataset is not for clinical diagnosis or treatment decisions.
+
 ## Splits
 
 | Split | Samples | Normal | Anomaly |
@@ -169,17 +179,45 @@ UUID and patient-group UUID to a shard offset and label. UUIDs stay stable withi
 this immutable Hub export. `dataset_metadata.json` records aggregate counts,
 preprocessing, source-manifest checksum, and shard/index checksums.
 
-## Source, terms, and limitations
+## Preprocessing and split policy
 
-Source: [BMAD](https://github.com/DorisBao/BMAD), Brain FLAIR 2D. BMAD states
-CC BY-NC-SA terms; the underlying BraTS terms may add conditions. Confirm the
-right to store or redistribute this derived dataset before changing repository
-visibility or sharing it. A private Hub repository does not replace that check.
+The source is the BMAD Brain FLAIR 2D rendered PNG export from BraTS 2021. The
+project decodes the source's opaque RGB/RGBA bone-rendered PNG as grayscale using
+Pillow luminance conversion, pads each 240×240 image symmetrically by 8 pixels to
+256×256 without resizing, and maps uint8 values to [-1, 1]. Masks are combined
+into binary whole-lesion masks. This is not a reconstruction of original NIfTI
+MRI intensities.
 
-The images are rendered PNG luminance, not original NIfTI intensity values.
-`patient-disjoint-v1` is a derived split for the pinned archive described by the
-project protocol, not a claim about BMAD's official split. This dataset is for
-research and is not for diagnosis.
+`patient-disjoint-v1` is a project-derived split for the pinned source archive:
+all original train and validation samples are retained, and test slices belonging
+to any validation patient are excluded. It is not BMAD's official split and its
+results are not directly comparable with BMAD's reported test results. See the
+project's [data protocol](https://github.com/tanh1c/DACN/blob/main/docs/DATA_PROTOCOL.md)
+and [audit](https://github.com/tanh1c/DACN/blob/main/docs/DATA_AUDIT.md).
+
+## Sources, terms, attribution, and limitations
+
+Sources: [BMAD repository](https://github.com/DorisBao/BMAD) and the
+[BraTS 2021 challenge](https://www.med.upenn.edu/cbica/brats2021/). BMAD's
+repository states CC BY-NC-SA but does not specify a version. The BraTS 2021
+data page permits research use subject to citation of the three works below; it
+does not state a license for re-hosting this derived export. Therefore this card
+does not assign a license to the underlying images or derived data. The Hub repo
+is private for the group's research. Do not make it public or redistribute the
+derived data without confirming all applicable source terms. Private storage does
+not replace those terms.
+
+Please cite BMAD and the three BraTS works requested by the BraTS 2021 data page:
+
+1. J. Bao et al., [“BMAD: Benchmarks for Medical Anomaly Detection”](https://arxiv.org/abs/2306.11876), CVPR Workshops, 2024.
+2. U. Baid et al., [“The RSNA-ASNR-MICCAI BraTS 2021 Benchmark on Brain Tumor Segmentation and Radiogenomic Classification”](https://arxiv.org/abs/2107.02314), 2021.
+3. B. H. Menze et al., [“The Multimodal Brain Tumor Image Segmentation Benchmark (BRATS)”](https://doi.org/10.1109/TMI.2014.2377694), IEEE Transactions on Medical Imaging, 34(10), 1993–2024, 2015.
+4. S. Bakas et al., [“Advancing The Cancer Genome Atlas glioma MRI collections with expert segmentation labels and radiomic features”](https://doi.org/10.1038/sdata.2017.117), Scientific Data, 4, 170117, 2017.
+
+The project-derived split is specific to the pinned archive and is not a claim
+about BMAD's official split. The archive's preprocessing provenance has limits;
+see the linked audit. These rendered slices do not preserve scanner intensity,
+scanner/site metadata, or full 3D context.
 
 Source archive SHA256: {metadata.get("source_archive_sha256") or "not provided"}.
 """

@@ -21,10 +21,12 @@ uploaded. Source filenames/paths and the QC exclusion ledger are omitted. The
 exporter rejects an export directory containing any unrecognized file before
 uploading it.
 
-BMAD states CC BY-NC-SA terms; the underlying BraTS terms may add conditions.
-Confirm that your group's use permits storing the derived images on an external
-service. The command creates a **private** dataset repo by default. `--public`
-is an explicit opt-in; a private repo does not remove the need to confirm terms.
+The BMAD repository states CC BY-NC-SA but does not specify a version. The
+BraTS2021 data page allows research use with three required citations, but does
+not specify a license for re-hosting derived files. See [DATA_PROTOCOL](DATA_PROTOCOL.md)
+and [REFERENCES](REFERENCES.md). Keep the repo **private** and confirm applicable
+source terms before granting access beyond the project or enabling `--public`;
+private storage does not remove those terms.
 
 ## Publish the prepared dataset
 

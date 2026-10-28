@@ -12,10 +12,19 @@ SHA256 bản đã tải ngày 24/10/2026:
 eb7a5aae9ea1752b16d3a76b47595ffd956c0b210444da76853455d4d7be61c8
 ```
 
-BMAD công bố điều kiện CC BY-NC-SA; giữ trích dẫn và kiểm tra thêm điều kiện nguồn
-BraTS trước khi chia sẻ lại dữ liệu. Đồ án dùng dữ liệu cho nghiên cứu; không đưa
-ảnh, patient manifest hay checkpoint lên Git. Xem điều kiện đầy đủ trong nguồn,
-không suy ra quyền tái phân phối từ việc link tải công khai.
+Repository BMAD tuyên bố CC BY-NC-SA nhưng không ghi phiên bản license. Trang
+BraTS2021 cho phép dùng dữ liệu cho nghiên cứu nếu trích dẫn ba công trình BraTS
+được liệt kê trên trang; trang này không xác định license hoặc quyền re-host bộ
+dữ liệu dẫn xuất. Vì vậy không gắn một phiên bản license cụ thể cho ảnh/dữ liệu
+phái sinh và không bật public repo. Trước khi mở rộng chia sẻ, cần xác nhận điều
+kiện áp dụng từ cả BMAD lẫn BraTS; link tải công khai không tự cấp quyền tái phân
+phối. Repo HF hiện private cho nghiên cứu nội bộ của nhóm. Không đưa ảnh, patient
+manifest hay checkpoint lên Git.
+
+Khi báo cáo kết quả, trích dẫn BMAD và ba công trình BraTS mà trang BraTS2021 yêu
+cầu: Baid et al. (2021), Menze et al. (2015), và Bakas et al. (2017). Xem link,
+DOI và metadata trong [REFERENCES](REFERENCES.md) và dataset card được sinh bởi
+`dacn.data.hub`.
 
 Ảnh là FLAIR 2D từ BraTS2021, lưu PNG đã render, **không phải intensity NIfTI gốc**.
 “Normal” là lát cắt không có tumor annotation, không có nghĩa bệnh nhân khỏe mạnh.

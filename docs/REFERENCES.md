@@ -23,6 +23,17 @@ nguồn sơ cấp và mục đích đọc; không hàm ý tất cả phương ph
 | THOR, 2024 | [Paper](https://arxiv.org/abs/2403.08464) | Related work về restoration/localization; chưa đưa vào phạm vi triển khai |
 | BMAD — Bao et al. | [Paper](https://arxiv.org/html/2306.11876v3), [repo](https://github.com/DorisBao/BMAD), [preprocessing](https://github.com/DorisBao/BMAD/blob/main/data_processing/brain/bras.py) | Dataset chính; cần kiểm tra archive thực tế, không chỉ chép bảng paper |
 
+### Trích dẫn dữ liệu BraTS bắt buộc
+
+Trang chính thức [BraTS 2021 — Data Usage Agreement / Citations](https://www.med.upenn.edu/cbica/brats2021/)
+nói có thể dùng dữ liệu trong nghiên cứu nếu luôn trích dẫn ba công trình dưới đây.
+Trang đó không nêu license cho việc re-host dữ liệu phái sinh; không suy ra quyền
+công bố lại từ quyền dùng cho nghiên cứu.
+
+1. U. Baid et al., [“The RSNA-ASNR-MICCAI BraTS 2021 Benchmark on Brain Tumor Segmentation and Radiogenomic Classification”](https://arxiv.org/abs/2107.02314), 2021.
+2. B. H. Menze et al., [“The Multimodal Brain Tumor Image Segmentation Benchmark (BRATS)”](https://doi.org/10.1109/TMI.2014.2377694), *IEEE Transactions on Medical Imaging*, 34(10), 1993–2024, 2015.
+3. S. Bakas et al., [“Advancing The Cancer Genome Atlas glioma MRI collections with expert segmentation labels and radiomic features”](https://doi.org/10.1038/sdata.2017.117), *Scientific Data*, 4, 170117, 2017.
+
 ## Lộ trình đọc theo vai trò
 
 **Bạn / data:** BMAD phần Brain → mã `bras.py` → audit của dự án → AnoDDPM và DAE

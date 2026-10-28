@@ -83,10 +83,14 @@ của Hub và `.gitattributes`, không bỏ kiểm tra shard/index/checksum.
 Hai hash manifest khác nhau do quy tắc newline: exporter tính hash trên nội dung
 đã chuẩn hóa LF; file local dùng CRLF. Đây không phải thay đổi hàng dữ liệu/split.
 
-Nguồn và điều kiện: [BMAD paper, mục1 và6.1](https://arxiv.org/html/2306.11876v3),
-[BraTS2021](https://www.med.upenn.edu/cbica/brats2021/). BMAD nêu CC BY-NC-SA, không
-ghi rõ phiên bản license trong paper; không tự diễn giải thành CC BY-NC-SA4.0.
-Giữ repo private và attribution; xem DATA_PROTOCOL trước khi chia sẻ ra ngoài.
+Nguồn và điều kiện: [BMAD paper](https://arxiv.org/html/2306.11876v3),
+[BMAD repository](https://github.com/DorisBao/BMAD), và [BraTS2021 — Data Usage
+Agreement / Citations](https://www.med.upenn.edu/cbica/brats2021/). BMAD tuyên bố
+CC BY-NC-SA nhưng không chỉ rõ phiên bản. Trang BraTS2021 cho phép dùng dữ liệu
+cho nghiên cứu nếu trích dẫn Baid et al. (2021), Menze et al. (2015), và Bakas et
+al. (2017); trang này không nêu license hoặc quyền re-host bản dẫn xuất. Không tự
+gán CC BY-NC-SA 4.0 cho ảnh. Giữ repo private và không chia sẻ lại trước khi xác
+nhận đầy đủ điều kiện áp dụng. Metadata trích dẫn có DOI trong [REFERENCES](REFERENCES.md).
 Phát hiện split chỉ áp dụng archive đã pin, không khẳng định mọi bản BMAD bị leakage.
 
 ## Việc tiếp theo

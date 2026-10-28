@@ -20,6 +20,12 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-28 — Complete BMAD source and dataset card draft
+- Issue/PR: [DAC-7](https://linear.app/dacn-khmt/issue/DAC-7/d01-chot-nguon-djieu-kien-su-dung-va-dataset-card-bmad); [GitHub PR #17](https://github.com/tanh1c/DACN/pull/17); [Hugging Face card PR #1](https://huggingface.co/datasets/dacn-bmad-team/bmad-flair-patient-disjoint-v1/discussions/1).
+- Changes: Expanded the generated Hugging Face dataset card with intended use, sample meaning, split policy, preprocessing, limitations, source terms, and required attribution. Documented that BMAD states CC BY-NC-SA without a version and the BraTS2021 page requests three citations but does not specify re-hosting rights; kept license metadata unset and the repo private.
+- Evidence/checks: Checked the BMAD repository and official BraTS2021 data/citation page; `git diff --check` passed. Opened and verified HF card PR #1 against the generated README; it changes documentation only. No tests or training run performed.
+- Next: Obtain teammate review and merge both PRs; keep DAC-7 open until the accepted card is on the private HF repo.
+
 ### 2026-10-26 — Verify private Hugging Face dataset and handoff
 - Issue/PR: [TRA-95](https://linear.app/traffic-agent-assistant/issue/TRA-95),
   [PR #14](https://github.com/tanh1c/DACN/pull/14).
