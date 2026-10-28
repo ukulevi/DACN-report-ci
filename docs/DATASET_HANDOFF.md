@@ -5,7 +5,7 @@ Dataset private của nhóm đã được xác minh đầy đủ:
 
 **Revision cố định:** `fbb884dfe144be5c71e205a73701507163557ea4`.
 Luôn pin revision này trong run manifest và lệnh Modal; không dùng moving `main`
-cho số liệu nghiên cứu đã chốt. Task: [TRA-95](https://linear.app/traffic-agent-assistant/issue/TRA-95).
+cho số liệu nghiên cứu đã chốt. Task: [DAC-9](https://linear.app/dacn-khmt/issue/DAC-9/d02-ban-giao-data-contract-va-kiem-chung-tren-may-thanh-vien).
 
 Repo này đã có nội dung khi bắt đầu lần bàn giao. Đã kiểm tra lại thay vì ghi đè:
 snapshot tải về đầy đủ, metadata nguồn khớp, 95 file remote đạt kiểm tra checksum
@@ -92,7 +92,7 @@ Phát hiện split chỉ áp dụng archive đã pin, không khẳng định m�
 ## Việc tiếp theo
 
 B/C xác nhận đọc được revision này trên máy/Colab của mình, rồi đính kết quả vào
-[TRA-74](https://linear.app/traffic-agent-assistant/issue/TRA-74). Khi đã nhận data,
-đo GPU pilot theo [TRA-75](https://linear.app/traffic-agent-assistant/issue/TRA-75).
+[DAC-9](https://linear.app/dacn-khmt/issue/DAC-9/d02-ban-giao-data-contract-va-kiem-chung-tren-may-thanh-vien). Khi đã nhận data,
+đo GPU pilot theo [DAC-10](https://linear.app/dacn-khmt/issue/DAC-10/i01-djo-gpu-pilot-va-quyet-djinh-ngan-sach-train).
 Lệnh Modal đã có trong [HUGGINGFACE_MODAL](HUGGINGFACE_MODAL.md); thay placeholder
 dataset revision bằng SHA phía trên. Chưa khởi chạy job GPU trong task này.
