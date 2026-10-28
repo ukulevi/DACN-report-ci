@@ -15,18 +15,18 @@ MVP: train DDPM trên normal slice, reconstruction với các `t*` được đă
 | W5 | 27/11 | Test theo freeze; thống kê theo patient nếu khả thi; phân tích lỗi và hạn chế. |
 | W6 | 04/12 | Report, slide, demo tái chạy; số liệu khớp artifacts. Bắt đầu viết khung báo cáo từ W1/W2. |
 
-W1 ngắn và B/C chưa xác nhận; các ngày là mục tiêu, không cam kết đã đủ GPU hay nhân lực. Nếu chậm, giảm các nhánh tùy chọn và sweep trước khi rút ngắn freeze/test. Ba seed và patient-bootstrap là mục tiêu tốt khi khả thi; báo số thực hoàn thành.
+Vai trò A/B/C được xác nhận ngày 28/10/2026; B và C đã được thêm vào project Linear. Các ngày là mục tiêu, không cam kết đã đủ GPU hay nhân lực. Nếu chậm, giảm các nhánh tùy chọn và sweep trước khi rút ngắn freeze/test. Ba seed và patient-bootstrap là mục tiêu tốt khi khả thi; báo số thực hoàn thành.
 
-## Vai trò tạm thời
+## Vai trò đã xác nhận
 
-- A / project-data: nguồn, quyền, version, QC, handoff, điều phối và review protocol.
-- B / baseline-evaluation: evaluator, pixel/SSIM scores, threshold, DAE khi khả thi, metric và phân tích; review C. Cùng C chốt interface score.
-- C / diffusion-integration: contract DDPM, trainer, partial reconstruction, `t*`, checkpoint, runner và demo; B review. Danh tính B/C chưa được xác nhận.
+- A — Chu Nguyen Tuan Anh / project-data: nguồn, quyền, version, QC, handoff, điều phối, review protocol và freeze.
+- B — Lê Hoàng Chí Vĩ / evaluation: evaluator, pixel/SSIM scores, threshold, DAE khi khả thi, metric, bootstrap và phân tích; review C. Cùng C chốt interface score.
+- C — Hai Tuan / diffusion-integration: contract DDPM, trainer, partial reconstruction, `t*`, checkpoint, runner và demo; B review.
 - Cả nhóm: pilot, chọn validation, freeze, phân tích, báo cáo và bảo vệ.
 
 ## Thứ tự trước khi dùng GPU
 
-1. Xác nhận B/C và quyền dataset; hoàn tất nguồn và dataset card.
+1. Xác nhận quyền dataset trên máy từng thành viên; hoàn tất nguồn và dataset card.
 2. Review contract DDPM, score, ROI và protocol; chuẩn bị runner ghi run bắt đầu, lỗi/gián đoạn và artifact khi có. Thiết kế evaluator có thể làm song song.
 3. Chạy smoke/pilot giới hạn sau khi contract và data access sẵn sàng; ghi GPU, batch, thời gian, VRAM và chi phí thực; ước lượng trước run dài.
 4. Train/validation, đăng ký tập score và timestep hữu hạn, freeze rồi mới test.
