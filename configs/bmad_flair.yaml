@@ -1,5 +1,5 @@
 # Research contract; current CLI takes flags and does NOT load this YAML.
-status: dae_pilot_implemented_ddpm_reconstruction_pending
+status: dae_and_anoddpm_prototype_implemented_ddpm_protocol_pending
 dataset:
   name: BMAD-Brain
   version: bmad-flair-patient-disjoint-v1

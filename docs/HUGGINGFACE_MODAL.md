@@ -57,7 +57,7 @@ Log in to Modal once, then create the named Secret from `.env`:
 
 ```powershell
 modal setup
-modal secret create huggingface --from-dotenv .env
+modal secret create huggingface-secret --from-dotenv .env
 ```
 
 The app uses a T4 GPU, a six-hour job timeout, a persistent dataset Volume, and
@@ -114,6 +114,32 @@ The T4 and six-hour timeout are hard ceilings, not a guarantee that a run fits a
 free-credit balance. This is a BMAD FLAIR adaptation of the published DAE
 baseline, not an exact reproduction of its four-modality experiment. The DDPM
 partial-reconstruction trainer and scorer remain unimplemented.
+
+## AnoDDPM implementation smoke test
+
+`dacn.training.anoddpm:train` is a separate AnoDDPM-style BMAD prototype, not the
+planned ANDi implementation. It reuses the same pinned private dataset and Modal
+boundary, consumes every normal training sample in an epoch, selects checkpoints
+only by validation pixel AP, and never receives a held-out test path. The vendored
+simplex core requires Numba, which is included in the Modal image.
+
+Start with a one-epoch cost/shape smoke test before using the descriptive defaults
+in `configs/anoddpm_bmad.yaml`:
+
+```powershell
+modal run --detach src/dacn/cloud/modal_train.py `
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 `
+  --dataset-revision fbb884dfe144be5c71e205a73701507163557ea4 `
+  --model-repo-id dacn-bmad-team/dacn-runs `
+  --run-id anoddpm-smoke-seed-17 `
+  --trainer dacn.training.anoddpm:train `
+  --config-json '{"seed":17,"epochs":1,"batch_size":1,"base_channels":32,"maximum_training_timestep":100,"validation_reconstruction_steps":25}'
+```
+
+This command is a planned GPU smoke test, not a result. Record it in
+`RESULT_TRACKING.md` only after the job actually starts, including failures and
+interruptions. The current trainer saves a best checkpoint but does not yet resume
+an interrupted run.
 
 ## Platform references
 

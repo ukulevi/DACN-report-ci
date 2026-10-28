@@ -19,6 +19,16 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 - Tạo cùng reconstruction một lần cho mỗi input, timestep, checkpoint và seed rồi so pixel/SSIM trên cùng output. Không train lại mỗi score/timestep. Ghi latency reconstruction và score riêng, tổng end-to-end, VRAM và số ảnh thực đo.
 - DAE là baseline khi khả thi, không chặn diffusion MVP. Feature difference chỉ làm khi còn thời gian và đã chốt encoder, nguồn/training, layer, map, license và chi phí. ANDi, VAE và Isolation Forest là related work/extension tùy chọn.
 
+## Prototype AnoDDPM tách biệt
+
+Repo có một trainer `dacn.training.anoddpm:train` được port có chọn lọc từ AnoDDPM
+để kiểm tra sớm pipeline diffusion một kênh trên BMAD. Nó dùng U-Net dự đoán noise,
+simplex hoặc Gaussian noise, full-shard epochs và squared reconstruction error. Đây
+là **AnoDDPM-style BMAD adaptation** để kiểm tra data/model/run boundary, không thay
+thế protocol DDPM partial reconstruction đã chốt: nó chưa có pixel absolute/local
+SSIM comparison và chưa freeze `t*`/sampler theo DAC-8. Không suy diễn smoke test
+hoặc validation subset thành kết quả nghiên cứu.
+
 ## Protocol đánh giá
 
 - Split `patient-disjoint-v1` và revision Hub cố định theo DATA_PROTOCOL. Validation có nhãn dùng chọn checkpoint/config/threshold: mô tả là normal-only training với labeled validation selection. Không dùng held-out test để lựa chọn hoặc tuning.

@@ -23,6 +23,19 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-10-28 — Port the algorithm core, not dataset-specific epoch semantics
+- Observation/evidence: Upstream AnoDDPM loads NFBS/Edinburgh volume layouts
+  and limits an epoch to 100 sampled images, while this project uses indexed
+  BMAD NPZ shards and requires auditable full-split coverage.
+- Lesson: Reusing a research implementation safely means preserving the model
+  and diffusion mathematics while adapting its data and training boundaries to
+  the target protocol.
+- Practice adopted: Use the validated shared shard loader, define an epoch over
+  the complete training split, keep test data out of the trainer, and name the
+  prototype AnoDDPM rather than conflating it with ANDi.
+- Source/run: `src/dacn/data/shards.py`, `src/dacn/training/anoddpm.py`, and the
+  AnoDDPM integration tests in `tests/test_anoddpm.py`.
+
 ### 2026-10-26 — Pin and verify an existing Hub dataset before uploading again
 - Observation/evidence: The organization already contained a private dataset with
   the same archive and canonical manifest hashes. All downloaded arrays matched

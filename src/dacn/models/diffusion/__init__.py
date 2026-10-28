@@ -1,1 +1,1 @@
-"""Tuấn Anh: DDPM, DDIM and proposed method."""
+"""Diffusion models, including the explicit AnoDDPM BMAD adaptation."""

@@ -11,7 +11,7 @@ dependencies = ["numpy>=1.24,<3", "scikit-learn>=1.3,<2", "PyYAML>=6,<7"]
 
 [project.optional-dependencies]
 data = ["pillow>=10", "gdown>=5,<7"]
-train = ["torch>=2.2", "torchvision>=0.17", "tqdm>=4.66", "pillow>=10"]
+train = ["torch>=2.2", "torchvision>=0.17", "tqdm>=4.66", "pillow>=10", "numba>=0.60,<1"]
 medical = ["nibabel>=5", "pydicom>=2.4"]
 hub = ["huggingface_hub>=0.28,<3", "python-dotenv>=1,<2"]
 cloud = ["modal>=0.73"]

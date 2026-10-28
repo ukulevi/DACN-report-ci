@@ -4,9 +4,10 @@
 khảo sát timestep bắt đầu tái tạo và score sai khác pixel/local SSIM; DAE là đối chứng khi khả thi.
 
 Hiện có pipeline kiểm tra/chuẩn bị dữ liệu, export dataset riêng tư lên Hugging Face,
-trainer baseline DAE coarse-noise, và runner lưu kết quả Modal vào Hugging Face.
-**Chưa có trainer DDPM reconstruction và chưa có số liệu hiệu năng mô hình.** Demo cũ chỉ dùng số
-giả lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, không dùng chẩn đoán.
+trainer baseline DAE coarse-noise, một prototype AnoDDPM-BMAD tách biệt, và runner
+lưu kết quả Modal vào Hugging Face. **Protocol DDPM partial reconstruction chính,
+local SSIM và số liệu hiệu năng mô hình chưa hoàn tất.** Demo cũ chỉ dùng số giả lập
+để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, không dùng chẩn đoán.
 
 ## Bắt đầu ở đây
 
@@ -19,6 +20,7 @@ giả lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, kh�
 - [Audit: leakage trong bản BMAD tải về](docs/DATA_AUDIT.md)
 - [Protocol data và lệnh chạy](docs/DATA_PROTOCOL.md)
 - [Hugging Face + Modal: lưu dataset và chạy experiment](docs/HUGGINGFACE_MODAL.md)
+- [Google Colab notebook: AnoDDPM smoke test và pilot](notebooks/anoddpm_bmad_colab.ipynb)
 - [Dataset đã xác minh: revision và cách tải cho nhóm](docs/DATASET_HANDOFF.md)
 - [Câu hỏi nghiên cứu, adaptation, thực nghiệm](docs/RESEARCH.md)
 - [Paper và thứ tự đọc](docs/REFERENCES.md)
@@ -34,6 +36,8 @@ python -m venv .venv
 ```
 
 Không cần GPU cho pipeline data. Cài PyTorch phù hợp thiết bị ở giai đoạn training.
+Notebook Colab mặc định chạy smoke test trên 128 ảnh train và 16 ảnh validation;
+đổi sang `pilot` chỉ sau khi smoke thành công. Smoke metrics không phải kết quả nghiên cứu.
 Từ raw root đã giải nén theo DATA_PROTOCOL:
 
 ```powershell
@@ -50,13 +54,16 @@ so trực tiếp với số paper gốc. Không chọn tham số dựa trên tes
 
 ## Thư mục và cộng tác
 
-`src/dacn/`: CLI/data/metric; `tests/`: kiểm thử không cần ảnh y tế hoặc GPU;
+`src/dacn/`: CLI/data/model/training/metric; `tests/`: kiểm thử không cần ảnh y tế;
 `configs/`: hợp đồng nghiên cứu; `docs/`: protocol và kế hoạch.
 `configs/bmad_flair.yaml` hiện là cấu hình mô tả, CLI **chưa đọc YAML**.
 `data/`, `runs/`, `checkpoints/`, `.venv/`, `.env` bị Git ignore. Hub export mặc định
 private, bỏ patient ID nguồn và source manifest, chỉ giữ UUID nhóm ẩn danh để
 bootstrap theo patient; kiểm tra điều kiện BMAD/BraTS trước khi chia sẻ ra ngoài.
-Modal gọi DAE qua `dacn.training.dae:train`; DDPM reconstruction vẫn đang chờ triển khai.
+Modal gọi DAE qua `dacn.training.dae:train` hoặc prototype AnoDDPM qua
+`dacn.training.anoddpm:train`; thí nghiệm DDPM reconstruction theo protocol đã chốt
+và score local SSIM vẫn đang chờ hoàn thiện. Không báo cáo prototype AnoDDPM như
+phương pháp chính đã hoàn tất; xem `configs/anoddpm_bmad.yaml` và third-party notices.
 DAE mặc định chạy pilot 3 epoch, chỉ chọn checkpoint bằng validation pixel AP; chưa
 đánh giá test và chưa tạo kết quả hiệu năng cho báo cáo.
 

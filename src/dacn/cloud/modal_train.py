@@ -30,6 +30,7 @@ image = (
     .pip_install(
         "huggingface_hub>=0.28,<3",
         "numpy>=1.24,<3",
+        "numba>=0.60,<1",
         "scikit-learn>=1.3,<2",
         "PyYAML>=6,<7",
         "torch>=2.2",
@@ -127,7 +128,7 @@ def _write_source_snapshot(output_dir: Path) -> str:
     gpu="T4",
     timeout=6 * 60 * 60,
     volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
-    secrets=[modal.Secret.from_name("huggingface")],
+    secrets=[modal.Secret.from_name("huggingface-secret")],
 )
 def train_remote(
     dataset_repo_id: str,
@@ -162,7 +163,9 @@ def train_remote(
 
     token = os.environ.get("HF_TOKEN")
     if not token:
-        raise RuntimeError("Modal Secret 'huggingface' must contain a write-capable HF_TOKEN")
+        raise RuntimeError(
+            "Modal Secret 'huggingface-secret' must contain a write-capable HF_TOKEN"
+        )
     api = HfApi(token=token)
 
     # Create the destination before spending GPU time; never silently publish to a public repo.

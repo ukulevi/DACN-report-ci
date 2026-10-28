@@ -1,0 +1,49 @@
+# Reference configuration for dacn.training.anoddpm:train.
+# Modal currently receives the equivalent object through --config-json.
+status: implementation_ready_for_smoke_test_no_measured_result
+method: anoddpm_bmad_flair_adaptation
+scope_note: AnoDDPM prototype; this is not the planned ANDi implementation.
+dataset:
+  name: BMAD-Brain
+  version: bmad-flair-patient-disjoint-v1
+  image_shape: [1, 256, 256]
+  normalization: uint8_div_127.5_minus_1
+  train_policy: normal_only
+  selection_split: validation_only
+trainer:
+  seed: 17
+  epochs: 3
+  batch_size: 1
+  validation_batch_size: 1
+  learning_rate: 0.0001
+  weight_decay: 0.0
+  early_stopping_patience: 5
+  log_every_steps: 100
+  max_train_samples: null
+  max_validation_samples: null
+  gradient_clip_norm: 1.0
+  ema_decay: 0.9999
+diffusion:
+  timesteps: 1000
+  maximum_training_timestep: 800
+  validation_reconstruction_steps: 100
+  beta_schedule: linear
+  noise_type: simplex
+  loss_type: l2
+  simplex_octaves: 6
+  simplex_persistence: 0.8
+  simplex_frequency: 64.0
+model:
+  base_channels: 32
+  channel_mults: ""
+  dropout: 0.0
+  attention_resolutions: "16,8"
+  num_heads: 2
+  num_head_channels: -1
+evaluation:
+  primary: validation_global_pixel_average_precision
+  anomaly_map: squared_reconstruction_error
+  crop_padding: true
+  image_score: mean_top_1_percent
+  threshold_source: validation_only
+  higher_is_anomalous: true

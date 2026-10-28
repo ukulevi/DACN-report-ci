@@ -20,11 +20,47 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-29 — Add a Google Colab AnoDDPM training path
+- Issue/PR: Not provided.
+- Changes: Added a self-contained Colab notebook that clones the feature branch,
+  reads `HF_TOKEN` from Colab Secrets, downloads and validates the pinned private
+  dataset, runs a bounded smoke test or full pilot, saves to Drive, and renders
+  aggregate metric tables and curves. Added deterministic sample limits and live
+  trainer progress without changing the full-data defaults.
+- Evidence/checks: Ruff check and format check, Python compilation, notebook JSON
+  and code-cell validation, and the full test suite passed. No model training or
+  measured result was produced; the earlier Modal attempt stopped before GPU
+  scheduling because its workspace required a payment method.
+- Next: Run `smoke` in a T4 Colab runtime, preserve its artifacts, and only then
+  switch the notebook to `pilot` with the full train and validation splits.
+
 ### 2026-10-28 — Complete BMAD source and dataset card draft
 - Issue/PR: [DAC-7](https://linear.app/dacn-khmt/issue/DAC-7/d01-chot-nguon-djieu-kien-su-dung-va-dataset-card-bmad); [GitHub PR #17](https://github.com/tanh1c/DACN/pull/17); [Hugging Face card PR #1](https://huggingface.co/datasets/dacn-bmad-team/bmad-flair-patient-disjoint-v1/discussions/1).
 - Changes: Expanded the generated Hugging Face dataset card with intended use, sample meaning, split policy, preprocessing, limitations, source terms, and required attribution. Documented that BMAD states CC BY-NC-SA without a version and the BraTS2021 page requests three citations but does not specify re-hosting rights; kept license metadata unset and the repo private.
 - Evidence/checks: Checked the BMAD repository and official BraTS2021 data/citation page; `git diff --check` passed. Opened and verified HF card PR #1 against the generated README; it changes documentation only. No tests or training run performed.
 - Next: Obtain teammate review and merge both PRs; keep DAC-7 open until the accepted card is on the private HF repo.
+
+### 2026-10-28 — Align the Modal Hugging Face secret name
+- Issue/PR: Not provided.
+- Changes: Updated the Modal runner and setup documentation to use the existing
+  `huggingface-secret` secret while retaining `HF_TOKEN` as the environment key.
+- Evidence/checks: Ruff check and format check, Python compilation, and the full
+  test suite passed. No Modal job or model training run was started.
+- Next: Authenticate the local Modal CLI and run the one-epoch AnoDDPM smoke test.
+
+### 2026-10-28 — Add an AnoDDPM training prototype for BMAD
+- Issue/PR: Not provided.
+- Changes: Ported the attributed AnoDDPM U-Net, diffusion process, and simplex
+  noise core; added a validated BMAD shard loader, normal-only full-split
+  training, validation-only anomaly scoring and threshold selection, EMA
+  checkpoints, a Modal-compatible trainer, and a pilot configuration. Kept this
+  prototype explicitly separate from the planned ANDi method.
+- Evidence/checks: Ruff check and format check, Python compilation, and the full
+  55-test suite passed in an isolated Python 3.11 environment with PyTorch 2.15
+  and Numba 0.68; six tests specifically exercised the AnoDDPM integration.
+  No medical-data training, GPU job, or measured model result was produced.
+- Next: Configure authorized Hugging Face access in Modal, run a one-epoch GPU
+  smoke test, and record that actual run separately. ANDi remains pending.
 
 ### 2026-10-26 — Verify private Hugging Face dataset and handoff
 - Issue/PR: [TRA-95](https://linear.app/traffic-agent-assistant/issue/TRA-95),
