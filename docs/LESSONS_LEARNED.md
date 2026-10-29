@@ -23,6 +23,19 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-10-29 — Handle shard batch tuple shape explicitly
+- Observation/evidence: `ShardDataset` yields `(image, label)` when masks are
+  disabled and `(image, mask, label)` when they are enabled. DDPM validation
+  needs labels for stratified sample selection but its noise-prediction loss
+  consumes only images.
+- Lesson: A shared dataset can expose different batch shapes by split/options;
+  trainer loops should select the intended tensor explicitly.
+- Practice adopted: DDPM validation reads `batch[0]` for image input and keeps
+  masks out of the objective.
+- Source/run: `src/dacn/data/shards.py` and
+  `src/dacn/training/ddpm_partial.py`; discovered by source inspection, not a
+  training run.
+
 ### 2026-10-29 — Use a result file for notebook-launched Modal jobs
 - Observation/evidence: Modal progress output interleaved with the local
   entrypoint's pretty-printed JSON, so parsing the combined terminal stream

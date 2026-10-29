@@ -1,5 +1,5 @@
 # Research contract; current CLI takes flags and does NOT load this YAML.
-status: dae_and_anoddpm_prototype_implemented_ddpm_protocol_pending
+status: ddpm_partial_trainer_implemented_method_contract_pending_ab_review
 dataset:
   name: BMAD-Brain
   version: bmad-flair-patient-disjoint-v1
@@ -15,7 +15,7 @@ dataset:
 research:
   primary_method: ddpm_partial_reconstruction
   baseline_if_feasible: coarse_noise_DAE
-  diffusion_schedule: to_be_decided_before_validation_sweep
+  diffusion_schedule: proposal_1000_step_linear_pending_ab_review
   starting_timesteps_candidates: [100, 200, 300]
   additional_timesteps_if_budget_allows: [50, 500]
   score_maps: [pixel_absolute_difference, local_one_minus_ssim]

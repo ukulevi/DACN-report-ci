@@ -4,10 +4,11 @@
 khảo sát timestep bắt đầu tái tạo và score sai khác pixel/local SSIM; DAE là đối chứng khi khả thi.
 
 Hiện có pipeline kiểm tra/chuẩn bị dữ liệu, export dataset riêng tư lên Hugging Face,
-trainer baseline DAE coarse-noise, một prototype AnoDDPM-BMAD tách biệt, và runner
-lưu kết quả Modal vào Hugging Face. **Protocol DDPM partial reconstruction chính,
-local SSIM và số liệu hiệu năng mô hình chưa hoàn tất.** Demo cũ chỉ dùng số giả lập
-để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, không dùng chẩn đoán.
+trainer baseline DAE coarse-noise, prototype AnoDDPM-BMAD tách biệt, trainer
+DDPM partial reconstruction và runner lưu kết quả Modal vào Hugging Face. Contract
+DDPM/checkpoint hiện là bản đề xuất chờ A/B review; evaluator pixel/local SSIM và
+kết quả nghiên cứu chưa hoàn tất. Chưa chạy DDPM smoke. Demo cũ chỉ dùng số giả
+lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, không dùng chẩn đoán.
 
 ## Bắt đầu ở đây
 
@@ -62,9 +63,12 @@ so trực tiếp với số paper gốc. Không chọn tham số dựa trên tes
 private, bỏ patient ID nguồn và source manifest, chỉ giữ UUID nhóm ẩn danh để
 bootstrap theo patient; kiểm tra điều kiện BMAD/BraTS trước khi chia sẻ ra ngoài.
 Modal gọi DAE qua `dacn.training.dae:train` hoặc prototype AnoDDPM qua
-`dacn.training.anoddpm:train`; thí nghiệm DDPM reconstruction theo protocol đã chốt
-và score local SSIM vẫn đang chờ hoàn thiện. Không báo cáo prototype AnoDDPM như
-phương pháp chính đã hoàn tất; xem `configs/anoddpm_bmad.yaml` và third-party notices.
+`dacn.training.anoddpm:train`; candidate DDPM chính chạy qua
+`dacn.training.ddpm_partial:train` sau DAC-8 A/B review và hoàn tất data gate DAC-9.
+Lệnh bounded smoke và resume nằm trong `docs/HUGGINGFACE_MODAL.md`. Không bắt đầu
+timestep/score sweep trước evaluator và review gate DAC-15. Không báo cáo prototype
+AnoDDPM như phương pháp chính đã hoàn tất; xem `configs/anoddpm_bmad.yaml` và
+third-party notices.
 DAE mặc định chạy pilot 3 epoch, chỉ chọn checkpoint bằng validation pixel AP; chưa
 đánh giá test và chưa tạo kết quả hiệu năng cho báo cáo.
 

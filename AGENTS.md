@@ -70,3 +70,12 @@ and the relevant protocol in `docs/`.
   as the agreed primary partial-DDPM research method. The local Jupyter workflow
   downloads only aggregate run artifacts; do not pull patient-level data into
   the notebook for display.
+- The primary DDPM trainer is `dacn.training.ddpm_partial:train`; its method and
+  checkpoint-selection contract are still a proposal until DAC-8 receives A/B
+  review. Use `configs/ddpm_partial_smoke.json` only for the bounded smoke after
+  DAC-8 review and DAC-9 data-access evidence. Do not run a timestep/score sweep
+  until B's evaluator and DAC-15 review gate are complete.
+- Modal writes a durable start manifest and commits DDPM checkpoints after
+  completed epochs. Resume only the same run ID when source snapshot, code,
+  config, trainer, and resolved dataset revision match. A fresh attempt needs a
+  new run ID; preserve failed/interrupted run records.

@@ -20,6 +20,22 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-29 — Implement the partial-DDPM trainer and resumable Modal lifecycle
+- Issue/PR: DAC-8, DAC-11, DAC-14; no PR opened yet.
+- Changes: Added the normal-only Gaussian DDPM epsilon-prediction trainer, a
+  review-pending method/config draft, one-based partial reconstruction, EMA
+  checkpoint selection from fixed-noise normal validation loss, and private
+  validation reconstruction artifacts. Modal now records durable run stages,
+  failure class, checksums and epoch checkpoints; DDPM resume requires matching
+  source, config, code, trainer and resolved dataset revision. Updated the team
+  guide and agent instructions.
+- Evidence/checks: Python compilation, Ruff check/format, and `git diff --check`
+  passed. No unit test suite or DDPM training/GPU run was started. The method
+  contract is still awaiting A/B review; DAC-9 data-access evidence is also a
+  prerequisite for the bounded smoke.
+- Next: Get A/B review on DAC-8, finish the teammate data gate, then run the
+  documented bounded smoke and record its actual manifest.
+
 ### 2026-10-29 — Document team Modal workflow
 - Issue/PR: No issue or PR linked; branch feat/anoddpm-notebook-training.
 - Changes: Added teammate onboarding for the shared Modal Workspace and

@@ -140,8 +140,66 @@ the function completes.
 
 The T4 and six-hour timeout are hard ceilings, not a guarantee that a run fits a
 free-credit balance. This is a BMAD FLAIR adaptation of the published DAE
-baseline, not an exact reproduction of its four-modality experiment. The DDPM
-partial-reconstruction trainer and scorer remain unimplemented.
+baseline, not an exact reproduction of its four-modality experiment.
+
+## Partial-DDPM trainer and bounded smoke
+
+The primary-method draft is implemented as `dacn.training.ddpm_partial:train`.
+Its method contract and checkpoint rule are proposals awaiting A/B review in
+DAC-8. Do not start its GPU smoke until DAC-8 is reviewed and DAC-9's data-access
+evidence is complete. The bounded smoke config is
+[`ddpm_partial_smoke.json`](../configs/ddpm_partial_smoke.json): seed 17, one
+epoch, at most 128 normal train slices and 16 validation slices, and up to four
+validation reconstructions at one-based `t*=100`. It checks training, checkpoint
+creation, and reconstruction output; it is not a research comparison or metric
+result. The trainer never receives the test directory.
+For B's evaluator, the trainer exposes `load_ema_checkpoint`, `build_diffusion`,
+and `partial_reconstruct`; compute the reconstruction once and pass the same
+tensor to the pixel-difference and local-SSIM scorers.
+
+From the repository root, submit the job from PowerShell:
+
+```powershell
+$runId = "ddpm-partial-smoke-$((Get-Date).ToUniversalTime().ToString('yyyyMMddTHHmmssZ'))"
+$configJson = (Get-Content configs/ddpm_partial_smoke.json -Raw).Trim()
+modal run --detach src/dacn/cloud/modal_train.py `
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 `
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 `
+  --model-repo-id dacn-bmad-team/dacn-runs `
+  --run-id $runId `
+  --trainer dacn.training.ddpm_partial:train `
+  --config-json $configJson
+```
+
+The runner commits a `started` manifest before Hub access or training, writes a
+source snapshot and immutable dataset commit, then updates progress and commits
+checkpoints after each completed epoch. Failures record the exception class and
+last stage without persisting exception text, which can contain private values.
+An abrupt termination can leave the last durable status as `running`; first
+confirm that the Modal job has stopped, then resume the same run:
+
+```powershell
+modal run --detach src/dacn/cloud/modal_train.py `
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 `
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 `
+  --model-repo-id dacn-bmad-team/dacn-runs `
+  --run-id $runId `
+  --trainer dacn.training.ddpm_partial:train `
+  --config-json $configJson `
+  --resume
+```
+
+Resume is limited to completed-epoch DDPM checkpoints and requires an identical
+trainer, config, source snapshot, code revision, and resolved dataset revision.
+If there is no completed-epoch checkpoint or any provenance differs, use a new
+run ID and keep the previous failed/interrupted record. Fresh attempts always
+need unique run IDs. On completion, private run artifacts are uploaded under
+`runs/<run-id>`; the Modal run Volume retains the manifest/checkpoints for
+recovery. The validation NPZ contains medical-image-derived pixels, so keep it
+inside the private model repo and Volume.
+If a handled failure occurs after the private model repo is verified, the runner
+also attempts to upload the partial run record; otherwise the Modal run Volume
+retains the failure manifest and any completed-epoch checkpoint.
 
 Modal shut down its hosted notebook editor on October 23, 2026. The project also
 provides a local Jupyter controller at
