@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import os
 import random
 import time
+import uuid
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable
@@ -328,6 +330,23 @@ def load_ema_checkpoint(
     return model
 
 
+def derive_sampling_seed(base_seed: int, sample_id: str) -> int:
+    """Derive a stable 32-bit seed from a run seed and Hub sample UUID.
+
+    Keep the UUID private; the derived seed is not an anonymization mechanism.
+    """
+    if isinstance(base_seed, bool) or not isinstance(base_seed, int) or base_seed < 0:
+        raise ValueError("base_seed must be a non-negative integer")
+    if not isinstance(sample_id, str):
+        raise TypeError("sample_id must be a Hub sample UUID string")
+    try:
+        canonical_id = str(uuid.UUID(sample_id))
+    except ValueError as exc:
+        raise ValueError("sample_id must be a Hub sample UUID string") from exc
+    payload = f"dacn-ddpm-seed-v1:{base_seed}:{canonical_id}".encode("utf-8")
+    return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
+
+
 @torch.inference_mode()
 def partial_reconstruct(
     model: torch.nn.Module,
@@ -342,10 +361,10 @@ def partial_reconstruct(
         raise TypeError("starting_timestep must be an integer")
     if not 1 <= starting_timestep <= diffusion.timesteps:
         raise ValueError("starting_timestep must be in [1, total_timesteps]")
-    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
-        raise ValueError("seed must be a non-negative integer")
-    if images.ndim != 4 or images.shape[1:] != (1, 256, 256):
-        raise ValueError("images must have shape [batch, 1, 256, 256]")
+    if isinstance(seed, bool) or not isinstance(seed, int) or not 0 <= seed < 2**32:
+        raise ValueError("seed must be an integer in [0, 2**32)")
+    if images.ndim != 4 or images.shape != (1, 1, 256, 256):
+        raise ValueError("images must have shape [1, 1, 256, 256]; reconstruct one sample per call")
     model.eval()
     with _fixed_rng(seed, images.device):
         return diffusion.reconstruct(model, images, steps=starting_timestep).clamp(-1, 1)
@@ -463,7 +482,6 @@ def train(
 
     best_checkpoint_path = output_dir / "ddpm_best.pt"
     last_checkpoint_path = output_dir / "ddpm_last.pt"
-    started_training = time.perf_counter()
     for epoch in range(start_epoch, config["epochs"] + 1):
         epoch_started = time.perf_counter()
         model.train()
@@ -618,6 +636,7 @@ def train(
         "resume_checkpoint": last_checkpoint_path.name,
         "validation_reconstruction": "validation_reconstruction.npz",
         "training_history": "training_history.json",
-        "training_seconds": total_training_seconds + time.perf_counter() - started_training,
+        "training_seconds": total_training_seconds,
+        "training_seconds_scope": "sum of completed epoch training and validation durations",
         "peak_vram_bytes": peak_vram,
     }

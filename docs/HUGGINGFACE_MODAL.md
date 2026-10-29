@@ -153,9 +153,13 @@ epoch, at most 128 normal train slices and 16 validation slices, and up to four
 validation reconstructions at one-based `t*=100`. It checks training, checkpoint
 creation, and reconstruction output; it is not a research comparison or metric
 result. The trainer never receives the test directory.
-For B's evaluator, the trainer exposes `load_ema_checkpoint`, `build_diffusion`,
-and `partial_reconstruct`; compute the reconstruction once and pass the same
-tensor to the pixel-difference and local-SSIM scorers.
+For B's evaluator, use `ShardDataset.sample_ids[index]` in memory with
+`derive_sampling_seed(base_seed, sample_id)`, then call `partial_reconstruct`
+with one image at a time. Load the checkpoint with `load_ema_checkpoint` and
+create the schedule with `build_diffusion`. Pass each reconstruction to both
+scorers. The per-sample UUIDs and derived seeds must not be published in run
+manifests or logs. `training_seconds` is the sum of completed epoch training
+and normal-validation durations; it excludes checkpoint writes and previews.
 
 From the repository root, submit the job from PowerShell:
 

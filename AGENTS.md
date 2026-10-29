@@ -75,6 +75,11 @@ and the relevant protocol in `docs/`.
   review. Use `configs/ddpm_partial_smoke.json` only for the bounded smoke after
   DAC-8 review and DAC-9 data-access evidence. Do not run a timestep/score sweep
   until B's evaluator and DAC-15 review gate are complete.
+- Follow the proposed score, sweep, threshold and seed contract in
+  `docs/RESEARCH.md` when implementing B's evaluator; obtain A/B review before
+  treating it as frozen. Derive a per-sample sampling seed from the Hub UUID,
+  reconstruct one sample per call and reuse that tensor for both score maps.
+  Do not publish sample UUIDs or per-sample derived seeds.
 - Modal writes a durable start manifest and commits DDPM checkpoints after
   completed epochs. Resume only the same run ID when source snapshot, code,
   config, trainer, and resolved dataset revision match. A fresh attempt needs a

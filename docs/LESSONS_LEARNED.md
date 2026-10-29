@@ -23,6 +23,17 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-10-29 — Reserve runner metadata in trainer output directories
+- Observation/evidence: the Modal runner writes its manifest and source snapshot
+  before invoking the trainer, while AnoDDPM rejected every non-empty output
+  directory. The focused regression test exercises this boundary.
+- Lesson: A shared runner and trainer need an explicit agreement about files
+  created before training.
+- Practice adopted: Both diffusion trainers allow the runner's two reserved
+  metadata files and reject other pre-existing artifacts for fresh runs.
+- Source: `src/dacn/cloud/modal_train.py`, `src/dacn/training/anoddpm.py`, and
+  `tests/test_dac8_contract.py`.
+
 ### 2026-10-29 — Handle shard batch tuple shape explicitly
 - Observation/evidence: `ShardDataset` yields `(image, label)` when masks are
   disabled and `(image, mask, label)` when they are enabled. DDPM validation

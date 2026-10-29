@@ -18,6 +18,8 @@ class ShardDataset(Dataset):
         self.split = split
         self.include_masks = include_masks
         self.records: list[tuple[str, int, int]] = []
+        # Hub UUIDs stay in memory for deterministic per-sample inference seeds.
+        self.sample_ids: list[str] = []
         self.indices_by_shard: dict[str, list[int]] = defaultdict(list)
         index_path = self.split_dir / "index.csv"
         if not index_path.is_file():
@@ -51,6 +53,7 @@ class ShardDataset(Dataset):
                     raise ValueError(f"Invalid shard offset in {split}/index.csv")
                 self.indices_by_shard[shard_name].append(len(self.records))
                 self.records.append((shard_name, offset, int(row["label"])))
+                self.sample_ids.append(row["sample_id"])
 
         if not self.records:
             raise ValueError(f"Dataset split is empty: {split}")

@@ -52,6 +52,7 @@ def test_shard_dataset_and_sampler_cover_full_split(tmp_path):
 
     _write_split(tmp_path, "train", [0, 0, 0])
     dataset = ShardDataset(tmp_path / "train", "train", include_masks=False)
+    assert dataset.sample_ids == ["sample-0", "sample-1", "sample-2"]
     sampler = ShardBatchSampler(dataset, batch_size=2, seed=17)
     indices = [index for batch in sampler for index in batch]
     assert sorted(indices) == [0, 1, 2]

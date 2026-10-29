@@ -21,6 +21,18 @@ research:
   score_maps: [pixel_absolute_difference, local_one_minus_ssim]
   final_train_seeds_target: [17, 42, 2026]
   optional_extensions: [feature_difference, ANDi, VAE, isolation_forest]
+  initial_validation_sweep:
+    status: proposal_pending_ab_review
+    train_seed: 17
+    sampling_base_seed: 17
+    sampling_seed_policy: sha256_uuid_v1_first_32_bits
+    inference_batch_size: 1
+    checkpoint_count: 1
+    train_and_validation_caps: null
+    validation_slices: 83
+    reconstruction_count: 249
+    timesteps: [100, 200, 300]
+    scores: [pixel_absolute_difference, local_one_minus_ssim]
 evaluation:
   primary: global_pixel_average_precision
   crop_padding: true
@@ -29,3 +41,13 @@ evaluation:
   test_locked_until: model_and_protocol_freeze
   bootstrap_unit: patient
   same_device_latency: true
+  ssim:
+    window: 11
+    gaussian_sigma: 1.5
+    data_range: 2.0
+    padding: reflect_after_crop
+    covariance: weighted_population
+    k1: 0.01
+    k2: 0.03
+  sweep_tie_break: [smaller_timestep, pixel_absolute_difference]
+  threshold_rule: validation_max_f1_ties_highest_score_threshold

@@ -20,6 +20,22 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-29 — Address DAC-8 review findings
+- Issue/PR: [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score); no PR linked.
+- Changes: Specified a review-pending SSIM, seed, validation sweep and threshold
+  contract and documented the DDPM/AnoDDPM adaptation. Added deterministic
+  per-sample sampling seeds and single-sample reconstruction, exposed Hub sample
+  UUIDs in memory, fixed AnoDDPM runner metadata compatibility and removed double
+  counting of epoch time. Added focused regression tests and agent guidance;
+  formatted the existing local notebook for the repository's Ruff CI check.
+- Evidence/checks: Full suite passed (61 tests) with CPU and synthetic test data;
+  Ruff and config parsing passed. Notebook output and execution-count hash was
+  unchanged by formatting. The first full-suite invocation failed two CLI
+  tests because the child Python process lacked `PYTHONPATH`; rerunning with
+  `PYTHONPATH=src` passed. No real-data training, evaluation or Modal job started.
+- Next: A/B review and agree the proposed DAC-8 contract and linked config;
+  complete DAC-9 evidence before the bounded DDPM smoke, and DAC-15 before sweep.
+
 ### 2026-10-29 — Implement the partial-DDPM trainer and resumable Modal lifecycle
 - Issue/PR: DAC-8, DAC-11, DAC-14; no PR opened yet.
 - Changes: Added the normal-only Gaussian DDPM epsilon-prediction trainer, a

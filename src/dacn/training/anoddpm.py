@@ -359,8 +359,9 @@ def train(
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    if any(output_dir.iterdir()):
-        raise ValueError("AnoDDPM output directory must be empty")
+    reserved = {"run_manifest.json", "source_snapshot.zip"}
+    if any(path.name not in reserved for path in output_dir.iterdir()):
+        raise ValueError("AnoDDPM output directory contains artifacts from another run")
     device = torch.device(device)
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
