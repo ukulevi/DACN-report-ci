@@ -57,7 +57,7 @@ Log in to Modal once, then create the named Secret from `.env`:
 
 ```powershell
 modal setup
-modal secret create huggingface-secret --from-dotenv .env
+modal secret create huggingface --from-dotenv .env
 ```
 
 The app uses a T4 GPU, a six-hour job timeout, a persistent dataset Volume, and
@@ -115,6 +115,13 @@ free-credit balance. This is a BMAD FLAIR adaptation of the published DAE
 baseline, not an exact reproduction of its four-modality experiment. The DDPM
 partial-reconstruction trainer and scorer remain unimplemented.
 
+Modal shut down its hosted notebook editor on October 23, 2026. Run this
+project's Modal jobs from a terminal with `modal run`; the Google Colab notebook
+linked in the README is a separate workflow and does not run inside Modal.
+Modal still documents using its SDK from external Jupyter notebooks, but that is
+not required for the training pipeline here. See [Modal Notebooks](https://modal.com/docs/guide/notebooks)
+and [Apps, Functions, and entrypoints](https://modal.com/docs/guide/apps).
+
 ## AnoDDPM implementation smoke test
 
 `dacn.training.anoddpm:train` is a separate AnoDDPM-style BMAD prototype, not the
@@ -123,23 +130,32 @@ boundary, consumes every normal training sample in an epoch, selects checkpoints
 only by validation pixel AP, and never receives a held-out test path. The vendored
 simplex core requires Numba, which is included in the Modal image.
 
+Run the Modal CLI from the repository root in a Python environment that can
+import this checkout. If Modal is installed globally and `dacn` is not installed
+in that same environment, set the source path first in PowerShell:
+
+```powershell
+$env:PYTHONPATH = (Join-Path (Get-Location) "src")
+```
+
 Start with a one-epoch cost/shape smoke test before using the descriptive defaults
 in `configs/anoddpm_bmad.yaml`:
 
 ```powershell
 modal run --detach src/dacn/cloud/modal_train.py `
   --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 `
-  --dataset-revision fbb884dfe144be5c71e205a73701507163557ea4 `
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 `
   --model-repo-id dacn-bmad-team/dacn-runs `
   --run-id anoddpm-smoke-seed-17 `
   --trainer dacn.training.anoddpm:train `
-  --config-json '{"seed":17,"epochs":1,"batch_size":1,"base_channels":32,"maximum_training_timestep":100,"validation_reconstruction_steps":25}'
+  --config-json '{"seed":17,"epochs":1,"batch_size":1,"base_channels":32,"maximum_training_timestep":100,"validation_reconstruction_steps":25,"max_train_samples":128,"max_validation_samples":16}'
 ```
 
-This command is a planned GPU smoke test, not a result. Record it in
-`RESULT_TRACKING.md` only after the job actually starts, including failures and
-interruptions. The current trainer saves a best checkpoint but does not yet resume
-an interrupted run.
+Use a new `--run-id` for every attempt. This bounded GPU smoke checks the training
+and artifact path; its validation metrics are not research results. Record each
+run in `RESULT_TRACKING.md` after it starts, including failures and interruptions.
+The current trainer saves a best checkpoint but does not yet resume an interrupted
+run.
 
 ## Platform references
 

@@ -23,6 +23,31 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-10-29 — Pin the dataset card revision used by the validator
+- Observation/evidence: The old pinned Hub revision had the pre-review README,
+  while the merged card update at `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`
+  matched the generated privacy-safe card exactly. With the old pin, the bounded
+  Modal smoke stopped at card validation; after pinning the merged revision, all
+  95 files validated and the bounded smoke completed.
+- Lesson: A dataset revision includes its README; validating the same data with
+  an older card revision can fail even after the corrected card is merged.
+- Practice adopted: Pin the reviewed Hub commit in Modal, notebooks, and handoff
+  instructions; keep historical run records on the revision they actually used.
+- Source/run: `DATASET_HANDOFF.md`, `RESULT_TRACKING.md`, and Modal smoke
+  `anoddpm-smoke-20261029T0518Z`.
+
+### 2026-10-29 — Bound smoke runs by samples and inference steps
+- Observation/evidence: The one-epoch Modal smoke command initially had no sample
+  limits and would have used the full 7,500-slice train and 83-slice validation
+  sets. The bounded 128/16 attempt stopped at dataset-card validation before
+  training.
+- Lesson: An epoch count alone does not bound smoke-test compute or cost.
+- Practice adopted: Set explicit train and validation sample limits and a short
+  reconstruction chain for pipeline smoke tests; label their metrics as
+  diagnostics, not research results.
+- Source/run: `docs/HUGGINGFACE_MODAL.md`, run
+  `anoddpm-smoke-20261029T0518Z` in `RESULT_TRACKING.md`.
+
 ### 2026-10-28 — Port the algorithm core, not dataset-specific epoch semantics
 - Observation/evidence: Upstream AnoDDPM loads NFBS/Edinburgh volume layouts
   and limits an epoch to 100 sampled images, while this project uses indexed

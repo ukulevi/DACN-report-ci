@@ -20,6 +20,6 @@ def test_anoddpm_colab_notebook_is_clean_and_compilable():
 
     complete_source = "\n".join(sources)
     assert "feat/anoddpm-notebook-training" in complete_source
-    assert "fbb884dfe144be5c71e205a73701507163557ea4" in complete_source
+    assert "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7" in complete_source
     assert 'max_train_samples": 128' in complete_source
     assert not re.search(r"hf_[A-Za-z0-9]{20,}", complete_source)

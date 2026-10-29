@@ -3,14 +3,14 @@
 **Project:** [DACN — Diffusion Models for Anomaly Detection](https://linear.app/dacn-khmt/project/dacn-diffusion-models-for-anomaly-detection-39ad392101f4)
 
 **Team:** DACN-KHMT; **target:** 04/12/2026.
-**Snapshot:** 28/10/2026; trạng thái hiện hành xem trực tiếp Linear.
+**Snapshot:** 29/10/2026; trạng thái hiện hành xem trực tiếp Linear.
 
 ## Quyết định và phạm vi
 
 - Quyết định 28/10: DDPM partial reconstruction train normal slice, nghiên cứu starting timestep và pixel difference/local SSIM. ANDi là related work hoặc optional extension.
 - Bắt đầu với ứng viên t = 100, 200, 300 nếu hợp lệ với schedule đã chốt; 50/500 tùy budget. Đây là phương án, không phải timestep tối ưu đã đo.
 - DAE đối chứng khi khả thi; feature difference/ANDi/VAE/Isolation Forest là tùy chọn. Chưa có kết quả model được xác minh.
-- Dataset revision `fbb884dfe144be5c71e205a73701507163557ea4`; giữ patient-disjoint, train normal-only, chọn model/score/threshold trên validation, freeze trước held-out test.
+- Dataset revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; giữ patient-disjoint, train normal-only, chọn model/score/threshold trên validation, freeze trước held-out test.
 - Metric image/pixel ROC-AUC, Precision, Recall, F1, pixel AP, Dice, latency và VRAM theo protocol; không ghi patient ID, ảnh riêng tư hoặc secrets vào Linear.
 
 ## Mốc tuần

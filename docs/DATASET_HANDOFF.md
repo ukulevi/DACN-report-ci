@@ -1,11 +1,21 @@
-# Dataset handoff — verified 26/10/2026
+# Dataset handoff — verified 29/10/2026
 
 Dataset private của nhóm đã được xác minh đầy đủ:
 [dacn-bmad-team/bmad-flair-patient-disjoint-v1](https://huggingface.co/datasets/dacn-bmad-team/bmad-flair-patient-disjoint-v1).
 
-**Revision cố định:** `fbb884dfe144be5c71e205a73701507163557ea4`.
+**Revision cố định cho các run mới:** `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`.
 Luôn pin revision này trong run manifest và lệnh Modal; không dùng moving `main`
 cho số liệu nghiên cứu đã chốt. Task: [DAC-9](https://linear.app/dacn-khmt/issue/DAC-9/d02-ban-giao-data-contract-va-kiem-chung-tren-may-thanh-vien).
+
+Revision `fbb884dfe144be5c71e205a73701507163557ea4` là bản export ban đầu.
+Sau khi card PR #1 được merge, revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`
+cập nhật README để khớp dataset card do code sinh. README tại revision mới đã
+được so sánh chính xác với `_dataset_card(dataset_metadata.json)`. Dùng revision
+mới để validator không so sánh code hiện tại với card cũ.
+Modal smoke ngày 29/10 đã tải đủ 95 file ở revision mới và `validate_hf_export`
+đã kiểm tra thành công. `dataset_metadata.json` không đổi so với export ban đầu
+(SHA256 `9c60fac0ff2a2d6274e82db466e5e338303d0dc24986b3bab4b32b6e710af218`);
+không upload lại shard hoặc sinh UUID patient-group mới.
 
 Repo này đã có nội dung khi bắt đầu lần bàn giao. Đã kiểm tra lại thay vì ghi đè:
 snapshot tải về đầy đủ, metadata nguồn khớp, 95 file remote đạt kiểm tra checksum
@@ -36,7 +46,7 @@ import numpy as np
 from huggingface_hub import snapshot_download
 from dacn.data.hub import validate_hf_export
 
-revision = "fbb884dfe144be5c71e205a73701507163557ea4"
+revision = "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7"
 folder = Path(
     snapshot_download(
         repo_id="dacn-bmad-team/bmad-flair-patient-disjoint-v1",

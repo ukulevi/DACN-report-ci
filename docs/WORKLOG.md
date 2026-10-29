@@ -20,6 +20,27 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-29 — Fix the Hugging Face card revision blocker
+- Issue/PR: W1 context [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score); branch `feat/anoddpm-notebook-training`.
+- Changes: Updated active dataset pins in the handoff, Modal instructions, project tracking, and Colab notebook to the merged Hub card revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`. Updated the notebook revision assertion, documented the card/revision lesson, and added the verified PowerShell `PYTHONPATH` fallback for Modal's local source mount. No dataset payload was re-uploaded.
+- Evidence/checks: Compared the README at the new revision with the generated privacy-safe card; the bytes match. The metadata bytes are unchanged from the prior revision. Modal fetched all 95 files and `validate_hf_export` passed. A bounded diagnostic AnoDDPM smoke completed 128 steps on 128 normal train samples and validated 16 samples; artifacts and metrics are in `RESULT_TRACKING.md`. The first CLI attempt stopped before remote execution because `dacn` was not importable; the retry with `PYTHONPATH=src` succeeded. No unit test suite was run.
+- Next: Role C should finish the approved partial-DDPM method contract; this exploratory AnoDDPM smoke does not close DAC-8.
+
+### 2026-10-29 — Review and run the bounded AnoDDPM Modal smoke
+- Issue/PR: W1 context [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score); branch `feat/anoddpm-notebook-training` is not linked to an issue/PR.
+- Changes: Aligned the Modal Secret name with the existing workspace Secret,
+  capped the documented smoke at 128 train and 16 validation samples, clarified
+  that Modal jobs use the terminal CLI after hosted Modal Notebooks shut down,
+  and recorded the failed run in `RESULT_TRACKING.md`.
+- Evidence/checks: Full suite passed (57 tests); Ruff check and format check
+  passed; Modal fetched all 95 files from the pinned dataset, then failed in
+  `validate_hf_export` because the README differed from the generated
+  privacy-safe card. The trainer was not called; no metrics or artifacts were
+  produced. The two earlier attempts stopped during image setup before a
+  training function ran.
+- Next: Reconcile the pinned Hub card with the generated card/validator, then
+  rerun this bounded smoke before treating the branch as merge-ready.
+
 ### 2026-10-29 — Add a Google Colab AnoDDPM training path
 - Issue/PR: Not provided.
 - Changes: Added a self-contained Colab notebook that clones the feature branch,
