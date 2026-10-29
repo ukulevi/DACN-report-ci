@@ -20,6 +20,39 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-29 — Document team Modal workflow
+- Issue/PR: No issue or PR linked; branch feat/anoddpm-notebook-training.
+- Changes: Added teammate onboarding for the shared Modal Workspace and
+  Hugging Face Secret, terminal/notebook smoke workflow guidance, and Modal run
+  rules for AI coding agents.
+- Evidence/checks: Cross-checked the documented commands and behavior against
+  the repository notebook and current Modal CLI, Secrets, and Workspace docs.
+  `git diff --check` passed. Documentation-only change; no training run or tests
+  were started.
+- Next: Share the guide with teammates and use a fresh run ID for each requested
+  Modal attempt.
+
+### 2026-10-29 — Add a local Jupyter controller for Modal training
+- Issue/PR: No issue or PR linked; branch feat/anoddpm-notebook-training.
+- Changes: Added a local Jupyter notebook that submits the existing Modal CLI
+  job, streams logs to a cell, saves its result JSON locally, downloads only
+  aggregate metrics and manifest from a pinned private Hub revision, and renders
+  a local plot. Added notebook dependencies and README/Hugging Face + Modal
+  documentation links. The Modal local entrypoint now returns its JSON result
+  for the CLI write-result option.
+- Evidence/checks: A bounded one-epoch Modal AnoDDPM diagnostic smoke completed
+  128 optimizer steps on a Tesla T4 using 128 normal train samples and 16
+  validation samples. Artifact revision
+  a95b40397aae6f11a7ee863aefbb2613f64a1f47; the local notebook rendered the
+  real manifest, metrics tables, and plot from that revision. The initial
+  notebook launch trained and uploaded successfully but its post-run parser
+  failed on interleaved progress output; a CPU-only Modal probe verified the
+  write-result channel, and the saved notebook was rendered from the completed
+  smoke artifacts without another GPU run. Notebook validation and code-cell
+  execution succeeded; git diff --check passed. No unit test suite was run.
+- Next: Use this notebook only for bounded pipeline checks until the agreed
+  partial-DDPM trainer and score protocol are implemented.
+
 ### 2026-10-29 — Fix the Hugging Face card revision blocker
 - Issue/PR: W1 context [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score); branch `feat/anoddpm-notebook-training`.
 - Changes: Updated active dataset pins in the handoff, Modal instructions, project tracking, and Colab notebook to the merged Hub card revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`. Updated the notebook revision assertion, documented the card/revision lesson, and added the verified PowerShell `PYTHONPATH` fallback for Modal's local source mount. No dataset payload was re-uploaded.

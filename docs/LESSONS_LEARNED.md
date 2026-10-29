@@ -23,6 +23,20 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-10-29 — Use a result file for notebook-launched Modal jobs
+- Observation/evidence: Modal progress output interleaved with the local
+  entrypoint's pretty-printed JSON, so parsing the combined terminal stream
+  failed after GPU training and Hub upload had completed. The Modal CLI
+  write-result option reliably wrote the local entrypoint's string return value
+  in a CPU-only probe.
+- Lesson: Human-readable progress output is not a stable machine-readable
+  result channel.
+- Practice adopted: Return structured JSON from the local entrypoint and use
+  Modal CLI write-result for notebook orchestration; keep streaming logs
+  separate from result parsing.
+- Source/run: docs/HUGGINGFACE_MODAL.md, notebooks/anoddpm_modal_local.ipynb,
+  and run anoddpm-local-smoke-20261029T055620Z-b71e.
+
 ### 2026-10-29 — Pin the dataset card revision used by the validator
 - Observation/evidence: The old pinned Hub revision had the pre-review README,
   while the merged card update at `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`

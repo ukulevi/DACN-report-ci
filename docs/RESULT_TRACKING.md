@@ -38,6 +38,59 @@ Copy this block for every actual run. Use `N/A` with a reason when a metric does
 not apply. For a failed or interrupted run, include the error class and last
 completed stage rather than fabricating metrics.
 
+### anoddpm-local-smoke-20261029T055620Z-b71e — AnoDDPM-style BMAD adaptation — completed diagnostic smoke
+- Started/completed (UTC): Modal app initialized at approximately 05:56 UTC;
+  trainer started 2026-10-29 05:57:01 UTC and completed 05:57:45 UTC (manifest).
+- Issue/PR: None linked; local notebook flow validation on branch
+  feat/anoddpm-notebook-training.
+- Code commit / dirty working tree: 82b4d2c01f4ea9f62c283f75eca17f114f562d3e;
+  working tree was dirty for the notebook and documentation work. Source
+  snapshot and manifest are in the run artifacts.
+- Dataset repo and immutable revision:
+  dacn-bmad-team/bmad-flair-patient-disjoint-v1 @
+  350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7.
+- Split and patient-disjoint protocol: patient-disjoint-v1; diagnostic pipeline
+  smoke; the held-out test split was not passed to the trainer.
+- Training data policy (normal-only or other): normal-only; capped at 128
+  training samples and 16 validation samples.
+- Model / score formula / score direction: AnoDDPM-style U-Net prototype;
+  simplex forward noise and squared reconstruction error; higher scores are
+  intended to mean more anomalous. This is not the agreed primary partial-DDPM
+  method.
+- Training and scoring config: seed 17, one epoch, batch size 1, base channels
+  32, maximum training timestep 100, 25 validation reconstruction steps, max
+  train 128, max validation 16.
+- Seed(s) attempted / completed: 1 requested / 1 completed; 128 optimizer steps.
+- Threshold source and selection rule (validation only): image and pixel
+  thresholds independently selected to maximize F1 on the 16-slice validation
+  subset (0.08077009 image; 0.00685009 pixel). Do not reuse these smoke
+  thresholds in the final protocol.
+- Validation metrics (level + aggregation): one seed, 16 stratified validation
+  slices. Image-level AUROC 0.6250, Precision 0.7500, Recall 0.7500, F1
+  0.7500, AP 0.6747. Pixel-level AUROC 0.6439, micro Precision 0.0261, micro
+  Recall 0.4258, micro F1 0.0492, AP 0.0254, macro Dice over anomalous slices
+  0.0899. Higher scores indicate more anomalous.
+- Test metrics (level + aggregation; only after freeze): N/A; no test evaluation
+  was performed.
+- Latency (device, batch, precision, resolution, warmup, sample count;
+  median/p95): per-image latency was not measured; trainer-reported training
+  time was 40.68 seconds on a Tesla T4.
+- Peak VRAM: 799,354,880 bytes (manifest).
+- Checkpoint, plots, and run_manifest.json links: [private run artifacts and
+  manifest at model revision
+  a95b40397aae6f11a7ee863aefbb2613f64a1f47](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/a95b40397aae6f11a7ee863aefbb2613f64a1f47/runs/anoddpm-local-smoke-20261029T055620Z-b71e);
+  checkpoint anoddpm_best.pt. [Modal app log](https://modal.com/apps/tanh1c/main/ap-649PQBlwoANkm7AtawNzmX).
+  Aggregate manifest, history, validation metrics, and plot are also saved
+  locally under runs/modal_notebook/anoddpm-local-smoke-20261029T055620Z-b71e/
+  and displayed in notebooks/anoddpm_modal_local.ipynb.
+- Failure, caveat, or interpretation: The actual Modal training and Hub upload
+  succeeded. The first notebook launch then failed while parsing the
+  human-oriented Modal progress stream, after training had completed. The
+  completed artifacts were re-read by the notebook and rendered locally; a
+  CPU-only Modal CLI probe verified the corrected write-result channel. This
+  sample-limited AnoDDPM smoke is a workflow check, not a research result or the
+  approved primary DDPM experiment. No test data was evaluated.
+
 ### anoddpm-smoke-cardfix-20261029T0524Z — AnoDDPM-style BMAD adaptation — completed diagnostic smoke
 - Started/completed (UTC): Modal app initialized 2026-10-29 05:24 UTC; training started 05:26:14 UTC and completed 05:27:14 UTC (manifest timestamps).
 - Issue/PR: W1 context [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score); branch `feat/anoddpm-notebook-training` is not linked to an issue/PR.

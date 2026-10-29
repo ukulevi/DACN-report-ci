@@ -53,12 +53,40 @@ Hub commit SHA. Pin that SHA for Modal runs instead of using moving `main`.
 
 ## Modal credentials and storage
 
-Log in to Modal once, then create the named Secret from `.env`:
+The project uses a shared Modal Workspace, which owns the Volumes and the
+`huggingface` Secret used by jobs. Each teammate needs to be invited to that
+Workspace and authenticate their own Modal CLI. In the dashboard, confirm the
+active Workspace is the team one before running commands; a personal Workspace
+will not have the team's Secret or cached Volumes. See Modal's [Workspace guide](https://modal.com/docs/guide/workspaces).
 
 ```powershell
+python -m pip install -e ".[cloud,hub,notebook]"
 modal setup
+modal secret list
+```
+
+`modal secret list` should show a Secret named `huggingface`; it does not reveal
+the token value. The Workspace owner provisions this shared Secret once from a
+private local `.env` file containing `HF_TOKEN`:
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+# Edit .env locally and fill HF_TOKEN; never paste the token in chat or commit it.
 modal secret create huggingface --from-dotenv .env
 ```
+
+Run the create command only if the Secret is absent. Do not overwrite the shared
+Secret while onboarding; a Workspace owner should coordinate any rotation. The
+token in this Secret must be able to read the private dataset repo and write to
+the organization's model repo. Modal's current CLI supports creating a Secret
+from dotenv and listing Secret names; see [Modal Secrets](https://modal.com/docs/guide/secrets)
+and the [`modal secret` CLI](https://modal.com/docs/cli/latest/secret).
+
+For notebook artifact downloads, each member also needs a local Hugging Face
+token with read access. The notebook reads it from the ignored root `.env` or
+from `hf auth login`. This local token is not sent to Modal; the remote job uses
+the shared Modal Secret. A terminal run that only uploads artifacts does not
+need a local token once the shared Secret is configured.
 
 The app uses a T4 GPU, a six-hour job timeout, a persistent dataset Volume, and
 a persistent run Volume. Modal injects the Hub token from the `huggingface`
@@ -115,12 +143,15 @@ free-credit balance. This is a BMAD FLAIR adaptation of the published DAE
 baseline, not an exact reproduction of its four-modality experiment. The DDPM
 partial-reconstruction trainer and scorer remain unimplemented.
 
-Modal shut down its hosted notebook editor on October 23, 2026. Run this
-project's Modal jobs from a terminal with `modal run`; the Google Colab notebook
-linked in the README is a separate workflow and does not run inside Modal.
-Modal still documents using its SDK from external Jupyter notebooks, but that is
-not required for the training pipeline here. See [Modal Notebooks](https://modal.com/docs/guide/notebooks)
-and [Apps, Functions, and entrypoints](https://modal.com/docs/guide/apps).
+Modal shut down its hosted notebook editor on October 23, 2026. The project also
+provides a local Jupyter controller at
+[anoddpm_modal_local.ipynb](../notebooks/anoddpm_modal_local.ipynb): it invokes
+the same Modal CLI entrypoint, streams logs into the cell, saves the launch
+result locally, and downloads aggregate artifacts for inline tables and plots.
+Training still runs on Modal; the notebook kernel is only the local controller
+and viewer. The Google Colab notebook is a separate workflow that trains in
+Colab. Modal documents external Jupyter integrations at [Jupyter notebooks](https://modal.com/docs/guide/jupyter-notebooks)
+and the CLI at [modal run](https://modal.com/docs/cli/latest/run).
 
 ## AnoDDPM implementation smoke test
 
@@ -142,11 +173,12 @@ Start with a one-epoch cost/shape smoke test before using the descriptive defaul
 in `configs/anoddpm_bmad.yaml`:
 
 ```powershell
+$runId = "anoddpm-smoke-" + [guid]::NewGuid().ToString("N")
 modal run --detach src/dacn/cloud/modal_train.py `
   --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 `
   --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 `
   --model-repo-id dacn-bmad-team/dacn-runs `
-  --run-id anoddpm-smoke-seed-17 `
+  --run-id $runId `
   --trainer dacn.training.anoddpm:train `
   --config-json '{"seed":17,"epochs":1,"batch_size":1,"base_channels":32,"maximum_training_timestep":100,"validation_reconstruction_steps":25,"max_train_samples":128,"max_validation_samples":16}'
 ```
@@ -156,6 +188,33 @@ and artifact path; its validation metrics are not research results. Record each
 run in `RESULT_TRACKING.md` after it starts, including failures and interruptions.
 The current trainer saves a best checkpoint but does not yet resume an interrupted
 run.
+
+## Run the local Jupyter controller
+
+From the repository root, install the optional notebook dependencies in the
+same Python environment that has the Modal CLI, then launch Jupyter:
+
+```powershell
+python -m pip install -e ".[cloud,hub,notebook]"
+jupyter lab notebooks/anoddpm_modal_local.ipynb
+```
+
+Run the notebook cells in order. The launch cell creates a fresh run ID and
+submits the documented one-epoch AnoDDPM smoke job to Modal; starting that cell
+uses GPU credit. The notebook streams the Modal logs, then downloads the pinned
+run manifest, training history, and validation metrics from the private model
+repo. It writes those aggregate files and a plot under
+`runs/modal_notebook/<run-id>/`, which is ignored by Git. A local HF token with
+read permission is required for this download. No MRI images or held-out test
+data are downloaded by this controller.
+
+This notebook is a local controller/viewer, not a Modal-hosted notebook and not
+a local training run. Its AnoDDPM job is only a pipeline diagnostic; its
+validation metrics are not a research result and do not implement the agreed
+primary partial-DDPM method. For an interactive run that should survive a
+terminal disconnect, use the documented `modal run --detach` option; Modal's
+current [CLI reference](https://modal.com/docs/cli/latest/run) documents both
+`--detach` and `--write-result` used by the notebook.
 
 ## Platform references
 

@@ -283,7 +283,7 @@ def main(
     run_id: str,
     trainer: str,
     config_json: str = "{}",
-):
+) -> str:
     """Launch one pinned training run; the Modal result is also synced to the Hub."""
     sha_result = subprocess.run(
         ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
@@ -305,4 +305,6 @@ def main(
         code_revision=code_revision,
         working_tree_dirty=working_tree_dirty,
     )
-    print(json.dumps(result, indent=2))
+    result_json = json.dumps(result, indent=2)
+    print(result_json)
+    return result_json

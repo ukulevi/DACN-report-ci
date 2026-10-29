@@ -21,6 +21,7 @@ local SSIM và số liệu hiệu năng mô hình chưa hoàn tất.** Demo cũ 
 - [Protocol data và lệnh chạy](docs/DATA_PROTOCOL.md)
 - [Hugging Face + Modal: lưu dataset và chạy experiment](docs/HUGGINGFACE_MODAL.md)
 - [Google Colab notebook: AnoDDPM smoke test và pilot](notebooks/anoddpm_bmad_colab.ipynb)
+- [Local Jupyter notebook: train trên Modal, xem output local](notebooks/anoddpm_modal_local.ipynb)
 - [Dataset đã xác minh: revision và cách tải cho nhóm](docs/DATASET_HANDOFF.md)
 - [Câu hỏi nghiên cứu, adaptation, thực nghiệm](docs/RESEARCH.md)
 - [Paper và thứ tự đọc](docs/REFERENCES.md)

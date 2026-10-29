@@ -47,3 +47,26 @@ and the relevant protocol in `docs/`.
   training job unless the user asked for it.
 - Report what changed and which checks were run. If no tests or experiments were
   run, say so explicitly.
+
+## Modal workflow
+
+- Before preparing or running a Modal job, read `docs/HUGGINGFACE_MODAL.md` and
+  the relevant requirements and data protocol. Treat Modal as remote compute:
+  the local Jupyter notebook submits and displays a job; its local kernel does
+  not train the model.
+- Use the shared team Modal Workspace so jobs can access the team's named
+  Volumes and `huggingface` Secret. Check the active Workspace and whether the
+  Secret name is present; never inspect, print, log, or commit its value. Do not
+  replace a shared Secret. If it is missing or needs rotation, explain that a
+  Workspace owner must provision it from a private local `.env` file.
+- Only start GPU work when the user explicitly asks. Start with the documented
+  bounded smoke configuration unless the user specifically requests a larger
+  run. Use a fresh run ID and immutable dataset revision for each attempt.
+- Record every training/evaluation attempt in `docs/RESULT_TRACKING.md` once it
+  starts, including failed and interrupted runs. Update the status from produced
+  artifacts; never infer metrics from logs or plans. Keep the held-out test split
+  out of trainer inputs and all model/threshold selection.
+- The current Modal AnoDDPM path is a diagnostic prototype. Do not describe it
+  as the agreed primary partial-DDPM research method. The local Jupyter workflow
+  downloads only aggregate run artifacts; do not pull patient-level data into
+  the notebook for display.
