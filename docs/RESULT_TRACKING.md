@@ -38,6 +38,31 @@ Copy this block for every actual run. Use `N/A` with a reason when a metric does
 not apply. For a failed or interrupted run, include the error class and last
 completed stage rather than fabricating metrics.
 
+### ddpm-partial-smoke-20261030T044737Z-79f605 — partial DDPM — completed smoke
+- Started/completed (UTC): 2026-10-30 04:48:42 / 04:49:54, manifest times;
+  upload completed afterward according to the Modal CLI result.
+- Issue: DAC-10/DAC-14. Code `a90b884`; working tree dirty, with exact sources
+  captured by the runner. Dataset `dacn-bmad-team/bmad-flair-patient-disjoint-v1`
+  at `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`.
+- Config: seed 17, one epoch, batch 1, 128 normal training slices and 16
+  validation slices, four validation reconstructions at t*=100. Checkpoint
+  selection used epsilon-MSE on 8 normal validation slices. Held-out test was
+  not passed to the trainer. One smoke seed completed; no anomaly thresholds,
+  ROC-AUC, Precision, Recall, F1, AP, Dice or test metrics were produced.
+- Resource observation: Tesla T4; 128 optimizer steps; 18.367 seconds for epoch
+  training plus normal validation, excluding checkpoint writes and preview;
+  peak allocated VRAM 799,354,880 bytes. End-to-end latency per image and credit
+  consumption were not measured. Normal-validation epsilon-MSE was
+  0.9969820901751518; this is a training diagnostic, not anomaly performance.
+- [Private artifact folder and manifest at immutable model revision
+  `62c0f78c5f49d5baaa52b0204f90033892f0fd6e`](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/62c0f78c5f49d5baaa52b0204f90033892f0fd6e/runs/ddpm-partial-smoke-20261030T044737Z-79f605):
+  `ddpm_best.pt`, `ddpm_last.pt`, private validation reconstructions, history,
+  metrics and source snapshot. [Modal app](https://modal.com/apps/tanh1c/main/ap-19UeEpUDpeaT9JlvN4TdX4).
+- This sample-limited run verifies the pipeline, not model performance. The
+  existing local notebook controls AnoDDPM and did not execute this DDPM run.
+- DAC-8 review completion and B/C data validation were reported by the project
+  lead; individual DAC-9 validator outputs have not yet been attached to Linear.
+
 ### anoddpm-local-smoke-20261029T055620Z-b71e — AnoDDPM-style BMAD adaptation — completed diagnostic smoke
 - Started/completed (UTC): Modal app initialized at approximately 05:56 UTC;
   trainer started 2026-10-29 05:57:01 UTC and completed 05:57:45 UTC (manifest).

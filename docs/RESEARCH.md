@@ -36,6 +36,17 @@ hoặc validation subset thành kết quả nghiên cứu.
 
 ## Protocol đánh giá
 
+Các hàm nền cho DAC-12/DAC-30 nằm trong `dacn.evaluation.scores` và
+`dacn.evaluation.validation`: `paired_score_maps` nhận một cặp 256×256 và trả
+hai score map đã crop; `evaluate_reconstructions` nối hai score với evaluator
+trên cùng các cặp reconstruction; `evaluate_maps` nhận map và mask đã crop 240×240, trả
+metric tổng hợp và chọn hai threshold riêng khi `split="validation"`. Khi
+`split="test"`, caller phải truyền threshold validation đã freeze và chịu
+trách nhiệm ghi provenance của threshold. Đây là API nền đã kiểm tra trên dữ
+liệu tổng hợp, chưa phải pipeline chạy dataset, sweep hay kết quả thực nghiệm.
+Caller phải dùng cùng tensor reconstruction cho hai map, không công bố UUID,
+ảnh hoặc mask; ghi checkpoint, seed, split và số seed theo protocol khi chạy thật.
+
 - Split `patient-disjoint-v1` và revision Hub cố định theo DATA_PROTOCOL. Validation có nhãn dùng chọn checkpoint/config/threshold: mô tả là normal-only training với labeled validation selection. Không dùng held-out test để lựa chọn hoặc tuning.
 - Pixel AP chính: global micro average precision trên vùng ảnh gốc 240×240, crop padding, gồm ảnh normal/abnormal. Report pixel/image ROC-AUC, Precision, Recall, F1; thêm pixel AP, Dice, latency, VRAM khi phù hợp. Image score là mean top 1% pixel score. Chốt threshold image và pixel riêng trên validation; pixel Dice micro-optimal trên validation là quy tắc dự kiến, phải freeze trước test.
 - Sweep và threshold đề xuất ở trên cần A/B review, rồi được đăng ký trước khi

@@ -20,6 +20,30 @@ source data in this file.
 
 ## Entries
 
+### 2026-10-30 — Run bounded partial-DDPM Modal smoke
+- Issue/PR: DAC-10, DAC-14; run `ddpm-partial-smoke-20261030T044737Z-79f605`.
+- Changes: Recorded the completed smoke and its provenance in RESULT_TRACKING.
+- Evidence/checks: The `tanh1c` Modal workspace and `huggingface` Secret name
+  were present. The pinned dataset passed validation; the job completed 128
+  optimizer steps and uploaded checkpoints and four private validation previews.
+  Manifest confirms Tesla T4 and completed status. No research evaluation or
+  test selection started. Resume and credit consumption were not measured.
+- Next: Attach B/C validator evidence to DAC-9, record the DAC-8 review decision,
+  demonstrate resume and estimate the resource budget before a larger run.
+
+### 2026-10-30 — Add paired scoring and evaluation primitives
+- Issue/PR: DAC-12 and DAC-30; work in progress on `feat/anoddpm-notebook-training`.
+- Changes: Added cropped pixel and local SSIM maps, image top-1% scores, validation
+  F1 threshold selection with tie rule, and aggregate image/pixel metrics. Updated
+  DAC-9 in Linear to distinguish the current pinned revision from the older export.
+- Evidence/checks: The full CPU suite passed (66 tests before the final paired
+  helper); the final focused suite passed (9 tests), covering score direction, crop,
+  SSIM formula, threshold ties, metric output and test-threshold guard. A final
+  full-suite rerun passed 67 tests; Ruff and formatting checks passed. No real-data
+  evaluation, training, Modal job or sweep was started in this implementation task.
+- Next: Collect B/C validator evidence, record DAC-8 review, integrate the evaluator
+  with the DDPM reconstruction runner and obtain teammate review before the sweep.
+
 ### 2026-10-29 — Address DAC-8 review findings
 - Issue/PR: [DAC-8](https://linear.app/dacn-khmt/issue/DAC-8/r01-chot-hop-djong-ddpm-partial-reconstruction-va-score); no PR linked.
 - Changes: Specified a review-pending SSIM, seed, validation sweep and threshold
