@@ -5,7 +5,12 @@ import json
 import numpy as np
 import pytest
 
-from dacn.data.hub import build_hf_export, validate_hf_export
+from dacn.data.hub import (
+    _dataset_card,
+    _legacy_dataset_card_v1,
+    build_hf_export,
+    validate_hf_export,
+)
 
 
 @pytest.fixture
@@ -84,6 +89,23 @@ def test_export_omits_source_patient_ids_and_validates(prepared_dataset, tmp_pat
     with (output / "data/train/index.csv").open(newline="", encoding="utf-8") as stream:
         train_groups = {row["patient_group_id"] for row in csv.DictReader(stream)}
     assert len(train_groups) == 1
+
+
+def test_validator_accepts_original_schema_v1_dataset_card(hf_export):
+    metadata = json.loads((hf_export / "dataset_metadata.json").read_text(encoding="utf-8"))
+    legacy_card = _legacy_dataset_card_v1(metadata)
+    assert legacy_card != _dataset_card(metadata)
+    (hf_export / "README.md").write_text(legacy_card, encoding="utf-8")
+
+    assert validate_hf_export(hf_export) == metadata
+
+
+def test_validator_rejects_modified_dataset_card(hf_export):
+    with (hf_export / "README.md").open("a", encoding="utf-8") as stream:
+        stream.write("\nUnreviewed text.\n")
+
+    with pytest.raises(ValueError, match="README differs"):
+        validate_hf_export(hf_export)
 
 
 def test_validator_rejects_shard_with_wrong_tensor_shape(hf_export):

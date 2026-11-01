@@ -223,6 +223,60 @@ Source archive SHA256: {metadata.get("source_archive_sha256") or "not provided"}
 """
 
 
+def _legacy_dataset_card_v1(metadata: dict) -> str:
+    """Reproduce the original schema-v1 card for immutable exports already on the Hub."""
+    counts = metadata["splits"]
+    train, val, test = counts["train"], counts["val"], counts["test"]
+    return f"""---
+task_categories:
+  - image-segmentation
+tags:
+  - brain-mri
+  - anomaly-detection
+  - bmad
+---
+
+# BMAD Brain FLAIR — {metadata["dataset_version"]}
+
+Privacy-minimized, sharded export of the BMAD Brain FLAIR 2D prepared dataset.
+The export contains image arrays, binary masks, split labels, opaque sample UUIDs,
+opaque patient-group UUIDs, and aggregate metadata. It omits the source manifest,
+original patient IDs, source filenames, and QC exclusion ledger. Group UUIDs allow
+patient-level bootstrap without revealing the source ID mapping.
+
+## Splits
+
+| Split | Samples | Normal | Anomaly |
+|---|---:|---:|---:|
+| Train | {train["samples"]} | {train["normal"]} | {train["anomaly"]} |
+| Validation | {val["samples"]} | {val["normal"]} | {val["anomaly"]} |
+| Test | {test["samples"]} | {test["normal"]} | {test["anomaly"]} |
+
+## Format
+
+Each `data/<split>/shard-*.npz` contains `images` (float32, N×1×256×256,
+normalized to [-1, 1]), `masks` (uint8, N×256×256, binary), and `labels`
+(uint8, N; 0=normal, 1=anomaly). Each split's `index.csv` maps an opaque sample
+UUID and patient-group UUID to a shard offset and label. UUIDs stay stable within
+this immutable Hub export. `dataset_metadata.json` records aggregate counts,
+preprocessing, source-manifest checksum, and shard/index checksums.
+
+## Source, terms, and limitations
+
+Source: [BMAD](https://github.com/DorisBao/BMAD), Brain FLAIR 2D. BMAD states
+CC BY-NC-SA terms; the underlying BraTS terms may add conditions. Confirm the
+right to store or redistribute this derived dataset before changing repository
+visibility or sharing it. A private Hub repository does not replace that check.
+
+The images are rendered PNG luminance, not original NIfTI intensity values.
+`patient-disjoint-v1` is a derived split for the pinned archive described by the
+project protocol, not a claim about BMAD's official split. This dataset is for
+research and is not for diagnosis.
+
+Source archive SHA256: {metadata.get("source_archive_sha256") or "not provided"}.
+"""
+
+
 def build_hf_export(
     source: Path,
     output: Path,
@@ -523,7 +577,9 @@ def validate_hf_export(
             actual_files.add(relative.as_posix())
     if actual_files != expected_files:
         raise ValueError("Hub export contains unexpected files; refusing to upload it")
-    if (path / "README.md").read_text(encoding="utf-8") != _dataset_card(metadata):
+    readme = (path / "README.md").read_text(encoding="utf-8")
+    allowed_cards = {_dataset_card(metadata), _legacy_dataset_card_v1(metadata)}
+    if readme not in allowed_cards:
         raise ValueError("Hub export README differs from the generated privacy-safe dataset card")
     return metadata
 

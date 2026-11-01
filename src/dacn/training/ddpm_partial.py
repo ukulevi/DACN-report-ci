@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import math
 import os
 import random
 import time
 import uuid
+from collections.abc import Callable
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable
 
 import numpy as np
 import torch
@@ -47,6 +47,7 @@ DEFAULTS = {
     "preview_starting_timestep": 100,
     "preview_samples": 4,
     "preview_seed_offset": 2_000_000,
+    "checkpoint_epochs": (),
 }
 
 METHOD = "ddpm_partial_reconstruction_bmad_flair"
@@ -134,6 +135,19 @@ def _resolved_config(config: dict) -> dict:
     result["channel_mults"] = tuple(channel_mults)
     if result["max_validation_samples"] is not None and result["max_validation_samples"] < 2:
         raise ValueError("max_validation_samples must include both validation classes")
+    checkpoint_epochs = result["checkpoint_epochs"]
+    if not isinstance(checkpoint_epochs, (tuple, list)):
+        raise TypeError("checkpoint_epochs must be a list of epoch numbers")
+    if any(
+        isinstance(epoch, bool) or not isinstance(epoch, int) or epoch < 1
+        for epoch in checkpoint_epochs
+    ):
+        raise ValueError("checkpoint_epochs must contain positive integers")
+    if len(set(checkpoint_epochs)) != len(checkpoint_epochs):
+        raise ValueError("checkpoint_epochs must not contain duplicates")
+    if any(epoch > result["epochs"] for epoch in checkpoint_epochs):
+        raise ValueError("checkpoint_epochs cannot exceed epochs")
+    result["checkpoint_epochs"] = tuple(sorted(checkpoint_epochs))
     return result
 
 
@@ -242,7 +256,7 @@ def _restore_rng_state(state: dict) -> None:
     np.random.set_state(state["numpy"])
     torch.set_rng_state(state["torch"].cpu())
     if torch.cuda.is_available() and state["cuda"]:
-        torch.cuda.set_rng_state_all(state["cuda"])
+        torch.cuda.set_rng_state_all([cuda_state.cpu() for cuda_state in state["cuda"]])
 
 
 def _save_checkpoint(path: Path, state: dict) -> None:
@@ -343,7 +357,7 @@ def derive_sampling_seed(base_seed: int, sample_id: str) -> int:
         canonical_id = str(uuid.UUID(sample_id))
     except ValueError as exc:
         raise ValueError("sample_id must be a Hub sample UUID string") from exc
-    payload = f"dacn-ddpm-seed-v1:{base_seed}:{canonical_id}".encode("utf-8")
+    payload = f"dacn-ddpm-seed-v1:{base_seed}:{canonical_id}".encode()
     return int.from_bytes(hashlib.sha256(payload).digest()[:4], "big")
 
 
@@ -546,6 +560,8 @@ def train(
             total_training_seconds=total_training_seconds,
         )
         _save_checkpoint(last_checkpoint_path, state)
+        if epoch in config["checkpoint_epochs"]:
+            _save_checkpoint(output_dir / f"ddpm_epoch_{epoch:03d}.pt", state)
         if best_improved:
             _save_checkpoint(best_checkpoint_path, state)
         _write_json(
@@ -631,9 +647,14 @@ def train(
         "normal_validation_samples": len(normal_validation_indices),
         "validation_samples_selected": len(validation_indices),
         "preview_starting_timestep_one_based": config["preview_starting_timestep"],
-        "preview_samples": int(len(original)),
+        "preview_samples": len(original),
         "checkpoint": best_checkpoint_path.name,
         "resume_checkpoint": last_checkpoint_path.name,
+        "milestone_checkpoints": [
+            f"ddpm_epoch_{epoch:03d}.pt"
+            for epoch in config["checkpoint_epochs"]
+            if (output_dir / f"ddpm_epoch_{epoch:03d}.pt").is_file()
+        ],
         "validation_reconstruction": "validation_reconstruction.npz",
         "training_history": "training_history.json",
         "training_seconds": total_training_seconds,

@@ -45,6 +45,24 @@ class FakeDiffusion:
         return torch.randn_like(images) * 0.1
 
 
+def test_restore_rng_state_moves_cuda_states_to_cpu(monkeypatch):
+    class FakeCudaState:
+        def cpu(self):
+            return torch.tensor([1, 2, 3], dtype=torch.uint8)
+
+    state = ddpm_partial._rng_state()
+    state["cuda"] = [FakeCudaState()]
+    restored = []
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(torch.cuda, "set_rng_state_all", restored.extend)
+
+    ddpm_partial._restore_rng_state(state)
+
+    assert len(restored) == 1
+    assert restored[0].device.type == "cpu"
+    assert restored[0].dtype == torch.uint8
+
+
 def test_sampling_seeds_are_stable_per_uuid_and_reconstruction_is_batch_independent():
     first_id = "12345678-1234-5678-1234-567812345678"
     second_id = "abcdefab-1234-5678-1234-567812345678"
@@ -105,13 +123,13 @@ def test_anoddpm_accepts_runner_metadata_but_rejects_existing_artifacts(tmp_path
     monkeypatch.setattr(anoddpm, "ShardBatchSampler", stop_before_training)
     (tmp_path / "run_manifest.json").write_text("{}", encoding="utf-8")
     (tmp_path / "source_snapshot.zip").write_bytes(b"snapshot")
-    kwargs = dict(
-        train_dir=tmp_path,
-        validation_dir=tmp_path,
-        output_dir=tmp_path,
-        config={"max_train_samples": 2, "max_validation_samples": 2},
-        device=torch.device("cpu"),
-    )
+    kwargs = {
+        "train_dir": tmp_path,
+        "validation_dir": tmp_path,
+        "output_dir": tmp_path,
+        "config": {"max_train_samples": 2, "max_validation_samples": 2},
+        "device": torch.device("cpu"),
+    }
     with pytest.raises(SamplerReached):
         anoddpm.train(**kwargs)
     (tmp_path / "anoddpm_best.pt").write_bytes(b"existing")
@@ -127,18 +145,19 @@ def test_epoch_time_is_not_double_counted_after_resume(tmp_path, monkeypatch):
     monkeypatch.setattr(ddpm_partial, "time", SimpleNamespace(perf_counter=lambda: next(ticks)))
     config = {
         "epochs": 2,
+        "checkpoint_epochs": [1, 2],
         "max_train_samples": 2,
         "max_validation_samples": 2,
         "preview_samples": 2,
         "batch_size": 1,
     }
-    kwargs = dict(
-        train_dir=tmp_path,
-        validation_dir=tmp_path,
-        output_dir=tmp_path,
-        config=config,
-        device=torch.device("cpu"),
-    )
+    kwargs = {
+        "train_dir": tmp_path,
+        "validation_dir": tmp_path,
+        "output_dir": tmp_path,
+        "config": config,
+        "device": torch.device("cpu"),
+    }
 
     class Interrupted(Exception):
         pass
@@ -149,7 +168,10 @@ def test_epoch_time_is_not_double_counted_after_resume(tmp_path, monkeypatch):
 
     with pytest.raises(Interrupted):
         ddpm_partial.train(**kwargs, on_checkpoint=interrupt_after_checkpoint)
+    assert (tmp_path / "ddpm_epoch_001.pt").is_file()
     result = ddpm_partial.train(**kwargs, resume_from_checkpoint=tmp_path / "ddpm_last.pt")
     assert result["epochs_completed"] == 2
     assert result["training_seconds"] == 5.0
     assert result["optimizer_steps"] == 4
+    assert result["milestone_checkpoints"] == ["ddpm_epoch_001.pt", "ddpm_epoch_002.pt"]
+    assert (tmp_path / "ddpm_epoch_002.pt").is_file()

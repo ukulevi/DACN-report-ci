@@ -39,6 +39,25 @@ and the relevant protocol in `docs/`.
   private medical data in these records. Use dataset commit/revision and safe
   aggregate provenance only.
 
+## Blockers and team handoff
+
+- When progress is blocked by missing access, an external dependency, a failed
+  prerequisite, a required team decision, or an artifact another member must
+  provide, create or update the corresponding entry in `docs/ISSUES.md` before
+  handing off the task. Do not use the blocker log for routine TODOs, expected
+  experiment runtime, or an issue resolved during the same task.
+- Use one stable blocker ID and update the existing entry instead of creating
+  duplicates. Record its status, owner, affected work, aggregate evidence,
+  attempts already made, the exact action needed from the next person, and the
+  condition that will close it. Mention the blocker ID in the handoff.
+- Keep resolved entries for history and add resolution evidence; do not silently
+  delete them. Linear remains the source of task ownership/status, while
+  `docs/RESULT_TRACKING.md` remains the source for actual run provenance and
+  metrics.
+- Apply the same privacy rules as all project records: never put credentials,
+  patient identifiers, source patient paths, private images, or per-sample
+  derived seeds in `docs/ISSUES.md`.
+
 ## Changes and validation
 
 - Follow `CONTRIBUTING.md` and the data/evaluation protocols. Preserve dataset
@@ -55,10 +74,11 @@ and the relevant protocol in `docs/`.
   the local Jupyter notebook submits and displays a job; its local kernel does
   not train the model.
 - Use the shared team Modal Workspace so jobs can access the team's named
-  Volumes and `huggingface` Secret. Check the active Workspace and whether the
-  Secret name is present; never inspect, print, log, or commit its value. Do not
-  replace a shared Secret. If it is missing or needs rotation, explain that a
-  Workspace owner must provision it from a private local `.env` file.
+  Volumes and `huggingface-secret-2` Secret. Check the active Workspace and
+  whether the Secret name is present; never inspect, print, log, or commit its
+  value. Do not replace a shared Secret. If it is missing or needs rotation,
+  explain that a Workspace owner must provision it from a private local `.env`
+  file.
 - Only start GPU work when the user explicitly asks. Start with the documented
   bounded smoke configuration unless the user specifically requests a larger
   run. Use a fresh run ID and immutable dataset revision for each attempt.

@@ -1,4 +1,4 @@
-"""Research CLI: dataset QC/preparation and synthetic metric smoke test."""
+"""Research CLI: dataset tools and a synthetic reconstruction/evaluation demo."""
 
 import argparse
 import json
@@ -6,11 +6,67 @@ import sys
 from pathlib import Path
 
 
+def _synthetic_reconstruction_split(seed):
+    """Create a tiny deterministic reconstruction split without medical data."""
+    import numpy as np
+
+    rng = np.random.default_rng(seed)
+    axis = np.linspace(-1.0, 1.0, 256, dtype=np.float64)
+    yy, xx = np.meshgrid(axis, axis, indexing="ij")
+    base = -0.8 + 0.7 * np.exp(-3.0 * (xx**2 + yy**2))
+    labels = np.array([0, 1, 0, 1], dtype=np.uint8)
+    images = np.empty((len(labels), 256, 256), dtype=np.float64)
+    reconstructions = np.empty_like(images)
+    masks = np.zeros_like(images, dtype=np.uint8)
+
+    for index, label in enumerate(labels):
+        normal = np.clip(base + 0.01 * (index - 1.5), -1.0, 1.0)
+        images[index] = normal
+        reconstructions[index] = np.clip(normal + rng.normal(0.0, 0.01, normal.shape), -1.0, 1.0)
+        if label:
+            top = 96 + 16 * index
+            left = 104 + 8 * index
+            lesion = (slice(top, top + 24), slice(left, left + 24))
+            images[index][lesion] = np.clip(images[index][lesion] + 0.6, -1.0, 1.0)
+            masks[index][lesion] = 1
+
+    return images, reconstructions, masks, labels
+
+
+def _run_synthetic_demo(seed):
+    """Run validation threshold selection and frozen-threshold test evaluation."""
+    from dacn.evaluation.validation import evaluate_reconstructions
+
+    validation_data = _synthetic_reconstruction_split(seed)
+    validation = evaluate_reconstructions(*validation_data, split="validation")
+    thresholds = {
+        method: {level: validation[method][level]["threshold"] for level in ("pixel", "image")}
+        for method in validation
+    }
+    test_data = _synthetic_reconstruction_split(seed + 1)
+    test = evaluate_reconstructions(*test_data, split="test", thresholds=thresholds)
+    return {
+        "warning": "Synthetic demo only; not trained-model or medical-model performance",
+        "seed": seed,
+        "score_direction": "higher_is_more_anomalous",
+        "protocol": (
+            "Select pixel/image thresholds on synthetic validation, then reuse the frozen "
+            "thresholds on synthetic test"
+        ),
+        "thresholds": thresholds,
+        "validation": validation,
+        "test": test,
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description="DACN research toolbox")
     sub = parser.add_subparsers(dest="command", required=True)
-    demo = sub.add_parser("demo", help="Synthetic metrics smoke test, NOT a trained model")
+    demo = sub.add_parser(
+        "demo", help="Synthetic reconstruction/evaluation demo, NOT a trained model"
+    )
     demo.add_argument("--output", type=Path, default=Path("runs/demo"))
+    demo.add_argument("--seed", type=int, default=17)
     data = sub.add_parser("data", help="Inspect or prepare BMAD Brain FLAIR data")
     data_sub = data.add_subparsers(dest="data_command", required=True)
     inspect = data_sub.add_parser("inspect", help="Read-only data quality checks")
@@ -125,13 +181,8 @@ def main():
             print(f"Data error: {exc}", file=sys.stderr)
             return 1
     if args.command == "demo":
-        from dacn.evaluation.metrics import compute_binary_metrics
-
         args.output.mkdir(parents=True, exist_ok=True)
-        result = {
-            "warning": "Synthetic demo only; not medical model performance",
-            "metrics": compute_binary_metrics([0, 0, 1, 1], [0.1, 0.4, 0.6, 0.9], threshold=0.5),
-        }
+        result = _run_synthetic_demo(args.seed)
         (args.output / "metrics.json").write_text(
             json.dumps(result, indent=2) + "\n", encoding="utf-8"
         )

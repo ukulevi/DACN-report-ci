@@ -329,4 +329,12 @@ def test_cli_prepare_and_original_demo(brain, tmp_path):
         text=True,
     )
     assert result.returncode == 0, result.stderr
-    assert (tmp_path / "demo/metrics.json").exists()
+    demo_metrics = json.loads((tmp_path / "demo/metrics.json").read_text())
+    assert set(demo_metrics["validation"]) == {"pixel_difference", "local_ssim"}
+    assert set(demo_metrics["test"]) == {"pixel_difference", "local_ssim"}
+    assert demo_metrics["score_direction"] == "higher_is_more_anomalous"
+    for method, thresholds in demo_metrics["thresholds"].items():
+        assert demo_metrics["validation"][method]["threshold_selection"].startswith("validation")
+        assert demo_metrics["test"][method]["threshold_selection"].startswith("provided")
+        assert demo_metrics["test"][method]["pixel"]["threshold"] == thresholds["pixel"]
+        assert demo_metrics["test"][method]["image"]["threshold"] == thresholds["image"]

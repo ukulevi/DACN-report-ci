@@ -162,10 +162,10 @@ def _remove_temporary_run_files(run_dir: Path) -> None:
 
 @app.function(
     image=image,
-    gpu="T4",
-    timeout=6 * 60 * 60,
+    gpu="A100",
+    timeout=10 * 60 * 60,
     volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
-    secrets=[modal.Secret.from_name("huggingface")],
+    secrets=[modal.Secret.from_name("huggingface-secret-2")],
 )
 def train_remote(
     dataset_repo_id: str,
@@ -333,7 +333,9 @@ def train_remote(
         persist_stage("hub_authentication")
         token = os.environ.get("HF_TOKEN")
         if not token:
-            raise RuntimeError("Modal Secret 'huggingface' must contain a write-capable HF_TOKEN")
+            raise RuntimeError(
+                "Modal Secret 'huggingface-secret-2' must contain a write-capable HF_TOKEN"
+            )
         api = HfApi(token=token)
 
         # Verify private destination access before any GPU training is invoked.
@@ -517,15 +519,18 @@ def train_remote(
                         )
                         manifest["artifact_sync_status"] = "uploaded_partial"
                         manifest["model_revision"] = getattr(commit, "oid", None)
-                    except Exception as upload_exc:
+                    except Exception as upload_exc:  # noqa: BLE001
                         manifest["artifact_sync_status"] = "modal_volume_only"
                         manifest["artifact_sync_error_type"] = type(upload_exc).__name__
                     manifest["updated_at"] = datetime.now(timezone.utc).isoformat()
                     _write_run_manifest(run_dir, manifest)
                     run_volume.commit()
-            except Exception:
-                # Preserve the primary error; Modal logs remain the diagnostic source.
-                pass
+            except Exception as cleanup_exc:  # noqa: BLE001
+                # Preserve the primary error and log only the cleanup error class.
+                print(
+                    f"failed_run_record_error={type(cleanup_exc).__name__}",
+                    flush=True,
+                )
         raise
 
 

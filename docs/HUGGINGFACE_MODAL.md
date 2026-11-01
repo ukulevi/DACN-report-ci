@@ -54,10 +54,11 @@ Hub commit SHA. Pin that SHA for Modal runs instead of using moving `main`.
 ## Modal credentials and storage
 
 The project uses a shared Modal Workspace, which owns the Volumes and the
-`huggingface` Secret used by jobs. Each teammate needs to be invited to that
-Workspace and authenticate their own Modal CLI. In the dashboard, confirm the
-active Workspace is the team one before running commands; a personal Workspace
-will not have the team's Secret or cached Volumes. See Modal's [Workspace guide](https://modal.com/docs/guide/workspaces).
+`huggingface-secret-2` Secret used by jobs. Each teammate needs to be invited to
+that Workspace and authenticate their own Modal CLI. In the dashboard, confirm
+the active Workspace is the team one before running commands; a personal
+Workspace will not have the team's Secret or cached Volumes. See Modal's
+[Workspace guide](https://modal.com/docs/guide/workspaces).
 
 ```powershell
 python -m pip install -e ".[cloud,hub,notebook]"
@@ -65,14 +66,14 @@ modal setup
 modal secret list
 ```
 
-`modal secret list` should show a Secret named `huggingface`; it does not reveal
-the token value. The Workspace owner provisions this shared Secret once from a
-private local `.env` file containing `HF_TOKEN`:
+`modal secret list` should show a Secret named `huggingface-secret-2`; it does not
+reveal the token value. The Workspace owner provisions this shared Secret once
+from a private local `.env` file containing `HF_TOKEN`:
 
 ```powershell
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 # Edit .env locally and fill HF_TOKEN; never paste the token in chat or commit it.
-modal secret create huggingface --from-dotenv .env
+modal secret create huggingface-secret-2 --from-dotenv .env
 ```
 
 Run the create command only if the Secret is absent. Do not overwrite the shared
@@ -88,12 +89,13 @@ from `hf auth login`. This local token is not sent to Modal; the remote job uses
 the shared Modal Secret. A terminal run that only uploads artifacts does not
 need a local token once the shared Secret is configured.
 
-The app uses a T4 GPU, a six-hour job timeout, a persistent dataset Volume, and
-a persistent run Volume. Modal injects the Hub token from the `huggingface`
-Secret. The token's account must have write access to the organization's model
-repo for run uploads. Dataset shards are cached by repo and immutable commit
-SHA. The run Volume is committed before the output folder is uploaded to the
-private model repo `dacn-bmad-team/dacn-runs` at `runs/<run-id>`.
+The app uses an A100 GPU, a six-hour job timeout, a persistent dataset Volume, and
+a persistent run Volume. Modal injects the Hub token from the
+`huggingface-secret-2` Secret. The token's account must have write access to the
+organization's model repo for run uploads. Dataset shards are cached by repo and
+immutable commit SHA. The run Volume is committed before the output folder is
+uploaded to the private model repo `dacn-bmad-team/dacn-runs` at
+`runs/<run-id>`.
 
 ## DAE pilot on Modal
 
@@ -138,7 +140,7 @@ modal run --detach src/dacn/cloud/modal_train.py `
 The command still streams logs while connected and prints the Hub run URL when
 the function completes.
 
-The T4 and six-hour timeout are hard ceilings, not a guarantee that a run fits a
+The A100 and six-hour timeout are hard ceilings, not a guarantee that a run fits a
 free-credit balance. This is a BMAD FLAIR adaptation of the published DAE
 baseline, not an exact reproduction of its four-modality experiment.
 
@@ -204,6 +206,35 @@ inside the private model repo and Volume.
 If a handled failure occurs after the private model repo is verified, the runner
 also attempts to upload the partial run record; otherwise the Modal run Volume
 retains the failure manifest and any completed-epoch checkpoint.
+
+### Full-data A100 training configuration
+
+[`ddpm_partial_a100_seed17.json`](../configs/ddpm_partial_a100_seed17.json) is the
+budgeted full-data training configuration: seed 17, 30 epochs, batch size 1,
+all 7,500 normal training slices and all validation slices. The trainer uses only
+the 39 normal validation slices for fixed-noise epsilon-MSE checkpoint selection,
+saves `ddpm_best.pt` and `ddpm_last.pt`, and never receives the test directory.
+It also retains full-state milestone checkpoints at epochs 5, 10, 20 and 30 as
+`ddpm_epoch_005.pt`, `ddpm_epoch_010.pt`, `ddpm_epoch_020.pt`, and
+`ddpm_epoch_030.pt`.
+The Modal function timeout is 10 hours so the 225,000-step budget can finish at
+the observed A100 throughput without being terminated near the final epochs.
+This run trains a checkpoint only; it does not authorize a timestep/score sweep
+or held-out test evaluation before the corresponding review gates.
+
+From a macOS/Linux terminal:
+
+```bash
+RUN_ID="ddpm-partial-a100-s17-e30-$(date -u +%Y%m%dT%H%M%SZ)"
+CONFIG_JSON="$(tr -d '\n' < configs/ddpm_partial_a100_seed17.json)"
+modal run --detach src/dacn/cloud/modal_train.py \
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 \
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 \
+  --model-repo-id dacn-bmad-team/dacn-runs \
+  --run-id "$RUN_ID" \
+  --trainer dacn.training.ddpm_partial:train \
+  --config-json "$CONFIG_JSON"
+```
 
 Modal shut down its hosted notebook editor on October 23, 2026. The project also
 provides a local Jupyter controller at

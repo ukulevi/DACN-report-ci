@@ -20,12 +20,186 @@ source data in this file.
 
 ## Entries
 
+### 2026-11-01 — Add blocker tracking and team handoff rules
+- Issue/PR: User-requested shared blocker log; no issue or PR was provided.
+- Changes: Added `docs/ISSUES.md` with a stable blocker template, summary table,
+  ownership/handoff fields, privacy rules, and two evidence-backed current
+  blockers covering the incomplete primary DDPM run and validation false
+  positives. Updated `AGENTS.md` so AI agents create or update this log before
+  handing off unresolved blockers while keeping Linear and result tracking as
+  their existing sources of truth.
+- Evidence/checks: Reviewed the contributor workflow, project requirements,
+  research protocol and recorded run results; `git diff --check` passed.
+  Documentation-only change; no training, evaluation or test suite was run.
+- Next: Confirm owners during team handoff, resume or close
+  `BLK-20261101-01`, and use the fixed validation protocol to investigate
+  `BLK-20261101-02` without opening held-out test data.
+
+### 2026-10-31 — Add real-checkpoint validation evaluation runner
+- Issue/PR: User-requested testing of epoch-5 and epoch-10 checkpoints; no issue
+  or PR was provided.
+- Changes: Added a validation-only checkpoint evaluator and Modal boundary for
+  deterministic partial reconstruction, pixel-difference/local-SSIM scoring,
+  threshold selection, aggregate metrics, incremental durable results and
+  private artifact upload. The evaluator has no held-out test path.
+- Evidence/checks: The complete local suite passed with 58 tests and 3
+  PyTorch-dependent skips; targeted Ruff, Python compilation and
+  `git diff --check` passed. The four-sample epoch-5 `t*=100` smoke completed on
+  `NVIDIA A100-SXM4-40GB`, wrote aggregate results, explicitly recorded no
+  held-out test use, and uploaded private artifacts at model revision
+  `5e77e82dddfc423af2bf179282441978ee08d6f3`. The subsequent full sweep
+  completed all six epoch/timestep combinations over 83 validation slices on
+  the same A100 class. Local one-minus-SSIM with epoch 10 and `t*=300` had the
+  best pixel AP (0.095895) and pixel AUROC (0.892010); its micro pixel F1 was
+  0.161616 and macro lesion-slice Dice was 0.241476. The final manifest records
+  six of six combinations complete, private artifact revision
+  `51a9c22ee71bdae7d9d78538fb8664a7b96c9e48`, and no held-out test use.
+- Next: Freeze the validation-selected epoch/timestep, score formula,
+  aggregation and threshold protocol before authorizing one held-out test run;
+  obtain additional seeds before drawing research conclusions.
+
+### 2026-10-31 — Download epoch-5 and epoch-10 DDPM checkpoints
+- Issue/PR: User-requested local checkpoint copies; no issue or PR was provided.
+- Changes: Downloaded `ddpm_epoch_005.pt` and `ddpm_epoch_010.pt` from the
+  stopped milestone run's Modal Volume into the ignored local `checkpoints/`
+  run directory. No remote artifact was changed or deleted.
+- Evidence/checks: Both files are approximately 126 MB. Local SHA-256 values
+  `8c1d957265858c70879f46273691be7d88e93c4a562d50168c2991716aed682f`
+  and `b828b5889d4164c0d9cebbbe0bf7afb603f5bec9ad7c84508baa222a26bc4fc9`
+  match the durable Modal manifest for epochs 5 and 10 respectively.
+- Next: Use these private local checkpoints for validation-only reconstruction
+  and scoring; do not select parameters on the held-out test split.
+
+### 2026-10-31 — Fix CUDA RNG restore and restart detached DDPM training
+- Issue/PR: User-requested restart after a Modal client cancellation; no issue or
+  PR was provided.
+- Changes: Reproduced the epoch-4 resume failure, converted restored CUDA RNG
+  states to CPU ByteTensors before calling PyTorch's CUDA RNG API, added a
+  regression test, and invoked `train_remote` directly with Modal detach instead
+  of the client-bound local controller. Preserved all earlier run artifacts.
+- Evidence/checks: The resume attempt passed config/source provenance and then
+  failed with `TypeError: RNG state must be a torch.ByteTensor` before epoch 5;
+  its epoch-4 checkpoints remained intact. The local suite passed with 58 tests
+  and 2 PyTorch-dependent skips; targeted Ruff, JSON validation, Python
+  compilation and `git diff --check` passed. Fresh run
+  `ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z` has a durable
+  manifest confirming the immutable dataset revision, milestones `[5,10,20,30]`,
+  and `NVIDIA A100-SXM4-40GB`. At the user's request, the app stopped at
+  07:07:05 UTC during epoch 11, step 1,800/7,500. Epoch 10 and 75,000 optimizer
+  steps are durable; the Volume contains milestone checkpoints for epochs 5 and
+  10 plus `ddpm_last.pt` and `ddpm_best.pt`. Best epoch is 10 with
+  normal-validation epsilon-MSE 0.0101424818. No anomaly/test metric was
+  produced.
+- Next: Preserve the stopped artifacts or resume the exact run from epoch 11 if
+  later milestones are required.
+
+### 2026-10-31 — Retain DDPM milestone and best checkpoints
+- Issue/PR: User-requested epoch 5, 10, 20 and 30 checkpoints; no issue or PR
+  was provided.
+- Changes: Added validated `checkpoint_epochs` configuration and atomic full-state
+  checkpoint retention as `ddpm_epoch_005.pt`, `010.pt`, `020.pt`, and `030.pt`,
+  while preserving validation-selected `ddpm_best.pt` and resumable
+  `ddpm_last.pt`. Updated the full A100 config, guide, and resume contract test.
+- Evidence/checks: The local suite passed with 58 tests and 2 PyTorch-dependent
+  skips; targeted Ruff, JSON validation, Python compilation and
+  `git diff --check` passed. Fresh run
+  `ddpm-partial-a100-s17-e30-milestones-20261030T165258Z` has a durable manifest
+  confirming the immutable dataset revision, milestone list `[5,10,20,30]`,
+  status `running`, stage `training`, and `NVIDIA A100-SXM4-80GB`. A later Modal
+  client cancellation stopped the function in epoch 5 at step 2,400/7,500.
+  Epoch 4 and 30,000 optimizer steps are durable; `ddpm_last.pt` and
+  `ddpm_best.pt` both represent epoch 4, with best normal-validation epsilon-MSE
+  0.0138888134. No epoch-5 milestone or anomaly/test metric was produced. The
+  interrupted epoch-2 run remains unchanged.
+- Next: Resume the same milestone run from epoch 5 using its exact config and
+  source snapshot, with a launch method that does not tie cancellation to the
+  local controller lifecycle.
+
+### 2026-10-30 — Change the full-data A100 budget to 30 epochs
+- Issue/PR: User-authorized replacement of the running 40-epoch retry; no issue
+  or PR was provided.
+- Changes: Stopped `ddpm-partial-a100-s17-e40-retry-20261030T145811Z`, changed
+  the reproducible seed-17 config and launch guide to 30 epochs (at most 225,000
+  optimizer steps), raised the Modal function timeout from 6 to 10 hours for the
+  observed A100 throughput, and retained the same full training data,
+  validation-only checkpoint selection, `T=1000`, and held-out test isolation.
+- Evidence/checks: Modal reports the replaced A100 app stopped at 15:02:43 UTC.
+  Its last output was epoch 1, step 2,300/7,500 with no completed epoch or
+  checkpoint; zero seeds completed and no anomaly/test metric was produced.
+  JSON validation, Python compilation, `git diff --check`, and the local suite
+  passed with 58 tests and 2 PyTorch-dependent skips. The replacement run
+  `ddpm-partial-a100-s17-e30-20261030T150704Z` has a durable manifest confirming
+  30 epochs, the immutable dataset revision, and `NVIDIA A100 80GB PCIe`. At the
+  user's request, Modal stopped that run at 15:29:27 UTC during epoch 3, step
+  2,600/7,500. The Volume retains `ddpm_last.pt` and `ddpm_best.pt` from epoch 2;
+  the aggregate history confirms 15,000 optimizer steps and best normal-validation
+  epsilon-MSE 0.0652383983. No anomaly or held-out test metric was produced.
+- Next: Resume the same run ID with its exact config and source snapshot if the
+  user wants to continue from epoch 3; otherwise preserve it as interrupted.
+
+### 2026-10-30 — Start full-data partial-DDPM training on Modal A100
+- Issue/PR: User-authorized run
+  `ddpm-partial-a100-s17-e40-20261030T144735Z`; no issue or PR was provided.
+- Changes: Synchronized the active Modal guide from T4 to A100, added the
+  reproducible 40-epoch seed-17 full-data config, and registered the running
+  training attempt in `RESULT_TRACKING.md`.
+- Evidence/checks: Confirmed Modal Workspace `phutungcogioihaitan` and Secret
+  `huggingface-secret-2`; validated the 25-key JSON config; Python compilation,
+  `git diff --check`, and the local suite passed with 58 tests and 2
+  PyTorch-dependent skips. The durable Modal manifest confirms immutable dataset
+  revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`, status `running`, stage
+  `training`, and `NVIDIA A100-SXM4-40GB`. A later client cancellation stopped
+  the run at epoch 1, step 4,700/7,500 before any checkpoint; the run Volume has
+  only its manifest and source snapshot. No evaluation or held-out test run was
+  started, and no model result was produced.
+- Next: Stop the stale app and launch a fresh run ID with the same config; this
+  attempt cannot resume because no completed-epoch checkpoint exists.
+
+### 2026-10-30 — Retry full-data A100 run after client cancellation
+- Issue/PR: User-authorized retry
+  `ddpm-partial-a100-s17-e40-retry-20261030T145811Z`; no issue or PR was provided.
+- Changes: Confirmed the previous function input was canceled before its first
+  checkpoint, recorded that attempt as interrupted, and launched a fresh run ID
+  with the identical source snapshot, immutable dataset revision and config.
+- Evidence/checks: Modal reported the old app stopped at 21:57:55+07. The new
+  durable manifest confirms status `running`, stage `training`, and
+  `NVIDIA A100-SXM4-40GB`; initial output reached epoch 1, step 200/7,500. No
+  evaluation or held-out test run was started.
+- Next: Keep the local detached client alive, confirm the first completed-epoch
+  checkpoint, and update both run records from durable artifacts.
+
+### 2026-10-30 — Add a runnable paired-score evaluation demo
+- Issue/PR: Not provided.
+- Changes: Replaced the scalar metric example with a deterministic synthetic
+  reconstruction pipeline that evaluates pixel difference and local SSIM,
+  selects pixel/image thresholds on validation, and reuses those frozen
+  thresholds on test. Added macOS/Linux setup commands and CLI regression
+  assertions for the validation/test boundary.
+- Evidence/checks: The synthetic CLI demo completed and wrote aggregate JSON;
+  Ruff check/format, Python compilation, `git diff --check`, and the complete
+  CPU suite passed with 58 tests and 2 PyTorch-dependent skips. No medical data,
+  model training, or research evaluation run was used.
+- Next: Install a compatible PyTorch build in the project Python environment
+  before exercising DDPM training or reconstruction code locally.
+
+### 2026-10-30 — Point Modal jobs to the rotated Hugging Face secret
+- Issue/PR: Not provided.
+- Changes: Updated the active Modal runner and setup guidance to use
+  `huggingface-secret-2` while retaining `HF_TOKEN` as the injected environment
+  key. No credential value was stored in the repository.
+- Evidence/checks: `git diff --check`, Python compilation, and notebook JSON
+  validation passed. Modal Workspace verification was not run because the Modal
+  CLI is not installed in this environment. No Modal job or model training run
+  was started.
+- Next: Confirm `huggingface-secret-2` exists in the shared Modal Workspace and
+  contains a read/write-capable `HF_TOKEN` before the next job.
+
 ### 2026-10-30 — Run bounded partial-DDPM Modal smoke
 - Issue/PR: DAC-10, DAC-14; run `ddpm-partial-smoke-20261030T044737Z-79f605`.
 - Changes: Recorded the completed smoke and its provenance in RESULT_TRACKING.
-- Evidence/checks: The `tanh1c` Modal workspace and `huggingface` Secret name
-  were present. The pinned dataset passed validation; the job completed 128
-  optimizer steps and uploaded checkpoints and four private validation previews.
+- Evidence/checks: The `tanh1c` Modal workspace and `huggingface-secret` Secret
+  name were present. The pinned dataset passed validation; the job completed
+  128 optimizer steps and uploaded checkpoints and four private validation previews.
   Manifest confirms Tesla T4 and completed status. No research evaluation or
   test selection started. Resume and credit consumption were not measured.
 - Next: Attach B/C validator evidence to DAC-9, record the DAC-8 review decision,
@@ -129,6 +303,17 @@ source data in this file.
   training function ran.
 - Next: Reconcile the pinned Hub card with the generated card/validator, then
   rerun this bounded smoke before treating the branch as merge-ready.
+### 2026-10-29 — Restore pinned dataset-card compatibility
+- Issue/PR: Not provided.
+- Changes: Preserved exact validation for the current generated dataset card and
+  added the original reviewed schema-v1 card as the only legacy alternative, so
+  the immutable pinned dataset remains usable without accepting arbitrary README
+  edits. Added positive and tamper-rejection regression tests, documented the
+  failed Modal smoke run, and recorded the reusable schema-versioning lesson.
+- Evidence/checks: Full Ruff check and format check passed; the complete suite
+  passed with 52 tests and 1 skip; `git diff --check` passed. No replacement
+  training run was started.
+- Next: Retry the bounded A100 smoke run with the same pinned dataset revision.
 
 ### 2026-10-29 — Add a Google Colab AnoDDPM training path
 - Issue/PR: Not provided.

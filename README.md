@@ -30,12 +30,29 @@ lập để kiểm tra metric. Sản phẩm phục vụ nghiên cứu, không d�
 
 ## Cài đặt và kiểm tra
 
+macOS/Linux (zsh hoặc bash):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[data,dev]"
+python -m pytest -q
+python -m dacn.cli demo --output runs/demo
+```
+
+Windows PowerShell:
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -e ".[data,dev]"
 .\.venv\Scripts\python.exe -m pytest -q
 .\.venv\Scripts\python.exe -m dacn.cli --help
 ```
+
+Lệnh `demo` tạo dữ liệu tổng hợp, tính pixel difference/local SSIM, chọn ngưỡng
+trên validation và dùng lại ngưỡng đã khóa trên test. Kết quả aggregate được ghi
+vào `runs/demo/metrics.json`; đây chỉ là kiểm tra pipeline, không phải hiệu năng
+mô hình hay kết quả trên dữ liệu y tế.
 
 Không cần GPU cho pipeline data. Cài PyTorch phù hợp thiết bị ở giai đoạn training.
 Notebook Colab mặc định chạy smoke test trên 128 ảnh train và 16 ảnh validation;

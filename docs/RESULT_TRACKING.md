@@ -30,13 +30,209 @@ clear; do not combine metrics from different splits or score definitions.
 
 | Run ID | Method | Dataset revision | Split | Seeds completed | ROC-AUC | Precision | Recall | F1 | Pixel AP / Dice | Latency / VRAM | Artifacts / manifest | Status |
 |---|---|---|---|---:|---:|---:|---:|---:|---|---|---|---|
-| No validated research model result recorded yet; diagnostic smoke runs are not research results. | | | | | | | | | | | | |
+| `ddpm-val-e5-e10-t100-200-300-20261031T074028Z` | Partial DDPM epoch 10, `t*=300`, local one-minus-SSIM; pixel level | `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7` | validation, 83 slices | 1 evaluation seed | 0.892010 | 0.101571 | 0.395303 | 0.161616 | AP 0.095895 / macro lesion-slice Dice 0.241476 | 11.210 s/slice / 100,651,520 B | [private revision `51a9c22e`](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/51a9c22ee71bdae7d9d78538fb8664a7b96c9e48/evaluations/ddpm-val-e5-e10-t100-200-300-20261031T074028Z) | validation-selected candidate; test sealed |
 
 ## Per-run record
 
 Copy this block for every actual run. Use `N/A` with a reason when a metric does
 not apply. For a failed or interrupted run, include the error class and last
 completed stage rather than fabricating metrics.
+
+### ddpm-val-e5-e10-t100-200-300-20261031T074028Z — validation sweep — completed
+- Started/completed (UTC): 2026-10-31 07:40:44 / 08:43:45 from the durable
+  evaluation manifest. Code revision
+  `e39632d1ef8b81d663aae82b8787a42f37ab03ee`; working tree dirty; exact Python
+  source snapshot SHA256
+  `a4ae2b89a3c6a2254d29accf7f48d341960f9fa9e78dd82f617ea772194ab523`.
+- Dataset and split: immutable private revision
+  `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; all 83 validation slices (39
+  normal, 44 anomalous). The manifest explicitly records held-out test use as
+  `false`.
+- Config: source checkpoints `ddpm_epoch_005.pt` and `ddpm_epoch_010.pt` from
+  run `ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z`, verified
+  by their recorded SHA256 values; starting timesteps 100, 200 and 300;
+  sampling base seed 17; pixel difference and local one-minus-SSIM scores.
+  Thresholds were selected separately on validation by maximum F1, taking the
+  largest threshold on a tie. Image scores are means over the top 576 pixels.
+- Validation selection: local one-minus-SSIM at epoch 10, `t*=300` maximized
+  the primary pixel AP across the six checkpoint/timestep combinations. Pixel
+  AUROC 0.892010, Precision 0.101571, Recall 0.395303, micro F1/Dice 0.161616,
+  AP 0.095895, and macro Dice over lesion slices 0.241476. Its image-level
+  AUROC was 0.344406, Precision 0.530120, Recall 1.0, F1 0.692913, and AP
+  0.454948. These are validation metrics from one inference seed, not test
+  results or uncertainty estimates.
+- Comparison: the best pixel-difference F1 was 0.165484 at epoch 5, `t*=300`,
+  with pixel AP 0.086649 and AUROC 0.831706. The local-SSIM primary candidate
+  was selected by pixel AP, not by image F1; all image-F1 values collapsed to
+  the all-positive validation operating point and should not drive selection.
+- Resource observation: `NVIDIA A100-SXM4-40GB`, batch size 1, 240x240 crop.
+  The selected combination took 930.401 seconds total, 11.210 seconds per
+  slice, and peak allocated VRAM was 100,651,520 bytes. No warmup-separated
+  median or p95 latency was measured.
+- [Private aggregate artifacts and manifest at immutable model revision
+  `51a9c22ee71bdae7d9d78538fb8664a7b96c9e48`](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/51a9c22ee71bdae7d9d78538fb8664a7b96c9e48/evaluations/ddpm-val-e5-e10-t100-200-300-20261031T074028Z).
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-CvDDPrqHJRM8Js3jj0BuhS).
+- Interpretation: all six requested validation combinations completed and were
+  durably uploaded. Freeze the selected validation protocol and obtain more
+  seeds before any one-time held-out test evaluation or research claim.
+
+### ddpm-val-smoke-e5-t100-20261031T073859Z — validation evaluator — completed smoke
+- Started/completed (UTC): 2026-10-31 07:39:16 / 07:39:49 from the durable
+  evaluation manifest. Code revision
+  `e39632d1ef8b81d663aae82b8787a42f37ab03ee`; working tree dirty; exact Python
+  source snapshot SHA256
+  `a4ae2b89a3c6a2254d29accf7f48d341960f9fa9e78dd82f617ea772194ab523`.
+- Dataset: immutable private revision
+  `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; validation split only. Held-out
+  test use is explicitly `false` in the manifest.
+- Config: epoch-5 checkpoint SHA256
+  `8c1d957265858c70879f46273691be7d88e93c4a562d50168c2991716aed682f`;
+  `t*=100`; sampling base seed 17; deterministic stratified limit of four
+  validation slices (two normal, two anomalous).
+- Diagnostic output: `NVIDIA A100-SXM4-40GB`; 10.897 seconds total, 2.724 seconds
+  per slice, peak allocated VRAM 100,651,520 bytes. Pixel AP was 0.075746 for
+  pixel difference and 0.106161 for local one-minus-SSIM. These four-slice
+  metrics validate the pipeline only and are not research results.
+- [Private aggregate artifacts at model revision
+  `5e77e82dddfc423af2bf179282441978ee08d6f3`](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/5e77e82dddfc423af2bf179282441978ee08d6f3/evaluations/ddpm-val-smoke-e5-t100-20261031T073859Z).
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-wDhW800vAY4ZQv39mu6LW9).
+
+### ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z — partial DDPM — interrupted, resumable
+- Started/interrupted (UTC): 2026-10-31 04:16:03 / 07:07:05. The start time is
+  from the durable manifest; the stop time is from the Modal app record.
+- Issue/PR: fresh run after correcting CUDA RNG-state restoration and replacing
+  the client-bound controller with direct detached remote invocation; no issue or
+  PR was provided. Code revision `e39632d1ef8b81d663aae82b8787a42f37ab03ee`;
+  working tree dirty; exact Python source snapshot SHA256
+  `5f04c494f975543e8146aa350e691bc33e331e197b5a95131d2b549d9ec1be75`.
+- Dataset: private `dacn-bmad-team/bmad-flair-patient-disjoint-v1` at immutable
+  revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; `patient-disjoint-v1`.
+  The trainer receives train and validation only; held-out test is not passed.
+- Config: normal-only partial DDPM; seed 17; 30 epochs; batch 1; all 7,500 normal
+  training slices; 39 normal validation slices for checkpoint selection;
+  Gaussian noise; `T=1000`; linear beta schedule; epsilon-prediction L2; AdamW
+  `lr=1e-4`; EMA 0.9999; maximum 225,000 optimizer steps. Full-state milestone
+  files are retained at epochs 5, 10, 20 and 30 in addition to `ddpm_best.pt`
+  and `ddpm_last.pt`.
+- Checkpoint/result status: the user intentionally stopped the app during epoch
+  11 at step 1,800/7,500. Epoch 10 completed with 75,000 optimizer steps. The
+  Volume retains `ddpm_epoch_005.pt`, `ddpm_epoch_010.pt`, `ddpm_last.pt`, and
+  `ddpm_best.pt`; the validation-selected best is epoch 10 with normal-validation
+  epsilon-MSE 0.0101424818. The last durable manifest remains at status
+  `running`, stage `training`, but the Modal app record confirms the
+  `NVIDIA A100-SXM4-40GB` job stopped. The run is resumable from epoch 11 with
+  the exact source snapshot and config. Zero full seeds completed; no anomaly
+  metric or held-out test evaluation exists.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-s5aqwTTko93RFtx7RHHocU).
+
+### ddpm-partial-a100-s17-e30-milestones-20261030T165258Z — partial DDPM — interrupted; resume attempt failed
+- Started/interrupted (UTC): 2026-10-30 17:12:59 / 18:01:07. The start time is
+  from the durable manifest; the interruption time is from the Modal client log.
+- Issue/PR: user-requested epoch 5, 10, 20 and 30 checkpoint retention plus the
+  validation-selected best checkpoint; no issue or PR was provided. Code revision
+  `e39632d1ef8b81d663aae82b8787a42f37ab03ee`; working tree dirty; exact Python
+  source snapshot SHA256
+  `a40f23113b3a954771c7c623dab147c29944f5e1750ca5cfcc6adcc09d5c5364`.
+- Dataset: private `dacn-bmad-team/bmad-flair-patient-disjoint-v1` at immutable
+  revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; `patient-disjoint-v1`.
+  The trainer receives train and validation only; held-out test is not passed.
+- Config: normal-only partial DDPM; seed 17; 30 epochs; batch 1; all 7,500 normal
+  training slices; 39 normal validation slices for checkpoint selection;
+  Gaussian noise; `T=1000`; linear beta schedule; epsilon-prediction L2; AdamW
+  `lr=1e-4`; EMA 0.9999; maximum 225,000 optimizer steps. Full-state milestone
+  files are retained at epochs 5, 10, 20 and 30 in addition to `ddpm_best.pt`
+  and `ddpm_last.pt`.
+- Checkpoint/result status: a Modal client cancellation stopped the function in
+  epoch 5 at step 2,400/7,500. Epoch 4 completed with 30,000 optimizer steps;
+  the Volume retains `ddpm_last.pt` and `ddpm_best.pt`, both at epoch 4. The best
+  normal-validation epsilon-MSE is 0.0138888134. The first requested milestone
+  is epoch 5, so no milestone file exists yet. The durable manifest remains at
+  status `running`, stage `training`, but Modal has no active app/task. The run
+  was eligible to resume from epoch 5 with the same source snapshot and config.
+  A direct detached resume attempt passed provenance checks but failed before
+  epoch 5 training because CUDA RNG tensors loaded onto the GPU were passed to
+  an API requiring CPU ByteTensors (`TypeError`); the epoch-4 checkpoints were
+  not overwritten. Zero full seeds completed; no anomaly metric or held-out test
+  evaluation exists.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-gPqtekWaMpUbER5eHFc9CL).
+
+### ddpm-partial-a100-s17-e30-20261030T150704Z — partial DDPM — interrupted, resumable
+- Started/interrupted (UTC): 2026-10-30 15:07:21 / 15:29:27. The start time is
+  from the durable Modal manifest; the stop time is from the Modal app record.
+- Issue/PR: user-authorized 30-epoch replacement run; no issue or PR was
+  provided. Code revision `e39632d1ef8b81d663aae82b8787a42f37ab03ee`;
+  working tree dirty; exact Python source snapshot SHA256
+  `b0e67ccbb051a24b81fca6a18805a49c748235d60ce96bcc6d6632f60d6d6e10`.
+- Dataset: private `dacn-bmad-team/bmad-flair-patient-disjoint-v1` at immutable
+  revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; `patient-disjoint-v1`.
+  The trainer receives train and validation only; held-out test is not passed.
+- Config: normal-only partial DDPM; seed 17; 30 epochs; batch 1; all 7,500 normal
+  training slices; 39 normal validation slices for checkpoint selection;
+  Gaussian noise; `T=1000`; linear beta schedule; epsilon-prediction L2; AdamW
+  `lr=1e-4`; EMA 0.9999; maximum 225,000 optimizer steps; 10-hour function
+  timeout.
+- Checkpoint/result status: the user intentionally stopped the app during epoch
+  3 at step 2,600/7,500. Epochs 1 and 2 completed (15,000 optimizer steps), and
+  the Volume retains both `ddpm_last.pt` and `ddpm_best.pt`; both currently
+  represent epoch 2, which is also the validation-selected best epoch with
+  normal-validation epsilon-MSE 0.0652383983. The last durable manifest remains
+  at status `running`, stage `training`, but the Modal app record confirms the
+  `NVIDIA A100 80GB PCIe` job stopped. The run is resumable from epoch 3 with the
+  same run ID, config and source snapshot. Zero full seeds completed; no anomaly
+  metric or held-out test evaluation exists.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-vINvpDwCb8El3JTFjeC5el).
+
+### ddpm-partial-a100-s17-e40-retry-20261030T145811Z — partial DDPM — interrupted
+- Started/interrupted (UTC): 2026-10-30 14:58:33 / 15:02:43. The start time is
+  from the durable Modal manifest; the stop time is from the Modal app record.
+- Issue/PR: fresh retry after the preceding attempt was canceled before its first
+  completed epoch; no issue or PR was provided. Code revision
+  `e39632d1ef8b81d663aae82b8787a42f37ab03ee`; working tree dirty; exact Python
+  source snapshot SHA256
+  `cc8f607f274ba4d57d411ff08aaec7fb55637665a5f32972426de7e359d644b1`.
+- Dataset: private `dacn-bmad-team/bmad-flair-patient-disjoint-v1` at immutable
+  revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; `patient-disjoint-v1`.
+  The trainer receives train and validation only; held-out test is not passed.
+- Config: normal-only partial DDPM; seed 17; 40 epochs; batch 1; all 7,500 normal
+  training slices; 39 normal validation slices for checkpoint selection;
+  Gaussian noise; `T=1000`; linear beta schedule; epsilon-prediction L2; AdamW
+  `lr=1e-4`; EMA 0.9999; maximum 300,000 optimizer steps.
+- Checkpoint/result status: the job was intentionally stopped when the requested
+  budget changed from 40 to 30 epochs. It reached epoch 1, step 2,300/7,500 with
+  running mean epsilon-MSE 0.044026, before any completed epoch or checkpoint.
+  Zero seeds completed; no anomaly metric or held-out test evaluation exists.
+  The last durable manifest remains at status `running`, stage `training`, while
+  the Modal app record confirms that the `NVIDIA A100-SXM4-40GB` job stopped.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-Ifrh5L4yHKikumhUHDPkCU).
+
+### ddpm-partial-a100-s17-e40-20261030T144735Z — partial DDPM — interrupted
+- Started/interrupted (UTC): 2026-10-30 14:48:46 / 14:56:29. The start time is
+  from the durable manifest; the interruption time is from the Modal client log.
+- Issue/PR: user-authorized full-data A100 training; no issue or PR was provided.
+  Code revision `e39632d1ef8b81d663aae82b8787a42f37ab03ee`; the working tree was
+  dirty and exact Python sources were captured in snapshot
+  `cc8f607f274ba4d57d411ff08aaec7fb55637665a5f32972426de7e359d644b1`.
+- Dataset: private `dacn-bmad-team/bmad-flair-patient-disjoint-v1` at immutable
+  revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; split policy
+  `patient-disjoint-v1`. The trainer receives train and validation only; held-out
+  test is not passed to it.
+- Training policy/config: normal-only partial DDPM; seed 17; 40 epochs; batch 1;
+  all 7,500 normal training slices; all validation slices selected, with only 39
+  normal slices used for fixed-noise epsilon-MSE checkpoint selection; Gaussian
+  noise; `T=1000`; linear beta schedule; epsilon-prediction L2; AdamW
+  `lr=1e-4`; EMA 0.9999. Expected maximum is 300,000 optimizer steps.
+- Checkpoints/results: the client cancellation occurred before epoch 1 completed,
+  at step 4,700/7,500 with running mean epsilon-MSE 0.027439. The Volume contains
+  only `run_manifest.json` and `source_snapshot.zip`; no `ddpm_best.pt` or
+  `ddpm_last.pt` exists, so this run cannot resume. Zero seeds completed. No
+  anomaly threshold, score/timestep sweep, ROC-AUC, Precision, Recall, F1, AP,
+  Dice or test metric was produced.
+- Resource/status: requested and confirmed GPU `NVIDIA A100-SXM4-40GB`. The
+  abrupt Modal cancellation left the last durable manifest at status `running`,
+  stage `training`; the absence of post-cancellation logs and checkpoints is the
+  evidence for interruption. This is not a completed training result.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-8EIIjwT7QoCK0YnNJl7OWD).
+  No private Hub artifact upload/model revision was produced.
 
 ### ddpm-partial-smoke-20261030T044737Z-79f605 — partial DDPM — completed smoke
 - Started/completed (UTC): 2026-10-30 04:48:42 / 04:49:54, manifest times;
@@ -171,3 +367,36 @@ completed stage rather than fabricating metrics.
 - Checkpoint, plots, and run_manifest.json links:
 - Failure, caveat, or interpretation:
 ```
+
+### anoddpm-a100-smoke-20261029-01 — AnoDDPM — failed before training
+
+- Started/completed (UTC): 2026-10-29; exact times were not captured.
+- Issue/PR: Not provided.
+- Code commit / dirty working tree: `36a56d4`; dirty because the Modal GPU was
+  changed from T4 to A100 in `modal_train.py`.
+- Dataset repo and immutable revision:
+  `dacn-bmad-team/bmad-flair-patient-disjoint-v1` at
+  `fbb884dfe144be5c71e205a73701507163557ea4`.
+- Split and patient-disjoint protocol: `patient-disjoint-v1`; validation stopped
+  before any split was passed to the trainer.
+- Training data policy (normal-only or other): Intended normal-only training;
+  training did not start.
+- Model / score formula / score direction: Intended AnoDDPM partial
+  reconstruction with higher scores meaning more anomalous; scoring did not run.
+- Training and scoring config: seed 17, 1 epoch, batch size 1, base channels 32,
+  maximum training timestep 100, 25 validation reconstruction steps, at most 128
+  training samples and 16 validation samples.
+- Seed(s) attempted / completed: 17 attempted / 0 completed.
+- Threshold source and selection rule (validation only): Not reached.
+- Validation metrics (level + aggregation): N/A; training and validation did not run.
+- Test metrics (level + aggregation; only after freeze): N/A; test was not used.
+- Latency (device, batch, precision, resolution, warmup, sample count; median/p95):
+  N/A; training did not start.
+- Peak VRAM: N/A; not captured before failure.
+- Checkpoint, plots, and run_manifest.json links: No artifacts or run manifest;
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-DQeLi3yfypZyKTnIcfRgKq).
+- Failure, caveat, or interpretation: `ValueError` from `validate_hf_export` after
+  download and before the trainer call. The pinned schema-v1 export contains the
+  original generated privacy-safe README, while commit `788ab72` expanded the
+  schema-v1 card template; exact comparison against only the new template caused
+  the compatibility failure.

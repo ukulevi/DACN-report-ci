@@ -85,6 +85,19 @@ source or run when possible. Append new entries at the top.
   diagnostics, not research results.
 - Source/run: `docs/HUGGINGFACE_MODAL.md`, run
   `anoddpm-smoke-20261029T0518Z` in `RESULT_TRACKING.md`.
+### 2026-10-29 — Preserve validators for immutable generated metadata
+
+- Observation/evidence: The pinned dataset revision passed its original full
+  validation, but a later documentation-only expansion of the generated card
+  caused Modal validation to fail before training because both cards used schema
+  version 1 and the validator recognized only the newest exact text.
+- Lesson: Exact validation of generated metadata is safe only when historical
+  generators remain recognized or the format version changes with the template.
+- Practice adopted: Generate new exports with the current card, accept only the
+  two exact reviewed schema-v1 templates for existing exports, and keep rejecting
+  arbitrary README changes.
+- Source/run: `anoddpm-a100-smoke-20261029-01`, `src/dacn/data/hub.py`, and
+  `tests/test_hub.py`.
 
 ### 2026-10-28 — Port the algorithm core, not dataset-specific epoch semantics
 - Observation/evidence: Upstream AnoDDPM loads NFBS/Edinburgh volume layouts
