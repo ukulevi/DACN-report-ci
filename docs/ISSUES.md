@@ -40,8 +40,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   `ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z` dừng trong
   epoch 11. Epoch 10 đã hoàn thành 75.000 optimizer steps; normal-validation
   epsilon-MSE tốt nhất là `0.0101424818`. Modal Volume giữ `ddpm_last.pt`,
-  `ddpm_best.pt` và milestone epoch 5/10. Chi tiết provenance nằm trong
-  [RESULT_TRACKING.md](RESULT_TRACKING.md).
+  `ddpm_best.pt` và milestone epoch 5/10. Checkpoint epoch 10 cùng manifest,
+  history và source snapshot đã được backup vào private Hugging Face model
+  revision `07ec8b455a3318a267df5568f7af3fa4f15d7a3c`. Chi tiết provenance nằm
+  trong [RESULT_TRACKING.md](RESULT_TRACKING.md).
 - **Attempts / constraints:** Resume chỉ hợp lệ khi cùng run ID, config, trainer,
   dataset revision và source snapshot SHA256 đã lưu. Phần epoch 11 chạy dở không
   có trong checkpoint và sẽ chạy lại từ đầu.

@@ -123,6 +123,14 @@ completed stage rather than fabricating metrics.
   `NVIDIA A100-SXM4-40GB` job stopped. The run is resumable from epoch 11 with
   the exact source snapshot and config. Zero full seeds completed; no anomaly
   metric or held-out test evaluation exists.
+- On 2026-11-01, the epoch-10 checkpoint and safe provenance files were synced
+  from the Modal Volume to the private model repo at immutable revision
+  `07ec8b455a3318a267df5568f7af3fa4f15d7a3c`. The checkpoint SHA256 is
+  `b828b5889d4164c0d9cebbbe0bf7afb603f5bec9ad7c84508baa222a26bc4fc9`, matching
+  the Modal manifest and local copy. This artifact sync used a CPU-only helper;
+  it did not resume training or perform a new evaluation.
+- [Private epoch-10 checkpoint and provenance at model revision
+  `07ec8b45`](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/07ec8b455a3318a267df5568f7af3fa4f15d7a3c/runs/ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z).
 - [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-s5aqwTTko93RFtx7RHHocU).
 
 ### ddpm-partial-a100-s17-e30-milestones-20261030T165258Z — partial DDPM — interrupted; resume attempt failed

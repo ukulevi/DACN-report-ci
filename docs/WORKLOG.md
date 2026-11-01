@@ -20,6 +20,23 @@ source data in this file.
 
 ## Entries
 
+### 2026-11-01 — Back up the epoch-10 checkpoint to private Hugging Face
+- Issue/PR: User-requested checkpoint upload; no issue or PR was provided.
+- Changes: Used the shared Modal Secret in a temporary CPU-only helper to sync
+  `ddpm_epoch_010.pt`, the durable run manifest, aggregate history/validation
+  metrics and exact source snapshot from `dacn-bmad-runs` to the existing
+  private `dacn-bmad-team/dacn-runs` model repo. No credential value, private
+  image or per-sample identifier was read or logged.
+- Evidence/checks: Hugging Face commit
+  `07ec8b455a3318a267df5568f7af3fa4f15d7a3c` reports a private destination. The
+  uploaded checkpoint SHA256
+  `b828b5889d4164c0d9cebbbe0bf7afb603f5bec9ad7c84508baa222a26bc4fc9` matches
+  the Modal manifest and prior local verification. No GPU, training or
+  evaluation run was started.
+- Next: Grant intended teammates private repo access or share the immutable
+  artifact link; resume the original Modal run separately if epoch 20/30 is
+  still required.
+
 ### 2026-11-01 — Add blocker tracking and team handoff rules
 - Issue/PR: User-requested shared blocker log; no issue or PR was provided.
 - Changes: Added `docs/ISSUES.md` with a stable blocker template, summary table,
