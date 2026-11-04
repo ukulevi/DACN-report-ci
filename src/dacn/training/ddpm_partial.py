@@ -31,6 +31,10 @@ DEFAULTS = {
     "timesteps": 1000,
     "beta_schedule": "linear",
     "loss_type": "l2",
+    "noise_type": "gaussian",
+    "simplex_octaves": 6,
+    "simplex_persistence": 0.8,
+    "simplex_frequency": 64.0,
     "base_channels": 32,
     "channel_mults": (1, 1, 2, 2, 4, 4),
     "num_res_blocks": 2,
@@ -75,6 +79,7 @@ def _resolved_config(config: dict) -> dict:
         "preview_starting_timestep",
         "preview_samples",
         "preview_seed_offset",
+        "simplex_octaves",
     )
     for key in positive_integers:
         value = result[key]
@@ -87,7 +92,15 @@ def _resolved_config(config: dict) -> dict:
         ):
             raise ValueError(f"{key} must be null or a positive integer")
 
-    numeric = ("learning_rate", "weight_decay", "dropout", "ema_decay", "gradient_clip_norm")
+    numeric = (
+        "learning_rate",
+        "weight_decay",
+        "dropout",
+        "ema_decay",
+        "gradient_clip_norm",
+        "simplex_persistence",
+        "simplex_frequency",
+    )
     for key in numeric:
         value = result[key]
         if isinstance(value, bool) or not isinstance(value, (int, float)):
@@ -107,6 +120,10 @@ def _resolved_config(config: dict) -> dict:
         raise ValueError("The reviewed-method candidate fixes a 1000-step linear beta schedule")
     if result["loss_type"] != "l2":
         raise ValueError("The reviewed-method candidate uses epsilon-prediction MSE")
+    if result["noise_type"] not in {"gaussian", "simplex"}:
+        raise ValueError("noise_type must be gaussian or simplex")
+    if not 0 < result["simplex_persistence"] <= 1 or result["simplex_frequency"] <= 0:
+        raise ValueError("Invalid simplex persistence or frequency")
     if result["base_channels"] % 32:
         raise ValueError("base_channels must be divisible by 32 for the U-Net GroupNorm layers")
     if result["preview_starting_timestep"] > result["timesteps"]:
@@ -314,14 +331,45 @@ def build_model(config: dict, device: torch.device | str = "cpu") -> UNetModel:
 
 
 def build_diffusion(config: dict) -> GaussianDiffusion:
-    """Create the fixed Gaussian DDPM forward and reverse process."""
+    """Create the fixed schedule with the checkpoint's configured forward noise."""
     config = _resolved_config(config)
     return GaussianDiffusion(
         timesteps=config["timesteps"],
         beta_schedule=config["beta_schedule"],
-        noise_type="gaussian",
+        noise_type=config["noise_type"],
         loss_type=config["loss_type"],
+        simplex_octaves=config["simplex_octaves"],
+        simplex_persistence=config["simplex_persistence"],
+        simplex_frequency=config["simplex_frequency"],
     )
+
+
+def _validate_resume_config(
+    checkpoint_config: dict,
+    requested_config: dict,
+    *,
+    completed_epoch: int,
+    allow_epoch_extension: bool,
+) -> None:
+    """Require an exact resume config unless only the run horizon is extended."""
+    checkpoint_config = _resolved_config(checkpoint_config)
+    requested_config = _resolved_config(requested_config)
+    if checkpoint_config == requested_config:
+        return
+    if not allow_epoch_extension:
+        raise ValueError("Resume config differs from the checkpoint config")
+
+    changed = {key for key in checkpoint_config if checkpoint_config[key] != requested_config[key]}
+    allowed_changes = {"epochs", "checkpoint_epochs"}
+    disallowed = changed - allowed_changes
+    if disallowed:
+        raise ValueError(
+            "Epoch extension cannot change training settings: " + ", ".join(sorted(disallowed))
+        )
+    if requested_config["epochs"] <= checkpoint_config["epochs"]:
+        raise ValueError("Epoch extension must increase the configured epoch horizon")
+    if requested_config["epochs"] <= completed_epoch:
+        raise ValueError("Epoch extension must end after the completed checkpoint epoch")
 
 
 def load_ema_checkpoint(
@@ -334,8 +382,12 @@ def load_ema_checkpoint(
     checkpoint = torch.load(Path(checkpoint_path), map_location="cpu", weights_only=False)
     if checkpoint.get("schema_version") != 1 or checkpoint.get("method") != METHOD:
         raise ValueError("Checkpoint schema or method does not match partial DDPM")
-    if checkpoint.get("config") != resolved:
-        raise ValueError("Checkpoint config differs from the requested DDPM config")
+    _validate_resume_config(
+        checkpoint.get("config"),
+        resolved,
+        completed_epoch=checkpoint.get("epoch", 0),
+        allow_epoch_extension=True,
+    )
     model = build_model(resolved, device)
     model.load_state_dict(checkpoint["ema"])
     model.eval()
@@ -384,6 +436,51 @@ def partial_reconstruct(
         return diffusion.reconstruct(model, images, steps=starting_timestep).clamp(-1, 1)
 
 
+@torch.inference_mode()
+def posterior_mean_reconstruct_batch(
+    model: torch.nn.Module,
+    images: torch.Tensor,
+    *,
+    starting_timestep: int,
+    seeds: list[int],
+    diffusion: GaussianDiffusion,
+) -> torch.Tensor:
+    """Batch deterministic reverse chains with per-sample initial-noise seeds."""
+    if isinstance(starting_timestep, bool) or not isinstance(starting_timestep, int):
+        raise TypeError("starting_timestep must be an integer")
+    if not 1 <= starting_timestep <= diffusion.timesteps:
+        raise ValueError("starting_timestep must be in [1, total_timesteps]")
+    if images.ndim != 4 or images.shape[1:] != (1, 256, 256) or not len(images):
+        raise ValueError("images must have nonempty shape [N, 1, 256, 256]")
+    if len(seeds) != len(images) or any(
+        isinstance(seed, bool) or not isinstance(seed, int) or not 0 <= seed < 2**32
+        for seed in seeds
+    ):
+        raise ValueError("seeds must contain one 32-bit integer per image")
+    if diffusion.noise_type != "gaussian":
+        raise ValueError("batched posterior-mean reconstruction currently requires Gaussian noise")
+
+    initial_noise = []
+    for image, seed in zip(images, seeds, strict=True):
+        generator = torch.Generator(device=images.device).manual_seed(seed)
+        initial_noise.append(
+            torch.randn(
+                image.shape,
+                device=images.device,
+                dtype=images.dtype,
+                generator=generator,
+            )
+        )
+    model.eval()
+    return diffusion.reconstruct(
+        model,
+        images,
+        steps=starting_timestep,
+        initial_noise=torch.stack(initial_noise),
+        reverse_sampler="posterior_mean",
+    ).clamp(-1, 1)
+
+
 def train(
     *,
     train_dir: Path,
@@ -392,10 +489,13 @@ def train(
     config: dict,
     device: torch.device,
     resume_from_checkpoint: Path | None = None,
+    allow_epoch_extension: bool = False,
     on_checkpoint: Callable[[dict], None] | None = None,
 ) -> dict:
     """Train epsilon-prediction DDPM on normal train slices; select by normal val loss."""
     config = _resolved_config(config)
+    if not isinstance(allow_epoch_extension, bool):
+        raise TypeError("allow_epoch_extension must be a boolean")
     _seed_everything(config["seed"])
     train_data = ShardDataset(train_dir, "train", include_masks=False)
     validation_data = ShardDataset(validation_dir, "val", include_masks=True)
@@ -475,8 +575,15 @@ def train(
         checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
         if checkpoint.get("schema_version") != 1 or checkpoint.get("method") != METHOD:
             raise ValueError("Resume checkpoint schema or method does not match")
-        if checkpoint.get("config") != config:
-            raise ValueError("Resume config differs from the checkpoint config")
+        checkpoint_epoch = checkpoint.get("epoch")
+        if isinstance(checkpoint_epoch, bool) or not isinstance(checkpoint_epoch, int):
+            raise ValueError("Resume checkpoint epoch is invalid")
+        _validate_resume_config(
+            checkpoint.get("config"),
+            config,
+            completed_epoch=checkpoint_epoch,
+            allow_epoch_extension=allow_epoch_extension,
+        )
         model.load_state_dict(checkpoint["model"])
         ema.load_state_dict(checkpoint["ema"])
         optimizer.load_state_dict(checkpoint["optimizer"])
@@ -485,7 +592,7 @@ def train(
         best_validation_noise_mse = checkpoint["best_validation_noise_mse"]
         optimizer_steps = checkpoint["optimizer_steps"]
         total_training_seconds = checkpoint["total_training_seconds"]
-        start_epoch = checkpoint["epoch"] + 1
+        start_epoch = checkpoint_epoch + 1
         train_sampler.epoch = checkpoint["sampler_epoch"]
         _restore_rng_state(checkpoint["rng_state"])
     else:

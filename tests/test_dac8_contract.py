@@ -1,5 +1,6 @@
 """Focused checks for DAC-8's runner boundary and reconstruction contract."""
 
+import json
 from types import SimpleNamespace
 
 import numpy as np
@@ -43,6 +44,25 @@ class FakeDiffusion:
 
     def reconstruct(self, model, images, *, steps):
         return torch.randn_like(images) * 0.1
+
+
+class FakePosteriorDiffusion:
+    timesteps = 1000
+    noise_type = "gaussian"
+
+    def reconstruct(
+        self,
+        model,
+        images,
+        *,
+        steps,
+        initial_noise=None,
+        reverse_sampler="ancestral",
+    ):
+        assert steps == 100
+        assert reverse_sampler == "posterior_mean"
+        assert initial_noise is not None
+        return initial_noise
 
 
 def test_restore_rng_state_moves_cuda_states_to_cpu(monkeypatch):
@@ -94,6 +114,39 @@ def test_sampling_seeds_are_stable_per_uuid_and_reconstruction_is_batch_independ
         )
 
 
+def test_posterior_mean_batch_keeps_initial_noise_independent_of_batch_order():
+    model = TinyModel()
+    images = torch.zeros(3, 1, 256, 256)
+    diffusion = FakePosteriorDiffusion()
+    seeds = [17, 18, 19]
+
+    together = ddpm_partial.posterior_mean_reconstruct_batch(
+        model,
+        images,
+        starting_timestep=100,
+        seeds=seeds,
+        diffusion=diffusion,
+    )
+    reversed_batch = ddpm_partial.posterior_mean_reconstruct_batch(
+        model,
+        images.flip(0),
+        starting_timestep=100,
+        seeds=list(reversed(seeds)),
+        diffusion=diffusion,
+    ).flip(0)
+
+    assert torch.equal(together, reversed_batch)
+    for index, seed in enumerate(seeds):
+        single = ddpm_partial.posterior_mean_reconstruct_batch(
+            model,
+            images[index : index + 1],
+            starting_timestep=100,
+            seeds=[seed],
+            diffusion=diffusion,
+        )
+        assert torch.equal(together[index : index + 1], single)
+
+
 def test_partial_ddpm_uses_one_based_timestep_and_full_reverse_chain(monkeypatch):
     diffusion = ddpm_partial.build_diffusion({})
     seen = []
@@ -110,6 +163,35 @@ def test_partial_ddpm_uses_one_based_timestep_and_full_reverse_chain(monkeypatch
     monkeypatch.setattr(diffusion, "p_sample", p_sample)
     diffusion.reconstruct(None, torch.zeros(1, 1, 4, 4), steps=3)
     assert seen == [("forward", 2), ("reverse", 2), ("reverse", 1), ("reverse", 0)]
+
+
+def test_posterior_mean_reverse_chain_does_not_sample_step_noise(monkeypatch):
+    diffusion = ddpm_partial.build_diffusion({})
+    seen = []
+
+    def q_sample(clean, timesteps, noise):
+        seen.append(("forward", int(timesteps[0])))
+        return clean
+
+    def p_mean_sample(model, noisy, timesteps):
+        seen.append(("mean", int(timesteps[0])))
+        return noisy
+
+    def reject_ancestral(*args, **kwargs):
+        raise AssertionError("posterior mean must not call ancestral p_sample")
+
+    monkeypatch.setattr(diffusion, "q_sample", q_sample)
+    monkeypatch.setattr(diffusion, "p_mean_sample", p_mean_sample)
+    monkeypatch.setattr(diffusion, "p_sample", reject_ancestral)
+    clean = torch.zeros(2, 1, 4, 4)
+    diffusion.reconstruct(
+        None,
+        clean,
+        steps=3,
+        initial_noise=torch.zeros_like(clean),
+        reverse_sampler="posterior_mean",
+    )
+    assert seen == [("forward", 2), ("mean", 2), ("mean", 1), ("mean", 0)]
 
 
 def test_anoddpm_accepts_runner_metadata_but_rejects_existing_artifacts(tmp_path, monkeypatch):
@@ -175,3 +257,93 @@ def test_epoch_time_is_not_double_counted_after_resume(tmp_path, monkeypatch):
     assert result["optimizer_steps"] == 4
     assert result["milestone_checkpoints"] == ["ddpm_epoch_001.pt", "ddpm_epoch_002.pt"]
     assert (tmp_path / "ddpm_epoch_002.pt").is_file()
+
+
+def test_completed_run_can_extend_only_epoch_horizon(tmp_path, monkeypatch):
+    monkeypatch.setattr(ddpm_partial, "ShardDataset", FakeDataset)
+    monkeypatch.setattr(ddpm_partial, "build_model", lambda config, device: TinyModel())
+    monkeypatch.setattr(ddpm_partial, "build_diffusion", lambda config: FakeDiffusion())
+    ticks = iter([100.0, 101.0, 200.0, 202.0])
+    monkeypatch.setattr(ddpm_partial, "time", SimpleNamespace(perf_counter=lambda: next(ticks)))
+    source_dir = tmp_path / "epoch1"
+    continuation_dir = tmp_path / "epoch30"
+    source_config = {
+        "epochs": 1,
+        "checkpoint_epochs": [1],
+        "max_train_samples": 2,
+        "max_validation_samples": 2,
+        "preview_samples": 2,
+        "batch_size": 1,
+    }
+    continued_config = {
+        **source_config,
+        "epochs": 2,
+        "checkpoint_epochs": [2],
+    }
+    kwargs = {
+        "train_dir": tmp_path,
+        "validation_dir": tmp_path,
+        "device": torch.device("cpu"),
+    }
+    first = ddpm_partial.train(
+        **kwargs,
+        output_dir=source_dir,
+        config=source_config,
+    )
+    continuation_dir.mkdir()
+    (continuation_dir / "ddpm_best.pt").write_bytes((source_dir / "ddpm_best.pt").read_bytes())
+    continued = ddpm_partial.train(
+        **kwargs,
+        output_dir=continuation_dir,
+        config=continued_config,
+        resume_from_checkpoint=source_dir / "ddpm_last.pt",
+        allow_epoch_extension=True,
+    )
+
+    assert first["epochs_completed"] == 1
+    assert continued["epochs_completed"] == 2
+    assert continued["optimizer_steps"] == 4
+    assert continued["training_seconds"] == 3.0
+    history = json.loads((continuation_dir / "training_history.json").read_text())
+    assert [record["epoch"] for record in history["epochs"]] == [1, 2]
+
+
+def test_epoch_extension_rejects_training_setting_changes():
+    source = ddpm_partial._resolved_config({"epochs": 1, "checkpoint_epochs": [1]})
+    changed = ddpm_partial._resolved_config(
+        {"epochs": 30, "checkpoint_epochs": [5, 10, 20, 30], "batch_size": 8}
+    )
+    with pytest.raises(ValueError, match="batch_size"):
+        ddpm_partial._validate_resume_config(
+            source,
+            changed,
+            completed_epoch=1,
+            allow_epoch_extension=True,
+        )
+
+
+def test_simplex_config_and_legacy_gaussian_checkpoint_contract():
+    assert ddpm_partial.build_diffusion({}).noise_type == "gaussian"
+    config = {"noise_type": "simplex", "simplex_frequency": 32.0}
+    diffusion = ddpm_partial.build_diffusion(config)
+    assert diffusion.noise_type == "simplex"
+    assert diffusion.simplex_frequency == 32.0
+    assert diffusion.simplex_octaves == 6
+    legacy = {
+        key: value
+        for key, value in ddpm_partial.DEFAULTS.items()
+        if not key.startswith("simplex_") and key != "noise_type"
+    }
+    ddpm_partial._validate_resume_config(
+        legacy,
+        {},
+        completed_epoch=1,
+        allow_epoch_extension=False,
+    )
+    with pytest.raises(ValueError, match="noise_type"):
+        ddpm_partial._validate_resume_config(
+            legacy,
+            {**config, "epochs": 10},
+            completed_epoch=1,
+            allow_epoch_extension=True,
+        )

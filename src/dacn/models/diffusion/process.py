@@ -190,18 +190,44 @@ class GaussianDiffusion:
         nonzero = (timesteps != 0).float().view(-1, 1, 1, 1)
         return mean + nonzero * torch.exp(0.5 * log_variance) * sampled_noise
 
+    def p_mean_sample(
+        self, model: torch.nn.Module, noisy: torch.Tensor, timesteps: torch.Tensor
+    ) -> torch.Tensor:
+        """Take the deterministic posterior-mean reverse transition."""
+        mean, _ = self._p_mean_variance(model, noisy, timesteps)
+        return mean
+
     @torch.inference_mode()
     def reconstruct(
-        self, model: torch.nn.Module, clean: torch.Tensor, *, steps: int
+        self,
+        model: torch.nn.Module,
+        clean: torch.Tensor,
+        *,
+        steps: int,
+        initial_noise: torch.Tensor | None = None,
+        reverse_sampler: str = "ancestral",
     ) -> torch.Tensor:
         """Diffuse to ``steps - 1`` and run the reverse chain back to zero."""
         if not 1 <= steps <= self.timesteps:
             raise ValueError("steps must be between one and timesteps")
+        if reverse_sampler not in {"ancestral", "posterior_mean"}:
+            raise ValueError("reverse_sampler must be ancestral or posterior_mean")
         start = torch.full((len(clean),), steps - 1, device=clean.device, dtype=torch.long)
-        value = self.q_sample(clean, start, self.noise(clean, start))
+        if initial_noise is None:
+            initial_noise = self.noise(clean, start)
+        elif (
+            initial_noise.shape != clean.shape
+            or initial_noise.device != clean.device
+            or initial_noise.dtype != clean.dtype
+        ):
+            raise ValueError("initial_noise must match clean shape, device and dtype")
+        value = self.q_sample(clean, start, initial_noise)
         for timestep in range(steps - 1, -1, -1):
             batch_timesteps = torch.full(
                 (len(clean),), timestep, device=clean.device, dtype=torch.long
             )
-            value = self.p_sample(model, value, batch_timesteps)
+            if reverse_sampler == "ancestral":
+                value = self.p_sample(model, value, batch_timesteps)
+            else:
+                value = self.p_mean_sample(model, value, batch_timesteps)
         return value.clamp(-1, 1)

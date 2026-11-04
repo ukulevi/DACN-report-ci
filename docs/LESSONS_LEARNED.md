@@ -23,6 +23,20 @@ source or run when possible. Append new entries at the top.
 
 ## Entries
 
+### 2026-11-04 — Modal preemption can replay a fresh-run input
+- Observation/evidence: Simplex continuation reached durable epoch18, then Modal
+  preempted its container during epoch19 and replayed the original no-resume
+  request. Directory protection correctly rejected the existing run; the app
+  stopped while its last durable manifest still said running.
+- Lesson: Detached execution and per-epoch checkpoints preserve progress, but
+  do not make a fresh-run invocation automatically resumable after preemption.
+- Practice adopted: Confirm the old app has stopped, inspect the latest durable
+  checkpoint, verify identical source/config, and reissue same run with --resume.
+  An initial continuation creates a new run; recovery of that run uses resume
+  without continue-from-run-id. Keep the directory-protection check intact.
+- Source/run: ddpm-simplex-t4-b8-e20-cont-20261104T070341Z; logs show preemption
+  2026-11-04 08:18:43UTC and the resulting output-already-exists error.
+
 ### 2026-10-29 — Reserve runner metadata in trainer output directories
 - Observation/evidence: the Modal runner writes its manifest and source snapshot
   before invoking the trainer, while AnoDDPM rejected every non-empty output

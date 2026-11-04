@@ -23,7 +23,8 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 | ID | Blocker | Status | Owner / next handoff | Affects | Last updated |
 |---|---|---|---|---|---|
 | `BLK-20261101-01` | Primary DDPM run mới hoàn thành epoch 10/30 | Open | C — Hai Tuan | Checkpoint 20/30, kết luận convergence | 2026-11-01 |
-| `BLK-20261101-02` | Pixel anomaly map có nhiều false positive | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-01 |
+| `BLK-20261101-02` | Pixel anomaly map có nhiều false positive | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-02 |
+| `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
 
 ## Blocker details
 
@@ -57,7 +58,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 ### BLK-20261101-02 — Pixel anomaly map có nhiều false positive
 
 - **Status:** Investigating
-- **Reported / updated:** 2026-11-01 / 2026-11-01
+- **Reported / updated:** 2026-11-01 / 2026-11-02
 - **Owner / next handoff:** B — Chí Vĩ dẫn evaluation; C — Hai Tuan cung cấp
   checkpoint/reconstruction và cùng review inference contract.
 - **Affected work:** Chưa nên freeze checkpoint/score/threshold để chạy held-out
@@ -67,18 +68,55 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   `0.395303`, micro F1/Dice `0.161616` và pixel AP `0.095895`. Đây là một
   inference seed; test chưa được dùng. Heatmap định tính cho thấy score cao ở
   nhiều mô bình thường, phù hợp với giả thuyết false positive nhưng không tự nó
-  chứng minh bug.
+  chứng minh bug. Audit CPU ngày 02/11 xác nhận checksum/config/EMA, crop,
+  one-based timestep, seed và score/threshold path khớp contract; 18 test liên
+  quan đều pass. Trên một validation lesion slice được chọn theo lesion lớn nhất,
+  2.982/3.087 local-SSIM false positives nằm trong brain ROI; foreground mask
+  chỉ tăng F1 của slice từ 0,3476 lên 0,3515. Trung bình ba reconstruction có
+  stochastic pixel standard deviation trung bình 0,0406 nhưng chỉ cải thiện nhẹ
+  AP trong brain ROI; posterior-mean reverse cho kết quả AP/AUROC trái chiều.
+  Các số một-slice này chỉ dùng diagnosis, không phải validation result. Full
+  83-slice T4 ablation sau đó xác nhận posterior mean giảm empty-normal FPR từ
+  0,077585 xuống 0,054391 nhưng local-SSIM AP giảm từ 0,095895 xuống 0,081721,
+  F1 giảm từ 0,161616 xuống 0,140292 và Recall giảm từ 0,395303 xuống 0,254533.
+  Vì vậy posterior mean không thay thế ancestral sampler.
 - **Attempts / constraints:** Đã so checkpoint epoch 5/10, timestep 100/200/300
   và pixel-difference/local-SSIM theo validation protocol. Noise-MSE thấp đo
   epsilon prediction trên normal validation, không đo segmentation quality.
-- **Action needed:** Trước hết đánh giá checkpoint epoch 20/30 bằng cùng
-  validation protocol và seed. Báo empty-mask pixel false-positive rate, TP/FP/FN,
-  lỗi theo lesion size và epsilon-MSE tại timestep 100/200/300. Nếu vẫn thấp,
-  đăng ký và review riêng mọi ablation về sampler, foreground mask,
-  post-processing hoặc score; không tune bằng test.
+- **Action needed:** Giữ ancestral sampler làm baseline hiện tại; không ưu tiên
+  posterior mean hoặc foreground mask đơn lẻ. Bước nghiên cứu tiếp theo cần được
+  review riêng là một run Simplex-noise có cùng data, kiến trúc và optimizer-step
+  budget để kiểm tra giả thuyết noise distribution; không thể đổi checkpoint
+  Gaussian hiện tại sang Simplex chỉ ở inference. Không tune bằng test. Epoch
+  20/30 chỉ đánh giá sau khi checkpoint tồn tại.
 - **Close when:** Nhóm có diagnosis dựa trên artifact, chọn/freeze protocol hoặc
   phê duyệt ablation mới, và ghi rõ giới hạn cùng số seed thực chạy.
 - **Resolution:** Chưa có.
+
+### BLK-20261102-03 — Modal client chưa deploy được T4 batch-8 pilot
+
+- **Status:** Resolved
+- **Reported / updated:** 2026-11-02 / 2026-11-02
+- **Owner / next handoff:** C — Hai Tuan hoặc thành viên đã đăng nhập shared
+  Modal Workspace retry lệnh documented khi kết nối function deployment ổn định.
+- **Affected work:** Fresh Gaussian DDPM one-epoch pilot trên toàn bộ 7.500 ảnh,
+  T4, batch size 8 chưa bắt đầu; chưa có runtime/loss/checkpoint từ cấu hình này.
+- **Evidence:** Config `ddpm_partial_t4_batch8_epoch1.json` và remote entrypoint
+  `train_remote_t4` đã validate; 77 test pass, Ruff/format/compile/diff check pass.
+  Bốn lần submit trả `Could not connect to the Modal server` trước khi tạo app.
+  `modal app list` rỗng và Volume không có run directory
+  `ddpm-partial-t4-b8-e1-20261102T032740Z`, nên không có GPU training hay quota
+  run nào đã bắt đầu. Modal status page lúc kiểm tra báo dịch vụ operational.
+- **Attempts / constraints:** Đã thử local entrypoint dynamic T4, fixed T4 remote
+  entrypoint, có/không `--detach`; profile và Volume read vẫn hoạt động. Không
+  re-authenticate hoặc thay shared Secret vì chưa có bằng chứng credential hỏng.
+- **Action needed:** Không còn; theo dõi run trong `RESULT_TRACKING` và chỉ báo
+  runtime/loss/checkpoint từ durable artifacts sau khi hoàn tất.
+- **Close when:** Run manifest được tạo và pilot bắt đầu, hoặc nhóm quyết định
+  không chạy cấu hình này.
+- **Resolution:** Đã retry fixed `train_remote_t4` ngoài sandbox với quyền mạng;
+  Modal tạo app `ap-vIFbYSY0oC1V74Tj4DFJvV`, durable start manifest và source
+  snapshot. Pilot bắt đầu ngày 2026-11-02; blocker kết nối được đóng.
 
 ## Mẫu blocker mới
 

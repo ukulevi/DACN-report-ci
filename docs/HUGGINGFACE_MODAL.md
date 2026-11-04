@@ -146,6 +146,51 @@ baseline, not an exact reproduction of its four-modality experiment.
 
 ## Partial-DDPM trainer and bounded smoke
 
+Patch/context fine-tune pilot (user-approved2026-11-02) uses the existing T4
+training lifecycle with trainer `dacn.training.patch_context:train` and config
+`configs/patch_context_t4_finetune5.json`. Submit a new run ID, `--no-resume`.
+The trainer locates the registered epoch30 checkpoint on the same run Volume,
+verifies its checksum and initializes from EMA. It resets optimizer/RNG, expands
+input1->3 with zero context/mask kernels and trains5 epochs/4,690 planned steps.
+Saves patch_context_epoch_001/003/005.pt, best/last and private normal preview;
+normal-validation patch MSE selects best. It does not overwrite or resume the
+original Gaussian run. Checkpoint method/config differs from baseline, so use
+`load_context_checkpoint` and conditioned reconstruction helpers for evaluation.
+Do not pass this checkpoint to the original one-channel evaluator.
+
+AutoDDPM-style SSIM-proxy pilot (user-requested 2026-11-02): same runner below
+also accepts `--method masked_ssim_proxy`. Use a new evaluation ID. It verifies
+and reuses the private t*=200 reconstruction cache from the epoch30 timestep
+study, creates a predicted mask (no ground-truth inference input), and runs
+50 reverse steps x5 resamples. The initial cache and checkpoint must exist on
+the shared Volume. Results include naive stitch and unchanged initial-score
+controls, mask coverage and grouped-holdout metrics. It is not exact AutoDDPM:
+local SSIM replaces LPIPS, with the existing FLAIR checkpoint/fixed-large variance.
+
+```bash
+modal run --detach src/dacn/cloud/modal_denoising.py::evaluate_remote \
+  --evaluation-id UNIQUE_EVALUATION_ID --code-revision GIT_COMMIT \
+  --working-tree-dirty --method masked_ssim_proxy
+```
+
+User-requested fixed multi-timestep denoising experiment (2026-11-02):
+
+```bash
+modal run --detach src/dacn/cloud/modal_denoising.py::evaluate_remote \
+  --evaluation-id UNIQUE_EVALUATION_ID \
+  --code-revision GIT_COMMIT --working-tree-dirty
+```
+
+This explicit T4 function reuses Gaussian epoch30 from the completed batch8
+run and cached pinned dataset revision. It performs3 timesteps x4 Gaussian
+draws per validation image, then compares denoising scores with brightness
+under the same grouped calibration/holdout rule as score fusion. It verifies
+the source checkpoint hash and dataset checksums, saves a durable manifest,
+exact source snapshot and private maps, and uploads to the existing private
+model repository. It does not train, run a reverse reconstruction chain, search
+hyperparameters or read the held-out test split. Existing original-reconstruction
+holdout metrics in SCORE_FUSION_RESULTS are the comparison. Use fresh IDs.
+
 The primary-method draft is implemented as `dacn.training.ddpm_partial:train`.
 Its method contract and checkpoint rule are proposals awaiting A/B review in
 DAC-8. Do not start its GPU smoke until DAC-8 is reviewed and DAC-9's data-access
@@ -236,6 +281,74 @@ modal run --detach src/dacn/cloud/modal_train.py \
   --config-json "$CONFIG_JSON"
 ```
 
+### Posterior-mean validation ablation on T4
+
+The validation evaluator uses a T4 and supports the registered ancestral sampler
+at batch size 1 or an exploratory `posterior_mean` reverse sampler at larger
+batches. Posterior mean keeps per-sample forward Gaussian noise deterministic
+from the private sample UUID-derived seed, then omits stochastic noise at every
+reverse transition. It is not DDIM and does not change checkpoint weights.
+
+For posterior-mean evaluation, batch size 8 is the reviewed T4 starting point.
+Each sample's initial noise is generated independently, so reconstruction is
+invariant to batch order. `--save-reconstruction-cache` stores derived medical
+image arrays under the private evaluation directory and uploads them only to the
+private model repo; never commit or publish that NPZ. The evaluator has no test
+path.
+
+```bash
+modal run --detach src/dacn/cloud/modal_evaluate.py::evaluate_remote \
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 \
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 \
+  --model-repo-id dacn-bmad-team/dacn-runs \
+  --source-run-id SOURCE_RUN_ID \
+  --evaluation-id UNIQUE_EVALUATION_ID \
+  --checkpoint-names-json '["ddpm_epoch_010.pt"]' \
+  --starting-timesteps-json '[300]' \
+  --code-revision GIT_COMMIT \
+  --working-tree-dirty \
+  --reverse-sampler posterior_mean \
+  --batch-size 8 \
+  --save-reconstruction-cache
+```
+
+### One-epoch T4 batch-8 training pilot
+
+User-requested Simplex ablation (2026-11-02): use the same
+`train_remote_t4` / `dacn.training.ddpm_partial:train` entrypoints with
+`configs/ddpm_partial_simplex_t4_batch8_epoch10.json` and a fresh run ID,
+without resume/continuation. This trains 10 full epochs from random weights,
+retains milestone 1/5/10, preserves normal-validation MSE selection and the
+existing artifact upload lifecycle. Forward noise is Simplex in both training
+and reconstruction; the configured ancestral reverse still samples Gaussian
+noise. Gaussian configs/checkpoints missing the new fields resolve to Gaussian.
+Do not compare raw noise MSE across these two noise distributions as anomaly
+quality. Evaluate the final milestone with the existing validation evaluator
+at t*=300 after the checkpoint exists; test remains sealed.
+
+[`ddpm_partial_t4_batch8_epoch1.json`](../configs/ddpm_partial_t4_batch8_epoch1.json)
+is a fresh Gaussian DDPM throughput pilot over all 7,500 normal training slices.
+It uses one epoch, batch size 8, 938 optimizer steps, learning rate `1e-4` and
+EMA decay `0.9992` (approximately `0.9999^8`) so per-sample smoothing remains
+close to the batch-1 baseline. It is not resumable from a batch-1 checkpoint and
+must use a new run ID. Its one-epoch checkpoint is not a replacement for the
+epoch-10 research checkpoint.
+
+```bash
+RUN_ID="ddpm-partial-t4-b8-e1-$(date -u +%Y%m%dT%H%M%SZ)"
+CONFIG_JSON="$(tr -d '\n' < configs/ddpm_partial_t4_batch8_epoch1.json)"
+modal run --detach src/dacn/cloud/modal_train.py::train_remote_t4 \
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 \
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 \
+  --model-repo-id dacn-bmad-team/dacn-runs \
+  --run-id "$RUN_ID" \
+  --trainer dacn.training.ddpm_partial:train \
+  --config-json "$CONFIG_JSON" \
+  --code-revision GIT_COMMIT \
+  --working-tree-dirty \
+  --no-resume
+```
+
 Modal shut down its hosted notebook editor on October 23, 2026. The project also
 provides a local Jupyter controller at
 [anoddpm_modal_local.ipynb](../notebooks/anoddpm_modal_local.ipynb): it invokes
@@ -245,6 +358,30 @@ Training still runs on Modal; the notebook kernel is only the local controller
 and viewer. The Google Colab notebook is a separate workflow that trains in
 Colab. Modal documents external Jupyter integrations at [Jupyter notebooks](https://modal.com/docs/guide/jupyter-notebooks)
 and the CLI at [modal run](https://modal.com/docs/cli/latest/run).
+
+To extend the completed batch-8 pilot from epoch 2 through epoch 30, use a new
+run ID and the continuation config. The runner restores model, EMA, optimizer,
+sampler and RNG state from the source run's `ddpm_last.pt`; it permits only
+`epochs` and `checkpoint_epochs` to differ and records the source checkpoint
+lineage in the new manifest. It rejects changes to batch size, learning rate,
+architecture, noise process, dataset revision or trainer.
+
+```bash
+SOURCE_RUN_ID="ddpm-partial-t4-b8-e1-20261102T032740Z"
+RUN_ID="ddpm-partial-t4-b8-e30-cont-$(date -u +%Y%m%dT%H%M%SZ)"
+CONFIG_JSON="$(tr -d '\n' < configs/ddpm_partial_t4_batch8_epoch30.json)"
+modal run --detach src/dacn/cloud/modal_train.py::train_remote_t4 \
+  --dataset-repo-id dacn-bmad-team/bmad-flair-patient-disjoint-v1 \
+  --dataset-revision 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 \
+  --model-repo-id dacn-bmad-team/dacn-runs \
+  --run-id "$RUN_ID" \
+  --trainer dacn.training.ddpm_partial:train \
+  --config-json "$CONFIG_JSON" \
+  --code-revision GIT_COMMIT \
+  --working-tree-dirty \
+  --no-resume \
+  --continue-from-run-id "$SOURCE_RUN_ID"
+```
 
 ## AnoDDPM implementation smoke test
 

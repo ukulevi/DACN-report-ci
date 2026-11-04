@@ -1,0 +1,12 @@
+{
+  "seed": 17,
+  "epochs": 5,
+  "batch_size": 8,
+  "learning_rate": 0.00001,
+  "ema_decay": 0.9992,
+  "patch_size": 64,
+  "log_every_steps": 25,
+  "checkpoint_epochs": [1, 3, 5],
+  "initial_run_id": "ddpm-partial-t4-b8-e30-cont-20261102T034644Z",
+  "initial_checkpoint_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946"
+}

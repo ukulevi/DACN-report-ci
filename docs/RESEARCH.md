@@ -11,6 +11,142 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 
 ## Hợp đồng mô hình và thực nghiệm
 
+### Simplex epoch20 validation — authorized2026-11-04
+
+After completed Simplex continuation, user requests validation. Evaluate explicit
+ddpm_epoch_020.pt EMA from ddpm-simplex-t4-b8-e20-cont-20261104T070341Z on all83
+validation slices (39 normal/44 abnormal), T4, ancestral batch1,t300,seed17,
+same Simplex-forward/Gaussian-fixed-large reverse adaptation as epoch10.
+Verify checkpoint against completed parent manifest, same pinned dataset.
+Full240crop absolute difference/local1-SSIM, existing all-validation max-F1
+threshold rule and top576 image score; compare same-protocol epoch10 metrics.
+Save private reconstruction cache for possible later group/fusion analysis.
+No new training, no timestep sweep or held-out-test access. Fresh evaluation ID,
+detached execution, status checked on user request; do not continuously monitor.
+
+### Simplex continuation to20 total epochs — authorized2026-11-04
+
+User requests continuing Simplex training to20 total epochs. Use completed
+ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_last.pt (epoch10/9,380steps),
+with original model/EMA/optimizer/sampler/RNG states; fresh output run ID via
+continue-from-run-id. Preserve source checkpoints. Config
+configs/ddpm_partial_simplex_t4_batch8_epoch20.json differs only in epochs20
+and milestones[1,5,10,15,20]. T4,batch8,LR1e-4,EMA0.9992,seed17,7500 normal
+train and39 normal-validation slices, same pinned dataset and Simplex settings.
+Train epochs11..20,9,380 additional steps,18,760 cumulative. Normal-validation
+epsilon MSE still selects best; persist last each epoch and new milestones15/20,
+private Hub upload on completion. Approximately75min incremental training from
+prior timings, not a guarantee. No automatic GPU evaluation/sweep or test access;
+check results when requested, do not continuously monitor.
+
+### Gaussian/Simplex SSIM fusion — authorized2026-11-04
+
+CPU-only fusion of registered ancestral t300 caches: Gaussian EMA epoch30 and
+Simplex EMA epoch10. Verify immutable cache/index hashes and identical full83
+input/mask/label arrays. Reuse first StratifiedGroupKFold2/shuffle/seed17 split:
+40 calibration and43 grouped holdout. Compute local1-SSIM; fit each empirical
+midrank CDF on all pixels of normal calibration slices only. No per-image or
+holdout normalization fitting. Three fixed Gaussian weights0.25,0.5,0.75;
+controls raw Gaussian/raw Simplex and each CDF-normalized map. Brightness is an
+independent control, excluded from diffusion-method selection. Select highest
+calibration pixel AP among diffusion candidates (exact ties prefer raw Gaussian
+by fixed order); also freeze highest-calibration-AP fusion before holdout.
+Fit pixel/image max-F1 thresholds only on calibration. Write frozen selection
+before evaluating any holdout candidate; no weight/normalizer retuning from
+holdout outcomes. Exploratory previously inspected validation, not final test.
+This tests an ensemble with different training budgets, not causal noise effects.
+No new GPU inference, no training or test-set access. Outputs private/ignored.
+
+### Fixed t300 sampler comparison — authorized2026-11-04
+
+User approves original Gaussian EMA epoch30 on all83 validation images: one-step
+x0 versus DDIM10 eta0 versus existing ancestral300 cache. Same base17 UUID seed
+and exact initial noisy tensor for new samplers, t300=index299. DDIM model-call
+indices299,269,239,209,179,149,119,89,59,29, then clean index-1(alpha1);
+10 calls, not11. Use clipped x0 and epsilon re-derived after clipping as in
+[guided-diffusion DDIM](https://github.com/openai/guided-diffusion/blob/main/guided_diffusion/gaussian_diffusion.py).
+No reverse random draws. Reuse immutable ancestral cache after SHA/content/order
+checks and recompute first sample as a seed/sampler control. Same40 calibration
+/43 grouped holdout, independently fit each score's thresholds on calibration
+only; report AP/F1 and normal pixel FPR, plus descriptive all83 metrics. Both
+pixel difference and localSSIM; brightness control. Time new reconstruction
+calls with CUDA synchronization separately from scoring/cache work. Historical
+ancestral runtime is not a matching pure model timing. No training/test access,
+no extra timestep/step-count sweep. Save private reconstructions/results.
+
+### One-step patch/context validation — authorized 2026-11-04
+
+Follow-up user request: evaluate original Gaussian DDPM epoch30 EMA one-step on
+all83 validation images, t100. Use full-image Gaussian noise from the same
+base17 UUID seed as original ancestral baseline, one model call, direct x0
+formula and clamp[-1,1]. No patch averaging/context channels/fine-tuning. Keep
+the same scores, grouped calibration/holdout, descriptive all83 metrics and
+private artifacts. This isolates inference change versus original epoch30
+t100 ancestral reconstruction; context comparison additionally changes weights
+and patch averaging. Test sealed, no timestep sweep.
+
+User requests T4 one-step inference on all83 validation slices. Use EMA best
+context checkpoint from fine-tune epoch5, t100, Gaussian forward draw, same
+private UUID-derived base17 seeds and patch64/stride48 coverage as the reverse
+diagnostic. Each patch calls epsilon model once at index99, computes x0 using
+the schedule, clamps to[-1,1], and retains original context outside that patch.
+Average overlapping patch outputs;25 model calls/image. No fine-tuning.
+Reuse the full-validation evaluator: pixel difference/localSSIM plus brightness,
+fixed40-slice calibration /43-slice grouped holdout, calibration-only thresholds;
+separate descriptive all83 metrics. Test sealed. This is one-step clean-image
+estimation from noised input, not distilled one-step generation. Prior full
+reverse validation remains user-stopped; this is a fresh evaluation run.
+
+### Approved patch/context fine-tune pilot — 2026-11-02
+
+User approved5-epoch T4 batch8 fine-tuning from Gaussian epoch30 EMA at LR1e-5.
+This is the team's3-channel adaptation, not an exact pDDPM reproduction. Keep
+the source DDPM checkpoint immutable; verify SHA256
+d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946.
+Load its EMA into the original base32 U-Net, then replace only the first
+convolution: copy original image-channel kernel/bias exactly, initialize the
+two context/mask channel kernels to zero; output remains1 epsilon channel.
+New optimizer (AdamW LR1e-5,betas0.9/0.999,weight_decay0,clip1), all parameters
+trainable; new EMA starts equal to expanded model, decay0.9992. No source
+optimizer/RNG resume. Fine-tune epochs1..5 are separate from the30 pretraining
+epochs; report both compute budgets, planned4,690 additional optimizer steps.
+
+Data: all7,500 normal training slices, unchanged256 input normalization and
+Gaussian linear T1000. One64x64 patch per image, centered on a uniformly drawn
+foreground pixel(input>-0.95), clipped inside original240 crop. First channel
+uses noised image inside patch and clean context outside; second channel is
+clean input outside patch and zero inside; third is binary patch mask. This
+prevents clean target pixels inside patch leaking through conditioning.
+Uniform0..999 timestep; loss mean squared epsilon error only in the patch,
+normalized per image by its mask area. No abnormal annotations in training.
+
+Selection: fixed-RNG patch/noise/timestep MSE over all39 normal validation slices,
+seed17+1,000,000, batch8, EMA. Save full optimizer/RNG/history/model/EMA states
+each epoch as patch_context_last.pt, normal-val-selected patch_context_best.pt,
+and milestones1/3/5. Patch loss is a new objective and not directly comparable
+to old full-image noise MSE. Private final-EMA one-step t100 normal preview is a
+sanity artifact, not an AP evaluation. No training epochs beyond5 authorized.
+
+Inference helper covers all240x240 pixels using64 patches/stride48 and equal
+overlap averaging, independent per-patch seeds; no tumor mask needed. Full
+sliding reverse inference can be expensive (25 patches per image), so measure
+a bounded pilot before any full83-image AP evaluation. Keep the established
+group calibration/holdout and brightness baseline for later evaluation; no
+automatic additional GPU inference sweep in this training run. Test sealed.
+
+Follow-up authorized2026-11-02: after the four-example reconstruction pilot,
+user requested evaluation on all83 validation slices (39 normal,44 abnormal).
+Freeze EMA fine-tune epoch5, t100, patch64/stride48,25 patches, same per-sample
+and per-patch seed derivation, fixed-large stochastic reverse; no new training.
+Use full240crop pixel difference/local SSIM and brightness control; thresholds
+fit only on the established40-slice group calibration, applied unchanged to
+43-slice group holdout (StratifiedGroupKFold2,shuffle,seed17,first fold).
+Also report all83 validation metrics as descriptive with locally fit thresholds,
+separate from group holdout. Validation has been inspected; neither is final test.
+T4 detached,3-hour ceiling based on ~100-minute pilot extrapolation; persist
+private prefix reconstructions after first sample and every5 samples, upload
+final artifacts privately. No additional timestep sweep or sealed-test access.
+
 - Input: một kênh PNG FLAIR đã render, pad 240→256, normalized [-1, 1] theo [DATA_PROTOCOL](DATA_PROTOCOL.md). Train chỉ trên normal slice; normal ở đây là slice không có tumor annotation, không đồng nghĩa bệnh nhân khỏe mạnh.
 - **Contract triển khai DAC-8 — bản đề xuất, chờ A/B review:** train U-Net dự đoán Gaussian noise với MSE (`epsilon-prediction`), `T=1000`, linear β từ 0.0001 đến 0.02 theo [DDPM](REFERENCES.md); timestep huấn luyện lấy đều trên `[0,999]`. Kiến trúc một kênh: U-Net hiện có, base channels 32, multipliers `(1,1,2,2,4,4)`, hai residual blocks/level, attention ở resolution 16 và 8, hai heads, dropout 0. Tối ưu AdamW (`lr=1e-4`, weight decay 0), gradient norm clip 1, EMA 0.9999. Đây là cấu hình triển khai được đề xuất, chưa phải cấu hình đã được nhóm phê duyệt qua review hay đã có kết quả.
 - **Quy ước partial reconstruction:** `t*` bên ngoài là one-based và chỉ mức forward-noise: `t*=100` ánh xạ tới timestep array index 99. Tạo một noisy input bằng forward process, rồi chạy toàn bộ ancestral DDPM reverse transitions từ index `t*-1` về 0 (`t*` reverse steps); fixed-large reverse variance theo `GaussianDiffusion`, dự đoán clean image được clip trong `[-1,1]`, đầu ra cuối cũng clip trong `[-1,1]`. Phân biệt `t*`, tổng schedule 1000 và số reverse steps. Ghi rõ khác biệt với nguồn tham khảo nếu contract review đổi lựa chọn nào.
@@ -26,6 +162,23 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 
 ## Prototype AnoDDPM tách biệt
 
+### Ablation Simplex được người dùng yêu cầu — 2026-11-02
+
+Thử nghiệm mới dùng chính trainer partial DDPM với `noise_type=simplex`;
+giữ Gaussian là mặc định cho checkpoint cũ. Config đăng ký trước chạy:
+`configs/ddpm_partial_simplex_t4_batch8_epoch10.json`, seed 17, 10 epoch,
+7.500 normal slices, T4 batch 8, LR 1e-4, EMA 0.9992, cùng U-Net base32 và
+schedule linear T=1000. Simplex: 6 octave, persistence 0.8, frequency divisor 64.
+Train từ đầu; checkpoint Gaussian không được resume thành Simplex. Selection
+vẫn dùng normal-validation noise MSE, lưu milestone 1/5/10. Forward corruption
+train và reconstruction dùng Simplex; reverse vẫn Gaussian fixed-large ancestral
+theo adaptation AnoDDPM trong code, không phải posterior-mean hay exact Gaussian
+posterior cho Simplex. Không so trực tiếp trị MSE của hai noise distribution như
+thước đo chất lượng anomaly detection. Kế hoạch đánh giá sau train: epoch 10,
+t*=300, full validation, sampling seed 17, hai score/threshold/ROI như baseline;
+không đổi test. Chỉ báo cải thiện khi có kết quả thực, ưu tiên đối chứng Gaussian
+epoch 10 batch8 cùng training budget, không chỉ đối chiếu Gaussian epoch30.
+
 Repo có một trainer `dacn.training.anoddpm:train` được port có chọn lọc từ AnoDDPM
 để kiểm tra sớm pipeline diffusion một kênh trên BMAD. Nó dùng U-Net dự đoán noise,
 simplex hoặc Gaussian noise, full-shard epochs và squared reconstruction error. Đây
@@ -35,6 +188,129 @@ SSIM comparison và chưa freeze `t*`/sampler theo DAC-8. Không suy diễn smok
 hoặc validation subset thành kết quả nghiên cứu.
 
 ## Protocol đánh giá
+
+### User-requested train/inference contract audit — 2026-11-02
+
+Fixed diagnostic, not an AP sweep: use Gaussian checkpoint epoch30, verify
+every loaded EMA tensor exactly equals checkpoint EMA, inspect online/EMA
+relative L2 difference and unchanged source modules in training snapshot.
+Check4 train tensors and4 selected normal-val tensors for1x256x256 float32,
+[-1,1], black padding8px and uint8 normalization grid. Choose4 of39 normal
+validation slices uniformly without replacement with NumPy seed17, then sort
+indices. Do not choose by reconstruction quality or use held-out test.
+
+At t*=100/300, derive the same sample seed17 as prior inference. Compare
+clipped noisy input, one-step x0 prediction with EMA, one-step with online
+weights, EMA full reverse with fixed-large variance, fixed-small variance and
+deterministic posterior mean. All share identical initial noise; stochastic
+chains share reverse Gaussian draws. No production sampler is changed.
+Report mean per-slice MAE/RMSE on[0,1] and localSSIM in foreground>-0.95 and
+interior distance>5px, plus private paired images. Test oracle-noise inversion,
+direct posterior-mean formula, exact linear schedule and both variance arrays.
+Unit test ensures diagnostic large chain exactly matches production sampler.
+
+This4-normal-image diagnostic can identify weight-loading mismatches or
+sampling contributions, not prove generalization or estimate AP improvement.
+Preserving normal anatomy alone is not sufficient evidence of tumor removal.
+
+User-requested reconstruction-map multi-timestep fusion (2026-11-02): fix
+Gaussian EMA epoch30 cached t100/200/300, existing83 validation samples, same
+grouped40-calibration/43-holdout split seed17. Verify cache hashes and exact
+image/mask/label alignment. For each of absolute difference and localSSIM,
+fit separate empirical midrank CDFs at each timestep on calibration pixels only,
+then average all three normalized maps with equal1/3 weights. Compare these
+two fixed ensembles with all six original single-timestep scores and brightness
+on the same holdout. Calibration-only thresholds, no weight search, ROI240x240,
+no foreground gating, no GPU or new inference. Exploratory validation only,
+not a final untouched test. Do not combine this experiment with averaged
+epsilon-prediction error, which is a different score already evaluated.
+
+### User-requested AutoDDPM-style pilot — 2026-11-02
+
+This is an independent implementation of mask/stitch/resample ideas from
+[AutoDDPM](https://arxiv.org/abs/2305.19643), NOT an exact reproduction of its
+LPIPS mask, training dataset/backbone or posterior variance. User was informed
+before execution that this pilot substitutes local SSIM for LPIPS, retaining
+the current checkpoint and fixed-large Gaussian reverse transitions.
+
+Fixed before run: Gaussian EMA epoch30; reuse checksum-verified initial full-val
+t*=200 reconstructions. On each input/reconstruction crop: heatmap=
+clip(abs residual / its95th percentile,0,1)*clip(1-localSSIM,0,1).
+Predicted binary mask=heatmap>=0.5, dilation3x3; no ground-truth mask used.
+Pad mask with zeros, stitch original outside mask and initial reconstruction
+inside. Forward to one-based50, reverse50 steps with5 resamples per step;
+stitch fresh noised original context at the matching next timestep, with exact
+clean original context at the final step. Re-noise x[k-1] to x[k] using beta[k]
+before repeating. Seed17, sample-UUID derived, isolated RNG, batch1, T4.
+
+All83 validation images; same40-calibration/43-holdout grouped split as previous
+experiments. Fixed outputs: initial raw absolute/SSIM residuals; initial heatmap; naive stitch-only absolute residual;
+final absolute residual; final localSSIM; final absolute residual times initial
+heatmap; brightness control. Fit thresholds on calibration only, no weight or
+mask threshold tuning. Report all outputs without holdout-based reselection,
+mask lesion coverage/precision/ROI fraction on both partitions. Coverage is
+diagnostic only, not used to generate masks. No foreground ROI filtering.
+
+Outside-mask equality is imposed by construction, so lower outside-mask error
+alone is not evidence of better restoration. Naive stitching is the required
+control for score gating; mask coverage reveals missed lesions. Private maps
+enable later error review. Completed pilot: holdout resampled-SSIM AP0.093603
+versus initial t200 SSIM0.090168 and earlier t300 SSIM0.102402; brightness0.389506.
+Predicted mask covers63.05% of holdout lesion pixels with9.20% precision.
+No overall AP gain established; resampling difference AP0.070007 is essentially
+the naive-stitch AP0.069851. Full record in RESULT_TRACKING, private revision
+2c8646c1. No retraining or held-out test use.
+
+### Planned denoising-score branch — requested 2026-11-02
+
+Implemented at `dacn.evaluation.denoising`; evaluated on real validation MRI
+in run `ddpm-denoising-e30-3t4r-20261102T103159Z`. Holdout AP0.085848 is below
+reconstruction AP~0.10 and brightness0.389506 on the same43 images; this fixed
+score is not adopted as an improvement. See RESULT_TRACKING for full results.
+Reuse Gaussian EMA epoch30; input images/weights/preprocessing remain fixed.
+For each sample, derive a seed from sampling base17 and its private UUID; use
+an isolated device generator. Draw4 independent Gaussian noise tensors. For each
+draw reuse the same tensor at one-based t*=100/200/300 (indices99/199/299).
+Average squared epsilon-prediction errors equally over all12 forward passes;
+crop to240x240, no reverse chain or smoothing. This is a simple noise-error
+ablation, not full ANDi, and high error is only hypothesized to mark lesions.
+
+Evaluate against rendered brightness on the same patient-group split used for
+score fusion: first StratifiedGroupKFold(2,shuffle=True,random_state=17) split,
+calibration thresholds frozen before internal-holdout metrics. Existing
+reconstruction holdout metrics remain the comparison. Fixed score parameters,
+no additional weighting/timestep search. The user requested pipeline changes;
+implementation/tests and the user-authorized T4 run are complete. Any further
+run must be separately registered in RESULT_TRACKING after start.
+
+Usage in an environment with the private checkpoint and validation shards:
+
+```bash
+python -m dacn.evaluation.denoising \
+  --validation-dir PRIVATE_VALIDATION_SHARDS \
+  --checkpoint PRIVATE_DDPM_EPOCH_030.pt \
+  --output-dir NEW_PRIVATE_OUTPUT_DIRECTORY \
+  --device cuda
+```
+
+Results contain aggregate pixel/image metrics, checkpoint/index hashes and
+partition sizes. Score maps and masks are private derived medical data; keep
+output within ignored runs/ or the private Modal/Hub artifact storage.
+
+Score-fusion diagnostic registered 2026-11-02 at the user's request: use only
+Gaussian epoch30 t*=300 full-validation cache, same original ROI. Fix the first
+split of StratifiedGroupKFold(2, shuffle=True, random_state=17) by Hub patient
+group; first training indices are calibration and first validation indices are
+internal holdout. Evaluate raw brightness, absolute difference and local SSIM,
+plus w*CDF(brightness)+(1-w)*CDF(reconstruction score), w in {0.25,0.5,0.75}
+for each of the two reconstruction scores. Fit empirical midrank CDFs and
+max-F1 pixel/image thresholds on calibration only; select one of nine candidates
+by calibration pixel AP, exact ties in predefined order (brightness first).
+Persist selection before reading holdout metrics. Report all predefined
+candidates and the calibration-selected candidate, without selecting weights
+again on holdout. This is exploratory internal validation: full validation has
+already influenced prior investigations, so holdout is not an untouched final
+test. No new model training/GPU inference or held-out test access.
 
 Các hàm nền cho DAC-12/DAC-30 nằm trong `dacn.evaluation.scores` và
 `dacn.evaluation.validation`: `paired_score_maps` nhận một cặp 256×256 và trả

@@ -74,7 +74,7 @@ def _parse_timestep_list(value: str) -> list[int]:
 
 @app.function(
     image=image,
-    gpu="A100",
+    gpu="T4",
     timeout=12 * 60 * 60,
     volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
     secrets=[modal.Secret.from_name("huggingface-secret-2")],
@@ -91,6 +91,9 @@ def evaluate_remote(
     working_tree_dirty: bool,
     max_validation_samples: int = 0,
     sampling_base_seed: int = 17,
+    reverse_sampler: str = "ancestral",
+    batch_size: int = 1,
+    save_reconstruction_cache: bool = False,
 ) -> dict:
     """Evaluate stored checkpoints on validation; the held-out test path is unavailable."""
     import torch
@@ -122,6 +125,16 @@ def evaluate_remote(
         if max_validation_samples < 0 or max_validation_samples == 1:
             raise ValueError("max_validation_samples must be 0 or at least 2")
         sample_limit = max_validation_samples or None
+        if reverse_sampler not in {"ancestral", "posterior_mean"}:
+            raise ValueError("reverse_sampler must be ancestral or posterior_mean")
+        if isinstance(batch_size, bool) or not isinstance(batch_size, int):
+            raise TypeError("batch_size must be an integer")
+        if batch_size < 1:
+            raise ValueError("batch_size must be positive")
+        if reverse_sampler == "ancestral" and batch_size != 1:
+            raise ValueError("ancestral evaluation requires batch_size=1")
+        if not isinstance(save_reconstruction_cache, bool):
+            raise TypeError("save_reconstruction_cache must be a boolean")
 
         source_dir = Path(RUN_ROOT) / source_run_id
         if not source_dir.is_dir():
@@ -162,6 +175,9 @@ def evaluate_remote(
             "starting_timesteps": timesteps,
             "max_validation_samples": sample_limit,
             "sampling_base_seed": sampling_base_seed,
+            "reverse_sampler": reverse_sampler,
+            "batch_size": batch_size,
+            "save_reconstruction_cache": save_reconstruction_cache,
             "code_revision": code_revision,
             "working_tree_dirty": working_tree_dirty,
             "progress": {"completed_combinations": 0},
@@ -266,6 +282,9 @@ def evaluate_remote(
                 device=torch.device("cuda"),
                 max_validation_samples=sample_limit,
                 sampling_base_seed=sampling_base_seed,
+                reverse_sampler=reverse_sampler,
+                batch_size=batch_size,
+                reconstruction_cache_dir=evaluation_dir if save_reconstruction_cache else None,
                 on_timestep_complete=save_timestep,
             )
             stored = results["checkpoints"][checkpoint_name]

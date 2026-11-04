@@ -12,6 +12,7 @@ import json
 import os
 import platform
 import re
+import shutil
 import subprocess
 import zipfile
 from datetime import datetime, timezone
@@ -160,14 +161,7 @@ def _remove_temporary_run_files(run_dir: Path) -> None:
             path.unlink()
 
 
-@app.function(
-    image=image,
-    gpu="A100",
-    timeout=10 * 60 * 60,
-    volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
-    secrets=[modal.Secret.from_name("huggingface-secret-2")],
-)
-def train_remote(
+def _train_remote_impl(
     dataset_repo_id: str,
     dataset_revision: str,
     model_repo_id: str,
@@ -177,6 +171,7 @@ def train_remote(
     code_revision: str,
     working_tree_dirty: bool,
     resume: bool = False,
+    continue_from_run_id: str = "",
 ) -> dict:
     """Fetch a pinned dataset, invoke one trainer, and durably record its lifecycle."""
     from importlib.metadata import version as package_version
@@ -204,8 +199,20 @@ def train_remote(
             )
         if not isinstance(resume, bool):
             raise TypeError("resume must be a boolean")
-        if resume and trainer != "dacn.training.ddpm_partial:train":
-            raise ValueError("Resume is currently supported only by the partial DDPM trainer")
+        if not isinstance(continue_from_run_id, str):
+            raise TypeError("continue_from_run_id must be a string")
+        if resume and continue_from_run_id:
+            raise ValueError("resume and continue_from_run_id are mutually exclusive")
+        if (resume or continue_from_run_id) and trainer != "dacn.training.ddpm_partial:train":
+            raise ValueError(
+                "Checkpoint continuation is supported only by the partial DDPM trainer"
+            )
+        if continue_from_run_id and not re.fullmatch(
+            r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", continue_from_run_id
+        ):
+            raise ValueError("continue_from_run_id must be 1-64 path-safe characters")
+        if continue_from_run_id == run_id:
+            raise ValueError("Continuation must use a new run_id")
 
         config = parse_config_json(config_json)
         safe_config = _json_safe(config)
@@ -214,6 +221,8 @@ def train_remote(
 
         run_dir = Path(RUN_ROOT) / run_id
         previous_manifest = None
+        continuation_dir = None
+        continuation_manifest = None
         if resume:
             if not run_dir.is_dir():
                 raise ValueError(f"Cannot resume missing run: {run_id}")
@@ -228,6 +237,35 @@ def train_remote(
         elif run_dir.exists():
             raise ValueError(f"Run output already exists: {run_id}; choose a new run_id")
         else:
+            if continue_from_run_id:
+                continuation_dir = Path(RUN_ROOT) / continue_from_run_id
+                if not continuation_dir.is_dir():
+                    raise ValueError(f"Cannot continue missing run: {continue_from_run_id}")
+                continuation_manifest = _read_run_manifest(continuation_dir)
+                if continuation_manifest.get("status") != "completed":
+                    raise ValueError("Continuation source run is not completed")
+                for filename in ("ddpm_last.pt", "ddpm_best.pt"):
+                    if not (continuation_dir / filename).is_file():
+                        raise ValueError(
+                            f"Continuation source is missing required checkpoint: {filename}"
+                        )
+                expected_parent = {
+                    "dataset_repo_id": dataset_repo_id,
+                    "requested_dataset_revision": dataset_revision,
+                    "model_repo_id": model_repo_id,
+                    "trainer": trainer,
+                }
+                parent_mismatches = [
+                    key
+                    for key, value in expected_parent.items()
+                    if continuation_manifest.get(key) != value
+                ]
+                if parent_mismatches:
+                    raise ValueError(
+                        "Continuation source metadata differs from the request ("
+                        + ", ".join(parent_mismatches)
+                        + ")"
+                    )
             run_dir.mkdir(parents=True)
             manifest = {
                 "schema_version": 2,
@@ -249,6 +287,22 @@ def train_remote(
                 "progress": {},
                 "artifacts": {},
             }
+            if continuation_manifest is not None:
+                manifest["continuation"] = {
+                    "source_run_id": continue_from_run_id,
+                    "source_checkpoint": "ddpm_last.pt",
+                    "source_checkpoint_sha256": continuation_manifest.get("artifacts", {}).get(
+                        "ddpm_last.pt"
+                    ),
+                    "source_best_checkpoint": "ddpm_best.pt",
+                    "source_best_checkpoint_sha256": continuation_manifest.get("artifacts", {}).get(
+                        "ddpm_best.pt"
+                    ),
+                    "source_model_revision": continuation_manifest.get("model_revision"),
+                    "source_completed_epoch": continuation_manifest.get("progress", {}).get(
+                        "epoch"
+                    ),
+                }
             _write_run_manifest(run_dir, manifest)
             run_volume.commit()
 
@@ -360,6 +414,13 @@ def train_remote(
             raise ValueError(
                 "Cannot resume: dataset reference now resolves to a different revision"
             )
+        if (
+            continuation_manifest is not None
+            and continuation_manifest.get("dataset_revision") != pinned_revision
+        ):
+            raise ValueError(
+                "Cannot continue: source run used a different resolved dataset revision"
+            )
         manifest["dataset_revision"] = pinned_revision
         manifest["source_snapshot_sha256"] = source_snapshot_sha256
         manifest["gpu"] = torch.cuda.get_device_name(0)
@@ -422,6 +483,12 @@ def train_remote(
             if "resume_from_checkpoint" not in parameters:
                 raise TypeError("DDPM trainer does not expose checkpoint resume")
             train_kwargs["resume_from_checkpoint"] = run_dir / "ddpm_last.pt"
+        elif continuation_dir is not None:
+            if not {"resume_from_checkpoint", "allow_epoch_extension"}.issubset(parameters):
+                raise TypeError("DDPM trainer does not expose safe epoch extension")
+            shutil.copy2(continuation_dir / "ddpm_best.pt", run_dir / "ddpm_best.pt")
+            train_kwargs["resume_from_checkpoint"] = continuation_dir / "ddpm_last.pt"
+            train_kwargs["allow_epoch_extension"] = True
         train_result = training_function(**train_kwargs)
         if trainer == "dacn.training.ddpm_partial:train" and not all(
             (run_dir / filename).is_file() for filename in ("ddpm_best.pt", "ddpm_last.pt")
@@ -534,6 +601,74 @@ def train_remote(
         raise
 
 
+@app.function(
+    image=image,
+    gpu="A100",
+    timeout=10 * 60 * 60,
+    volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
+    secrets=[modal.Secret.from_name("huggingface-secret-2")],
+)
+def train_remote(
+    dataset_repo_id: str,
+    dataset_revision: str,
+    model_repo_id: str,
+    run_id: str,
+    trainer: str,
+    config_json: str,
+    code_revision: str,
+    working_tree_dirty: bool,
+    resume: bool = False,
+    continue_from_run_id: str = "",
+) -> dict:
+    """Run the shared training lifecycle on an A100."""
+    return _train_remote_impl(
+        dataset_repo_id,
+        dataset_revision,
+        model_repo_id,
+        run_id,
+        trainer,
+        config_json,
+        code_revision,
+        working_tree_dirty,
+        resume,
+        continue_from_run_id,
+    )
+
+
+@app.function(
+    image=image,
+    gpu="T4",
+    timeout=10 * 60 * 60,
+    volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
+    secrets=[modal.Secret.from_name("huggingface-secret-2")],
+)
+def train_remote_t4(
+    dataset_repo_id: str,
+    dataset_revision: str,
+    model_repo_id: str,
+    run_id: str,
+    trainer: str,
+    config_json: str,
+    code_revision: str,
+    working_tree_dirty: bool,
+    resume: bool = False,
+    continue_from_run_id: str = "",
+) -> dict:
+    """Run the shared training lifecycle on a T4."""
+    return _train_remote_impl(
+        dataset_repo_id,
+        dataset_revision,
+        model_repo_id,
+        run_id,
+        trainer,
+        config_json,
+        code_revision,
+        working_tree_dirty,
+        resume,
+        continue_from_run_id,
+    )
+
+
 @app.local_entrypoint()
 def main(
     dataset_repo_id: str,
@@ -543,8 +678,12 @@ def main(
     trainer: str,
     config_json: str = "{}",
     resume: bool = False,
+    continue_from_run_id: str = "",
+    gpu: str = "A100",
 ) -> str:
     """Launch one pinned training run; the Modal result is also synced to the Hub."""
+    if gpu not in {"A100", "T4"}:
+        raise ValueError("gpu must be A100 or T4")
     sha_result = subprocess.run(
         ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
     )
@@ -555,7 +694,8 @@ def main(
     working_tree_dirty = (
         bool(status_result.stdout.strip()) if status_result.returncode == 0 else True
     )
-    result = train_remote.remote(
+    remote_function = train_remote if gpu == "A100" else train_remote_t4
+    result = remote_function.remote(
         dataset_repo_id=dataset_repo_id,
         dataset_revision=dataset_revision,
         model_repo_id=model_repo_id,
@@ -565,6 +705,7 @@ def main(
         code_revision=code_revision,
         working_tree_dirty=working_tree_dirty,
         resume=resume,
+        continue_from_run_id=continue_from_run_id,
     )
     result_json = json.dumps(result, indent=2)
     print(result_json)

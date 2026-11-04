@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -16,6 +17,7 @@ from dacn.training.ddpm_partial import (
     derive_sampling_seed,
     load_ema_checkpoint,
     partial_reconstruct,
+    posterior_mean_reconstruct_batch,
 )
 
 
@@ -51,6 +53,9 @@ def evaluate_checkpoint(
     device: torch.device,
     max_validation_samples: int | None = None,
     sampling_base_seed: int = 17,
+    reverse_sampler: str = "ancestral",
+    batch_size: int = 1,
+    reconstruction_cache_dir: Path | None = None,
     log_every_samples: int = 10,
     on_timestep_complete: Callable[[dict], None] | None = None,
 ) -> dict:
@@ -72,6 +77,17 @@ def evaluate_checkpoint(
         raise TypeError("log_every_samples must be an integer")
     if log_every_samples < 1:
         raise ValueError("log_every_samples must be positive")
+    if reverse_sampler not in {"ancestral", "posterior_mean"}:
+        raise ValueError("reverse_sampler must be ancestral or posterior_mean")
+    if isinstance(batch_size, bool) or not isinstance(batch_size, int):
+        raise TypeError("batch_size must be an integer")
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
+    if reverse_sampler == "ancestral" and batch_size != 1:
+        raise ValueError("ancestral evaluation requires batch_size=1 for per-sample RNG isolation")
+    if reconstruction_cache_dir is not None:
+        reconstruction_cache_dir = Path(reconstruction_cache_dir)
+        reconstruction_cache_dir.mkdir(parents=True, exist_ok=True)
 
     checkpoint_path = Path(checkpoint_path)
     checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
@@ -106,24 +122,37 @@ def evaluate_checkpoint(
             torch.cuda.synchronize(device)
         started = time.perf_counter()
         reconstructions = np.empty_like(images)
-        for position, index in enumerate(indices, start=1):
-            image, _, _ = validation_data[index]
-            image_batch = image.unsqueeze(0).to(device, non_blocking=True)
-            sample_seed = derive_sampling_seed(
-                sampling_base_seed,
-                validation_data.sample_ids[index],
+        for start in range(0, len(indices), batch_size):
+            batch_indices = indices[start : start + batch_size]
+            image_batch = torch.stack([validation_data[index][0] for index in batch_indices]).to(
+                device,
+                non_blocking=True,
             )
-            reconstruction = partial_reconstruct(
-                model,
-                image_batch,
-                starting_timestep=timestep,
-                seed=sample_seed,
-                diffusion=diffusion,
-            )
-            reconstructions[position - 1] = reconstruction[0, 0].cpu().numpy()
-            if position % log_every_samples == 0 or position == len(indices):
+            sample_seeds = [
+                derive_sampling_seed(sampling_base_seed, validation_data.sample_ids[index])
+                for index in batch_indices
+            ]
+            if reverse_sampler == "posterior_mean":
+                reconstruction = posterior_mean_reconstruct_batch(
+                    model,
+                    image_batch,
+                    starting_timestep=timestep,
+                    seeds=sample_seeds,
+                    diffusion=diffusion,
+                )
+            else:
+                reconstruction = partial_reconstruct(
+                    model,
+                    image_batch,
+                    starting_timestep=timestep,
+                    seed=sample_seeds[0],
+                    diffusion=diffusion,
+                )
+            stop = start + len(batch_indices)
+            reconstructions[start:stop] = reconstruction[:, 0].cpu().numpy()
+            if stop // log_every_samples > start // log_every_samples or stop == len(indices):
                 print(
-                    f"checkpoint_epoch={epoch} t={timestep} samples={position}/{len(indices)}",
+                    f"checkpoint_epoch={epoch} t={timestep} samples={stop}/{len(indices)}",
                     flush=True,
                 )
         if device.type == "cuda":
@@ -136,14 +165,37 @@ def evaluate_checkpoint(
             split="validation",
         )
         elapsed = time.perf_counter() - started
+        cache_name = None
+        cache_seconds = 0.0
+        if reconstruction_cache_dir is not None:
+            cache_started = time.perf_counter()
+            cache_name = (
+                f"{checkpoint_path.stem}_t{timestep:04d}_{reverse_sampler}_reconstructions.npz"
+            )
+            cache_path = reconstruction_cache_dir / cache_name
+            temporary = cache_path.with_suffix(cache_path.suffix + ".tmp")
+            with temporary.open("wb") as stream:
+                np.savez_compressed(
+                    stream,
+                    images=images,
+                    reconstructions=reconstructions,
+                    masks=masks,
+                    labels=labels,
+                )
+            os.replace(temporary, cache_path)
+            cache_seconds = time.perf_counter() - cache_started
         result = {
             "starting_timestep": timestep,
+            "reverse_sampler": reverse_sampler,
+            "batch_size": batch_size,
             "validation_samples": len(indices),
             "normal_samples": int((labels == 0).sum()),
             "anomaly_samples": int((labels == 1).sum()),
             "sampling_base_seed": sampling_base_seed,
             "seconds": elapsed,
             "seconds_per_sample": elapsed / len(indices),
+            "reconstruction_cache": cache_name,
+            "reconstruction_cache_seconds": cache_seconds,
             "peak_vram_bytes": (
                 int(torch.cuda.max_memory_allocated(device)) if device.type == "cuda" else 0
             ),
