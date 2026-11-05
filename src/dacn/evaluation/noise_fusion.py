@@ -3,6 +3,7 @@
 import argparse
 import csv
 import hashlib
+import io
 import json
 import platform
 import time
@@ -38,21 +39,23 @@ def evaluate_noise_fusion(
     if output_dir.exists():
         raise FileExistsError("Use a fresh output directory")
     paths = {"gaussian": gaussian_cache, "simplex": simplex_cache, "index": index_path}
-    hashes = {key: hashlib.sha256(path.read_bytes()).hexdigest() for key, path in paths.items()}
+    # Deserialize exactly the bytes we verify, even if a producer replaces a path.
+    payloads = {key: path.read_bytes() for key, path in paths.items()}
+    hashes = {key: hashlib.sha256(payload).hexdigest() for key, payload in payloads.items()}
     simplex_hash = {10: SIMPLEX_SHA, 20: SIMPLEX20_SHA}[simplex_epoch]
     if hashes != {"gaussian": GAUSSIAN_SHA, "simplex": simplex_hash, "index": INDEX_SHA}:
         raise ValueError("Registered cache/index checksum mismatch")
     started = time.perf_counter()
-    with np.load(gaussian_cache, allow_pickle=False) as cache:
+    with np.load(io.BytesIO(payloads.pop("gaussian")), allow_pickle=False) as cache:
         images, gaussian, masks, labels = [
             cache[key] for key in ("images", "reconstructions", "masks", "labels")
         ]
-    with np.load(simplex_cache, allow_pickle=False) as cache:
+    with np.load(io.BytesIO(payloads.pop("simplex")), allow_pickle=False) as cache:
         for key, expected in (("images", images), ("masks", masks), ("labels", labels)):
             if not np.array_equal(cache[key], expected):
                 raise ValueError("Gaussian/Simplex cache images, masks or label order differ")
         simplex = cache["reconstructions"].copy()
-    with index_path.open(newline="") as stream:
+    with io.StringIO(payloads.pop("index").decode("utf-8"), newline="") as stream:
         rows = list(csv.DictReader(stream))
     if len(rows) != 83 or len(images) != 83 or any(row["split"] != "val" for row in rows):
         raise ValueError("Expected all83 validation examples")

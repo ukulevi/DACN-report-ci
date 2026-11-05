@@ -3,7 +3,8 @@ import uuid
 
 import numpy as np
 import pytest
-import torch
+
+torch = pytest.importorskip("torch", reason="Patch validation requires the train extra")
 
 from dacn.evaluation import patch_validation
 

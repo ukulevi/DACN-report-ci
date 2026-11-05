@@ -134,7 +134,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Resolution:** Chưa có hoặc bằng chứng đóng blocker và ngày đóng.
 ```
 
-## 2026-11-05 � B handoff update
+## 2026-11-05 — B handoff update
 
 BLK-20261101-02 remains Investigating. B reproduced both scores on full83 Gaussian30/Simplex20 caches;34 numeric fields per model exactly match C JSON. Producer provenance corrected to00d199f+dirty source snapshot, evaluator84088f9; see RESULT_TRACKING and docs/evidence. This validates handoff, not anomaly improvement. New branch codex/bc-evaluation-colab integrates B evaluation/provenance code with C7134b10;37 CPU checks pass. Reusable legacy adapter, Torch/GPU integration check, Colab Gaussian20 and grouped comparison remain pending. Do not ask C to regenerate existing full83 caches.
 
@@ -143,3 +143,12 @@ holdout comparison are recorded in RESULT_TRACKING. The brightness control
 still leads pixel AP. B will run the prepared Gaussian20 notebook for the
 matched-budget comparison and report uncertainty before recommending a
 configuration freeze. Status remains Investigating.
+
+2026-11-05 review update for BLK-20261101-02: notebook lifecycle/interrupt and
+verified-snapshot bugs have been fixed with regression coverage. Full Torch CPU
+suite:164 passed; data-only environment:113 passed/10 skipped. Aggregate metric
+consistency checks passed; these are software/report checks, not new model
+results. B can run the separate smoke gate, then explicitly enable full83 on
+Colab. Gaussian20 real inference, matched-budget comparison and paired group
+bootstrap remain pending. Closure still requires research evidence/protocol
+decision, not code tests. See B_REVIEW_2026-11-05.md. No Linear status changed.

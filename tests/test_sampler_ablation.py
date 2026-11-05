@@ -4,7 +4,8 @@ import uuid
 
 import numpy as np
 import pytest
-import torch
+
+torch = pytest.importorskip("torch", reason="Sampler ablation requires the train extra")
 
 from dacn.evaluation import sampler_ablation as ablation
 from dacn.evaluation.patch_validation import gaussian_one_step

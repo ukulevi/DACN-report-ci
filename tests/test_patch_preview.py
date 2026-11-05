@@ -2,7 +2,9 @@ import json
 import uuid
 
 import numpy as np
-import torch
+import pytest
+
+torch = pytest.importorskip("torch", reason="Patch preview requires the train extra")
 
 from dacn.evaluation import patch_preview
 

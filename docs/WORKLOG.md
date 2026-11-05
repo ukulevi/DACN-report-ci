@@ -975,7 +975,7 @@ source data in this file.
 - Evidence/checks: Linear user search matched both display names; the live project member list included both, and a fresh issue query confirmed the new owners. `git diff --check` passed; the CSV parsed as 26 issue rows. No tests, training, or evaluation runs were performed.
 - Next: Review the role/ownership PR, verify private HF dataset access on B/C machines, and agree the weekly sync cadence; DAC-6 and DAC-9 remain In Progress until their criteria are met.
 
-## 2026-11-05 � B integration branch
+## 2026-11-05 — B integration branch
 
 Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrated B evaluator, diagnostics, UUID artifact export and dataset-binding guards. Resolved runner conflict preserving C sampler/batch/cache options alongside B artifact_dir. Added reviewed aggregate reproduction evidence and retrospective run record; old worktree preserved. Targeted CPU tests:37 passed. Torch runner runtime/GPU remains unverified. No new inference or training. Legacy adapter and new Colab notebook remain pending.
 
@@ -993,3 +993,29 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   checkpoint. Checked Python cell syntax locally. Colab execution remains pending.
 - Remaining B work: paired patient-group bootstrap and the Gaussian20 Colab run
   followed by the budget-matched comparison.
+
+## 2026-11-05 — B review: notebook lifecycle and verified cache snapshots
+
+- Reviewed branch base `2df19bc`; details and remaining research limits in
+  [B_REVIEW_2026-11-05.md](B_REVIEW_2026-11-05.md).
+- Reproduced then fixed notebook smoke/full opt-in, missing failure manifests
+  before checkpoint load, and manual-interrupt status. Full inference now has
+  a separate default-off gate after successful smoke. Documented cooperative
+  timeout and ephemeral Colab storage limits.
+- Fusion now deserializes the exact hashed cache/index bytes. Regression tests
+  replace producer files after hash verification for both Simplex presets.
+  Added synthetic legacy-conversion validation tests, guarded optional Torch
+  imports for data-only CI, repaired two invalid UTF-8 separators and lint-only
+  notebook/U-Net issues. No model objective, weight or architecture change.
+- Verification: full CPU suite with Torch **164 passed (29.84 s)**; minimal
+  `[data,dev]` environment **113 passed, 10 skipped (16.27 s)**. Minimal suite
+  first encountered a Windows sandbox PermissionError on atomic manifest
+  replacement; full rerun outside sandbox passed. Ruff check/format passed;
+  notebook cells compiled without saved outputs. Synthetic CLI demo passed.
+- Checked 48 saved Precision/Recall/F1 values against aggregate confusion
+  counts and confirmed candidate selection uses calibration AP. No new BMAD
+  experiment, GPU job, held-out-test access or Linear update.
+- Restored local Git metadata from remote while preserving source and backup
+  of the missing-parent worktree pointer. Keep `BLK-20261101-02` Investigating;
+  next is actual Gaussian20 Colab inference, matched-budget comparison and
+  patient-group uncertainty. Tests do not constitute GPU/model acceptance.

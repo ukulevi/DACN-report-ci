@@ -1,8 +1,10 @@
 import csv
 import hashlib
 import json
+from pathlib import Path
 
 import numpy as np
+import pytest
 
 from dacn.evaluation import noise_fusion
 
@@ -16,7 +18,11 @@ def test_normal_cdf_uses_only_reference_normals_and_preserves_ties():
     assert np.array_equal(noise_fusion.normal_cdf(maps, np.array([0, 1]))[:2], result[:2])
 
 
-def test_fusion_freezes_calibration_selection_before_holdout(tmp_path, monkeypatch):
+@pytest.mark.parametrize("simplex_epoch", [10, 20])
+@pytest.mark.parametrize("replace_after_hash", [False, True])
+def test_fusion_freezes_calibration_selection_before_holdout(
+    tmp_path, monkeypatch, simplex_epoch, replace_after_hash
+):
     images = np.zeros((83, 256, 256), dtype=np.float32)
     masks = np.zeros_like(images, dtype=np.uint8)
     labels = np.array([i % 2 for i in range(83)], dtype=np.uint8)
@@ -30,9 +36,10 @@ def test_fusion_freezes_calibration_selection_before_holdout(tmp_path, monkeypat
             masks=masks,
             labels=labels,
         )
-        monkeypatch.setattr(
-            noise_fusion, f"{name.upper()}_SHA", hashlib.sha256(path.read_bytes()).hexdigest()
+        constant = (
+            "SIMPLEX20_SHA" if name == "simplex" and simplex_epoch == 20 else f"{name.upper()}_SHA"
         )
+        monkeypatch.setattr(noise_fusion, constant, hashlib.sha256(path.read_bytes()).hexdigest())
     index = tmp_path / "index.csv"
     with index.open("w", newline="") as stream:
         writer = csv.DictWriter(
@@ -74,11 +81,23 @@ def test_fusion_freezes_calibration_selection_before_holdout(tmp_path, monkeypat
         return {"pixel": {"average_precision": 0.4}}
 
     monkeypatch.setattr(noise_fusion, "evaluate_maps", evaluate)
+    if replace_after_hash:
+        original_read = Path.read_bytes
+
+        def replace_after_snapshot(path):
+            contents = original_read(path)
+            if path == index:
+                for candidate in [*paths.values(), index]:
+                    candidate.write_bytes(b"replaced after checksum")
+            return contents
+
+        monkeypatch.setattr(Path, "read_bytes", replace_after_snapshot)
     result = noise_fusion.evaluate_noise_fusion(
         gaussian_cache=paths["gaussian"],
         simplex_cache=paths["simplex"],
         index_path=index,
         output_dir=output,
+        simplex_epoch=simplex_epoch,
     )
     assert len(fit_sizes) == len(evaluated) == 8
     assert result["selected_by_calibration_ap"] == "gaussian_raw"

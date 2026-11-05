@@ -245,9 +245,7 @@ class UNetModel(nn.Module):
                 channel_mults = (1, 1, 2, 2, 4, 4)
             elif img_size == 128:
                 channel_mults = (1, 1, 2, 3, 4)
-            elif img_size == 64:
-                channel_mults = (1, 2, 3, 4)
-            elif img_size == 32:
+            elif img_size in (64, 32):
                 channel_mults = (1, 2, 3, 4)
             else:
                 raise ValueError(f"unsupported image size: {img_size}")
@@ -411,5 +409,5 @@ def zero_module(module):
 def update_ema_params(target, source, decay_rate=0.9999):
     targParams = dict(target.named_parameters())
     srcParams = dict(source.named_parameters())
-    for k in targParams:
-        targParams[k].data.mul_(decay_rate).add_(srcParams[k].data, alpha=1 - decay_rate)
+    for k, parameter in targParams.items():
+        parameter.data.mul_(decay_rate).add_(srcParams[k].data, alpha=1 - decay_rate)

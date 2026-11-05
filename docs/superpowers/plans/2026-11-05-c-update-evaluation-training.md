@@ -186,3 +186,25 @@ Colab runtime mất là dự kiến: lưu full-state checkpoint + config + sourc
 ## Thực hiện trong lượt kiểm tra này
 
 Đã fetch Git, đọc source/docs mới, đọc HF manifest/config/results, đối chiếu checksum và kiểm hai cache với validation dataset. Đã viết kế hoạch và evidence tổng hợp. Chưa merge/push, chưa sửa thuật toán, chưa chạy unit test mới, chưa tái tính metric, chưa chạy Colab/GPU/train và chưa cập nhật Linear.
+
+## Cập nhật sau implementation và review — 05/11/2026
+
+Phần trên giữ như bản kế hoạch/lịch sử ban đầu. Trạng thái hiện tại:
+
+- NEXT-01: đã tái lập Gaussian30/Simplex20, kiểm confusion và provenance; xem
+  RESULT_TRACKING và aggregate evidence, không yêu cầu C tạo lại cache sẵn có.
+- NEXT-02: branch tích hợp và adapter đã có; notebook được sửa lifecycle,
+  tách smoke/full và kiểm thử CPU. Full suite 164 pass, môi trường data-only
+  113 pass/10 skip. Runtime GPU/Colab với checkpoint thật chưa được xác nhận.
+- NEXT-03: terminal decision cho run batch1 cũ vẫn thuộc A/C; review B này
+  không cập nhật trạng thái run hoặc tự kết luận recovery đã được giải quyết.
+- NEXT-04: notebook Gaussian20 sẵn cho smoke riêng trước full83. Chưa chạy thật;
+  giới hạn45phút là cooperative guard giữa các calls, không hard GPU shutdown.
+- NEXT-05/06: so cùng budget Gaussian20/Simplex20 và bootstrap chưa hoàn tất.
+  Grouped Gaussian30/Simplex20 đã có nhưng khác budget, không thay thế NEXT-05.
+- NEXT-07: vẫn là đề xuất có điều kiện; chưa bắt đầu fine-tune/training mới.
+
+Chi tiết review: [B_REVIEW_2026-11-05.md](../../B_REVIEW_2026-11-05.md).
+Giữ nguyên test sealed và các quyết định chọn bằng calibration; không chọn lại
+fusion hoặc hyperparameter bằng holdout. Không lấy CI/test pass làm Done cho
+blocker chất lượng reconstruction/anomaly score.
