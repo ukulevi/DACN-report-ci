@@ -3,6 +3,7 @@
 import csv
 import hashlib
 import json
+import os
 import time
 from pathlib import Path
 
@@ -36,6 +37,22 @@ def gaussian_one_step(model, diffusion, image, *, steps=100, seed=17):
         return diffusion._predict_clean(noisy, t, model(noisy, t)).clamp(-1, 1)
 
 
+@torch.inference_mode()
+def gaussian_ancestral_with_noisy(model, diffusion, image, *, steps=300, seed=17):
+    """Original one-channel chain with explicit paired forward noise for audit."""
+    if image.shape != (1, 1, 256, 256) or not 1 <= steps <= diffusion.timesteps:
+        raise ValueError("Invalid input shape or timestep")
+    if diffusion.noise_type != "gaussian":
+        raise ValueError("This control requires Gaussian noise")
+    model.eval()
+    with _fixed_rng(seed, image.device):
+        t = torch.full((1,), steps - 1, device=image.device, dtype=torch.long)
+        noise = diffusion.noise(image, t)
+        noisy = diffusion.q_sample(image, t, noise)
+        result = diffusion.reconstruct(model, image, steps=steps, initial_noise=noise)
+    return result, noisy
+
+
 def evaluate_patch_validation(
     *,
     validation_dir,
@@ -45,10 +62,44 @@ def evaluate_patch_validation(
     on_progress=None,
     one_step=False,
     gaussian_baseline=False,
+    feature_condition=False,
+    starting_timestep=100,
+    resume_partial=False,
+    condition_mode="self",
+    donor_train_dir=None,
+    unconditional_finetune=False,
 ):
     output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=False)
-    if gaussian_baseline:
+    if unconditional_finetune and (feature_condition or gaussian_baseline or one_step):
+        raise ValueError("Unconditional fine-tune cannot mix evaluation modes")
+    stores_noisy = feature_condition or unconditional_finetune
+    if condition_mode not in {"self", "zero", "normal_donor"} or (
+        condition_mode != "self" and not feature_condition
+    ):
+        raise ValueError("Invalid conditional intervention")
+    output_dir.mkdir(parents=True, exist_ok=stores_noisy and resume_partial)
+    if unconditional_finetune:
+        checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+        initialization = checkpoint.get("ema_initialization", {})
+        if (
+            checkpoint.get("method") != "ddpm_partial_reconstruction_bmad_flair"
+            or not 31 <= checkpoint["epoch"] <= 40
+            or initialization.get("source_epoch") != 30
+            or initialization.get("encoder_added") is not False
+        ):
+            raise ValueError("Expected unconditional EMA30 fine-tune checkpoint")
+        selected_epoch = checkpoint["epoch"]
+        model = load_ema_checkpoint(checkpoint_path, checkpoint["config"], device)
+        diffusion = build_diffusion(checkpoint["config"])
+        del checkpoint
+    elif feature_condition:
+        from dacn.training.feature_condition import load_feature_checkpoint
+
+        model, diffusion = load_feature_checkpoint(checkpoint_path, device)
+        selected_epoch = torch.load(checkpoint_path, map_location="cpu", weights_only=False)[
+            "epoch"
+        ]
+    elif gaussian_baseline:
         if not one_step:
             raise ValueError("Gaussian control is one-step only")
         checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
@@ -63,6 +114,13 @@ def evaluate_patch_validation(
     else:
         model, diffusion = load_context_checkpoint(checkpoint_path, device)
     data = ShardDataset(validation_dir, "val", include_masks=True)
+    donors = None
+    if condition_mode == "normal_donor":
+        if donor_train_dir is None:
+            raise ValueError("Normal training donor directory required")
+        donors = ShardDataset(donor_train_dir, "train", include_masks=False)
+        if not len(donors) or np.any(donors.labels != 0):
+            raise ValueError("Condition donors must be normal training slices")
     with (validation_dir / "index.csv").open(newline="") as stream:
         rows = list(csv.DictReader(stream))
     if [row["sample_id"] for row in rows] != data.sample_ids:
@@ -87,20 +145,52 @@ def evaluate_patch_validation(
     reconstruct = gaussian_one_step if gaussian_baseline else sliding_reconstruct
     if gaussian_baseline:
         reconstruction_kwargs = {}
+    noisy_images = []
+    if feature_condition:
+        from dacn.training.feature_condition import feature_reconstruct
+
+        reconstruct = feature_reconstruct
+        reconstruction_kwargs = {"return_noisy": True}
+    elif unconditional_finetune:
+        reconstruct, reconstruction_kwargs = gaussian_ancestral_with_noisy, {}
+    previous = None
+    if stores_noisy and resume_partial and (output_dir / "private_reconstructions.npz").is_file():
+        with np.load(output_dir / "private_reconstructions.npz", allow_pickle=False) as cache:
+            previous = {key: cache[key].copy() for key in cache.files}
+        if not np.array_equal(previous["labels"], data.labels[: len(previous["labels"])]):
+            raise ValueError("Partial evaluation cache labels differ")
     for index in range(len(data)):
         image, mask, _ = data[index]
-        reconstructed = (
-            reconstruct(
-                model,
+        if previous is not None and index < len(previous["images"]):
+            if not np.array_equal(
+                previous["images"][index], image[0].numpy()
+            ) or not np.array_equal(previous["masks"][index], mask.numpy()):
+                raise ValueError("Partial evaluation cache sample differs")
+            reconstructed = previous["reconstructions"][index]
+            noisy_images.append(previous["noisy_images"][index])
+        else:
+            selected_model = model
+            if condition_mode != "self":
+                from dacn.evaluation.condition_ablation import ConditionIntervention, donor_index
+
+                donor = (
+                    donors[donor_index(data.sample_ids[index], len(donors))][0][None].to(device)
+                    if donors is not None
+                    else None
+                )
+                selected_model = ConditionIntervention(model, condition_mode, donor)
+            value = reconstruct(
+                selected_model,
                 diffusion,
                 image[None].to(device),
-                steps=100,
+                steps=starting_timestep,
                 seed=derive_sampling_seed(17, data.sample_ids[index]),
                 **reconstruction_kwargs,
-            )[0, 0]
-            .cpu()
-            .numpy()
-        )
+            )
+            if stores_noisy:
+                value, noisy = value
+                noisy_images.append(noisy[0, 0].cpu().numpy())
+            reconstructed = value[0, 0].cpu().numpy()
         x = image[0].numpy()
         scores = paired_score_maps(x, reconstructed)
         images.append(x)
@@ -110,15 +200,22 @@ def evaluate_patch_validation(
             maps[name].append(scores[name])
         maps["brightness_control"].append(x[8:-8, 8:-8])
         completed = index + 1
-        if completed == 1 or completed % 5 == 0 or completed == len(data):
+        if (completed == 1 or completed % 5 == 0 or completed == len(data)) and (
+            previous is None or completed >= len(previous["images"])
+        ):
             # Durable prefix cache prevents losing all reconstruction work on interruption.
-            np.savez_compressed(
-                output_dir / "private_reconstructions.npz",
-                images=np.asarray(images),
-                reconstructions=np.asarray(reconstructions),
-                masks=np.asarray(masks),
-                labels=data.labels[:completed],
-            )
+            cache_path = output_dir / "private_reconstructions.npz"
+            temporary = cache_path.with_suffix(".npz.tmp")
+            with temporary.open("wb") as stream:
+                np.savez_compressed(
+                    stream,
+                    images=np.asarray(images),
+                    reconstructions=np.asarray(reconstructions),
+                    masks=np.asarray(masks),
+                    labels=data.labels[:completed],
+                    **({"noisy_images": np.asarray(noisy_images)} if stores_noisy else {}),
+                )
+            os.replace(temporary, cache_path)
             progress = {
                 "completed_samples": completed,
                 "total_samples": len(data),
@@ -131,23 +228,34 @@ def evaluate_patch_validation(
     inference_seconds = time.perf_counter() - started
     cropped_masks = np.asarray(masks)[:, 8:-8, 8:-8]
     result = {
-        "method": "gaussian_ddpm_full_image_one_step_x0"
+        "method": "unconditional_ddpm_EMA30_finetune"
+        if unconditional_finetune
+        else "resnet18_feature_conditioned_ddpm"
+        if feature_condition
+        else "gaussian_ddpm_full_image_one_step_x0"
         if gaussian_baseline
         else "patch_context_sliding_one_step_x0"
         if one_step
         else "patch_context_sliding_reconstruction",
         "reconstruction_mode": "one_step_x0" if one_step else "ancestral_reverse_chain",
-        "model_calls_per_image": 1 if gaussian_baseline else 25 if one_step else 2500,
+        "condition_mode": "none" if unconditional_finetune else condition_mode,
+        "model_calls_per_image": starting_timestep
+        if stores_noisy
+        else 1
+        if gaussian_baseline
+        else 25
+        if one_step
+        else 2500,
         "split": "validation",
         "held_out_test_used": False,
-        "timesteps_one_based": [100],
+        "timesteps_one_based": [starting_timestep],
         "sampling_base_seed": 17,
         "partition_seed": 17,
-        "checkpoint_epoch": 30 if gaussian_baseline else 5,
+        "checkpoint_epoch": selected_epoch if stores_noisy else 30 if gaussian_baseline else 5,
         "ema": True,
-        "patch_size": None if gaussian_baseline else 64,
-        "stride": None if gaussian_baseline else 48,
-        "patches_per_image": None if gaussian_baseline else 25,
+        "patch_size": None if gaussian_baseline or stores_noisy else 64,
+        "stride": None if gaussian_baseline or stores_noisy else 48,
+        "patches_per_image": None if gaussian_baseline or stores_noisy else 25,
         "samples": len(data),
         "checkpoint_sha256": hashlib.sha256(checkpoint_path.read_bytes()).hexdigest(),
         "index_sha256": hashlib.sha256((validation_dir / "index.csv").read_bytes()).hexdigest(),

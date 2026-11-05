@@ -35,6 +35,708 @@ clear; do not combine metrics from different splits or score definitions.
 
 ## Per-run record
 
+### ddpm-uncertainty-k4-val83-t4-20261105T163529Z — Gaussian EMA30 K4 scoring83 — completed
+- After bounded K4smoke passed,user-authorized full inference-only experiment,
+  shared profile/Workspace phutungcogioihaitan,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-R0EC27PZnPnALYHMySkxkH).
+  OneT4,batch1,t300,hardtimeout2h,no training or encoder.
+- Original Gaussian EMA30 source d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946;
+  drawbases17/1017/2017/3017. Immutable cached draw1/base17 reused after
+  2image replay;249new reconstructions across83images for remaining3draws.
+  Atomic prefix caches/commit every5images,checkpoint/index/seed/source checked
+  on resume. No Spatial checkpoint or extra training used.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,index
+  57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3,
+  code7134b105c0c4d4fb620715908f100103b1d0b0ab+dirty source
+  15a90894fc8dcd6578a64256710af85604ae4fac3d1ef66e147ecd9d7f878583.
+- Fixed6scores:single absolute/SSIM,mean4 absolute/SSIM,variance-normalized
+  squared residual,pooled normal-calibration3x3patch Mahalanobis. Variance floor
+  median normalcal variance/min1e-6;covariance shrinkage0.1/ridge fixed.
+  Parameters normal-calibration only,persisted before holdout metrics.
+  Thresholds40calibration/43group holdout,25groups each,globalmicro240crop,
+  image mean top576. All83descriptive thresholds separate. No holdout tuning.
+- Full AP/F1/FPR,image metrics,normal quality,lesion/nonlesion score/variance
+  means,latency/VRAM and private ensemble/calibration artifacts planned. Six
+  comparisons fixed before launch,no claims from smoke. One fixed ensemble/model
+  on previously inspected validation,not4trainingseeds. Held-out test sealed.
+  App created;metrics pending. Leave detached after start verification.
+- Start verified:manifest2026-11-05T16:35:52UTC,running,
+  reconstruction_draw_2_of4,TeslaT4,exact source snapshot. Cached baseline
+  replay errors[0,0];draw2progress5/83 at67.945679s inclsetup/preflight.
+  Detached local client after confirmation;no continuous monitoring.
+- Completion checked06/11/2026local:all3newdraws83/83,full249newreconstructions,
+  replayerrors[0,0],normal-calibration20images/1152000patch vectors. Completed
+  2026-11-05T17:17:40UTC(06/11 00:17local),completed/uploaded manifest,
+  [private revisionaf0bf4006db4c948292b9bc50748073e1b421bb4](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/af0bf4006db4c948292b9bc50748073e1b421bb4/evaluations/ddpm-uncertainty-k4-val83-t4-20261105T163529Z).
+  ResultsSHAfc12e2093045f9b6f7c0850e683a7c0258c05529d6a92580419101bf77f8ce16
+  matches manifest artifact;sourcecheckpointSHA,83samples,sealed-test flag
+  verified locally. Single-draw AP reproduced registered baseline exactly.
+- Calibration frozen:variance_floor0.00005194913791110404,shrinkage0.1,
+  ridge0.000000835616497628855. Covariance/mean from normal calibration only.
+  All thresholds below independently calibrated on40images then applied to43
+  group-holdout;globalmicro240crop,image mean top576,one ensemble/model.
+
+| Score,43group holdout | Pixel ROC-AUC | Precision | Recall | F1/microDice | Pixel AP | Normal pixel FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| single_absolute |0.876854|0.119934|0.314702|0.173678|0.101066|0.058079|
+| single_ssim |0.888870|0.110476|0.257712|0.154654|0.102402|0.055234|
+| mean4_absolute |0.872069|0.124609|0.284321|0.173276|0.103810|0.052835|
+| mean4_ssim |0.879083|0.116795|0.179714|0.141579|0.099472|0.038697|
+| variance_normalized |0.534862|0.096144|0.172352|0.123433|0.045729|0.040329|
+| patch_mahalanobis |0.874171|0.087801|0.474827|0.148199|0.077657|0.137883|
+
+| Score,43group holdout | Image ROC-AUC | Precision | Recall | F1 | Image AP |
+|---|---:|---:|---:|---:|---:|
+| single_absolute |0.263158|0.558140|1.000000|0.716418|0.430006|
+| single_ssim |0.372807|0.558140|1.000000|0.716418|0.505258|
+| mean4_absolute |0.307018|0.547619|0.958333|0.696970|0.453941|
+| mean4_ssim |0.405702|0.558140|1.000000|0.716418|0.539785|
+| variance_normalized |0.594298|0.536585|0.916667|0.676923|0.720711|
+| patch_mahalanobis |0.416667|0.558140|1.000000|0.716418|0.542902|
+
+- Pixel/image thresholds in score order above:
+  0.253657147288/0.494910077574;0.956885287835/1.154324681719;
+  0.207741984050/0.383705765685;0.909948174235/1.046867417355;
+  4.402128372042/52.600949796141;14.172663102923/78.649962948236.
+  All83descriptive PixelAP/F1 respectively:
+  singleabs0.099834/0.182870,singleSSIM0.100741/0.167483,
+  mean4abs0.101912/0.185849,mean4SSIM0.102312/0.161804,
+  normalized0.042073/0.119290,Mahalanobis0.076216/0.156224.
+- Main result:averaging helps absolute AP slightly(0.101066->0.103810),not
+  SSIM AP;normalized and pooled-patch Mahalanobis do not beat mean4controls for
+  pixel localization. Lower FPR in meanSSIM/normalized accompanies lower Recall;
+  not an improvement at matched sensitivity. Mahalanobis FPR rises13.79%.
+- Variance-normalized image AP0.720711/AUROC0.594298 is better than original
+  image scores but not lesion localization. Existing brightness control image
+  AP0.770309/AUROC0.679825 remains higher under sameholdout. One previously
+  inspected validation ensemble,no significance/generalization claim.
+- Normal tissue mean4 MAE[0,1]0.063042679/SSIM0.408378352 vs single
+  0.082674084/0.292438059. Mean variance normalforeground0.032296945 and
+  lesion0.041919858. Normalized score abnormal-slice macro lesion5.556999 vs
+  nonlesionforeground11.326831,showing poor separation in this scoring design;
+  consistent with suppressing lesion signals,not proof of one causal mechanism.
+  Mahalanobis corresponding means24.278770/18.250254.
+- End-to-end manifest walltime2507.975575s(~41.80min). Later draw elapsed
+  counters restart(draw4final365.411s < draw3final1564.867s),consistent with
+  prefix-cache resumption;do not sum those counters or call final-attempt timing
+  full run latency. Final-attempt inference phase367.987923s,total469.895990s,
+  peak101438464B. Private arrays/calibration/summary uploaded;no new GPU work
+  during status check,no training or held-out-test access.
+
+### ddpm-uncertainty-k4-smoke-t4-20261105T163114Z — Gaussian EMA30 K4 scoring smoke — completed
+- Explicit user inference test,K4,t300,original GaussianEMA30 sourceSHA
+  d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946.
+  Profile/Workspace phutungcogioihaitan,Secret name verified,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-XWKFboy5nw35LHkFTNev1O).
+- Bounded1normal+1abnormal,4draws per image,bases17/1017/2017/3017. Cached
+  originaldraw1 reused after two exact replay checks;6new reconstructions.
+  Finite unbiased variance,normalized squared residual and normal-only pooled
+  3x3patch Mahalanobis checked. No AP computed on this tiny sample,no training.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,immutable baselinecache
+  8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959,
+  code7134b105c0c4d4fb620715908f100103b1d0b0ab+dirtysnapshot inmanifest.
+ 146tests passed27.89s,targeted Ruff/format/whitespace passed. Parameters
+  and full protocol fixed in UNCERTAINTY_SCORING.md before GPU submission.
+  Full83/249newdraws only after smoke success;no test access or claim of gain.
+- Verified completed/uploaded501d5f86ee79ddd3d81b1cfa7b62c53a620670a8,
+  replay maxerrors[0,0],draws2/3/4 each2/2completed,finite normalized/Mahalanobis
+  smoke passed. Final draw progress84.248039s inclsetup/preflight/6newchains.
+  Frozen source15a90894fc8dcd6578a64256710af85604ae4fac3d1ef66e147ecd9d7f878583.
+  No AP result on2images. Independent full validation permitted after smoke.
+
+### spatial-imagenet-gray-t4-b8-e10-20261105T141939Z — spatial ImageNet grayscale10 + validation — completed
+- User-requested spatial feature trial with explicit1channel grayscale. After
+  smoke3 passed,independent full run submitted to shared Workspace/profile
+  phutungcogioihaitan,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-z896lVzq2nUac9XbgTsY4L).
+- Config spatial_imagenet_grayscale_t4_epoch10.json,T4,batch8,seed17,
+  7500normal train,10fine-tune epochs/9380updates. Original U-Net EMA30 strict
+  source SHA d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946,
+  not smoke/A/B/control weights. ResNet18 official IMAGENET1K_V1 hash
+  f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec,
+  conv1 meanRGB->1channel,MRI[-1,1],noRGB repeat/norm/resize/crop.
+- Four spatial maps64×64×64/128×32×32/256×16×16/512×8×8,no pooling;
+  zero1x1 residual fusion into U-Net down terminal blocks[8,11,14,17],then
+  bottleneck/skips. Jointtrain U-Net+encoderLR1e-5,fusion1e-4,freshAdamW
+  betas0.9/0.999,wd0,clip1,EMA0.9992 with copied online BatchNorm buffers.
+  Gaussian epsilonMSE,linearT1000. Best selected39normal-val/fixedseed1000017;
+  save initial0,last each epoch,best,milestones1/5/10 andImageNet provenance.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus exact source snapshot in manifest.4hour timeout,private HF upload/durable
+  checkpoints,source/config-checked resume;no held-out-test access.
+- After training auto83slice t300 ancestral/batch1/base17 validation,shared
+  40calibration/43group holdout/calibration-only thresholds,paired difference/
+  SSIM,normal FPR,quality/latency/VRAM/private figures. Compare registered
+  original30/A/B/unconditional control caches/results after SHA/protocol checks.
+  Trial jointly changes spatial fusion/pretraining/encoderLR;not isolated
+  spatial-only ablation,one exploratory seed. No AP improvement claim yet.
+- Start verified:durable manifest2026-11-05T14:27:12UTC,running/training,
+  TeslaT4,epoch0recovery checkpoint committed,exact source snapshot
+  2f6c5005dd22618a4d49fa56707b9779143f12fab04467b580681cdd6c1118e8.
+  Actual epoch1/10 step150/938,finite running epsilonMSE0.008948. Detached
+  local client after start confirmation;job continues without monitoring.
+- Completion verified:10epochs/9380updates,best normal-val EMA10,
+  epsilonMSE0.004498155053,4507.506611s train+val,peak5883574272B.
+  Training completed/uploaded29777bf14204bdc7b4450f2b9a0746b1a537911c at15:45:05UTC.
+  No new training on user check.
+- Validation83/83 completed16:00:37UTC,completed/uploaded revision
+  [a6e21e5c2553e683fda3e51496fdc52a31662b60](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/a6e21e5c2553e683fda3e51496fdc52a31662b60/evaluations/spatial-imagenet-gray-t4-b8-e10-20261105T141939Z-val).
+  Bestcheckpoint SHA6a4103bb14937421fc79e595fb7fdd7d460774dc68e2db1ef3e8c75b04d307cb;
+  resultsSHA0c9b75267a8d6f26a54c071ab26e263ea3fc0b292a438ff112acd2a15dd5299f
+  matches manifest artifact. CheckpointSHA,samples83,sealed-test flag verified.
+  SelectedEMA10,t300,base17,40calibration/43group holdout/25groups each,
+  calibration-only thresholds,globalmicro240crop,image mean top576,one seed.
+
+| Score,43group holdout | Level | ROC-AUC | Precision | Recall | F1/microDice | AP | Normal pixel FPR |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Difference | pixel |0.795266|0.072812|0.337595|0.119789|0.063110|0.120666|
+| Local1-SSIM | pixel |0.843081|0.074047|0.861924|0.136377|0.065459|0.260876|
+| Difference | image |0.217105|0.512821|0.833333|0.634921|0.429099|n/a|
+| Local1-SSIM | image |0.208333|0.472222|0.708333|0.566667|0.418773|n/a|
+
+- Thresholds pixel/image:difference0.067786693573/0.227941763770;
+  SSIM0.067449256461/0.731668359946. Macro lesion-slice Dice
+  difference0.189223981/SSIM0.216837302. All83 descriptive AP/F1/FPR:
+  difference0.062165556/0.130531382/0.170679309;
+  SSIM0.066047096/0.121576622/0.271205929. All83thresholds descriptive only.
+- Holdout PixelAP baseline30/control/A/B/spatial:difference
+  0.101066/0.104391/0.104645/0.104464/0.063110;SSIM
+  0.102402/0.104004/0.104247/0.104084/0.065459. Both threshold-independent AP
+  scores lower;not solely a threshold problem. Brightness holdoutAP0.389506
+  unchanged separate control. No significance/general-method claim from1seed.
+- Normal39foreground MAE[0,1]0.039324712/SSIM0.688031178 versus control
+  0.082240741/0.295440689. Abnormal44 macro lesion/nonlesion SSIMerror
+  0.276705021/0.271836988;difference0.073481523/0.063075532. Improved
+  normal reconstruction but weak lesion separation is consistent with original
+  spatial condition retaining pathology;mechanism not proven by these means.
+- Loop837.866527s,peak151107072B,total916.399822s. Private images/cache
+  uploaded. Lower noiseMSE did not imply better anomaly detection. No new
+  inference,extra epochs or test-set access initiated during status check.
+
+### spatial-imagenet-gray-smoke3-t4-20261105T141647Z — grayscale spatial smoke3 — completed
+- User-requested spatial ImageNet pilot with explicit grayscale1channel.
+  App ap-Gkt1RTxe4nYswmOMDt2AnX,image im-HkuyXIq2wxtmzvaYr4i0PF built
+  successfully with official pretrained hash check before GPU allocation.
+  Required workspace/Secret verified;shared profile phutungcogioihaitan.
+- Config spatial_imagenet_grayscale_smoke.json,1epoch,batch2,normal16train/
+  4normal-val,seed17;U-NetEMA30originalSHA d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946.
+  ResNet18 IMAGENET1K_V1 conv1=mean RGB weights ->1channel,inputsMRI[-1,1],
+  no RGB repeat/norm/crop. Four spatial maps,zero1x1 fusion at64/32/16/8,
+  jointtrain U-Net/encoderLR1e-5,fusionLR1e-4,EMA0.9992.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus dirty snapshot in manifest.140tests passed17.19s;actual ImageNetfile
+  hash/meanRGBadaptation/4map shapes checked locally. No AP or held-out-test result;
+  weights from smoke are not reused.
+- Remote smoke=passed,finite3step reconstruction,completed/uploaded private
+  revision4d47de2f38c281e14401ed80a79ab315ef5186ba.15shard-aware updates,
+  16normal train/4normal-val,best1,normal epsilonMSE0.000329594652,
+  train+val3.862974s,peak1710858752B. Tiny subset MSE is not an AP result.
+  Snapshot9ab3166e6a271edef902edb0aaaccbb92563344892bd75d43dd72114c2dc2be7.
+  Smoke passed before full submission;subsequent Python edit only removes extra
+  whitespace in cloud import block,not model/training behavior.
+
+### spatial-imagenet-gray-smoke2-t4-20261105T141500Z — grayscale spatial smoke2 — image build failed
+- App ap-0xrdUXDoZClwpR6h6KGhIb,image im-u7YjCDr3ssfButgK9qg8Tl. CPU build
+  failed parsing Dockerfile because run_commands contained literal multiline
+  Python source;no GPU training/data/checkpoint/AP started. Same bounded config
+  and grayscale architecture as smoke1. Replaced with checked single-line
+  stdlib Python download/checksum command;fresh smoke3 needed.
+
+### spatial-imagenet-gray-smoke-t4-20261105T140929Z — grayscale spatial smoke1 — image build failed
+- User requested spatial ImageNet+EMA30,then grayscale1channel. First sandbox
+  request could not connect before app creation; retry with network permission
+  initialized app ap-2XcnTEi9RUdSDrI79jCTJH.140local tests passed17.19s.
+- Build im-tQ7GhEuXL1PQauMd6wRbNL failed before GPU training: run_function
+  hydrated cloud module whose top-level imports required dacn before local source
+  was mounted. ModuleNotFoundError,dacn. No training/checkpoint/AP or patient data
+  access in this attempt. Intended bounded1epoch/16normal train/4normal-val,batch2.
+- Fixed build to run self-contained stdlib download/checksum Python via
+  run_commands,then mount local source. Official ImageNet weights hash already
+  checked locally;meanRGB1channel adaptation and shapes tested. Use fresh smoke2
+  ID;full10epoch pilot remains contingent on actual smoke success.
+
+### ddpm-uncond-val-best36-t300-20261105T094934Z — matched control validation83 — completed
+- After successful bounded validation smoke,user-authorized full evaluation on
+  oneT4,ancestral300,batch1,base17 UUID sampling. Workspace/profile
+  phutungcogioihaitan,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-2AEvfGt80K4eoxODBlGW4g).
+- Fixed source ddpm-uncond-control-t4-b8-e40-20261105T082502Z/ddpm_best.pt,
+  normal-val-selected epoch36(FT6),not milestone40,EMA,noencoder,
+  SHA350791c48fd99babc38c329af5644a4c53a70f6628b6d751e85e3a6cab8cf0f7.
+  Parent10epoch/9380update training completed/uploaded375bc6ba5578f5c27953f3306cecdabb531f073b.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,83val39normal/44abnormal,
+  existing40calibration/43group holdout(25groups each),calibration-only thresholds,
+  difference/local1-SSIM and brightness control. Globalmicro240crop pixel
+  metrics,image mean top576,normal tissue MAE/SSIM,lesion/nonlesion quality,
+  latency/VRAM/private examples. Cached baseline30 plus immutable A/B results
+  matched by protocol/index and exact image/mask/label/noisy arrays.
+- Code7134b105c0c4d4fb620715908f100103b1d0b0ab+dirty source
+  68092ef7fe5e470d833a1ce0909c84011438e7b41414e91f1761f5dc4968c93a.
+  Repeated bounded replay preflight inside full worker;prefix cache every5images,
+  source-checked resume,private HF upload,two-hour hard timeout. No new
+  training,sweep,test access or AP-based selection.
+  One exploratory seed on previously inspected validation; no significance claim.
+- Start verified:durable manifest2026-11-05T09:50:15UTC,running,TeslaT4,
+  selected36,exact frozen snapshot. Full preflight passed; actual reconstruction
+  progress1/83 at11.104288s. Job subsequently completed83/83 before the local
+  client disconnected; actual produced artifacts verified below.
+- Completed2026-11-05T10:10:14UTC,manifest completed/uploaded at
+  [private revision38491cba20168ac41a038e98cfaffe1bc3fb51b5](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/38491cba20168ac41a038e98cfaffe1bc3fb51b5/evaluations/ddpm-uncond-val-best36-t300-20261105T094934Z).
+  Full preflight original replay maxerrors[0,0],target36 smoke passed,exact
+  input/mask/label/initial-noise pairing with B verified by worker. Result SHA
+  babbd335d6a9c40e64d23b2e7dded4dd8f195e3522669586713488ced3f62c7e
+  matches manifest artifact; actual checkpointSHA,83samples,sealed-test flag
+  verified locally. Normal-val selection retained; no AP-based checkpoint search.
+
+| Score,43group holdout | Level | ROC-AUC | Precision | Recall | F1/microDice | AP | Normal pixel FPR |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Absolute difference | pixel |0.879392|0.125207|0.317036|0.179518|0.104391|0.056382|
+| Local1-SSIM | pixel |0.889144|0.113874|0.260477|0.158469|0.104004|0.054682|
+| Absolute difference | image |0.243421|0.558140|1.000000|0.716418|0.422203|n/a|
+| Local1-SSIM | image |0.405702|0.558140|1.000000|0.716418|0.523079|n/a|
+
+- Thresholds difference pixel0.257816046476/image0.483886012720,
+  SSIMpixel0.957553517695/image1.139503239352 fitted on40calibration only,
+  frozen on43holdout. Macro lesion-slice Dice difference0.234445353,
+  SSIM0.207376961. Image thresholds predict all holdout images positive.
+- Holdout PixelAP baseline30/control/A/B: difference
+  0.101066/0.104391/0.104645/0.104464;SSIM
+  0.102402/0.104004/0.104247/0.104084. Adding10epochs without encoder already
+  produces nearly the same AP increase. A-minus-control AP only0.000253351
+  difference/0.000243256SSIM;B-minus-control0.000072805/0.000079918.
+  No clear incremental conditioning/pretraining benefit demonstrated. Small
+  FPR/quality tradeoffs remain; one seed/inspected validation not significance.
+- All83 descriptive control: differenceROC0.886424,Precision0.123099,
+  Recall0.406822,F10.189007,AP0.103114,FPR0.061640;
+  SSIMROC0.896166,Precision0.111455,Recall0.350228,F10.169098,
+  AP0.102278,FPR0.063673. These thresholds are all-validation optimized and
+  descriptive only. Brightness holdout AP0.389506/F10.268051 unchanged control.
+- Normal foreground MAE[0,1]0.082240741/SSIM0.295440689 versus original
+  0.082674084/0.292438059; A/B normal reconstruction quality somewhat better.
+  Abnormal44 macro lesion/nonlesion difference0.232020910/0.147787429,
+  localSSIMerror0.797625873/0.653556285.
+- Evaluator loop1075.184828s,peak101438464B,total1196.861115s including preflight/
+  quality/figures/artifacts before upload. Private reconstructions and examples
+  uploaded; no medical images/checkpoints copied to Git.
+
+### ddpm-uncond-val-smoke-t4-20261105T094736Z — best36 matched validation smoke — completed
+- User requested validation after completed unconditional40epoch fine-tune.
+  Normal-val-selected best36/FT6 SHA350791c48fd99babc38c329af5644a4c53a70f6628b6d751e85e3a6cab8cf0f7,
+  selection MSE0.007353029596,source training uploaded375bc6ba5578f5c27953f3306cecdabb531f073b.
+  No milestone/threshold selection by AP. Profile/Workspace phutungcogioihaitan,
+  existing Secret name verified. OneT4,two-hour hard ceiling,no training/test use.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-7Hot55hkZx47D5XtcOaMrd)
+  created. Bounded smoke replays original Gaussian30 EMA on1normal+1abnormal
+  at t300,requires maxerror<=1e-6 versus registered original baseline and exact
+  initial noisy arrays versus B,then finite3step best36 reconstruction on2images.
+  No AP computed in smoke. Verify completed training/source/A/B/cache/index hashes.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,seed17,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus dirty snapshot in manifest.135local tests passed12.83s,targeted Ruff/format
+  and whitespace passed. Exact original-chain equality,unconditional selected
+  checkpoint,group thresholds and cache-prefix recovery tested before submission.
+  Full83 validation only after smoke success; metrics pending.
+- Verified completed/uploaded0ad3619e2aa19d0d04a37069e4c750f7d263f37f;
+  smoke preflight passed,original Gaussian replay maxerrors[0,0],paired-noise
+  checks passed,target36 finite2image/3steps.25.784308s evaluation,source snapshot
+  68092ef7fe5e470d833a1ce0909c84011438e7b41414e91f1761f5dc4968c93a.
+  This is a sampler/loader check,not an AP result; permits full83 validation.
+
+### ddpm-uncond-control-t4-b8-e40-20261105T082502Z — unconditional EMA30 +10epoch control — completed
+- User requested original Gaussian DDPM baseline fine-tune10epochs without
+  encoder. After bounded smoke success, submitted independent full run to
+  Workspace/profile phutungcogioihaitan,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-kpcgyltxZ55ANmBYWC1N2O).
+- Config ddpm_unconditional_control_t4_epoch40.json,trainer
+  dacn.training.ddpm_unconditional_control:train,oneT4,batch8,seed17,
+  epoch31..40/9380new updates,all7500normal train,39normal-val selection.
+  Source sameGaussian EMA30 as A/B with registered SHA; no encoder,condition
+  projection or smoke/A/B weights. FreshAdamW LR1e-5,betas0.9/0.999,wd0,clip1,
+  EMA0.9992,Gaussian epsilonMSE,linearT1000,unchanged U-Net architecture.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus frozen source03f0be1c2c2991db35952c492372b51e9cbad3afcc05307a3b60e80c0034ffd2.
+  Four-hour hard timeout,private HF upload/shared checkpoint Volume. Save initial
+  epoch30/0updates recovery,last each epoch,best among31..40 by normal EMA noise
+  MSE fixed seed1000017,milestones31/35/40,initialization/history/config.
+  Counter9380 is this fine-tune stage,not restored28140-step optimizer state.
+- Training only;private2image/t100preview per original trainer contract,not
+  full83 AP evaluation. No sweep/test access. Started08:26:49UTC;durable manifest
+  running/training,TeslaT4,exact source hash,epoch30/0updates recovery checkpoint
+  committed. Log epoch31/40 step50/938,finite running epsilonMSE0.008318 confirms
+  training began. Full training metrics pending; client detached after this
+  check, no continuous monitoring. Check on user request.
+- This is a matched fine-tune control for A/B U-Net LR/update budget,not native
+  full-state LR1e-4 continuation. Do not infer conditioning benefit until matched
+  t300 grouped evaluation is actually run and uncertainty considered.
+- Completion verified on user validation request: completed/uploaded at private
+  revision375bc6ba5578f5c27953f3306cecdabb531f073b,2026-11-05T09:39:18UTC.
+  All10fine-tune epochs31..40/9380updates,7500normal train/39normal-val.
+  Best normal-val epoch36(FT6),epsilonMSE0.007353029596,training+normal-val
+  4144.204522s,peak5465677824B. Best checkpoint SHA
+  350791c48fd99babc38c329af5644a4c53a70f6628b6d751e85e3a6cab8cf0f7.
+  Milestones31/35/40 and private2image/t100preview uploaded. EMA30/freshAdamW/
+  encoder_added=false confirmed. This is training completion, not PixelAP evidence.
+
+### ddpm-uncond-control-smoke-t4-20261105T082204Z — unconditional EMA30 fine-tune smoke — completed
+- User-requested baseline fine-tune control. Profile/Workspace phutungcogioihaitan,
+  existing Secret name checked. Initial sandbox submission could not connect
+  before app creation; repeated with network permission.
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-uW93yqQAyW93cmX0gdbFuY)
+  initialized/functions created; training/checkpoint/private preview completed
+  and manifest completed/uploaded verified after run.
+- Config ddpm_unconditional_control_smoke.json,trainer
+  dacn.training.ddpm_unconditional_control:train,T4,batch2,seed17,normal16train,
+  atmost8val(subset normal for loss),one fine-tune epoch31,private2image/3step
+  preview. Original Gaussian EMA30 source hash
+  d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946;
+  freshAdamW LR1e-5,EMA0.9992,no encoder. Source manifest completed/uploaded
+  at1ee5c4995623532e7ab51c043839555c1dd0b0db,source checkpoint SHA matched.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus dirty source snapshot in manifest.133tests passed12.79s,targeted
+  Ruff/format and whitespace checks passed. No AP evaluation or held-out test.
+  This checks initialization/training/checkpoint/reconstruction pipeline; full
+  control must initialize independently from EMA30 after smoke succeeds.
+- Completed1fine-tune epoch31/15shard-aware updates,16normal train,
+  4normal-val out of8selected validation,2image/3step private preview artifact
+  present. Normal epsilonMSE0.000374397350,4.466861s train+val,
+  peak1466632704B. Not comparable to full-data validation MSE/AP.
+- Private upload73552266d80393164a2a1dcf3fb3eacbe1d15a57;
+  source snapshot03f0be1c2c2991db35952c492372b51e9cbad3afcc05307a3b60e80c0034ffd2.
+  Manifest confirms sourceEMA30,freshoptimizer,encoder_added=false. Full133tests
+  passed before launch. Smoke passed prerequisite for full10epoch control.
+
+### taitrang2005 personal-workspace T4 startup — 2026-11-05 — completed
+- User clarified the requested account is taitrang2005, not the old shared
+  Workspace. Earlier modal-new probes used phutungcogioihaitan and do not prove
+  startup in this new Workspace. Browser authentication created/activated CLI
+  profile taitrang2005; Modal verified its Workspace as taihongtran2005.
+- Explicit --profile taitrang2005,standalone modal_gpu_smoke.py::check_gpu,
+  no Secrets/Volumes/Hugging Face/data/checkpoints. T4,60s function timeout.
+  [New Workspace app](https://modal.com/apps/taihongtran2005/main/ap-HEmpKNsuPAviG0hKdP2KzN)
+  completed/stopped,statuspassed,TeslaT4/15360MiB,driver610.57.04.
+  Startup/driver check only; no training, tensor benchmark or credit estimate.
+
+### Minimal T4 startup without Secret — 2026-11-05 — completed
+- User explicitly requested another small test using profile modal-new without
+  Hugging Face keys/Secret. Entrypoint src/dacn/cloud/modal_gpu_smoke.py::check_gpu
+  uses standalone App, base Debian Python3.11, T4,60s function timeout, no Secrets,
+  no Volumes, no Hugging Face calls, model or data access.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-t4QbkUQSa8RZ6Sc97R7us9)
+  completed/stopped. Remote status=passed,nvidia-smi TeslaT4/15360MiB,
+  driver610.57.04. Profile modal-new resolved to Workspace phutungcogioihaitan.
+  This checks allocation/driver startup, not tensor computation or training.
+
+### Modal profile modal-new access check — 2026-11-05 — completed
+- User requested startup verification after changing account. Explicit CLI
+  profile modal-new, Workspace phutungcogioihaitan; default local profile was
+  still phutungcogioihaitan and was not changed. Secret names and both project
+  Volumes visible to modal-new; no credentials printed or shared Secret changed.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-jGYAyb2PvLTaOey1nSFXb5),
+  entrypoint src/dacn/cloud/modal_access_check.py::check_remote, short T4
+  allocation with120s function timeout. Actual remote result gpu_startup=passed,
+  TeslaT4/15360MiB. App completed and stopped after probe.
+- Cached pinned validation index and B best checkpoint exist on mounted shared
+  Volumes. Private HF dataset/model metadata both returnedHTTP200/private=true
+  through existing shared Secret. This verifies read access, not upload/write
+  permission or remaining credit balance. No data/checkpoint download, training,
+  reconstruction, anomaly evaluation or test access; no AP/quality metrics.
+
+### B-condition-full83-t4-20261105T072451Z — B condition diagnostic full83 — completed
+- User-requested paired inference after B condition smoke passed. App
+  [ap-nxZTHthEc7ebwJkuTlTOi0](https://modal.com/apps/phutungcogioihaitan/main/ap-nxZTHthEc7ebwJkuTlTOi0),
+  oneTeslaT4,batch1,t300,2hour hard timeout, no training. Manifest started
+  2026-11-05T07:25:23UTC,running/bounded_preflight. Source snapshot
+  b5e4fccffe407d80914106884b49a41567a1fab134bfa025a89f77799d1f41c0,
+  code7134b105c0c4d4fb620715908f100103b1d0b0ab+dirty; same pinned dataset/index,
+  EMA6 checkpoint and original B reference hashes as smoke.
+- Three arms: cached correct-image condition, zero injected condition including
+  bias, and one fixed normal-training donor per evaluated image. Two new83-slice
+  ancestral runs, same UUID-derived base17 noise/reverse RNG; donor mapping
+  base77 independent of annotation/metric. Exact cached-image/noisy-array pairing
+  required, full reverse replay preflight repeated before new runs.
+- Reuse40calibration/43group holdout,calibration-only thresholds independently
+  fitted per arm. AP,ROC-AUC,Precision/Recall/F1,normal pixel FPR,image metrics,
+  240crop reconstruction changes versus self,latency/VRAM and private figures.
+  Previous validation inspected,1seed,not final test. No held-out test access.
+- Durable prefix caches every5images,source-checked resume; outputs under
+  private evaluations/B-condition-full83-t4-20261105T072451Z. Self reference
+  metrics reused from immutable B results17cea7ce87afc15332835ffdafa514b2758883d92510339f86bb45b521ac247d.
+  Full worker passed preflight and began zero-condition reconstruction:
+  completed1/83 at8.799s. Client detached after start; completion verified on
+  subsequent user request. Both arms83/83,preflight errors[0,0],no failure.
+- Completed2026-11-05T07:54:25UTC,manifest completed/uploaded at private revision
+  [c22ee10da5f0193e99d3f3c097ab37e120cb7737](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/c22ee10da5f0193e99d3f3c097ab37e120cb7737/evaluations/B-condition-full83-t4-20261105T072451Z).
+  Aggregate results SHA17300018158205e715e2c186c6fa1ea713fe13abeebbdaec21ff2300f08df0b0
+  matches manifest artifact hash; sample83,sealed-test flag and checkpoint SHA
+  verified locally. No new GPU work initiated by result check.
+
+| Condition,43group holdout | Pixel score | ROC-AUC | Precision | Recall | F1/microDice | AP | Normal pixel FPR |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Correct image | Absolute difference |0.878343|0.126436|0.310393|0.179681|0.104464|0.055678|
+| Zero injection | Absolute difference |0.879854|0.125348|0.312906|0.178993|0.104579|0.055271|
+| Normal train donor | Absolute difference |0.880107|0.126232|0.319065|0.180896|0.105132|0.056058|
+| Correct image | Local1-SSIM |0.887708|0.115097|0.251140|0.157851|0.104084|0.053144|
+| Zero injection | Local1-SSIM |0.890025|0.114561|0.253636|0.157832|0.104416|0.052590|
+| Normal train donor | Local1-SSIM |0.889813|0.115234|0.254911|0.158719|0.104699|0.052691|
+
+- Aggregation globalmicro240crop; independent40calibration maxF1 thresholds
+  frozen on43group holdout(25groups each); one previously inspected validation
+  seed. Similar AP does not establish statistical equivalence or method failure.
+  Correct-image condition has no demonstrated advantage under these interventions.
+- Holdout image-level results(self/zero/donor): difference ROC-AUC
+  0.228070/0.254386/0.243421,AP0.417369/0.426584/0.421661;
+  SSIM ROC-AUC0.414474/0.405702/0.405702,AP0.528226/0.523079/0.523708.
+  All image Precision0.558140,Recall1,F10.716418 at independently calibrated
+  thresholds; all holdout images positive, not effective class separation.
+- All83 descriptive PixelAP(self/zero/donor): difference
+  0.104162/0.102956/0.103748;SSIM0.103002/0.102292/0.102624. Small gains for
+  correct condition in all83 differ from holdout; no model selection from these.
+- Reconstruction mean absolute change versus self on240crop,[0,1] scale:
+  zero0.001952624(normal0.001514973,abnormal0.002340543),
+  donor0.001710228(normal0.001585713,abnormal0.001820594).
+  Max pixel changes0.535652/0.506981 respectively; crop means include background
+  and do not exclude large localized effects. Condition affects reconstruction;
+  this is not proof that encoder/injection is entirely ignored.
+- Timings:zero813.079245s,peak146502656B;donor818.888632s,peak146765312B;
+  total1739.938872s incl preflight/CPU scoring/artifacts before upload. Correct
+  arm reused immutable B cache. Private paired arrays and figures uploaded.
+
+### B-condition-smoke-t4-20261105T072319Z — B condition diagnostic smoke — completed
+- User-authorized inference-only diagnostic, oneT4,batch1. Shared Workspace and
+  Secret name checked. App ap-fuzCaXC71cYCTeIlbyiGtv completed; no training.
+  B normal-val-selected EMA6 SHA0c4f21705830f5dd6054174fc6b2c1591263779413737ce87b4407e3ca8b01b7;
+  immutable dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7 and index verified.
+- Replay1normal+1abnormal image at300steps/base17 matched reference exactly:
+  maximum absolute reconstruction errors[0,0],initial noisy tensors identical.
+  Three-step zero-injection/donor controls finite. No AP evaluated on smoke.
+  Zero bypasses projection plus bias; donor from normal training changes encoder
+  input only. Cache/results/manifest checksums validated before replay.
+- Manifest completed/uploaded,private HF revision
+  92df7e4ef60628e019d7a2b85146b393f2d28450 under evaluations/B-condition-smoke-t4-20261105T072319Z.
+  Code7134b105c0c4d4fb620715908f100103b1d0b0ab plus source snapshot
+  b5e4fccffe407d80914106884b49a41567a1fab134bfa025a89f77799d1f41c0.
+  129local tests, targeted Ruff/format and whitespace checks passed before smoke.
+  No held-out test access. Passed prerequisite for paired full83 experiment.
+
+### feature-B-pretrain5-joint10-t4-20261105T053132Z — B full chain — completed
+- After successful bounded B smoke, submitted fresh full run on oneT4,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-UKIL1QqcsgKzhIzGNO0m50).
+  Encoder pretrain5epochs/4690planned updates, then joint10epochs/9380planned
+  updates with automatic83-slice ancestral t300 grouped evaluation. Four-hour
+  hard timeout. No smoke or A fine-tune weights transferred to the full run.
+- Configs encoder_pretrain_B_t4_epoch5.json/feature_condition_B_t4_epoch10.json;
+  exact method/protocol in FEATURE_CONDITION_B.md. Dataset revision
+  350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,seed17,batch8,7500normal train,
+  39normal-val for checkpoint selection,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus dirty source snapshot bcc65e702e23a2ca97179cf066c7d38c9a40d1bd1c3f3c58b8f726c9d67aadf2.
+- Separate manifests/artifacts under private HF runs/RUN-enc and runs/RUN;
+  auto evaluation under evaluations/RUN-val. Encoder best selected by fixed-mask
+  normal reconstruction MSE; fine-tune best EMA by fixed-noise normal epsilon MSE.
+  Encoder checkpoint checksum bound automatically and validated before loading.
+- Validation will reuse A's40calibration/43group-holdout partition/seeds/scorers,
+  calibration-only thresholds and immutable baseline/A artifacts. Reports pixel
+  and image ROC-AUC/Precision/Recall/F1/AP, normal quality, runtime/VRAM and private
+  examples. One exploratory seed, extra pretrain compute separate, test sealed.
+  Durable manifest started2026-11-05T05:31:54UTC,statusrunning,stagetraining,
+  TeslaT4,source hash verified. Log encoder epoch1/5 step150/938 finite running
+  maskedMSE0.084553 confirms GPU training began; this is not an AP result.
+  Detached after this start check. Completion verified on user request below.
+- Encoder completed5epochs/4690updates,best5,normal maskedMSE0.055597168799,
+  training+normal-val313.874214s,peak910336512B. Private uploaded revision
+  626ec3ec07acdfc38274300c374045d09212f1c7,runs/RUN-enc.
+- Joint completed10epochs/9380updates,best6,normal epsilonMSE0.007341488981,
+  training+normal-val4436.784669s,peak5883660288B. Private uploaded revision
+  352d96a26a3b9b056274bbeb7bc5864eb8e25562,runs/RUN. Best EMA SHA
+  0c4f21705830f5dd6054174fc6b2c1591263779413737ce87b4407e3ca8b01b7.
+- Validation completed83/83 at2026-11-05T07:10:59UTC; completed/uploaded manifest,
+  [private evaluation artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/348c47aa2528fcd48b1dc62f378e7078c7592571/evaluations/feature-B-pretrain5-joint10-t4-20261105T053132Z-val).
+  Checkpointbest6/EMA,seed17,t300,index57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3;
+  40calibration/43holdout,25groups each,thresholds fitted only on calibration.
+  Pixel global micro240crop, image mean top576pixels;1seed,held_out_test_used=false.
+  Results JSON SHA17cea7ce87afc15332835ffdafa514b2758883d92510339f86bb45b521ac247d
+  matches manifest artifact hash; checkpoint SHA/sample count verified locally.
+
+| Score,43 grouped-holdout slices | Level | ROC-AUC | Precision | Recall | F1/microDice | AP | Normal pixel FPR |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Absolute difference | pixel |0.878343|0.126436|0.310393|0.179681|0.104464|0.055678|
+| Local1-SSIM | pixel |0.887708|0.115097|0.251140|0.157851|0.104084|0.053144|
+| Absolute difference | image |0.228070|0.558140|1.000000|0.716418|0.417369|n/a|
+| Local1-SSIM | image |0.414474|0.558140|1.000000|0.716418|0.528226|n/a|
+
+- Holdout PixelAP baseline/A/B: difference0.101066/0.104645/0.104464;
+  SSIM0.102402/0.104247/0.104084. B is marginally lower than A for both scores;
+  no clear pretraining benefit with this pilot. PixelF1 A->B difference
+  0.180757->0.179681,SSIM0.158039->0.157851. Normal FPR slightly lower than A.
+  Brightness holdout pixelAP0.389506,F10.268051 remains substantially stronger
+  at different normal FPR0.134935. Image classifier still predicts all holdout
+  slices positive at calibration-selected threshold; F1 is not good separation.
+- All83 descriptive metrics, independently validation-optimized thresholds:
+  difference AP0.104162,F10.191531,FPR0.063298;SSIM AP0.103002,F10.169885,
+  FPR0.061234. These tiny descriptive AP gains over A do not reverse the grouped
+  holdout conclusion. No significance claim from one seed/inspected validation.
+- Normal39 foreground(input>-0.95 heuristic) quality B:MAE[0,1]0.081059648,
+  SSIM0.302334383 vs A0.081020562/0.302187646;essentially unchanged. Abnormal44
+  macro SSIM error lesion/nonlesion0.791558521/0.640803810;absolute error
+  0.230870375/0.144413748. Selected normal epsilonMSE also nearly identical A/B.
+- Inference loop806.260116s/83images,eval total885.090154s,peak147551744B.
+  Cached private reconstruction arrays/figures remain private. Additional encoder
+  pretraining compute313.87s is separate from matched9380joint updates.
+
+### feature-B-smoke-t4-20261104T202500Z — encoder pretrain + joint smoke — completed
+- User-requested B, shared Workspace/Secret name verified. First local request
+  failed to connect before app creation; repeated with network permission.
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-y06ZcVgJDcUqeBm5WhIf0P)
+  initialized and function objects created. Remote smoke=passed, finite3-step
+  reconstruction and both manifests completed/uploaded verified.
+- One T4, bounded1pretrain+1joint epoch,16normal train/4normal val,batch2,
+  then3conditional reverse steps. Configs encoder_pretrain_B_smoke.json and
+  feature_condition_B_smoke.json. Separate encoder run suffix-enc; fine-tune
+  independently loads original Gaussian EMA30 and only the produced encoder.
+- Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus exact dirty source snapshot in manifests.124 local tests passed before
+  submission; targeted Ruff/format and whitespace checks passed. Private HF
+  artifacts will be under runs/feature-B-smoke-t4-20261104T202500Z[-enc].
+- Encoder phase:15shard-aware updates,3.401343s,peak346722816B,normal-val masked
+  MSE0.120478242636,best1;private revision60fd76a28f3a7bfe3b6feb336ef23339fedbd400.
+  Joint phase:15updates,3.364274s,peak1709877760B,normal-val epsilonMSE
+  0.000329598508,best1;private revision0f4de9f4bdc5549859f0fd03db1fb7fddfe34032.
+  Both source snapshots bcc65e702e23a2ca97179cf066c7d38c9a40d1bd1c3f3c58b8f726c9d67aadf2.
+  These different objectives/subsets are not comparable to full-data loss/AP.
+- This is a pipeline check, not a Pixel AP evaluation. Successful smoke permits
+  full B above. No held-out test read or external pretrained weights.
+
+### feature-A-joint-t4-b8-e10-20261104T174552Z — ResNet condition A10 + validation — completed
+- User-authorized experiment A after reading docs/newmethod.md; random grayscale
+  ResNet-18(standard[2,2,2,2],512 pooled features),Linear512->128+SiLU,
+  zero-initialized128->actual U-Net timestep embedding projection. Add condition
+  embedding to timestep embedding through all original residual blocks. Original
+ 1-channel U-Net initialized strictly from Gaussian EMA epoch30, source hash
+  d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946.
+  Fresh full-run initialization, not continued from smoke weights; no encoder
+  pretraining/external weights/experiment B.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-nhqC8aXEv1sdC8orCC0nbi).
+  Config configs/feature_condition_A_t4_epoch10.json,T4,batch8,seed17,10 fine-tune
+  epochs/9,380 planned optimizer updates on7500 normal train slices. Gaussian
+  linearT1000,epsilon-MSE,AdamW betas0.9/0.999,weight_decay0,gradientclip1;
+  U-NetLR1e-5,encoder/projectionLR1e-4,EMA0.9992. All parameters trainable;
+  EMA copies online BatchNorm buffers.39 normal-val fixed seed1,000,017 selects
+  best. Initial zero-injection model output must exactly equal baseline.
+- Epoch0 full-state recovery,last each epoch,best,and milestones1/5/10 use
+  feature_condition_*.pt namespace. Wrapper detects preemption/repeated request,
+  validates exact source/config and resumes full state rather than fresh-run
+  collision. Preserves original baseline checkpoints. Dataset revision
+ 350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus dirty package snapshot; source recorded in durable manifest.
+- After training, automatically evaluate normal-val-selected best EMA on83
+  validation slices at t300,ancestral,batch1,seed17. Encode original image once,
+  same condition every reverse step; no tumor-mask input. Existing40 calibration
+  /43 patient-group holdout,calibration-only thresholds,pixel difference/localSSIM,
+  brightness control and separately descriptive all83 metrics. Reuse original
+  Gaussian30 baseline cache after checksum and exact-array alignment checks.
+  Also report normal tissue MAE/SSIM,lesion/nonlesion score means,private figures.
+  Save private cache every5 images and resume prefixes after evaluation interruption.
+- Smoke2 completed before full submission;119 local tests passed. Full training
+  and AP results pending. Budget adds10epochs beyond baseline30, so a gain would
+  not isolate conditioning from extra training without an unconditional matched
+  fine-tune control. Whole-image condition may retain tumor information. Test
+  sealed; no further training, B, external weights or sweeps. Run detached.
+- Durable start2026-11-04 17:46:35UTC (2026-11-05 00:46:35local),TeslaT4;
+  source snapshot SHA25672e43a42c623d123c29ec5ebb707de3de3b22c63a859148e662a7e4ceaef9ee1,
+  identical package to successful smoke2. Epoch0 full-state checkpoint committed.
+  Initial log confirms epoch1/10,step25/938,samples200/7500,finite epsilon
+  MSE0.008372 (interim running mean only). No final normal-validation or AP
+  metrics yet. Stream detached; remote chain continues training then evaluation.
+- Completion check:10epochs/9,380updates completed2026-11-04 19:04:01UTC,
+  uploaded19:04:20UTC at private training revision
+  [10833f849f9a93bbfd5364336a2b920350b278b1](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/10833f849f9a93bbfd5364336a2b920350b278b1/runs/feature-A-joint-t4-b8-e10-20261104T174552Z).
+  Best normal-validation checkpoint is fine-tune epoch6, epsilon MSE0.007343506560.
+  Normal-only selection, not AP selection. Milestones1/5/10 and best/last exist.
+  Training/validation4449.683s (~74.16min), peak allocatedVRAM5,884,708,864B.
+  Best checkpoint SHA2560a5939b2b9e1df31f635c411c67fb01ef46df42ed5dad9599992948d6b0ddd29;
+  epoch10 milestonec6445e97e6fc4c44b9e7fc1349bb2f15b304cb08e43cdf4121e703cc511f626b.
+- Automatic evaluation completed all83 slices at t300 using best EMA(epoch6),
+  completed2026-11-04 19:20:08UTC, uploaded19:20:11UTC at private revision
+  [56f13bc33a470858475058cb961b1e904f680946](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/56f13bc33a470858475058cb961b1e904f680946/evaluations/feature-A-joint-t4-b8-e10-20261104T174552Z-val).
+  App stopped2026-11-05 02:21:28local,zero tasks. Baseline cache SHA/content
+  alignment verified;brightness control reproduces prior metrics.
+
+  | Holdout43 / pixel score | AP | ROC-AUC | Precision | Recall | F1 / micro Dice | Normal pixel FPR |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | Original Gaussian30 / difference | 0.101066 | 0.876854 | 0.119934 | 0.314702 | 0.173678 | 0.058079 |
+  | Experiment A / difference | 0.104645 | 0.878721 | 0.126465 | 0.316731 | 0.180757 | 0.056641 |
+  | Original Gaussian30 / SSIM | 0.102402 | 0.888870 | 0.110476 | 0.257712 | 0.154654 | 0.055234 |
+  | Experiment A / SSIM | 0.104247 | 0.888060 | 0.115090 | 0.252128 | 0.158039 | 0.053224 |
+  | Brightness control | 0.389506 | 0.950197 | 0.161469 | 0.788577 | 0.268051 | 0.134935 |
+
+  Global micro over240crop;40calibration/43holdout,25 disjoint patient groups
+  each. A thresholds difference0.25466160476207733 /SSIM0.9594686479174731,
+  fit only on calibration. Pixel SSIM AP improves~1.80%relative on holdout;
+  difference AP~3.54%. Gains small, no sampling-seed repeats or intervals.
+  SSIM recall slightly declines; lower FPR is threshold-dependent.
+
+  | All83 descriptive pixel score | AP | F1 / micro Dice | Normal pixel FPR |
+  | --- | --- | --- | --- |
+  | Original Gaussian30 / difference | 0.099834 | 0.182870 | 0.063527 |
+  | Experiment A / difference | 0.104001 | 0.191032 | 0.059151 |
+  | Original Gaussian30 / SSIM | 0.100741 | 0.167483 | 0.071126 |
+  | Experiment A / SSIM | 0.102805 | 0.169561 | 0.060523 |
+
+  Separate in-sample thresholds for all83; not interchangeable with group holdout.
+  A all83 thresholds difference0.23569299280643463 /SSIM0.9217134888540419.
+
+  | A holdout43 image score(top576 mean) | AP | ROC-AUC | Precision | Recall | F1 |
+  | --- | --- | --- | --- | --- | --- |
+  | Difference | 0.415001 | 0.221491 | 0.558140 | 1.000000 | 0.716418 |
+  | Local SSIM | 0.527520 | 0.412281 | 0.558140 | 1.000000 | 0.716418 |
+
+  Image thresholds0.4787318131986669(difference),1.139835233359465(SSIM),
+  calibration-only;near-all-positive image predictions remain, no useful image
+  discrimination established by high F1 alone.
+- Normal39-slice macro foreground quality [0,1]MAE baseline0.082674->A0.081021;
+  foregroundSSIM0.292438->0.302188. Foreground=input>-0.95,not an anatomical mask.
+  Abnormal44-slice macro SSIM-error means lesion/nonlesion baseline0.798852/0.662143
+  vs A0.791949/0.642771; absolute-error means baseline0.229169/0.150152 versus
+  A0.230798/0.144902. Small normal-preservation/score gains, not complete tumor removal.
+- Evaluation reconstruction/score/cache loop868.109s, full evaluation945.740s
+  (includes baseline scoring/figures),peak allocatedVRAM147,551,744B. Produced
+  private6-panel figures and cached images/noisy/reconstructions/masks. Results
+  SHA256a8e57ed824c9e6a00404d82296f15fb208eabb9d8d911c06fcd983dfb8b5a962;
+  NPZ329babd5232cb57b7c07c47ad0ed3f87ca013414d55017181c2e916f0f1d9c9f.
+  Modest positive exploratory signal; extra fine-tune compute confounds attribution
+  to conditioning alone. B not run; no new training or evaluation started by this check.
+
+### feature-A-smoke2-t4-20261104T174325Z — ResNet condition smoke — completed
+- Fresh retry after correcting image build order; [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-1q7CzTsHLovLVuoq3X5tUi).
+  Trainer dacn.training.feature_condition:train; configfeature_condition_A_smoke.json,
+  random standard grayscale ResNet-18,zero condition injection,original Gaussian
+  epoch30 EMA,all model parts trainable.16 normal train/4 normal val,1epoch,batch2,
+  LR U-Net1e-5 /encoder+projections1e-4,EMA0.9992,seed17. Smoke only, no AP claim.
+  Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7; code7134b105c0c4d4fb620715908f100103b1d0b0ab
+  plus dirty source snapshot. Image built successfully, dataset setup started;
+  full10epoch run awaits smoke success. Source model SHA256d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946.
+  Checkpoint selection normal-val MSE; subsequent3-step normal-only reconstruction
+  must be finite. No external weights, tumor training, test access or experiment B.
+- Actual smoke start2026-11-04 17:43:56UTC, training completed17:45:02,
+  uploaded17:45:18 at private revision
+  [2e89ab1e4ad5469656bb53065fdccbfb5cd49b59](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/2e89ab1e4ad5469656bb53065fdccbfb5cd49b59/runs/feature-A-smoke2-t4-20261104T174325Z).
+ 15 optimizer updates (subset spans shards; batch2 ceiling, mostly singleton
+  shards),16 train/4normal val. Epsilon validation MSE0.000329598362,
+  training+validation3.860s,peak allocatedVRAM1,710,402,048B. This is a tiny
+  fixed subset and not comparable to full39-normal validation or anomaly AP.
+  Remote function then returned smoke=passed, finite3-step reconstruction.
+  Zero-injection real-backbone equality guard passed. Source snapshot SHA256
+  72e43a42c623d123c29ec5ebb707de3de3b22c63a859148e662a7e4ceaef9ee1.
+
+### feature-A-smoke-t4-20261104T174219Z — ResNet condition smoke — build failed
+- User-authorized bounded smoke before experiment A10epoch training. Config
+  configs/feature_condition_A_smoke.json,16 normal train/4 normal val,batch2,
+  1epoch,Gaussian epoch30 EMA source. Random ResNet-18/no pretraining,
+  zero-injection, joint training planned. No external weights or test data.
+- [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-dLWRfA9tkNS2g3UgBttvHe).
+  Failed before remote training/image execution: image.pip_install was appended
+  after add_local_python_source, which Modal disallows. No training checkpoint
+  or metrics produced. Correct build order via separate base_image before
+  local-source mount, then use a fresh smoke run ID. Full10epoch run not started.
+
 ### ddpm-val-simplex-e20-t300-20261104T105703Z — Simplex20 full validation — completed
 - User requests validation after Simplex20 training completed/uploaded. Evaluate
   EMA ddpm_epoch_020.pt from ddpm-simplex-t4-b8-e20-cont-20261104T070341Z,

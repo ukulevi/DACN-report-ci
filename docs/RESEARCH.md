@@ -11,6 +11,93 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 
 ## Hợp đồng mô hình và thực nghiệm
 
+### K4 uncertainty scoring — authorized2026-11-05
+
+User explicitly requests inference-only trial after proposing uncertainty-aware
+scoring. Freeze original GaussianEMA30,t300,K4 bases17/1017/2017/3017,
+reuse immutable first draw,three new draws per83validation. Six fixedscores:
+single absolute/SSIM,mean4 absolute/SSIM,variance-normalized squared residual,
+pooled normal-calibration3x3patch Mahalanobis. Parameters normal-calibration only,
+thresholds40calibration,freeze43group holdout,no test/training/sweep. Bounded
+2image K4smoke before full. Exact formulas/cache/reproducibility and limits in
+UNCERTAINTY_SCORING.md;do not infer uncertainty guarantees tumor localization.
+
+### Spatial ImageNet conditioning, grayscale — authorized2026-11-05
+
+User requests Spatial ResNet18 ImageNet pretrained +original U-Net EMA30,then
+explicitly keeps1channel grayscale. Follow SPATIAL_IMAGENET_GRAYSCALE.md:
+meanRGB conv1 adaptation,MRI[-1,1],noRGB repeat/norm/crop,4spatial maps,
+zero1x1 residual fusion at64/32/16/8. Joint10epoch/9380update pilot after bounded
+T4 smoke,encoderLR1e-5,U-Net1e-5,fusion1e-4,normal-only checkpoint selection,
+automatic same83slice t300 evaluation with baseline/A/B/unconditional control.
+No test access or claim that this isolates spatial fusion from pretraining.
+
+### Unconditional control validation — authorized2026-11-05
+
+User requests validation after completed control training. Freeze normal-val
+best36(FT6),9380updates,EMA,noencoder. Same full83,ancestral t300,batch1,seed17,
+40calibration/43group holdout/calibration-only thresholds as A/B. Bounded
+replay/source-noise smoke before full. Baseline/A/B private artifacts immutable,
+aligned input/noise checks,quality/latency/VRAM/private examples. No extra
+training,sweep,test access or selection using AP. Exact protocol appended to
+UNCONDITIONAL_FINETUNE_CONTROL.md. Earlier training-only scope is superseded by
+this explicit validation request.
+
+### Matched unconditional fine-tune — authorized2026-11-05
+
+User requests original Gaussian DDPM epoch30 plus10fine-tune epochs without
+encoder, following A/B conclusion. See UNCONDITIONAL_FINETUNE_CONTROL.md:
+EMA30 warm start,freshAdamW/U-NetLR1e-5,batch8,seed17,9380new updates,epoch31..40,
+same39normal-val selection and EMA as A/B. Preserve existing full-state resume
+contract; do not confuse this control with LR1e-4 native continuation.
+Bounded smoke precedes full job; training/private preview only,no automatic
+AP sweep/full83 inference or held-out-test access.
+
+### B condition intervention — authorized2026-11-05
+
+User requests inference-only diagnostic after B's AP approximately matches A.
+Freeze B normal-val-selected EMA fine-tuneepoch6,checkpoint SHA
+0c4f21705830f5dd6054174fc6b2c1591263779413737ce87b4407e3ca8b01b7,
+ancestral t300,batch1,seed17 and all83 validation samples. Three cases:
+original-image condition(reuse immutable B cache), zero entire injected embedding
+(bypass projection including bias), and condition from a deterministic normal
+training donor(UUID-derived seed77 modulo7500,never chosen using masks/metrics).
+Donor affects encoder input only; forward image/noise/reverse RNG are paired.
+No checkpoint changes, fine-tuning, timestep sweep or held-out-test access.
+
+Before full evaluation, bounded T4 smoke replays one normal/one abnormal image
+through original300steps and requires identical initial noise/max reconstruction
+error<=1e-6 against registered B cache, then finite3step zero/donor controls.
+Full run reuses self-condition cache, computes two83-image interventions and
+checks exact input/mask/label/noisy-image alignment. Separate prefix caches and
+source-checked manifests support resume. Metrics follow existing40calibration/
+43group holdout with calibration-only thresholds; all83 metrics descriptive.
+Report AP,ROC-AUC,Precision/Recall/F1,normal pixel FPR and reconstruction changes
+versus self on240crop scaled[0,1], separately normal/abnormal. Thresholds are
+independently calibrated per intervention; AP does not depend on threshold.
+One donor per image/one exploratory seed; similar results would show weak
+sensitivity under these interventions, not proof the encoder is always ignored.
+Private caches/figures and model artifacts remain on Modal/private HF.
+
+### ResNet-18 feature conditioning B — authorized2026-11-05
+
+After completed A, user requests B. Follow FEATURE_CONDITION_B.md:5epochs
+normal-only masked ResNet-18 pretraining, then independently initialize the same
+Gaussian EMA30 U-Net and fine-tune10epochs/9380joint updates with A's exact
+settings. Additional encoder pretraining compute is separate. Bounded smoke
+precedes full T4 chain with automatic fixed t300 validation/A/baseline comparison;
+no timestep search, external encoder weights or held-out-test use.
+
+### ResNet-18 feature conditioning A — authorized2026-11-05
+
+User supersedes the initial pretraining preference in docs/newmethod.md and
+requests experiment A first: random ResNet-18, zero condition projection,
+original Gaussian epoch30 EMA U-Net, joint10-epoch fine-tune then Pixel AP
+validation. Follow FEATURE_CONDITION_A.md for exact architecture/learning rates,
+EMA buffers, update budget, normal-only selection, bounded smoke and automatic
+t300 validation with existing grouped calibration/holdout and baseline cache.
+This entry records A's original scope; B is subsequently authorized above.
+
 ### Simplex epoch20 validation — authorized2026-11-04
 
 After completed Simplex continuation, user requests validation. Evaluate explicit

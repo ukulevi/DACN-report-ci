@@ -375,15 +375,24 @@ class UNetModel(nn.Module):
             ),
         )
 
-    def forward(self, x, time):
+    def forward(self, x, time, condition_embedding=None, spatial_residuals=None):
 
         time_embed = self.time_embedding(time)
+        if condition_embedding is not None:
+            if condition_embedding.shape != time_embed.shape:
+                raise ValueError("Condition embedding must match timestep embedding shape")
+            time_embed = time_embed + condition_embedding
 
         skips = []
 
         h = x.type(self.dtype)
         for i, module in enumerate(self.down):
             h = module(h, time_embed)
+            if spatial_residuals is not None and i in spatial_residuals:
+                residual = spatial_residuals[i]
+                if residual.shape != h.shape:
+                    raise ValueError("Spatial residual must match U-Net activation shape")
+                h = h + residual
             skips.append(h)
         h = self.middle(h, time_embed)
         for i, module in enumerate(self.up):

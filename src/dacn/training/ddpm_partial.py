@@ -295,8 +295,10 @@ def _checkpoint_state(
     best_epoch: int,
     best_validation_noise_mse: float,
     total_training_seconds: float,
+    ema_initialization: dict | None = None,
 ) -> dict:
     return {
+        **({"ema_initialization": ema_initialization} if ema_initialization else {}),
         "schema_version": 1,
         "method": METHOD,
         "model": model.state_dict(),
@@ -491,11 +493,15 @@ def train(
     resume_from_checkpoint: Path | None = None,
     allow_epoch_extension: bool = False,
     on_checkpoint: Callable[[dict], None] | None = None,
+    initial_checkpoint: Path | None = None,
+    initial_checkpoint_sha256: str | None = None,
 ) -> dict:
     """Train epsilon-prediction DDPM on normal train slices; select by normal val loss."""
     config = _resolved_config(config)
     if not isinstance(allow_epoch_extension, bool):
         raise TypeError("allow_epoch_extension must be a boolean")
+    if initial_checkpoint is not None and (not initial_checkpoint_sha256 or allow_epoch_extension):
+        raise ValueError("EMA fine-tuning requires a checksum and cannot use epoch extension")
     _seed_everything(config["seed"])
     train_data = ShardDataset(train_dir, "train", include_masks=False)
     validation_data = ShardDataset(validation_dir, "val", include_masks=True)
@@ -568,11 +574,18 @@ def train(
     optimizer_steps = 0
     total_training_seconds = 0.0
     start_epoch = 1
+    ema_initialization = None
     if resume_from_checkpoint is not None:
         checkpoint_path = Path(resume_from_checkpoint)
         if not checkpoint_path.is_file():
             raise FileNotFoundError("Resume checkpoint is not available in the run Volume")
         checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+        ema_initialization = checkpoint.get("ema_initialization")
+        if initial_checkpoint is not None and (
+            not ema_initialization
+            or ema_initialization["source_sha256"] != initial_checkpoint_sha256
+        ):
+            raise ValueError("Fine-tuning resume source differs")
         if checkpoint.get("schema_version") != 1 or checkpoint.get("method") != METHOD:
             raise ValueError("Resume checkpoint schema or method does not match")
         checkpoint_epoch = checkpoint.get("epoch")
@@ -600,6 +613,78 @@ def train(
         unexpected = [path.name for path in output_dir.iterdir() if path.name not in reserved]
         if unexpected:
             raise ValueError("DDPM output directory contains artifacts from another run")
+        if initial_checkpoint is not None:
+            source = Path(initial_checkpoint)
+            if hashlib.sha256(source.read_bytes()).hexdigest() != initial_checkpoint_sha256:
+                raise ValueError("Fine-tuning EMA source checksum mismatch")
+            initial = torch.load(source, map_location="cpu", weights_only=False)
+            if (
+                initial.get("method") != METHOD
+                or initial.get("epoch") != 30
+                or initial.get("schema_version") != 1
+            ):
+                raise ValueError("Fine-tuning requires original Gaussian epoch30")
+            source_config = _resolved_config(initial["config"])
+            fixed = (
+                "timesteps",
+                "beta_schedule",
+                "loss_type",
+                "noise_type",
+                "base_channels",
+                "channel_mults",
+                "num_res_blocks",
+                "attention_resolutions",
+                "num_heads",
+                "num_head_channels",
+                "dropout",
+            )
+            if source_config["noise_type"] != "gaussian" or any(
+                source_config[k] != config[k] for k in fixed
+            ):
+                raise ValueError("Fine-tuning diffusion/architecture differs from source")
+            if config["epochs"] <= 30:
+                raise ValueError("Fine-tuning must end after epoch30")
+            model.load_state_dict(initial["ema"], strict=True)
+            ema.load_state_dict(initial["ema"], strict=True)
+            if not all(
+                torch.equal(model.state_dict()[k].cpu(), v) for k, v in initial["ema"].items()
+            ):
+                raise ValueError("Fine-tuning EMA initialization differs")
+            start_epoch = 31
+            ema_initialization = {
+                "source_sha256": initial_checkpoint_sha256,
+                "source_epoch": 30,
+                "source_weights": "ema",
+                "optimizer": "fresh AdamW; no source optimizer state restored",
+                "seed": config["seed"],
+                "encoder_added": False,
+            }
+            _write_json(output_dir / "initialization.json", ema_initialization)
+            del initial
+            initial_state = _checkpoint_state(
+                model=model,
+                ema=ema,
+                optimizer=optimizer,
+                epoch=30,
+                optimizer_steps=0,
+                sampler_epoch=train_sampler.epoch,
+                config=config,
+                history=history,
+                best_epoch=0,
+                best_validation_noise_mse=best_validation_noise_mse,
+                total_training_seconds=0,
+                ema_initialization=ema_initialization,
+            )
+            _save_checkpoint(output_dir / "ddpm_last.pt", initial_state)
+            if on_checkpoint:
+                on_checkpoint(
+                    {
+                        "epoch": 30,
+                        "optimizer_steps": 0,
+                        "checkpoint": "ddpm_last.pt",
+                        "best_epoch": 0,
+                    }
+                )
 
     best_checkpoint_path = output_dir / "ddpm_best.pt"
     last_checkpoint_path = output_dir / "ddpm_last.pt"
@@ -665,6 +750,7 @@ def train(
             best_epoch=best_epoch,
             best_validation_noise_mse=best_validation_noise_mse,
             total_training_seconds=total_training_seconds,
+            ema_initialization=ema_initialization,
         )
         _save_checkpoint(last_checkpoint_path, state)
         if epoch in config["checkpoint_epochs"]:
@@ -765,6 +851,7 @@ def train(
         "validation_reconstruction": "validation_reconstruction.npz",
         "training_history": "training_history.json",
         "training_seconds": total_training_seconds,
+        **({"ema_initialization": ema_initialization} if ema_initialization else {}),
         "training_seconds_scope": "sum of completed epoch training and validation durations",
         "peak_vram_bytes": peak_vram,
     }
