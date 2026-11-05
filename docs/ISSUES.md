@@ -152,3 +152,30 @@ results. B can run the separate smoke gate, then explicitly enable full83 on
 Colab. Gaussian20 real inference, matched-budget comparison and paired group
 bootstrap remain pending. Closure still requires research evidence/protocol
 decision, not code tests. See B_REVIEW_2026-11-05.md. No Linear status changed.
+
+### BLK-20261105-02 — Colab HF credential rejected before Gaussian20 inference
+
+- **Status:** Waiting
+- **Reported / updated:** 2026-11-05 / 2026-11-05
+- **Owner / next handoff:** B(account holder) enters a valid HF read credential
+  directly into masked Colab getpass; agent continues smoke/inference afterwards.
+- **Affected work:** Gaussian20 full83 inference and budget-matched comparison.
+- **Evidence:** T4 connected and pinned source7a0f024 installed. HF whoami
+  returned401/invalid user token before downloading checkpoint or dataset.
+  No model inference started. CPU local HF index verification and existing-cache
+  bootstrap succeeded independently.
+- **Attempts / constraints:** Source clone access failure bypassed with authorized
+  SHA-verified source archive. Supplied read/fine-grained token creation guide.
+  Do not send credentials through Git, Linear or chat.
+- **Action needed:** Account holder reruns notebook cell2 and enters a valid
+  read token with access to dacn-bmad-team's dataset/model repos in getpass.
+- **Close when:** HF authentication and pinned checkpoint/validation checks pass.
+  Closing this access blocker does not mean smoke/full evaluation is completed.
+- **Resolution:** Pending. The separate anomaly-score blocker remains Investigating.
+
+2026-11-05 update for BLK-20261101-02: paired group bootstrap completed999valid
+of1000draws on43validation rows/25groups. Aggregate evidence in RESULT_TRACKING;
+fusion delta-AP CI is positive conditional on the examined cohort, but differs
+in training budget and does not change calibration selection. Uncertainty for
+Gaussian20/Simplex20 still needs the pending Gaussian20 cache. No Linear status
+changed and no model-quality blocker closed.

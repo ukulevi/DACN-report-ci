@@ -208,3 +208,12 @@ Chi tiết review: [B_REVIEW_2026-11-05.md](../../B_REVIEW_2026-11-05.md).
 Giữ nguyên test sealed và các quyết định chọn bằng calibration; không chọn lại
 fusion hoặc hyperparameter bằng holdout. Không lấy CI/test pass làm Done cho
 blocker chất lượng reconstruction/anomaly score.
+
+### Tiến độ NEXT-04/06 sau review
+
+NEXT-06 đã thực hiện cho Gaussian30/Simplex20:1000 paired group bootstrap,
+999valid/1missing-class, giữ threshold/normalizer. Xem RESULT_TRACKING và
+evidence/2026-11-05-b-group-bootstrap-g30-s20.json. Đây là uncertainty cho
+comparison khác budget, chưa thay uncertainty của NEXT-05.
+NEXT-04: T4 Colab/source đã sẵn sàng; HF token bị401 trước download, đang chờ
+người dùng nhập credential read hợp lệ trong getpass(BLK-20261105-02).

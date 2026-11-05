@@ -1,0 +1,105 @@
+{
+  "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+  "reference": "gaussian_cdf",
+  "seed": 17,
+  "requested_replicates": 1000,
+  "valid_replicates": 999,
+  "skipped_missing_class": 1,
+  "groups": 25,
+  "samples": 43,
+  "candidates": {
+    "gaussian_cdf": {
+      "pixel_ap": 0.10239951187633337,
+      "pixel_dice_micro": 0.15465261615377984,
+      "threshold": 0.9496527777777778,
+      "ap_ci95": [
+        0.03621351926014617,
+        0.14895644665073174
+      ],
+      "dice_ci95": [
+        0.06727011728372001,
+        0.20871658964178477
+      ],
+      "delta_ap_ci95": [
+        0.0,
+        0.0
+      ],
+      "delta_dice_ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "simplex_raw": {
+      "pixel_ap": 0.08741649704151673,
+      "pixel_dice_micro": 0.16855049818381054,
+      "threshold": 1.011264749867756,
+      "ap_ci95": [
+        0.028685483787666863,
+        0.14759116959478116
+      ],
+      "dice_ci95": [
+        0.06328514354252654,
+        0.25958478007370445
+      ],
+      "delta_ap_ci95": [
+        -0.03280823418551926,
+        0.007926589403111663
+      ],
+      "delta_dice_ci95": [
+        -0.044667506508765546,
+        0.07050839451070953
+      ]
+    },
+    "fusion_gaussian_0.75": {
+      "pixel_ap": 0.11724060242935251,
+      "pixel_dice_micro": 0.16637178510750483,
+      "threshold": 0.9250464409722222,
+      "ap_ci95": [
+        0.04301007297233559,
+        0.1732399116530906
+      ],
+      "dice_ci95": [
+        0.07288095754065342,
+        0.2229341748665255
+      ],
+      "delta_ap_ci95": [
+        0.0051524257076187895,
+        0.025821773293666393
+      ],
+      "delta_dice_ci95": [
+        0.0026097871467300146,
+        0.0183646822753047
+      ]
+    },
+    "brightness_control": {
+      "pixel_ap": 0.3895056557159785,
+      "pixel_dice_micro": 0.2680513044300881,
+      "threshold": -0.03529411554336548,
+      "ap_ci95": [
+        0.10377847643653142,
+        0.5832932564841332
+      ],
+      "dice_ci95": [
+        0.09845356122152453,
+        0.44401818975731744
+      ],
+      "delta_ap_ci95": [
+        0.04439729193740777,
+        0.46630224184804525
+      ],
+      "delta_dice_ci95": [
+        0.014348516170715147,
+        0.2518603737214707
+      ]
+    }
+  },
+  "source_cache_hashes": [
+    "8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959",
+    "4dd1b3c5eac41f43638a2ccea5d97bdb53074f30ce3d21c8e84ef593fe8a28c0"
+  ],
+  "index_sha256": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+  "frozen_selection_sha256": "a88607cf9a9e988e7ee06879ae6de6ffd48abea225bb2386f42e62c4be43333a",
+  "cpu_seconds": 28.39400740000201,
+  "scope": "Exploratory previously inspected validation; differing training budgets; one trained seed per model. No candidate reselection. Conditional intervals do not cover training variability.",
+  "test_used": false
+}

@@ -1415,3 +1415,54 @@ All pixel/image metrics, normal FPR, thresholds and provenance hashes are in
 [grouped evidence](evidence/2026-11-05-b-grouped-g30-s20.json).
 CPU elapsed 25.314 s. The validation set had already informed earlier analysis
 and the checkpoints have different optimizer budgets. Held-out test remains sealed.
+
+### b-group-bootstrap-g30-s20-20261105 — CPU uncertainty analysis
+
+- Attempt1 failed before resampling: private UUID conversion used canonical UUIDs,
+  while the checked CSV used a different textual case. Exact string comparison
+  rejected the input. No metrics produced. Preserved local failed manifest.
+- Attempt2 completed after canonicalizing CSV UUIDs. All83 UUIDs and their order
+  match both byte-verified UUID artifacts, whose reconstructions exactly match
+  the original checksum-pinned caches. Same registered40/43 patient-group split;
+  holdout43/25groups, one train/sampling seed17, t300, full240crop/localSSIM.
+- 1000 paired patient-group draws with replacement, seed17. Valid999;
+  skipped1 missing-class draw for every candidate. Calibration normalizers and
+  thresholds remain fixed; no candidate reselection. Percentile95% intervals.
+  CPU28.394s including map computation/bootstrap; GPU/VRAM inapplicable.
+
+| Candidate | Pixel AP [95% CI] | Pixel micro Dice [95% CI] | Delta AP CI versus Gaussian CDF |
+|---|---|---|---|
+| Gaussian CDF | .102400 [.036214,.148956] | .154653 [.067270,.208717] | reference |
+| Simplex raw | .087416 [.028685,.147591] | .168550 [.063285,.259585] | [-.032808,.007927] |
+| Fusion75% Gaussian | .117241 [.043010,.173240] | .166372 [.072881,.222934] | [.005152,.025822] |
+| Brightness control | .389506 [.103778,.583293] | .268051 [.098454,.444018] | [.044397,.466302] |
+
+- Aggregate evidence: [bootstrap JSON](evidence/2026-11-05-b-group-bootstrap-g30-s20.json),
+  including source-cache/index/frozen-selection hashes and exact thresholds.
+  Point AP/Dice reproduce the prior grouped output to1e-12 tolerance. Required
+  ROC-AUC/Precision/Recall/F1 remain in the linked grouped evidence above;
+  this run estimates uncertainty for AP/Dice only.
+- Source: `dacn.evaluation.group_bootstrap`, driver `scripts/bootstrap_grouped_cache.py`
+  on branch codex/bc-evaluation-colab following5361635. Gaussian30/Simplex20,
+  pinned dataset/model revisions as above. Private inputs/identifiers not published.
+- These conditional intervals omit model-training variability, selection bias
+  from previously inspected validation and multiple comparisons. Fusion does not
+  replace the calibration-selected Gaussian CDF based on these holdout findings.
+  Matched-budget Gaussian20 inference still pending. No training or sealed test.
+
+### Gaussian20 Colab preparation — 2026-11-05, inference not started
+
+- Uploaded the output-free notebook5361635 to the user's private Google Colab;
+  T4 runtime connected. Initial unauthenticated Git clone failed(exit128).
+  Source initialization subsequently succeeded using a user-authorized private
+  archive of source7a0f024, SHA256
+  `16c9936c81fd4bb63286bc96dd591c42b104e14eae3986ec1ea372ef98086b66`.
+- Temporary initialization edits also encountered SyntaxError and a canceled
+  upload/StopIteration before the successful source installation. No model
+  inference, checkpoint loading or metrics occurred in those initialization cells.
+- Preparation is waiting for the user to enter their HF read credential directly
+  into masked getpass. Token creation instructions supplied. No token stored in
+  repository or chat. Do not count this as completed smoke/full83 evaluation.
+- Subsequent authentication returned401 at whoami (invalid user token), before
+  checkpoint/data download. User instructed to enter a valid read token directly
+  in getpass and rerun that cell. No actual inference started.

@@ -1019,3 +1019,21 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   of the missing-parent worktree pointer. Keep `BLK-20261101-02` Investigating;
   next is actual Gaussian20 Colab inference, matched-budget comparison and
   patient-group uncertainty. Tests do not constitute GPU/model acceptance.
+
+## 2026-11-05 — B paired patient-group uncertainty and Colab preparation
+
+- Added exact tied-score weighted AP and paired patient-group bootstrap with fixed
+  thresholds/shared draws; tests compare against explicit group replication and
+  check missing-class rejection. Added reproducible private-input CLI driver.
+- Actual CPU bootstrap: first attempt rejected noncanonical CSV UUID strings;
+  second verified canonical UUID/order/cache content and completed1000 draws,
+  999valid/1skipped,28.394s. Added aggregate evidence and RESULT_TRACKING record.
+  Conditional fusion-minus-Gaussian-CDF AP CI [.005152,.025822]; previously
+  inspected validation/different training budgets prohibit a confirmatory claim.
+- Colab T4 connected; source archive7a0f024 installed after Git clone access
+  failure. User explicitly authorized source/checkpoint/validation transfer.
+  Notebook waits for user-entered HF read credential; supplied token creation
+  instructions. No actual Gaussian20 inference/training yet.
+- Checks: full CPU suite166passed/28.38s; bootstrap CLI help runs. Colab HF
+  authentication later returned401 before data/model download; handoff recorded
+  as BLK-20261105-02. No credential copied into chat/repository.
