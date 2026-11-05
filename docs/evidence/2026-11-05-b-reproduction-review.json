@@ -1,0 +1,37 @@
+{
+  "review_date": "2026-11-05",
+  "scope": "Compare saved CPU evaluation results against pinned producer JSON; no new inference or metric computation",
+  "evaluator_code_revision": "84088f9a1eb158dcafe472578179147f037db3e6",
+  "runs": [
+    {
+      "model": "gaussian30",
+      "numeric_values_compared": 34,
+      "maximum_absolute_difference": 0,
+      "all_fields_match": true,
+      "source_cache_sha256": "8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959",
+      "uuid_artifact_sha256": "34d70eaa42c7726ea2ea78f3a5d8c82119d4ae5ecb45163d5026b1b20337c013",
+      "image_confusion_inferred_from_exact_precision_recall_and_cohort": {
+        "tp": 44,
+        "fp": 39,
+        "tn": 0,
+        "fn": 0
+      },
+      "corrected_result": "2026-11-05-b-gaussian30-reproduction.json"
+    },
+    {
+      "model": "simplex20",
+      "numeric_values_compared": 34,
+      "maximum_absolute_difference": 0,
+      "all_fields_match": true,
+      "source_cache_sha256": "4dd1b3c5eac41f43638a2ccea5d97bdb53074f30ce3d21c8e84ef593fe8a28c0",
+      "uuid_artifact_sha256": "6fa913c4ef895c847a028de3c4f8a6b64b92c033846ae7319bdaf5603201aedf",
+      "image_confusion_inferred_from_exact_precision_recall_and_cohort": {
+        "tp": 44,
+        "fp": 39,
+        "tn": 0,
+        "fn": 0
+      },
+      "corrected_result": "2026-11-05-b-simplex20-reproduction.json"
+    }
+  ]
+}

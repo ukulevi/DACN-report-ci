@@ -11,6 +11,7 @@ import numpy as np
 import torch
 
 from dacn.data.shards import ShardDataset
+from dacn.evaluation.handoff import write_pairs
 from dacn.evaluation.validation import evaluate_reconstructions
 from dacn.training.ddpm_partial import (
     build_diffusion,
@@ -57,6 +58,7 @@ def evaluate_checkpoint(
     batch_size: int = 1,
     reconstruction_cache_dir: Path | None = None,
     log_every_samples: int = 10,
+    artifact_dir: Path | None = None,
     on_timestep_complete: Callable[[dict], None] | None = None,
 ) -> dict:
     """Evaluate one checkpoint without exposing validation sample identifiers."""
@@ -157,6 +159,14 @@ def evaluate_checkpoint(
                 )
         if device.type == "cuda":
             torch.cuda.synchronize(device)
+        artifact_name = None
+        if artifact_dir is not None:
+            artifact_name = f"{checkpoint_path.stem}_t{timestep:03d}_pairs.npz"
+            write_pairs(
+                Path(artifact_dir) / artifact_name,
+                [validation_data.sample_ids[index] for index in indices],
+                reconstructions,
+            )
         metrics = evaluate_reconstructions(
             images,
             reconstructions,
@@ -192,6 +202,7 @@ def evaluate_checkpoint(
             "normal_samples": int((labels == 0).sum()),
             "anomaly_samples": int((labels == 1).sum()),
             "sampling_base_seed": sampling_base_seed,
+            "timing_scope": "reconstruction, transfer, private artifact write and scoring",
             "seconds": elapsed,
             "seconds_per_sample": elapsed / len(indices),
             "reconstruction_cache": cache_name,
@@ -200,6 +211,7 @@ def evaluate_checkpoint(
                 int(torch.cuda.max_memory_allocated(device)) if device.type == "cuda" else 0
             ),
             "metrics": metrics,
+            "private_reconstruction_artifact": artifact_name,
         }
         results[str(timestep)] = result
         if on_timestep_complete is not None:

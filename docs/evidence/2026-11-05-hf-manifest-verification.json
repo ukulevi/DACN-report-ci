@@ -1,0 +1,383 @@
+{
+  "checked_on": "2026-11-05",
+  "revision": "1788b1232aa19b3c9ae96aa95a74e2975f4b592a",
+  "checks": [
+    {
+      "path": "evaluations/ddpm-val-simplex-e10-t300-20261102T090806Z/ddpm_epoch_010_t0300_ancestral_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-simplex-e10-t300-20261102T090806Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-simplex-e10-t300-20261102T090806Z/validation_results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-simplex-e20-t300-20261104T105703Z/ddpm_epoch_020_t0300_ancestral_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-simplex-e20-t300-20261104T105703Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-simplex-e20-t300-20261104T105703Z/validation_results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-t4b8-e30-t300-20261102T071516Z/ddpm_epoch_030_t0300_ancestral_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-t4b8-e30-t300-20261102T071516Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/ddpm-val-t4b8-e30-t300-20261102T071516Z/validation_results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-contract-audit-20261102T153939Z/results/private_comparison.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-contract-audit-20261102T153939Z/results/results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-contract-audit-20261102T153939Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/results/private_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/results/progress.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/results/results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/results/private_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/results/progress.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/results/results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/results/private_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/results/progress.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/results/results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-recon4-t100-20261102T163928Z/results/private_reconstructions.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-recon4-t100-20261102T163928Z/results/results.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "evaluations/patch-context-e5-recon4-t100-20261102T163928Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/config.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/ddpm_best.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/ddpm_epoch_001.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/ddpm_last.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/training_history.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/validation_metrics.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/validation_reconstruction.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/config.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_best.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_005.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_010.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_020.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_030.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_last.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/training_history.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/validation_metrics.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/validation_reconstruction.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/config.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_best.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_epoch_001.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_epoch_005.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_epoch_010.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_last.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/training_history.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/validation_metrics.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/validation_reconstruction.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/config.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_best.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_epoch_015.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_epoch_020.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_last.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/training_history.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/validation_metrics.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/validation_reconstruction.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/config.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/initialization.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_best.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_epoch_001.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_epoch_003.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_epoch_005.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_last.pt",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/private_normal_preview.npz",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/source_snapshot.zip",
+      "verified_by": "Hub_LFS_metadata_only",
+      "matches": true
+    },
+    {
+      "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/training_history.json",
+      "verified_by": "downloaded_bytes",
+      "matches": true
+    }
+  ],
+  "all_match": true,
+  "limitations": "Only JSON bytes downloaded; checkpoint/NPZ hashes checked against Hub LFS metadata, not independently downloaded/deserialized."
+}

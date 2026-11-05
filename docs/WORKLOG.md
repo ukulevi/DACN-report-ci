@@ -974,3 +974,7 @@ source data in this file.
 - Changes: Recorded A = Chu Nguyen Tuan Anh (project/data lead), B = Lê Hoàng Chí Vĩ (evaluation), and C = Hai Tuan (diffusion). Confirmed B and C are Linear project members; aligned owner assignments and collaboration notes across the backlog. Updated `TEAM.md`, `PROJECT_PLAN.md`, `PROJECT_TRACKING.md`, and the Linear CSV snapshot.
 - Evidence/checks: Linear user search matched both display names; the live project member list included both, and a fresh issue query confirmed the new owners. `git diff --check` passed; the CSV parsed as 26 issue rows. No tests, training, or evaluation runs were performed.
 - Next: Review the role/ownership PR, verify private HF dataset access on B/C machines, and agree the weekly sync cadence; DAC-6 and DAC-9 remain In Progress until their criteria are met.
+
+## 2026-11-05 � B integration branch
+
+Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrated B evaluator, diagnostics, UUID artifact export and dataset-binding guards. Resolved runner conflict preserving C sampler/batch/cache options alongside B artifact_dir. Added reviewed aggregate reproduction evidence and retrospective run record; old worktree preserved. Targeted CPU tests:37 passed. Torch runner runtime/GPU remains unverified. No new inference or training. Legacy adapter and new Colab notebook remain pending.

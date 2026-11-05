@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-05",
+  "model_revision": "1788b1232aa19b3c9ae96aa95a74e2975f4b592a",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "scope": "Read-only validation cache identity/QC; no inference, metric recomputation or test access. UUIDs not exported.",
+  "checks": [
+    {
+      "run": "ddpm-val-t4b8-e30-t300-20261102T071516Z",
+      "sha256": "8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959",
+      "fields": [
+        "images",
+        "reconstructions",
+        "masks",
+        "labels"
+      ],
+      "shape": [
+        83,
+        256,
+        256
+      ],
+      "images_exact": true,
+      "masks_exact": true,
+      "labels_exact": true,
+      "reconstruction_finite": true,
+      "range_valid": true,
+      "samples": 83,
+      "normal": 39,
+      "abnormal": 44
+    },
+    {
+      "run": "ddpm-val-simplex-e20-t300-20261104T105703Z",
+      "sha256": "4dd1b3c5eac41f43638a2ccea5d97bdb53074f30ce3d21c8e84ef593fe8a28c0",
+      "fields": [
+        "images",
+        "reconstructions",
+        "masks",
+        "labels"
+      ],
+      "shape": [
+        83,
+        256,
+        256
+      ],
+      "images_exact": true,
+      "masks_exact": true,
+      "labels_exact": true,
+      "reconstruction_finite": true,
+      "range_valid": true,
+      "samples": 83,
+      "normal": 39,
+      "abnormal": 44
+    }
+  ]
+}

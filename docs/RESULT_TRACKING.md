@@ -1337,3 +1337,44 @@ completed stage rather than fabricating metrics.
   original generated privacy-safe README, while commit `788ab72` expanded the
   schema-v1 card template; exact comparison against only the new template caused
   the compatibility failure.
+
+### b-cached-reproduction-20261105 — CPU evaluation — completed; reviewed
+
+- Actual CPU evaluations completed in preceding chat execution on 2026-11-05;
+  this entry was added retrospectively during review. Exact start/end/runtime were
+  not captured; do not infer latency from file timestamps. No new model seed,
+  inference, training, GPU allocation or held-out test evaluation.
+- Evaluator source `84088f9a1eb158dcafe472578179147f037db3e6`; same project
+  score/metric implementation as C. This reproduces the artifact-to-evaluator
+  path; it is not an independent mathematical implementation of the metrics.
+- Dataset `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; model repository
+  `dacn-bmad-team/dacn-runs` revision `1788b1232aa19b3c9ae96aa95a74e2975f4b592a`.
+  Two full83 caches: Gaussian batch8 epoch30 and Simplex batch8 epoch20,
+  t300/ancestral/EMA/sampling17,39 normal/44 abnormal, crop240.
+- Input/mask/label equality against checked validation export was required before
+  attaching UUIDs to separate private cache copies. Original caches preserved.
+  Review rechecked source-cache bytes against manifest SHA and output UUID-cache
+  bytes against evaluator receipt. Ground-truth arrays/UUIDs remain private.
+- Review compares both score result dictionaries recursively to checked HF JSON:
+  34 numeric fields per model, maximum absolute difference0; other fields match.
+  Evidence: `evidence/2026-11-05-b-reproduction-review.json`; corrected aggregate
+  outputs `evidence/2026-11-05-b-gaussian30-reproduction.json` and
+  `evidence/2026-11-05-b-simplex20-reproduction.json`.
+- Provenance correction: original local sidecars incorrectly declared repository
+  commit7134b10 as producer code. Corrected copies use manifest code00d199f plus
+  per-run dirty source snapshot SHA and separately identify CPU evaluator84088f9.
+  Preserve old local files as historical records; use corrected evidence for reporting.
+
+| Model / score | Pixel AP | Pixel AUROC | Precision | Recall | Micro F1/Dice | Normal pixel FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| Gaussian30 / SSIM | 0.100741 | 0.895647 | 0.107193 | 0.382770 | 0.167483 | 0.071126 |
+| Simplex20 / SSIM | 0.074791 | 0.743631 | 0.096629 | 0.599044 | 0.166414 | 0.131908 |
+
+- Both scores for both models use independently fitted full83 validation-max-F1
+  image/pixel thresholds. These are descriptive in-sample validation results.
+  Image precision44/83 and recall1 imply TP44/FP39/TN0/FN0; specificity0 and
+  imageF1 0.692913. This confusion is inferred from saved exact metrics/cohort,
+  not from a new per-sample scoring run. Full outputs include both scores.
+- Remaining: reusable guarded adapter, grouped calibration/holdout comparison,
+  patient-group uncertainty and matched-budget Gaussian20 inference. Different
+  budgets here preclude attributing score differences solely to noise family.

@@ -101,6 +101,7 @@ def evaluate_remote(
 
     from dacn.data.hub import validate_hf_export
     from dacn.evaluation.ddpm_validation import evaluate_checkpoint
+    from dacn.evaluation.handoff import validate_dataset_binding
 
     evaluation_dir = None
     manifest = None
@@ -218,6 +219,7 @@ def evaluate_remote(
             repo_type="dataset",
             revision=dataset_revision,
         ).sha
+        validate_dataset_binding(source_manifest, dataset_repo_id, pinned_revision)
         manifest["dataset_revision"] = pinned_revision
         _write_run_manifest(evaluation_dir, manifest)
         run_volume.commit()
@@ -235,6 +237,11 @@ def evaluate_remote(
         )
         persist_stage("validate_dataset")
         validate_hf_export(dataset_dir, verify_checksums=True, allow_hf_cache=True)
+        manifest["dataset_metadata_sha256"] = _sha256(dataset_dir / "dataset_metadata.json")
+        manifest["train_seed"] = source_manifest.get(
+            "effective_config", source_manifest.get("config", {})
+        ).get("seed")
+        manifest["source_training_snapshot_sha256"] = source_manifest.get("source_snapshot_sha256")
         dataset_volume.commit()
 
         results = {
@@ -285,6 +292,7 @@ def evaluate_remote(
                 reverse_sampler=reverse_sampler,
                 batch_size=batch_size,
                 reconstruction_cache_dir=evaluation_dir if save_reconstruction_cache else None,
+                artifact_dir=evaluation_dir,
                 on_timestep_complete=save_timestep,
             )
             stored = results["checkpoints"][checkpoint_name]

@@ -133,3 +133,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Close when:**
 - **Resolution:** Chưa có hoặc bằng chứng đóng blocker và ngày đóng.
 ```
+
+## 2026-11-05 � B handoff update
+
+BLK-20261101-02 remains Investigating. B reproduced both scores on full83 Gaussian30/Simplex20 caches;34 numeric fields per model exactly match C JSON. Producer provenance corrected to00d199f+dirty source snapshot, evaluator84088f9; see RESULT_TRACKING and docs/evidence. This validates handoff, not anomaly improvement. New branch codex/bc-evaluation-colab integrates B evaluation/provenance code with C7134b10;37 CPU checks pass. Reusable legacy adapter, Torch/GPU integration check, Colab Gaussian20 and grouped comparison remain pending. Do not ask C to regenerate existing full83 caches.

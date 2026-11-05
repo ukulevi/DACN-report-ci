@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "split": "validation",
+  "samples": 83,
+  "normal": 39,
+  "anomaly": 44,
+  "provenance_declared_by_producer": {
+    "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+    "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "dataset_metadata_sha256": "9c60fac0ff2a2d6274e82db466e5e338303d0dc24986b3bab4b32b6e710af218",
+    "model_repo_id": "dacn-bmad-team/dacn-runs",
+    "model_revision": "1788b1232aa19b3c9ae96aa95a74e2975f4b592a",
+    "code_revision": "00d199fbe726922caaf6696b02addffe380f0d93",
+    "train_seed": 17,
+    "sampling_seed": 17,
+    "starting_timestep": 300,
+    "checkpoint_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946"
+  },
+  "reconstruction_artifact_sha256": "34d70eaa42c7726ea2ea78f3a5d8c82119d4ae5ecb45163d5026b1b20337c013",
+  "thresholds_frozen": false,
+  "scope": "complete validation; review required before protocol freeze or test",
+  "score_protocol": "DAC-8 candidate: crop8; abs; SSIM11/sigma1.5/range2/reflect/population; no foreground or postprocessing; image mean top576",
+  "metrics": {
+    "pixel_difference": {
+      "split": "validation",
+      "samples": 83,
+      "pixel": {
+        "auroc": 0.8841316393215072,
+        "auprc": 0.09983389821351041,
+        "precision": 0.11817532433098449,
+        "recall": 0.404080805495115,
+        "f1": 0.1828695826364402,
+        "threshold": 0.22918590903282166,
+        "average_precision": 0.09983389821351041,
+        "dice_micro": 0.1828695826364402
+      },
+      "image": {
+        "auroc": 0.25407925407925414,
+        "auprc": 0.3929897799240225,
+        "precision": 0.5301204819277109,
+        "recall": 1.0,
+        "f1": 0.6929133858267716,
+        "threshold": 0.4949100775742813
+      },
+      "pixel_dice_macro_lesion_slices": 0.25997137775619883,
+      "empty_mask_pixel_false_positive_rate": 0.06352653133903134,
+      "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "local_ssim": {
+      "split": "validation",
+      "samples": 83,
+      "pixel": {
+        "auroc": 0.895647099269842,
+        "auprc": 0.10074147134080014,
+        "precision": 0.10719288865524255,
+        "recall": 0.38277016937582664,
+        "f1": 0.1674829947846784,
+        "threshold": 0.8922310462404459,
+        "average_precision": 0.10074147134080014,
+        "dice_micro": 0.1674829947846784
+      },
+      "image": {
+        "auroc": 0.38344988344988346,
+        "auprc": 0.4882351700441667,
+        "precision": 0.5301204819277109,
+        "recall": 1.0,
+        "f1": 0.6929133858267716,
+        "threshold": 1.1543246817193156
+      },
+      "pixel_dice_macro_lesion_slices": 0.2458813629611786,
+      "empty_mask_pixel_false_positive_rate": 0.07112580128205129,
+      "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    }
+  },
+  "provenance_correction": {
+    "reason": "Earlier sidecar incorrectly used later repository commit7134b10 as producer source. Producer manifest records00d199f plus dirty snapshot; CPU evaluator runs84088f9. Metrics unchanged.",
+    "original_result_sha256": "045a49730c28073d795cf5b72751bff258731385d74112c0609fe5a29cef5c34",
+    "producer_source_snapshot_sha256": "9ce78422ec1c46b3836925f1ff11826bd512aff84f22dae95b068dd9f0d344df",
+    "producer_working_tree_dirty": true,
+    "evaluator_code_revision": "84088f9a1eb158dcafe472578179147f037db3e6",
+    "source_cache_sha256": "8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959",
+    "source_evaluation_id": "ddpm-val-t4b8-e30-t300-20261102T071516Z",
+    "review_date": "2026-11-05"
+  }
+}
