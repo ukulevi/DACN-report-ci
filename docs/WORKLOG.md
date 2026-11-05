@@ -978,3 +978,18 @@ source data in this file.
 ## 2026-11-05 — B integration branch
 
 Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrated B evaluator, diagnostics, UUID artifact export and dataset-binding guards. Resolved runner conflict preserving C sampler/batch/cache options alongside B artifact_dir. Added reviewed aggregate reproduction evidence and retrospective run record; old worktree preserved. Targeted CPU tests:37 passed. Torch runner runtime/GPU remains unverified. No new inference or training. Legacy adapter and new Colab notebook remain pending.
+
+## 2026-11-05 â€” B spatial diagnostics and grouped comparison
+
+- Converted the checksum-pinned Gaussian30 and Simplex20 legacy caches using
+  scripts/convert_legacy_validation_cache.py. Both 83-row UUID artifacts have the
+  same SHA-256 as the previously reviewed conversions. Private files stay under runs/.
+- Ran both baseline and FG-v1 diagnostics. Both baseline score dictionaries exactly
+  reproduce the recorded metrics. Saved aggregate spatial and grouped evidence.
+- Added an explicit Simplex20 preset to the grouped evaluator. Its original
+  Simplex10 default remains available. Calibration selection is persisted before
+  holdout scoring.
+- Prepared notebooks/ddpm_validation_colab.ipynb for Gaussian20 at the registered
+  checkpoint. Checked Python cell syntax locally. Colab execution remains pending.
+- Remaining B work: paired patient-group bootstrap and the Gaussian20 Colab run
+  followed by the budget-matched comparison.

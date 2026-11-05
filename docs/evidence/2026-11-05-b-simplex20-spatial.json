@@ -1,0 +1,397 @@
+{
+  "split": "validation",
+  "scope": "exploratory CPU comparison; test not used",
+  "samples": 83,
+  "thresholds_frozen": false,
+  "provenance_declared_by_producer": {
+    "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+    "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "dataset_metadata_sha256": "9c60fac0ff2a2d6274e82db466e5e338303d0dc24986b3bab4b32b6e710af218",
+    "model_repo_id": "dacn-bmad-team/dacn-runs",
+    "model_revision": "1788b1232aa19b3c9ae96aa95a74e2975f4b592a",
+    "code_revision": "00d199fbe726922caaf6696b02addffe380f0d93",
+    "train_seed": 17,
+    "sampling_seed": 17,
+    "starting_timestep": 300,
+    "checkpoint_sha256": "1b9f50988f8a57634ddc9b3b9de1db93c4e324c5de7d42132db50525e4a36d07"
+  },
+  "reconstruction_artifact_sha256": "6fa913c4ef895c847a028de3c4f8a6b64b92c033846ae7319bdaf5603201aedf",
+  "coverage": {
+    "policy": "FG-v1: crop8; input>-1; largest8-connected component; fill holes; no erosion",
+    "samples": 83,
+    "lesion_pixels": 93756,
+    "excluded_lesion_pixels": 0,
+    "excluded_lesion_fraction": 0.0,
+    "affected_lesion_slices": 0,
+    "fully_excluded_lesion_slices": 0,
+    "empty_foreground_slices": 0,
+    "foreground_below_top576_slices": 0,
+    "foreground_fraction": 0.2749188420348059
+  },
+  "results": {
+    "pixel_difference": {
+      "baseline": {
+        "metrics": {
+          "split": "validation",
+          "samples": 83,
+          "pixel": {
+            "auroc": 0.6912953210833461,
+            "auprc": 0.03486257801754644,
+            "precision": 0.04121399903256592,
+            "recall": 0.3362451469772601,
+            "f1": 0.0734278520402578,
+            "threshold": 0.939251720905304,
+            "average_precision": 0.03486257801754644,
+            "dice_micro": 0.0734278520402578
+          },
+          "image": {
+            "auroc": 0.36363636363636365,
+            "auprc": 0.45575053036225466,
+            "precision": 0.5301204819277109,
+            "recall": 1.0,
+            "f1": 0.6929133858267716,
+            "threshold": 1.8970544491377141
+          },
+          "pixel_dice_macro_lesion_slices": 0.12155379885855973,
+          "empty_mask_pixel_false_positive_rate": 0.16738203347578348,
+          "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+          "pixel_aggregation": "global micro over 240x240 crop",
+          "image_aggregation": "mean of top 576 pixels"
+        },
+        "diagnostics": {
+          "top576_boundary_tie_slices": 0,
+          "top576_location_caveat": "location ambiguous on slices with a cutoff tie",
+          "pixel_confusion": {
+            "tp": 31525,
+            "fp": 733385,
+            "fn": 62231,
+            "tn": 3953659
+          },
+          "image_confusion": {
+            "tp": 44,
+            "fp": 39,
+            "fn": 0,
+            "tn": 0
+          },
+          "image_all_positive": true,
+          "normal_image_false_positive_rate": 1.0,
+          "fp_outside_foreground": 513269,
+          "fp_inside_foreground": 220116,
+          "top576_outside_foreground_fraction": 0.9695448460508701,
+          "image_score_quantiles_q0_q25_q50_q75_q100": {
+            "normal": [
+              1.9016518614565332,
+              1.9294868274074461,
+              1.9367149383243587,
+              1.9489248557947576,
+              1.9705905564543273
+            ],
+            "anomaly": [
+              1.8970544491377141,
+              1.919317697795729,
+              1.930781903055807,
+              1.9437598212259926,
+              1.9613063600328233
+            ]
+          },
+          "lesion_size_strata": {
+            "1_to_100": {
+              "slices": 2,
+              "tp": 27,
+              "fp": 18460,
+              "fn": 36,
+              "tn": 96677
+            },
+            "101_to_1000": {
+              "slices": 8,
+              "tp": 1692,
+              "fp": 71395,
+              "fn": 3424,
+              "tn": 384289
+            },
+            "over_1000": {
+              "slices": 34,
+              "tp": 29806,
+              "fp": 267523,
+              "fn": 58771,
+              "tn": 1602300
+            }
+          }
+        }
+      },
+      "foreground_floor": {
+        "metrics": {
+          "split": "validation",
+          "samples": 83,
+          "pixel": {
+            "auroc": 0.8997475781655668,
+            "auprc": 0.12795714463392976,
+            "precision": 0.11932240168947501,
+            "recall": 0.3941294423823542,
+            "f1": 0.1831855204517175,
+            "threshold": 0.8548809438943863,
+            "average_precision": 0.12795714463392976,
+            "dice_micro": 0.1831855204517175
+          },
+          "image": {
+            "auroc": 0.7517482517482517,
+            "auprc": 0.7677128814278577,
+            "precision": 0.6451612903225806,
+            "recall": 0.9090909090909091,
+            "f1": 0.7547169811320755,
+            "threshold": 1.4283859911374748
+          },
+          "pixel_dice_macro_lesion_slices": 0.2699089092122265,
+          "empty_mask_pixel_false_positive_rate": 0.06909366096866097,
+          "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+          "pixel_aggregation": "global micro over 240x240 crop",
+          "image_aggregation": "mean of top 576 pixels"
+        },
+        "diagnostics": {
+          "top576_boundary_tie_slices": 10,
+          "top576_location_caveat": "location ambiguous on slices with a cutoff tie",
+          "pixel_confusion": {
+            "tp": 36952,
+            "fp": 272730,
+            "fn": 56804,
+            "tn": 4414314
+          },
+          "image_confusion": {
+            "tp": 40,
+            "fp": 22,
+            "fn": 4,
+            "tn": 17
+          },
+          "image_all_positive": false,
+          "normal_image_false_positive_rate": 0.5641025641025641,
+          "fp_outside_foreground": 0,
+          "fp_inside_foreground": 272730,
+          "top576_outside_foreground_fraction": 0.0,
+          "image_score_quantiles_q0_q25_q50_q75_q100": {
+            "normal": [
+              1.2223813922351434,
+              1.3519047861660107,
+              1.4470840896376305,
+              1.5156329163971045,
+              1.678817810387247
+            ],
+            "anomaly": [
+              1.2122108098119497,
+              1.480096172166264,
+              1.5672652329732146,
+              1.6043574516144063,
+              1.8431314330341086
+            ]
+          },
+          "lesion_size_strata": {
+            "1_to_100": {
+              "slices": 2,
+              "tp": 31,
+              "fp": 6744,
+              "fn": 32,
+              "tn": 108393
+            },
+            "101_to_1000": {
+              "slices": 8,
+              "tp": 1959,
+              "fp": 27689,
+              "fn": 3157,
+              "tn": 427995
+            },
+            "over_1000": {
+              "slices": 34,
+              "tp": 34962,
+              "fp": 83085,
+              "fn": 53615,
+              "tn": 1786738
+            }
+          }
+        }
+      },
+      "floor": -1.0,
+      "candidate_threshold_at_floor": false
+    },
+    "local_ssim": {
+      "baseline": {
+        "metrics": {
+          "split": "validation",
+          "samples": 83,
+          "pixel": {
+            "auroc": 0.743630731534842,
+            "auprc": 0.07479149994992267,
+            "precision": 0.09662889645134318,
+            "recall": 0.5990443278296855,
+            "f1": 0.16641431724914443,
+            "threshold": 0.9991420610921259,
+            "average_precision": 0.07479149994992267,
+            "dice_micro": 0.16641431724914443
+          },
+          "image": {
+            "auroc": 0.2196969696969697,
+            "auprc": 0.38552500626698794,
+            "precision": 0.5301204819277109,
+            "recall": 1.0,
+            "f1": 0.6929133858267716,
+            "threshold": 1.0684869438444222
+          },
+          "pixel_dice_macro_lesion_slices": 0.27889268290370195,
+          "empty_mask_pixel_false_positive_rate": 0.13190838675213676,
+          "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+          "pixel_aggregation": "global micro over 240x240 crop",
+          "image_aggregation": "mean of top 576 pixels"
+        },
+        "diagnostics": {
+          "top576_boundary_tie_slices": 0,
+          "top576_location_caveat": "location ambiguous on slices with a cutoff tie",
+          "pixel_confusion": {
+            "tp": 56164,
+            "fp": 525070,
+            "fn": 37592,
+            "tn": 4161974
+          },
+          "image_confusion": {
+            "tp": 44,
+            "fp": 39,
+            "fn": 0,
+            "tn": 0
+          },
+          "image_all_positive": true,
+          "normal_image_false_positive_rate": 1.0,
+          "fp_outside_foreground": 22238,
+          "fp_inside_foreground": 502832,
+          "top576_outside_foreground_fraction": 0.058923192771084335,
+          "image_score_quantiles_q0_q25_q50_q75_q100": {
+            "normal": [
+              1.0812429840527267,
+              1.1123742641962169,
+              1.1418393580141262,
+              1.1678076436081415,
+              1.2287021308269124
+            ],
+            "anomaly": [
+              1.0684869438444222,
+              1.0934725784010602,
+              1.1029726788004528,
+              1.1179382806989029,
+              1.1868114494150257
+            ]
+          },
+          "lesion_size_strata": {
+            "1_to_100": {
+              "slices": 2,
+              "tp": 32,
+              "fp": 13604,
+              "fn": 31,
+              "tn": 101533
+            },
+            "101_to_1000": {
+              "slices": 8,
+              "tp": 3165,
+              "fp": 53978,
+              "fn": 1951,
+              "tn": 401706
+            },
+            "over_1000": {
+              "slices": 34,
+              "tp": 52967,
+              "fp": 161169,
+              "fn": 35610,
+              "tn": 1708654
+            }
+          }
+        }
+      },
+      "foreground_floor": {
+        "metrics": {
+          "split": "validation",
+          "samples": 83,
+          "pixel": {
+            "auroc": 0.900997341129939,
+            "auprc": 0.09447243488304448,
+            "precision": 0.10008514631264336,
+            "recall": 0.6143286829642903,
+            "f1": 0.17212762015193445,
+            "threshold": 0.9983691386887058,
+            "average_precision": 0.09447243488304448,
+            "dice_micro": 0.17212762015193445
+          },
+          "image": {
+            "auroc": 0.21095571095571095,
+            "auprc": 0.3829868488479984,
+            "precision": 0.5301204819277109,
+            "recall": 1.0,
+            "f1": 0.6929133858267716,
+            "threshold": 1.063712975935334
+          },
+          "pixel_dice_macro_lesion_slices": 0.2897146820089667,
+          "empty_mask_pixel_false_positive_rate": 0.13114093660968662,
+          "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+          "pixel_aggregation": "global micro over 240x240 crop",
+          "image_aggregation": "mean of top 576 pixels"
+        },
+        "diagnostics": {
+          "top576_boundary_tie_slices": 0,
+          "top576_location_caveat": "location ambiguous on slices with a cutoff tie",
+          "pixel_confusion": {
+            "tp": 57597,
+            "fp": 517883,
+            "fn": 36159,
+            "tn": 4169161
+          },
+          "image_confusion": {
+            "tp": 44,
+            "fp": 39,
+            "fn": 0,
+            "tn": 0
+          },
+          "image_all_positive": true,
+          "normal_image_false_positive_rate": 1.0,
+          "fp_outside_foreground": 0,
+          "fp_inside_foreground": 517883,
+          "top576_outside_foreground_fraction": 0.0,
+          "image_score_quantiles_q0_q25_q50_q75_q100": {
+            "normal": [
+              1.0755541747654058,
+              1.1100467946004025,
+              1.1409243121722632,
+              1.1673594845274726,
+              1.228596262245222
+            ],
+            "anomaly": [
+              1.063712975935334,
+              1.089772707205199,
+              1.1001611409437582,
+              1.1151322787346196,
+              1.186648636538466
+            ]
+          },
+          "lesion_size_strata": {
+            "1_to_100": {
+              "slices": 2,
+              "tp": 33,
+              "fp": 13212,
+              "fn": 30,
+              "tn": 101925
+            },
+            "101_to_1000": {
+              "slices": 8,
+              "tp": 3256,
+              "fp": 53434,
+              "fn": 1860,
+              "tn": 402250
+            },
+            "over_1000": {
+              "slices": 34,
+              "tp": 54308,
+              "fp": 156642,
+              "fn": 34269,
+              "tn": 1713181
+            }
+          }
+        }
+      },
+      "floor": -0.702816125020669,
+      "candidate_threshold_at_floor": false
+    }
+  }
+}

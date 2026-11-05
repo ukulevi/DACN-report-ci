@@ -17,6 +17,7 @@ from dacn.evaluation.validation import evaluate_maps, select_validation_threshol
 
 GAUSSIAN_SHA = "8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959"
 SIMPLEX_SHA = "5bf4cfddf144ac2ce88e3da6417df5e86cea91bcff4d39f97738ae70ab2d0218"
+SIMPLEX20_SHA = "4dd1b3c5eac41f43638a2ccea5d97bdb53074f30ce3d21c8e84ef593fe8a28c0"
 INDEX_SHA = "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3"
 
 
@@ -31,12 +32,15 @@ def normal_cdf(values, normal_indices):
     ) / (2 * len(reference))
 
 
-def evaluate_noise_fusion(*, gaussian_cache, simplex_cache, index_path, output_dir):
+def evaluate_noise_fusion(
+    *, gaussian_cache, simplex_cache, index_path, output_dir, simplex_epoch=10
+):
     if output_dir.exists():
         raise FileExistsError("Use a fresh output directory")
     paths = {"gaussian": gaussian_cache, "simplex": simplex_cache, "index": index_path}
     hashes = {key: hashlib.sha256(path.read_bytes()).hexdigest() for key, path in paths.items()}
-    if hashes != {"gaussian": GAUSSIAN_SHA, "simplex": SIMPLEX_SHA, "index": INDEX_SHA}:
+    simplex_hash = {10: SIMPLEX_SHA, 20: SIMPLEX20_SHA}[simplex_epoch]
+    if hashes != {"gaussian": GAUSSIAN_SHA, "simplex": simplex_hash, "index": INDEX_SHA}:
         raise ValueError("Registered cache/index checksum mismatch")
     started = time.perf_counter()
     with np.load(gaussian_cache, allow_pickle=False) as cache:
@@ -105,7 +109,7 @@ def evaluate_noise_fusion(*, gaussian_cache, simplex_cache, index_path, output_d
     selected = max(candidates, key=lambda name: selection[name]["calibration_pixel_ap"])
     selected_fusion = max(candidates[4:], key=lambda name: selection[name]["calibration_pixel_ap"])
     plan = {
-        "method": "gaussian30_simplex10_normal_calibration_cdf_ssim_fusion",
+        "method": f"gaussian30_simplex{simplex_epoch}_normal_calibration_cdf_ssim_fusion",
         "split": "validation_exploratory_patient_group_holdout",
         "held_out_test_used": False,
         "seed": 17,
@@ -128,7 +132,10 @@ def evaluate_noise_fusion(*, gaussian_cache, simplex_cache, index_path, output_d
             }
             for name, idx in (("calibration", calibration), ("holdout", holdout))
         },
-        "caveat": "Previously examined validation; not pristine final test. Gaussian epoch30 and Simplex epoch10 differ in training budget. This tests an ensemble, not isolated noise causality.",
+        "caveat": (
+            f"Previously examined validation. Gaussian epoch30 and Simplex epoch{simplex_epoch} "
+            "differ in training budget. The analysis is exploratory."
+        ),
     }
     output_dir.mkdir(parents=True)
     # Persist model/normalizer/threshold choice BEFORE reading any holdout outcomes.
@@ -173,12 +180,14 @@ def main():
     parser.add_argument("--simplex-cache", type=Path, required=True)
     parser.add_argument("--index", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--simplex-epoch", type=int, choices=(10, 20), default=10)
     args = parser.parse_args()
     evaluate_noise_fusion(
         gaussian_cache=args.gaussian_cache,
         simplex_cache=args.simplex_cache,
         index_path=args.index,
         output_dir=args.output,
+        simplex_epoch=args.simplex_epoch,
     )
 
 

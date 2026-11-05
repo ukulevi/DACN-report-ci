@@ -1378,3 +1378,40 @@ completed stage rather than fabricating metrics.
 - Remaining: reusable guarded adapter, grouped calibration/holdout comparison,
   patient-group uncertainty and matched-budget Gaussian20 inference. Different
   budgets here preclude attributing score differences solely to noise family.
+
+### b-spatial-g30-s20-20261105 — completed, CPU validation analysis
+
+Both converted caches have 83 validation rows (39 normal, 44 abnormal), EMA,
+ancestral t300 and seed 17. Dataset/model revisions, original checkpoint and
+source-cache hashes are in the reproduction and spatial evidence files.
+Both score dictionaries reproduce the prior baselines. FG-v1 uses input-only
+foreground, the full 240 x 240 metric domain and independent validation max-F1
+thresholds. It retains all 93,756 annotated lesion pixels.
+
+| Model / score | AP baseline → FG-v1 | Pixel F1 baseline → FG-v1 | Baseline FP inside / outside FG |
+|---|---:|---:|---:|
+| Gaussian30 / difference | .099834 → .107474 | .182870 → .189722 | 267733 / 14965 |
+| Gaussian30 / SSIM | .100741 → .103010 | .167483 → .169504 | 294303 / 4599 |
+| Simplex20 / difference | .034863 → .127957 | .073428 → .183186 | 220116 / 513269 |
+| Simplex20 / SSIM | .074791 → .094472 | .166414 → .172128 | 502832 / 22238 |
+
+Full ROC-AUC, precision, recall, F1 and confusion/lesion strata are in
+[evidence Gaussian30](evidence/2026-11-05-b-gaussian30-spatial.json) and
+[evidence Simplex20](evidence/2026-11-05-b-simplex20-spatial.json).
+Thresholds were fitted and evaluated on the same validation cohort. Runtime
+was not captured. GPU and VRAM are inapplicable to these CPU computations.
+
+### b-grouped-g30-s20-20261105 — completed, CPU validation analysis
+
+Same source caches, one trained seed per model. First fold of the registered
+patient-group split with seed 17. Calibration 40 rows from 25 groups and
+holdout 43 rows from 25 disjoint groups. CDFs fit only on normal calibration
+pixels. Thresholds and candidate choices fit only on calibration. The selected
+Gaussian CDF had calibration AP .101266 and holdout AP .102400. The selected
+fusion-only candidate (75% Gaussian CDF) had calibration AP .099565 and holdout
+AP .117241. Raw Gaussian, raw Simplex and brightness control holdout AP were
+.102402, .087416 and .389506. Brightness was excluded from model selection.
+All pixel/image metrics, normal FPR, thresholds and provenance hashes are in
+[grouped evidence](evidence/2026-11-05-b-grouped-g30-s20.json).
+CPU elapsed 25.314 s. The validation set had already informed earlier analysis
+and the checkpoints have different optimizer budgets. Held-out test remains sealed.
