@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-11-06 — Audit GitHub/HF/Linear và cập nhật LPIPS/DDIM
+
+Đọc live Linear DACN-KHMT, Git đến C c02addb và HF fae9b50; kiểm dataset unchanged,
+Colab disconnected, Modal cá nhân app list rỗng. Đọc hội thoại Gemini và đối
+chiếu paper/model-card chính thức. Thêm PROJECT_AUDIT_2026-11-06 và evidence JSON,
+link từ README/plan/tracking/result tracking; blocker BLK-20261106-01 và cập nhật 2 blocker cũ.
+Kiểm 94 artifact references mới không mismatch (JSON bytes/LFS metadata, không tải
+NPZ/checkpoint); không model/GPU/held-out test run mới. CPU QA chi tiết trong audit:
+C c02addb có 181 passed / 1 failed (float32 reduction); B có 165 passed / 1 error
+ở lần cuối (Windows rename), 35 data tests chạy riêng pass. Không tuyên bố full
+suite xanh khi các lỗi này còn tồn tại.
+Kiểm tra cuối: JSON hợp lệ, 94/94 checks matched, không có UUID/token hoặc key
+patient/sample identity trong evidence; local documentation links và git diff --check pass.
+Chưa merge source C, chưa thay Linear status/owner; bước tiếp là integration và
+private-cache reproduction trước paired bootstrap/freeze.
+
 This log records completed repository work. Linear remains the source of task
 status; this file records changes and evidence, not a second task board. Keep
 entries concise and append new entries at the top.

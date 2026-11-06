@@ -22,22 +22,43 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 | ID | Blocker | Status | Owner / next handoff | Affects | Last updated |
 |---|---|---|---|---|---|
-| `BLK-20261101-01` | Primary DDPM run mới hoàn thành epoch 10/30 | Open | C — Hai Tuan | Checkpoint 20/30, kết luận convergence | 2026-11-01 |
-| `BLK-20261101-02` | Pixel anomaly map có nhiều false positive | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-02 |
+| `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
+| `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
 | `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
+| `BLK-20261106-01` | Branch và private-cache contract chưa tích hợp | Open | B/C; A review freeze | DAC-11/12/14/15/30 | 2026-11-06 |
 
 ## Blocker details
 
-### BLK-20261101-01 — Primary DDPM run chưa hoàn thành
+### BLK-20261106-01 — Tích hợp và kiểm chứng branch C mới trước freeze
 
 - **Status:** Open
-- **Reported / updated:** 2026-11-01 / 2026-11-01
-- **Owner / next handoff:** C — Hai Tuan xác minh provenance và resume; người có
-  quyền shared Modal Workspace hỗ trợ nếu access thay đổi.
-- **Affected work:** Chưa có checkpoint epoch 20/30, chưa thể phân biệt rõ
-  undertraining với hạn chế của reconstruction/score, và chưa đủ điều kiện chốt
-  model cuối.
-- **Evidence:** Run
+- **Reported / updated:** 2026-11-06
+- **Owner / next handoff:** B tích hợp/evaluator; C cache/continuation; A review freeze.
+- **Affected work:** DAC-11/12/14/15/30 và final reproducibility.
+- **Evidence:** B `a556a85` và C `c02addb` chưa tích hợp; CI chỉ push main/PR.
+  C d282f02 có 8 collection errors trong data-only env; c02addb có 181 tests pass,
+  1 float32 equality failure khi có Torch. Prefix cache và hash-before-reopen/parent-byte guards còn thiếu.
+  B full suite có Windows rename lỗi lặp ở hai test khác nhau, cả ngoài sandbox.
+- **Attempts:** fetch/isolated source review, CPU suites, minimal dependency
+  collection, HF JSON/LFS checksum audit; không GPU hay mở test.
+- **Action needed:** Tích hợp branch, sửa guards/test/CI, điều tra Windows rename,
+  kiểm cache mới bằng UUID adapter; chạy hai dependency environments và review.
+- **Close when:** source chung có verification xanh, private-cache reproduction
+  có receipt, B/C ký acceptance; không đòi model phải đạt một AP tùy ý.
+- **Resolution:** Chưa có; xem PROJECT_AUDIT_2026-11-06.md.
+
+### BLK-20261101-01 — Terminal status của primary run batch-1 cũ
+
+- **Status:** Open
+- **Reported / updated:** 2026-11-01 / 2026-11-06
+- **Owner / next handoff:** C — Hai Tuan xác minh provenance và chốt trạng thái
+  run cũ; người có quyền shared Modal Workspace hỗ trợ nếu cần.
+- **Affected work:** Lifecycle/provenance lịch sử chưa khép kín. Gaussian30 đã
+  hoàn tất ở run khác; blocker này không ngăn B evaluation checkpoint mới.
+- **Current evidence (06/11):** HF snapshot af0bf400 vẫn ghi run batch-1 cũ
+  running và thiếu 3 checkpoint được manifest tham chiếu; không xác minh live
+  Modal C. Xem [audit](PROJECT_AUDIT_2026-11-06.md).
+- **Historical evidence (01/11):** Run
   `ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z` dừng trong
   epoch 11. Epoch 10 đã hoàn thành 75.000 optimizer steps; normal-validation
   epsilon-MSE tốt nhất là `0.0101424818`. Modal Volume giữ `ddpm_last.pt`,
@@ -48,9 +69,9 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Attempts / constraints:** Resume chỉ hợp lệ khi cùng run ID, config, trainer,
   dataset revision và source snapshot SHA256 đã lưu. Phần epoch 11 chạy dở không
   có trong checkpoint và sẽ chạy lại từ đầu.
-- **Action needed:** Xác minh `ddpm_last.pt`, manifest và exact source snapshot
-  còn khớp; resume cùng run từ epoch 11; giữ milestone epoch 20/30; cập nhật
-  `RESULT_TRACKING.md` từ artifact thực tế. Không dùng held-out test.
+- **Action needed:** C xác minh trạng thái cuối trên Modal, ghi completed /
+  interrupted / abandoned theo bằng chứng và lý do; cập nhật manifest và
+  `RESULT_TRACKING.md`. Không tự resume run cũ chỉ để đóng blocker.
 - **Close when:** Epoch 30 hoàn thành hoặc nhóm ghi quyết định có bằng chứng rằng
   run sẽ không tiếp tục; mọi checkpoint/status cuối đã được lưu và track.
 - **Resolution:** Chưa có.
@@ -58,12 +79,16 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 ### BLK-20261101-02 — Pixel anomaly map có nhiều false positive
 
 - **Status:** Investigating
-- **Reported / updated:** 2026-11-01 / 2026-11-02
+- **Reported / updated:** 2026-11-01 / 2026-11-06
 - **Owner / next handoff:** B — Chí Vĩ dẫn evaluation; C — Hai Tuan cung cấp
   checkpoint/reconstruction và cùng review inference contract.
 - **Affected work:** Chưa nên freeze checkpoint/score/threshold để chạy held-out
   test hoặc đưa ra kết luận nghiên cứu cuối.
-- **Evidence:** Trên 83 validation slices, candidate epoch 10, `t*=300`, local
+- **Current evidence (06/11):** LPIPS/DDIM20+30 có AP .312330 / Dice .371215,
+  naive-stitch LPIPS AP .180593 trên 43 internal holdout slices. Giữ Investigating
+  cho independent reproduction/uncertainty/freeze; không yêu cầu chạy lại đối
+  chứng đã có hoặc tăng epoch. Xem [audit](PROJECT_AUDIT_2026-11-06.md), HF fae9b50.
+- **Historical evidence:** Trên 83 validation slices, candidate epoch 10, `t*=300`, local
   one-minus-SSIM đạt pixel AUROC `0.892010` nhưng Precision `0.101571`, Recall
   `0.395303`, micro F1/Dice `0.161616` và pixel AP `0.095895`. Đây là một
   inference seed; test chưa được dùng. Heatmap định tính cho thấy score cao ở
@@ -83,12 +108,9 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Attempts / constraints:** Đã so checkpoint epoch 5/10, timestep 100/200/300
   và pixel-difference/local-SSIM theo validation protocol. Noise-MSE thấp đo
   epsilon prediction trên normal validation, không đo segmentation quality.
-- **Action needed:** Giữ ancestral sampler làm baseline hiện tại; không ưu tiên
-  posterior mean hoặc foreground mask đơn lẻ. Bước nghiên cứu tiếp theo cần được
-  review riêng là một run Simplex-noise có cùng data, kiến trúc và optimizer-step
-  budget để kiểm tra giả thuyết noise distribution; không thể đổi checkpoint
-  Gaussian hiện tại sang Simplex chỉ ở inference. Không tune bằng test. Epoch
-  20/30 chỉ đánh giá sau khi checkpoint tồn tại.
+- **Action needed:** B tái tính LPIPS/DDIM, naive-stitch và brightness trên cache
+  được xác minh; paired group bootstrap với threshold cố định. C hỗ trợ artifact
+  contract. A/B/C freeze shortlist và quy tắc test; không tune bằng test.
 - **Close when:** Nhóm có diagnosis dựa trên artifact, chọn/freeze protocol hoặc
   phê duyệt ablation mới, và ghi rõ giới hạn cùng số seed thực chạy.
 - **Resolution:** Chưa có.

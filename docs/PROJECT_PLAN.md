@@ -1,5 +1,10 @@
 # Kế hoạch đồ án — DDPM reconstruction cho BMAD Brain
 
+> Cập nhật 06/11/2026: phần dưới giữ roadmap ban đầu; câu “chưa có kết quả model”
+> đã lỗi thời. Xem [audit và kế hoạch ưu tiên mới](PROJECT_AUDIT_2026-11-06.md):
+> tiếp nhận C `c02addb`, kiểm chứng LPIPS/DDIM20+30, tích hợp và freeze trước test.
+> Không train lại hay mở nhánh mới chỉ vì noise-MSE/validation score.
+
 Theo [PROJECT_REQUIREMENTS](PROJECT_REQUIREMENTS.md), [RESEARCH](RESEARCH.md) và [Linear](PROJECT_TRACKING.md). Quyết định ngày 28/10/2026: thực hiện đề xuất của thành viên về partial DDPM reconstruction, `t*` và anomaly score thay kế hoạch ANDi-FLAIR ngày 24/10. Deadline 04/12/2026 giữ nguyên. Chưa có kết quả model.
 
 MVP: train DDPM trên normal slice, reconstruction với các `t*` được đăng ký trước, so pixel absolute difference và local SSIM trên cùng output, đánh giá validation rồi freeze và đánh giá test. DAE là đối chứng khi khả thi; feature difference, ANDi và các baseline khác chỉ là mở rộng khi nhóm có thời gian và nguồn lực.

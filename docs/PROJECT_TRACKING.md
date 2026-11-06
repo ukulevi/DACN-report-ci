@@ -1,5 +1,14 @@
 # Theo dõi dự án bằng Linear
 
+## Live audit 06/11/2026
+
+Đã xem UI đúng workspace DACN-KHMT: 4 Done (DAC-5/6/7/8), 6 In Progress
+(DAC-9/10/11/12/14/30), 16 Backlog. Lead Tuấn Anh, B Chí Vĩ, C Hải Tuấn;
+target 04/12 không đổi. Connector đang trỏ workspace khác nên không dùng để ghi.
+Latest project update 28/10 còn phân công cũ; project description còn dataset
+revision cũ. Chưa sửa live status/owner. [Audit mới](PROJECT_AUDIT_2026-11-06.md)
+đối chiếu evidence và acceptance; bảng 29/10 bên dưới là lịch sử.
+
 **Project:** [DACN — Diffusion Models for Anomaly Detection](https://linear.app/dacn-khmt/project/dacn-diffusion-models-for-anomaly-detection-39ad392101f4)
 
 **Team:** DACN-KHMT; **target:** 04/12/2026.

@@ -1,5 +1,35 @@
 # Experiment and result tracking
 
+## 2026-11-06 — Audit receipt for C's completed runs
+
+Đây là đối chiếu artifact đã được C tạo, không phải run mới của B. HF snapshot
+`fae9b50a4b78114fb51d87e803c77d019668f523`: kiểm 94 references mới qua JSON bytes
+hoặc LFS metadata, không mismatch; chưa tái tính metric từ NPZ trong lượt audit.
+Source branch C được kiểm đến `c02addb`; không mặc định đó là source snapshot
+của mọi run. Provenance từng run nằm trong manifest/evidence.
+
+[Manifest bất biến của run DDIM20+30](https://huggingface.co/dacn-bmad-team/dacn-runs/blob/fae9b50a4b78114fb51d87e803c77d019668f523/evaluations/autoddpm-ddim2030-full83-t4-20261106T074200Z/run_manifest.json)
+ghi code revision `e75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a` và source snapshot
+SHA256 `7b76a23f2712aa7f3bb26698aafdf6311ef26e088c4b62fadedd5bacb44869e1`.
+[Results bất biến](https://huggingface.co/dacn-bmad-team/dacn-runs/blob/fae9b50a4b78114fb51d87e803c77d019668f523/evaluations/autoddpm-ddim2030-full83-t4-20261106T074200Z/results.json)
+là nguồn các số bên dưới; cần quyền truy cập repo private.
+
+Run `autoddpm-ddim2030-full83-t4-20261106T074200Z`: Gaussian EMA30,
+DDIM20 + 30, LPIPS final; một sampling seed, 83 validation slices chia
+40 calibration / 43 internal group holdout (25 groups). Pixel AP micro .312330,
+AUROC .949036, Precision .297471, Recall .493572, F1/Dice .371215;
+image AUROC .914474, Precision .687500, Recall .916667, F1 .785714.
+Threshold chọn max F1 trên calibration, score >= threshold, hòa chọn threshold
+lớn nhất; holdout giữ threshold đó. Đây là validation được khảo sát nhiều lần,
+không phải kết quả held-out test cuối.
+
+Naive-stitch LPIPS có AP .180593, brightness .389506 trên cùng holdout;
+không kết luận diffusion vượt brightness từ Dice tại threshold riêng.
+Đọc [audit và kế hoạch](PROJECT_AUDIT_2026-11-06.md) cùng
+[aggregate evidence](evidence/2026-11-06-project-audit-latest.json) cho metric,
+artifact paths, runtime và checksum checks. Không có GPU/MRI evaluation mới
+được khởi chạy trong audit này.
+
 Use this file for runs that actually started, including failed, interrupted,
 and smoke-test runs. Linear tracks task status; this file tracks experimental
 provenance and results. The Modal `run_manifest.json` and saved artifacts are
