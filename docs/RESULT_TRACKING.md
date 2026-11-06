@@ -1,5 +1,123 @@
 # Experiment and result tracking
 
+## 2026-11-06 — RAD-DINO full83 frozen scoring
+
+- Evaluation `rad-dino-full83-t4-20261106T084846Z` completed2026-11-06T08:50:32Z;
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-MEBlm8GiyPkuor5st2SzkH).
+  Status: completed, private upload revision `fae9b50a4b78114fb51d87e803c77d019668f523`.
+- Identical [registered protocol](RAD_DINO_SCORING.md) and code snapshot to smoke:
+  frozen CXR-pretrained RAD-DINO4taps raw primary/normal-calibrated secondary,
+  fixed final DDIM20+30 cache and cachedLPIPS reference.83validation,
+  40calibration/43patient-group holdout;0diffusion calls/no test.
+- Dataset revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`, encoder revision
+  `110cbc18d5133582e320b43d53bf5c44e410c936`, code HEAD
+  `e75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a` plus dirty snapshot.
+  [private Hub artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/fae9b50a4b78114fb51d87e803c77d019668f523/evaluations/rad-dino-full83-t4-20261106T084846Z).
+- Results SHA `34004333b348e467f6b0fefac502995440f84ede71787a4c4f1339f642289fef`
+  matches manifest. 83encoder pairs,52.109713669s, peak VRAM874679296bytes;
+  zero diffusion calls, no held-out test.
+
+| Arm | Pixel AP | Pixel AUROC | P | R | F1/Dice | Normal pixel FPR | Image AP |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| RAD-DINO raw mean | .289211335 | .942452048 | .185947150 | .638435020 | .288010044 | .030442251 | .948820197 |
+| RAD-DINO normal-calibrated | .284123511 | .942153502 | .184587563 | .639620067 | .286495551 | .030927448 | .941350053 |
+| SqueezeNet LPIPS reference | .312330164 | .949036058 | .297471026 | .493572019 | .371214628 | .005772113 | .944385917 |
+
+- Thresholds: each arm's pixel/image maxF1 fit on40calibration, largest on ties;
+  holdout43patient-disjoint validation. Pixel AP/AUROC/F1 use global micro
+ 240x240; image AP/AUROC/F1 use mean top576. RAD-DINO raw reduces PixelAP by
+  .023118830 and Dice/F1 by .083204584 against LPIPS, raises recall but lowers
+  precision, and has ~5.3x normal FPR. Image AP is similar (+.004434280).
+  Normal calibration further lowers PixelAP. This transfer trial gives no
+  improvement in pixel segmentation; RAD-DINO remains CXR-pretrained and this
+  comparison also changes architecture/preprocessing/learned head. One fixed
+  checkpoint/seed and inspected validation: exploratory only.
+
+## 2026-11-06 — RAD-DINO frozen scoring smoke
+
+- Attempt `rad-dino-smoke-t4-20261106T084704Z` submitted;
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-B8POBcs4Gxjgalz71hjxnH).
+  Status: completed, private upload confirmed, revision
+  `751d189847802ac9dd3f68f2b764919761c7b75e`. No smoke AP claimed.
+- User-requested [fixed protocol](RAD_DINO_SCORING.md): chest-X-ray pretrained
+  RAD-DINO revision `110cbc18d5133582e320b43d53bf5c44e410c936`, frozen4taps,
+  original finalDDIM20+30 cached pairs, raw primary/normal-calibrated secondary,
+  cachedLPIPS control. No DDPM calls, encoder training or pseudo-mask change.
+- Dataset `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`, code HEAD
+  `e75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a` plus dirty snapshot.
+  Team Volume manifest path `evaluations/rad-dino-smoke-t4-20261106T084704Z/run_manifest.json`
+  once GPU callable starts. T4/30min,83validation ordering verified,20normalcal fit,
+  2output pairs plus identical-pair sanity check; test remains sealed.
+- Measured22encoder pair calls (21finalpairs including20normalcal + identical),
+  identical-pair error0; all4IQR floors inactive.12.870362152s work,
+  peak allocatedVRAM874679296bytes. Strict loading: no missing/unexpected/mismatched
+  keys/errors. Source snapshot
+  `1e1e4c4b57f21c94b7ca347fab42aa669b744f4a743b741ed0e6f771caa6f1bd`;
+  encoder model.safetensors SHA `dbfb9f54459c38773505de64a6ab7807bdcb392610fe1e697166342e43fb91ae`.
+
+## 2026-11-06 — Full83 normal-calibrated LPIPS
+
+- Evaluation `lpips-normalcal-full83-t4-20261106T083649Z` started on T4;
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-SsEzk6RQezELGdvji8sh4y).
+  Status: completed2026-11-06T08:37:59Z; private upload confirmed.
+- Same fixed [protocol](NORMAL_CALIBRATED_LPIPS.md) as passing smoke below,
+  immutable DDIM20+30 finals, original LPIPS/equal mean/calibrated equal mean/
+  naive-stitch LPIPS controls;83validation,40calibration/43group holdout.
+  Normal statistics fit20normal calibration images; no test, no diffusion calls.
+- Dataset revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; code
+  `e75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a` plus dirty source snapshot.
+  Manifest/artifacts: team Volume `evaluations/lpips-normalcal-full83-t4-20261106T083649Z/`;
+  [private Hub artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/25c4868058a46e4a6e6b856c2c3be8f1c0825371/evaluations/lpips-normalcal-full83-t4-20261106T083649Z).
+- Verified downloaded aggregate results SHA against manifest:
+  `a715ead9b769058fb237ebaa301547d8a4816208c01caec80db59b9390c443ff`.
+  Source snapshot `a358d099e96a85bca9409c703aca02d93a21c1eab881b71cfa6321265ebeb8a8`.
+  166LPIPS pair calls,0diffusion calls;42.564381212s total function work,
+  peak allocated VRAM45882880bytes. Cache replay and layer sum errors both0.
+- Group-holdout43 metrics below; pixel global micro over240crop, image mean
+  top576pixels. Each arm uses pixel/image maxF1 thresholds from40calibration,
+  largest threshold on ties. One fixed source checkpoint/noise realization;
+  this inspected validation is exploratory, not independent confirmation.
+
+| Arm | Pixel AP | Pixel AUROC | Pixel P | Pixel R | Pixel F1/Dice | Normal pixel FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| Original LPIPS | .312330164 | .949036058 | .297471026 | .493572019 | .371214628 | .005772113 |
+| Uncalibrated aggregate/7 | .312330164 | .949036058 | .297471026 | .493572019 | .371214628 | .005772113 |
+| Normal-calibrated equal mean | .307159662 | .947552281 | .312157458 | .465310446 | .373649189 | .005152595 |
+| Naive stitch LPIPS | .180593333 | .936299322 | .218752925 | .461665530 | .296848753 | .018309576 |
+
+| Arm | Image AP | Image AUROC | Image P | Image R | Image F1 |
+|---|---:|---:|---:|---:|---:|
+| Original LPIPS | .944385917 | .914473684 | .687500000 | .916666667 | .785714286 |
+| Uncalibrated aggregate/7 | .944385917 | .914473684 | .687500000 | .916666667 | .785714286 |
+| Normal-calibrated equal mean | .950431487 | .918859649 | .647058824 | .916666667 | .758620690 |
+| Naive stitch LPIPS | .861002904 | .785087719 | .617647059 | .875000000 | .724137931 |
+
+- Conclusion: primary Pixel AP did not improve (.312330→.307160).
+  Tiny pixel F1 increase accompanies lower recall; lower normal FPR is not a
+  matched-recall gain. Keep original LPIPS as reference. Final re-sampling with
+  LPIPS exceeds naive-stitch LPIPS by .131736831AP here, supporting a contribution
+  beyond simple stitching under this protocol; no general superiority claim.
+  Medical encoders remain untested; no further GPU job started during check.
+
+## 2026-11-06 — Normal-calibrated LPIPS smoke
+
+- Evaluation `lpips-normalcal-smoke-t4-20261106T083504Z` submitted on T4;
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-pZsyDu5Y4UNBI5QubstURo).
+  Status: completed; private Hub upload confirmed by runner, revision
+  `f0ee17da4f83de5c3bc0598839831ef27bf6154b`. No smoke AP/F1 claimed.
+- Fixed [protocol](NORMAL_CALIBRATED_LPIPS.md), Gaussian EMA30 final DDIM20+30
+  cache, seven existing SqueezeNet LPIPS layers, normal-only median/IQR fit.
+  Two output pairs plus20normal calibration pairs; zero diffusion calls.
+- Dataset revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`, code HEAD
+  `e75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a`, dirty source snapshot retained.
+  Manifest on team Volume at `evaluations/lpips-normalcal-smoke-t4-20261106T083504Z/run_manifest.json`.
+  Test remains sealed; private arrays stay on Volume/private Hub.
+- Aggregate result:2 output pairs,21 final pairs processed including20normal
+  calibration,2naive pairs,23LPIPS calls,0diffusion calls;15.168606435s.
+  Aggregate replay error0,seven-layer sum error0; all seven scale floors inactive,
+  295786normal foreground pixels. Source snapshot
+  `a358d099e96a85bca9409c703aca02d93a21c1eab881b71cfa6321265ebeb8a8`.
+
 Use this file for runs that actually started, including failed, interrupted,
 and smoke-test runs. Linear tracks task status; this file tracks experimental
 provenance and results. The Modal `run_manifest.json` and saved artifacts are
@@ -24,6 +142,231 @@ the detailed run record; link them here and keep a compact comparison summary.
   medical data.
 
 ## Comparison summary
+
+### 2026-11-06 — Authorized full DDIM20+30 four-score ablation
+
+- Run `autoddpm-ddim2030-full83-t4-20261106T074200Z`: **completed/uploaded**,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-98lEz64JkA8I5USQcgE4CR).
+  User explicitly approved full83after successful50-callsmoke. This satisfies the
+  suppliedtesting_Lpips.md authorizationgate;not the superseded10+10x5fullrun.
+- Exact smoke-passed preset:EMA30,T1000linear,DDIM20fromt300 +DDIM30fromt50,
+  eta0,onephase2pass,seed17. Expected4150U-Net/166LPIPScalls across83outputs.
+  Fourrequired rows use sharedinitial/final reconstructions;also report initial
+  LPIPS/product,naive-stitch and brightness,with historicalsamplers labeled.
+- Same pinned dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7,40calibration/
+  43group holdout,normal-only maskfit and calibration-only scorethresholds;
+  no training or finaltest. Code parente75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a,
+  dirty source expected7b76a23f2712aa7f3bb26698aafdf6311ef26e088c4b62fadedd5bacb44869e1.
+- Durablemanifest confirmsrunning at07:42:26UTC (14:42:26Vietnam),TeslaT4,
+  modefull,20+30preset,repeats1,no-testflag,and exactsource identicaltosmoke.
+  Completed07:45:33UTC (14:45:33Vietnam).
+  [Private immutable revision](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/ceba5af6b7cdc46b5404554575add3c5cb09d9c7/evaluations/autoddpm-ddim2030-full83-t4-20261106T074200Z).
+  RootresultSHA`a8bae24bd7270b078d49f923461e43fb51aea3163ede5a2fe71c90a70b127730`
+  verified against manifest;all83output callcounts50,4150U-Net/166LPIPS total,
+  no extra calibrationcalls,onephase2pass,outside-maskerror0,no finaltest.
+- Required fourmatched rows on43group holdout,40calibrationthresholds frozen.
+  Time/image below is the mean of synchronized model/scoring component sums over
+  shared computations,NOT independent end-to-end reruns. Scope excludes transfers,
+  mask assembly,globalcalibration,metrics/cache/I-O andstartup.
+
+| Method | Phase1 | Phase2 | Pixel AP | Micro Dice | Normal FPR | Component seconds/image |
+|---|---|---|---:|---:|---:|---:|
+| DDPM + L1 | DDIM20 | None | 0.090936 | 0.156053 | 0.074325 | 0.588357 |
+| AutoDDPM + L1 | DDIM20 | DDIM30 | 0.099569 | 0.200077 | 0.069091 | 1.471042 |
+| AutoDDPM + LPIPS | DDIM20 | DDIM30 | 0.312330 | 0.371215 | 0.005772 | 1.477092 |
+| AutoDDPM + LPIPS x final residual | DDIM20 | DDIM30 | 0.196812 | 0.272453 | 0.006499 | 1.477929 |
+
+| Current score/control | Pixel AUROC | Precision | Recall | F1/Dice | Pixel AP | Normal FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| DDPM-DDIM20 L1 | 0.874136 | 0.101839 | 0.333698 | 0.156053 | 0.090936 | 0.074325 |
+| AutoDDPM-DDIM20+30 L1 | 0.819276 | 0.128802 | 0.447966 | 0.200077 | 0.099569 | 0.069091 |
+| AutoDDPM-DDIM20+30 LPIPS | 0.949036 | 0.297471 | 0.493572 | 0.371215 | 0.312330 | 0.005772 |
+| AutoDDPM-DDIM20+30 final product | 0.831096 | 0.272722 | 0.272184 | 0.272453 | 0.196812 | 0.006499 |
+| Initial-DDIM20 LPIPS only | 0.926110 | 0.194958 | 0.336464 | 0.246871 | 0.157876 | 0.015723 |
+| Initial-DDIM20 product | 0.905685 | 0.193713 | 0.238554 | 0.213808 | 0.144068 | 0.016109 |
+| Naive stitch L1 | 0.819259 | 0.128943 | 0.368783 | 0.191077 | 0.099308 | 0.057721 |
+| Brightness | 0.950197 | 0.161469 | 0.788577 | 0.268051 | 0.389506 | 0.134935 |
+
+| Current score/control | Image AUROC | Image AP | Precision | Recall | F1 |
+|---|---:|---:|---:|---:|---:|
+| DDPM-DDIM20 L1 | 0.250000 | 0.431879 | 0.558140 | 1.000000 | 0.716418 |
+| AutoDDPM-DDIM20+30 L1 | 0.440789 | 0.501203 | 0.571429 | 1.000000 | 0.727273 |
+| AutoDDPM-DDIM20+30 LPIPS | 0.914474 | 0.944386 | 0.687500 | 0.916667 | 0.785714 |
+| AutoDDPM-DDIM20+30 final product | 0.912281 | 0.943103 | 0.687500 | 0.916667 | 0.785714 |
+| Initial-DDIM20 LPIPS only | 0.787281 | 0.854501 | 0.611111 | 0.916667 | 0.733333 |
+| Initial-DDIM20 product | 0.793860 | 0.858131 | 0.611111 | 0.916667 | 0.733333 |
+| Naive stitch L1 | 0.410088 | 0.488216 | 0.571429 | 1.000000 | 0.727273 |
+| Brightness | 0.679825 | 0.770309 | 0.571429 | 1.000000 | 0.727273 |
+
+- Pixel globalmicro overfull240crop,continuousAP;image mean top576pixels.
+  Historical different-sampler reference:ancestral300initial LPIPS-onlypixelAP
+  0.266899/Dice0.339668,imageAP0.868242;not the matchedDDIM20baseline.
+- SameLPIPS scoring before/after phase2:pixelAP0.157876->0.312330(+0.154454),
+  Dice0.246871->0.371215,imageAP0.854501->0.944386. CalibrationLPIPSAP also
+  increases0.238079->0.312952. On the SAMEfinal,LPIPSAP0.312330 exceedsL1
+  0.099569 andfinalproduct0.196812. Report all fourarms,not a newholdout-selected
+  winner or independently confirmed method. Oldweightedfinal0.154785 usedinitial
+  heatmap and a different sampler/repeatbudget;do not attribute all differences
+  from that historical score solely to fasterDDIM.
+- Naive-stitch L1AP0.099308 vsfinalL1AP0.099569 is only+0.000262. No naive-stitch
+  LPIPS control was measured,so the LPIPS gain cannot yet isolate learned
+  inpainting from stitching effects in perceptual space. No proof of guaranteed
+  tumor removal or superior normal restoration from exact-context preservation.
+- Holdout pseudo-mask lesionrecall0.759256,precision0.123192,normalcoverage
+  0.120276;calibration0.893122/0.106485/0.119341. Maskthreshold0.13344676792621613
+  unchanged from smoke. It misses24.0744percent lesionpixels. LPIPS scores are
+  spatial/nonlocal;do not treat maskcoverage as an anatomical segmentation quality
+  claim. BrightnesspixelAP0.389506 still exceedsfinalLPIPS0.312330;Dice/FPR are
+  at different recalls(0.788577 vs0.493572),not matched-sensitivity superiority.
+- Meanphase1/phase2denoising0.588042/0.874035s across83images,sum1.462077s;
+  fourcomponent medians0.577506/1.457580/1.463789/1.464696s. Historicalmatched
+  TWO-image denoising reference gives9.187524xspeedup,priorT4container,not83image
+  end-to-end speedup. Total186.571349s before upload includes setup,calibration,
+  score metrics andI/O(2.247848s/image jobaverage,not isolatedinference latency).
+  Peak104671232B. No new GPU run or unit rerun on this artifact-onlycheck.
+
+### 2026-11-06 — Supplied DDIM20+30 single-pass ablation smoke
+
+- Run `autoddpm-ddim2030-smoke-t4-20261106T073737Z`: **completed/uploaded**.
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-mSM7Tlr1zK7LHFEEoS2fiu),
+  [private immutable revision](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/ac8aaaa082fa72363c53253e5db4317f4d4365ea/evaluations/autoddpm-ddim2030-smoke-t4-20261106T073737Z).
+  User supplieddocs/testing_Lpips.md while the older10+10x5smoke finished;
+  this is the new active contract,not a repeat of the older budget.
+- Configconfigs/autoddpm_ddim20_30.json:20steps fromt300,30steps fromt50,
+  eta0,onepass,seed17. Fourrequired scoring arms alluse the sameinitial/final;
+  finalLPIPS andfinalproduct are actually computed againstfinal reconstruction.
+  No hidden5repeat loop;U-Net hooks assert20+30 per output image.
+- Only2outputimages,plus20normal calibrationinitials needed for propermaskfit;
+  extra calibration calls explicitly counted. No smokeAP. Source/cache/LPIPS
+  provenance retained;full83requires separate authorization per suppliedtask.
+- Verified rootJSONSHAaeef3c54e055985edbd579afd3936ae27e098ca4b10a9aae0f729f98ce1f8955
+  against manifest;source7b76a23f2712aa7f3bb26698aafdf6311ef26e088c4b62fadedd5bacb44869e1.
+  Actual calls peroutput[50,50],phase2passes1,outside-maskerror0,finite maps and
+  private2example panels saved. Total480U-Netcalls:100for2outputimages plus380
+  for19additionalnormal-calibrationinitials. LPIPScalls23,not U-Net evaluations.
+- Mask threshold0.13344676792621613 fit20normal calibration,not ancestral numeric
+  reuse. Meanphase1/phase2denoising1.059434/0.885648s on2outputs;sum1.945082s.
+  Historical matchedtwo-image ancestral denoisingmean16.975729s gives8.727513x
+  denoising-only speedup,cross-containerT4 scope,not83image or end-to-end speedup.
+  Score component latency means:M1=1.059616s,M2=2.007998s,M3=2.014264s,
+  M4=2.015014s;shared-run component sums exclude transfers/mask assembly/global
+  calibration,I/O andstartup. Total22.787917s before upload,peak104671232B.
+- No AP/AUROC/F1 measured fromsmoke;historical metrics inartifact are references,
+  not new20+30results. Full83 **not started**,awaiting explicit authorization as
+  docs/testing_Lpips.md requires. Exactfullcommand inAUTODDPM_DDIM20_30.md.
+
+### 2026-11-06 — AutoDDPM two-phase DDIM10 bounded smoke
+
+- Run `autoddpm-ddim-smoke-t4-20261106T072722Z`: **completed/uploaded; superseded before full**,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-ghqmk2bcm1tRiBMyajKhEu).
+  OriginalGaussianEMA30,LPIPS squeeze unchanged; fixed t300DDIM10 phase1 and
+  t50DDIM10 x5phase2,eta0. Cumulative-alpha forward re-noising across skipped
+  gaps;exact outside-mask context preservation. No model training or mask sweep.
+- Smoke replays twofullancestral initial/final pairs with synchronized phase
+  timings,then twoimages each forphase2-only and both-phase accelerated arms.
+  Normal20calibration DDIMinitials are also generated tofit the unchangedmaskrule.
+  No smoke AP;algorithmNFE550/350/60 is not measured wall speedup.
+- Dataset/source/cache/LPIPS checks and masks/metric/timing protocol in
+  AUTODDPM_DDIM.md. Code parente75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a,
+  dirty source`29f8804fdd554a3e11f892c145f6b17c291c9f4b827e4b1c468993cedea868b0`.
+  Private revision
+  [d3d088ed](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/d3d088ed7cbf491f690db265eb7a16f3d308c184/evaluations/autoddpm-ddim-smoke-t4-20261106T072722Z).
+  ResultSHA40ce933e3c848f9da8066f2235d5ebe72a7046a96c65e2cb4492b8314340a396
+  matches manifest;1510actualnewU-Net calls(1100ancestralprobe+210initial+200inpaint),
+  finite2imagearms;ancestralinitial/final replayerrors[0,0]. Total64.330359s,
+  peak105523200B. No AP measured. No full10+10x5run launched after user supplied
+  new20+30specification. Retained as two-image ancestral timing reference:
+  normalphase1/2=10.550942/7.415179s,abnormal8.701458/7.283880s;not83image means.
+
+### 2026-11-06 — Full83 LPIPS-only and pseudo-mask explanatory audit
+
+- Run `perceptual-audit-full83-t4-20261106T065328Z`: **completed/uploaded**,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-VmGU48SYKuWh8W685WGCf6).
+  Passed2image product/mask replay first;full83uses same frozen LPIPS and cached
+  GaussianEMA30 initial images,zeroDDPM/re-sampling/training calls. No mask redesign.
+- New twoarms LPIPS-only and normalized-absolute-only;report existing8controls.
+  Thresholds fit40calibration,43group holdout unchanged. FP proxy regions,
+  lesion boundary/core and8connected component bins fixed before run;gradient
+  high threshold from20normal calibration only. Private4fixed example panels,
+  no public MRI and no final-test access. SeePERCEPTUAL_MASK_ROADMAP.md.
+- Code parente75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a,dirtysource expected
+  `4689409edc64b047b0822dfe966e377fda4e0fcd4c4f398eab19a11365f2e297`.
+  [Private immutable revision](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/3b82d8b2bbfa62d887dbb2f687a790905c351113/evaluations/perceptual-audit-full83-t4-20261106T065328Z).
+  No method selection from the repeatedly inspectedholdout.
+- Durable manifest confirms06:54:33UTC,TeslaT4,modefull,identicalsmoke source,
+  diffusion_model_calls=0,mask_redesign=false,held_out_test_used=false.
+- Completed06:55:00UTC (13:55Vietnam),83samples;total25.922446s before upload,
+  peak45882880B. Root JSON SHA matches manifest:
+  `224e17448d671bf96de619efe4196a1d0a2992bc07e29915a7c0499df63ba0fa`.
+  Product replay maximumerror0 and pseudo-maskexactmatchTrue across83samples.
+  Frozen diagnostic gradient threshold0.352968424559. Four private example PNGs
+  and exact new maps persisted;not downloaded locally or anatomically reviewed.
+- New score arms on43group holdout,thresholds selected40calibration only.
+  Pixel globalmicro240crop includes background;normalFPR empty-mask normal images.
+
+| Score | Pixel AUROC | Precision | Recall | F1/Dice | Pixel AP | Normal FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| LPIPS only | 0.946559 | 0.284005 | 0.422469 | 0.339668 | 0.266899 | 0.007686 |
+| Normalized absolute only | 0.874988 | 0.116323 | 0.299978 | 0.167640 | 0.102264 | 0.057595 |
+
+| Score | Image AUROC | Image AP | Precision | Recall | F1 |
+|---|---:|---:|---:|---:|---:|
+| LPIPS only | 0.780702 | 0.868242 | 0.606061 | 0.833333 | 0.701754 |
+| Normalized absolute only | 0.500000 | 0.558140 | 0.558140 | 1.000000 | 0.716418 |
+
+- Pixel/image thresholds LPIPS0.266326934099/0.253568206500,normalized
+  absolute0.916695535183/1.0. Per-image clipping saturates top5percent at1,
+  so the top1percent image-score aggregation is constant1 for normalized residual;
+  its image AUROC0.5/APclass-prevalence is expected,not evidence of detection.
+- Controls unchanged: rawabsolute AP0.101066/Dice0.173678;initialLPIPSproduct
+  0.204298/0.274354;weightedfinal0.154785/0.226256;brightness0.389506/0.268051.
+  LPIPS-only AP exceeds product by0.062601 on holdout. CalibrationAP also shows
+  LPIPS0.316582 > product0.285192 > weightedfinal0.196476. The ablation supports
+  a strong perceptual-scoring contribution and residual multiplication reduces
+  AP in this model/cohort;not an independently confirmed new-method claim.
+  LPIPS-only imageAP0.868242 is below product0.887665;do not claim all metrics win.
+- Pseudo-mask diagnostic onholdout:9048/55694 lesionpixels missed(16.2459%).
+  Boundary<=3pixels misses2497/13693(18.2356%),core>3pixels misses6551/42001
+  (15.5972%). Core contributes72.4027percent of allmisses due its larger area,
+  not a higher within-core missrate. Not merely boundary undercoverage.
+- Pseudo-mask false positives303007:background17424(5.7504percent),foreground
+  boundary53260(17.5772percent),interior highgradient5613(1.8524percent),interior
+  other226710(74.8201percent). Counts and geometric miss strata sum exactly.
+  Within-region normal-image pseudo-mask rates:background0.006951,boundary
+  0.432058,highgradient0.780517,interiorother0.418644. Highgradient is a small
+  area despite high rate;mostFP counts are not there. These proxies are not
+  anatomy labels and do not establish ventricle/cortex-specific errors.
+- Connected lesion components(8connected,pixel areas) whollymissed bypseudo-mask:
+  3/29 area1–25,3/6 area26–100,0/3 area101–400,0/22 area>400. LPIPS calibrated
+  detection threshold whollymisses20/29 smallestcomponents despite better pixelAP;
+  distinguish high-recall pseudo-mask from final segmentation threshold.
+- LPIPS-only normalFPR0.007686 and Dice0.339668 vs brightness0.134935/0.268051
+  occur at different sensitivity(LPIPSrecall0.422469 vsbrightness0.788577),not
+  matched-recall superiority;brightnesspixelAP0.389506 remains higher. FP share
+  depends on regionarea;report within-region rate alongside countshare.
+- No new mask design chosen or tuned from this audit;no independenttest,
+  training,reverse chain or extra GPU run on check. Freeze the later mask method
+  and validate independently,as the user's roadmap requires.
+
+### 2026-11-06 — Perceptual-only ablation and pseudo-mask audit smoke
+
+- Run `perceptual-audit-smoke-t4-20261106T065148Z`: **completed/uploaded**,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-FvyVHTJjk0cuYi4Hso4zJw).
+  TwoLPIPS image-pair calls,zeroDDPM/re-sampling/training calls;source artifacts
+  fromcompleted AutoDDPM LPIPS t300 evaluation. No smoke AP.
+- Replay same LPIPS state/product maps and exact pseudo-masks before scoring
+  ablation. New LPIPS-only and normalized-absolute-only maps,normal-calibration
+  gradient diagnostic threshold,unchanged40/43partition. Fixed diagnostic strata
+  and independent-confirmation boundaries inPERCEPTUAL_MASK_ROADMAP.md.
+- Code parente75469bedfe757ad9651e03ab6cfe2cfd2b5fd5a,dirty package snapshot
+  `4689409edc64b047b0822dfe966e377fda4e0fcd4c4f398eab19a11365f2e297`.
+  Private revision
+  [402250a5](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/402250a5f04037a03881be94cabff9ef8a82e09b/evaluations/perceptual-audit-smoke-t4-20261106T065148Z).
+  Root result hash verified against manifest;product replay maximumerror0,
+  pseudo-mask exactmatchTrue. Frozen diagnostic gradient threshold0.352968424559
+  fromnormal calibration only. Total5.726332s before upload,peak45882880B.
+  TwoLPIPS-only inputs,all outputs finite;no AP measured. Full comparative
+  metrics are not smoke results.
 
 ### 2026-11-06 — LPIPS AutoDDPM t300 full83 comparison
 

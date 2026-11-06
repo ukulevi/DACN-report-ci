@@ -11,6 +11,66 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 
 ## Hợp đồng mô hình và thực nghiệm
 
+### Authorized normal-calibrated LPIPS trial — 2026-11-06
+
+The user approved running the prioritized review direction. First retain
+SqueezeNet and unchanged cachedfinalDDIM20+30 pairs;capture7pretrained layer
+contributions,fit median/IQR only on20normalcalibration foreground,and use equal
+mean zscore onfull240crop. Fixed controls are originalLPIPS,aggregate/7 and
+naive-stitchLPIPS with originalmask. No new encoder,training,U-Netcalls ormask
+design. Same40/43partition and frozen calibrationthresholds. Bounded smoke then
+full83after replay/finite checks;no score/layer/weight sweep. See
+[NORMAL_CALIBRATED_LPIPS.md](NORMAL_CALIBRATED_LPIPS.md) for the fixed protocol.
+
+### User-requested LPIPS encoder review — 2026-11-06
+
+Completed the research/design request in [test.md](test.md), refined by the
+user's encoder-role table: SqueezeNet LPIPS is the current baseline; RAD-DINO
+is chest-X-ray domain transfer; a brain-MRI/FLAIR-pretrained encoder is a
+domain-match hypothesis, not a guaranteed improvement. Add same-architecture
+DINOv2 and ResNet50 controls before attributing effects to pretraining domain.
+See [LPIPS_ENCODER_RESEARCH.md](LPIPS_ENCODER_RESEARCH.md) for primary sources,
+weights/license/input readiness, A–D proposals and attention/multi-contrast limits.
+Prioritize normal-calibrated multi-layer scoring on the unchanged cached DDIM20+30
+final pairs; keep medical encoders as controlled extensions after artifact checks.
+This entry records a review/proposal only: no new weights loaded, training, GPU
+experiment, AP result, mask redesign or final-test access. Changing a trunk does
+not preserve the original learned LPIPS head or establish method novelty.
+
+### User-requested two-phase DDIM acceleration — 2026-11-06
+
+Superseded after the bounded10+10x5smoke by the user's supplied
+[testing_Lpips.md](testing_Lpips.md):fixedDDIM20+DDIM30,onephase2pass,exact50U-Net
+calls and four scoring arms that compute LPIPS against the actualfinal tensor.
+Implement/smoke per [AUTODDPM_DDIM20_30.md](AUTODDPM_DDIM20_30.md);full83must
+wait for the explicit authorization required in that task. No oldfullrun started.
+The original proposal below is retained as history,not the current run contract.
+After successful20+30smoke,the user explicitly approved full83on2026-11-06;
+launched`autoddpm-ddim2030-full83-t4-20261106T074200Z` with unchanged preset.
+
+Keep EMA30/LPIPS/maskrule/protocol and test fixed DDIM10initial t300 plus
+DDIM10inpaint t50 x5repeats,eta0. Add cachedancestral and phase2-only acceleration
+controls; no full factorial or step sweep. Repeat re-noising uses cumulative
+alpha ratio across skipped timesteps,not adjacent beta. Context stays original
+outside mask;eta0reverse still has stochastic forward/context draws.
+Recalibrate DDIMphase1 mask only by unchanged20normal-calibration95percentile
+rule. Freeze score thresholds on40calibration before43holdout metrics.
+Document timings/NFE separately;550->60calls is not measured9.17xwall speedup.
+See [AUTODDPM_DDIM.md](AUTODDPM_DDIM.md). Bounded smoke before full83comparison;
+no training,holdoutmask-design selection or final-test use.
+
+### User-selected roadmap — LPIPS attribution and mask audit — 2026-11-06
+
+Implement steps1/2 of the user's roadmap:LPIPS-only and normalized-absolute-only
+ablation on the same cached EMA30 reconstructions,then descriptive pseudo-mask
+FN/FP analysis. Verify existing product/mask replay and keep all8original controls.
+No new diffusion chains,training,mask redesign or score-weight search. Existing
+40/43group partition with calibration-only thresholds. Anatomy is not annotated;
+use named geometric/gradient proxies without claiming anatomical structures.
+See [PERCEPTUAL_MASK_ROADMAP.md](PERCEPTUAL_MASK_ROADMAP.md) for preregistered
+diagnostics,smoke/full commands,and the step3/4 independent-confirmation boundary.
+Do not select a new mask design from outcomes on the repeatedly inspectedholdout.
+
 ### User-requested LPIPS AutoDDPM adaptation — 2026-11-06
 
 Reuse Gaussian EMA30/t300 cache for pseudo-mask -> stitch ->50step x5repeat

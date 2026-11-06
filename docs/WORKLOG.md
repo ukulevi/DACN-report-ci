@@ -1,5 +1,38 @@
 # Worklog
 
+### 2026-11-06 — Implement frozen RAD-DINO score comparison
+
+- User requested RAD-DINO. Pinned official public weights revision and processor;
+  added frozen blocks3/6/9/12 patch distance, equal mean raw primary and fixed
+  normal-calibration secondary on immutable finalDDIM20+30 pairs; LPIPS control.
+- Added bounded T4 runner with strict loading/source alignment, private artifacts
+  and fixed protocol. No training or new reconstruction. CPU targeted8tests
+  passed in3.82s; full suite182tests passed in30.37s; Ruff and whitespace passed.
+- Modal smoke completed with strict weight load, zero identical-pair distance
+  and no scale floors; full83completed. PixelAP raw RAD-DINO .289211 vs LPIPS
+  .312330; normal-calibration .284124. Full metrics/provenance in RESULT_TRACKING.
+
+### 2026-11-06 — Check full83 calibrated LPIPS results
+
+- Verified completed/uploaded Modal manifest and aggregate JSON checksum.
+  Recorded all four arms' pixel/image AP, AUROC, P/R/F1, normal FPR and runtime.
+- Calibration did not improve primary holdout PixelAP (.312330→.307160);
+  final re-sampling LPIPS exceeded naive stitching (.312330 vs .180593).
+  Interpretation is exploratory on inspected validation; test remains sealed.
+- Documentation only; no new GPU jobs. Exact checksum and numerical control
+  checks performed; no implementation change requiring another test suite.
+
+### 2026-11-06 — Implement normal-calibrated LPIPS scoring trial
+
+- Added seven-layer extraction/replay checks, normal-calibration-only median/IQR
+  statistics, equal-weight calibrated score, original LPIPS and naive-stitch
+  controls on immutable final DDIM20+30 cache; no training/reverse calls.
+- Added T4 runner with source/index/weights checksums and private artifact storage,
+  fixed protocol and five meaningful calibration/replay/isolation tests.
+- Validation: targeted5 tests passed; complete suite179 passed in28.30s.
+  Smoke completed with zero layer-sum/cache replay error and no scale floors;
+  full83started detached with same protocol. Actual provenance/status in RESULT_TRACKING.
+
 This log records completed repository work. Linear remains the source of task
 status; this file records changes and evidence, not a second task board. Keep
 entries concise and append new entries at the top.
@@ -19,6 +52,121 @@ artifacts when known. Do not put credentials, patient identifiers, or private
 source data in this file.
 
 ## Entries
+
+### 2026-11-06 — Review test.md and separate encoder roles for perceptual research
+- Changes: Added LPIPS_ENCODER_RESEARCH.md answering the requested foundation
+  model, attention, multi-contrast and A–D experiment questions, with primary
+  links, input/license/weights readiness, formulas, layer taps, relative compute
+  and a staged implementation plan. Incorporated the user's SqueezeNet baseline /
+  RAD-DINO cross-domain / brain-MRI-domain hypothesis table and architecture controls.
+- Evidence: Inspected official LPIPS, RadImageNet, RAD-DINO, MedSAM, RadFM,
+  BrainFound, BrainDINO, MM-DINOv2 and 3DINO sources/model cards. RAD-DINO is CXR;
+  some MRI artifacts are not runnable from the sources checked; 3DINO is gated
+  with a separate license; arXiv2608.28773 is withdrawn. RadImageNet weight bytes,
+  exact processor and strict load were not verified; did not claim they were.
+- Recommendation: Normal-calibrated per-layer perceptual scoring on fixed
+  DDIM20+30 final pairs, followed by controlled medical-encoder comparisons.
+  No new AP prediction or claim of novelty; all A–D remain proposals.
+- Checks: Local baseline values, Markdown links and whitespace. Documentation
+  only; no unit tests, new pretrained downloads, training, GPU calls or final test.
+
+### 2026-11-06 — Verify completed DDIM20+30 four-score ablation
+- Evidence:Full83completed/uploadedceba5af6;root aggregate SHA matches manifest,
+  exactsmokesource/config,all83callcounts50,4150U-Net/166LPIPS,onephase2pass,
+  outsideerror0,no-testflag. Recorded all8currentpixel/image arms,matched vs
+  historical controls,maskcoverage,timing scopes and privateexample availability.
+- Findings:FinalLPIPSAP0.312330/Dice0.371215 vs matchedinitialDDIM20LPIPS
+  0.157876/0.246871. FourrequiredAPs0.090936/0.099569/0.312330/0.196812;
+  no suppressed arms or post-hoc design selection. Naive-stitchL1 andfinalL1
+  AP are nearlyequal;naive-stitchLPIPS unmeasured,so avoid over-attributing gains
+  to learnedinpainting. BrightnesspixelAP0.389506 remainshigher.
+- Checks:Result checksum/count/no-test/numeric records andwhitespace only,no
+  newunit/GPUrun. Updated report/tracking/conclusions. Actualdenoisingmean1.462s
+  perimage,rootjob186.571s;9.1875xspeed reference is onlytwohistoricalT4samples,
+  not83image end-to-end speed. Independentmethod confirmation remainsfuturework.
+
+### 2026-11-06 — Launch authorized full DDIM20+30 ablation
+- User approved full83after concrete50-callsmoke. Launched detached
+  autoddpm-ddim2030-full83-t4-20261106T074200Z,
+  appap-98lEz64JkA8I5USQcgE4CR with unchangedJSONpreset and source. Fourrequired
+  matchedscore rows share the finalDDIM30image;onephase2pass,notfive repeats.
+- Evidence:Modal initialized and createdrun_ddim_ablation_remote. Existing174tests
+  and successfulsmoke remain applicable;no source edits or newtests for launch.
+- Durablemanifest confirmsrunning07:42:26UTC,TeslaT4,20+30,repeats1,exactsmoke
+  source hash and no-testflag.
+- Next:Check artifacts on user request. No training,
+  finaltest or continuing monitoring;fullmetrics pending.
+
+### 2026-11-06 — Apply supplied testing_Lpips.md DDIM20+30 requirements
+- User asked to read test_lpips.md;found actualdocs/testing_Lpips.md and read it
+  in full. It supersedes the earlier10+10x5proposal with exact20+30U-Net budget,
+  onephase2pass,four matched scoring arms and explicit full83authorizationgate.
+  Preserved that supplied document and completedolder smoke;no oldfulljob started.
+- Changes:Added validated flatJSONpreset,explicit uniform endpoint-correct grids,
+  DDIM20initial/DDIM30singlepass,four-arm scores usingactualfinalLPIPS/final
+  normalizedresidual,samefinaltensor for3AutoDDPMscores,initial/historical controls,
+  calibrated mask/thresholds,private examples,component timing and hooked callcounts.
+- Checks:174tests passed17.66s,targeted Ruff/format,whitespace. Five newtests
+  verify20/30grids,actual50calls/context,four score identities,LPIPSfinalnotinitial,
+  fixedonepassconfig. Previous10+10x5smoke completed/uploadedd3d088ed with1510calls,
+  exactancestralreplay and noAP;aggregatehashverified,retainedtimingreference.
+- Attempt:newautoddpm-ddim2030-smoke-t4-20261106T073737Z completed/uploadedac8aaaa0,
+  appap-mSM7Tlr1zK7LHFEEoS2fiu;rootresultchecksumverified. Bothoutputs50calls,
+  onephase2pass,outsideerror0,23LPIPS/480totalU-Netcalls incl380calibrationextra.
+  Denoising-only2image speedup8.7275x vs prior matchedancestral timing;not83image
+  end-to-end speed. No smokeAP. Recorded actualcounts,timings,scope,config/source
+  hashes and privateartifact provenance;no source change after successful smoke.
+- Full83notstarted,must await explicit confirmation after smoke,as suppliedtask
+  requires. Exact reviewable command and protocol inAUTODDPM_DDIM20_30.md.
+
+### 2026-11-06 — Implement DDIM acceleration for both AutoDDPM phases
+- Changes:Added eta0 arbitrary reverse jumps and cumulative-alpha forward gap
+  re-noising for masked re-sampling. Phase1ten DDIMcalls at t300,phase2tenjumps
+  x5repeats at t50;preserve seed/RNG/context contracts. Extended shared evaluator
+  with explicit sampler pair and synchronized inpainting timings. Added cached
+  ancestral,phase2-only and both-phase comparison,T4 lifecycle,exact U-Net hook
+  counts,two-image fresh ancestral timing/cache replay and calibrated maskrule.
+- Checks:169tests passed18.88s,targeted Ruff/format and whitespace. Six newtests
+  verify multi-step/clean-terminal forward gaps,existing DDIM clipping parity,
+  shared phase1noise/ten calls,phase2fifty calls/context/RNG,oracle inversion,
+  invalid indices/repeats and empty-mask preservation. No new mask design chosen.
+- Attempt:autoddpm-ddim-smoke-t4-20261106T072722Z,
+  appap-ghqmk2bcm1tRiBMyajKhEu started;timing/finite/cache replay pending.
+- Next:After bounded smoke,requested full83sampler-speed comparison. Do not
+  equate theoretical550/60NFE with actual full-pipeline wall-clock acceleration.
+
+### 2026-11-06 — Verify LPIPS-only attribution and pseudo-mask error audit
+- Evidence:Full83audit completed/uploaded3b82d8b2;rootresultSHA matches manifest,
+  productreplayerror0,pseudo-mask exact across83;zeroDDPM/re-sampling calls.
+  Recorded newscore pixel/image AUROC/AP/P/R/F1,diagnostic strata and private
+  panel availability. Four private images remain remote,not visually reviewed.
+- Findings:LPIPS-onlypixelAP0.266899/Dice0.339668 vs product0.204298/0.274354,
+  weightedfinal0.154785/0.226256,brightness0.389506/0.268051. Pseudo-mask misses
+  16.2459percent lesion pixels includingcore;74.8201percent of itsFP count lies
+  inotherforegroundinterior. Distinguish area counts from rates and pseudo-mask
+  from calibrated final score threshold. No anatomical labels or matchedrecall claim.
+- Checks:Verified checksum/status/83samples/no-testflag,FP/lesion-strata count
+  consistency,numeric records and whitespace. Record-only edits,no unit rerun,
+  new GPU run,mask redesign or independent-test evaluation.
+
+### 2026-11-06 — Begin user-selected perceptual/mask research roadmap
+- Changes:Recorded four-stage roadmap with explicit no-holdout-design-selection
+  rule and independent-confirmation requirement. Implemented steps1/2 only:
+  LPIPS-only/normalized-residual ablation on cached original reconstructions,
+  exact product/mask replay,normal-calibration gradient threshold,post-hoc
+  lesion geometry/component and disjoint FP proxy strata,private fixed examples.
+  New T4 lifecycle uses no diffusion calls and preserves source artifact hashes.
+- Checks:163tests passed19.55s,targeted Ruff/format and whitespace. Five new
+  tests cover exact original product reproduction,gradient-fit leakage,
+  exhaustive/exclusive proxy regions,lesion/component misses and normal FP counts.
+- Attempt:smokeperceptual-audit-smoke-t4-20261106T065148Z,
+  appap-FvyVHTJjk0cuYi4Hso4zJw completed/uploaded402250a5;aggregate checksum
+  verified,originalproduct replayerror0,pseudo-maskexactmatchTrue,no AP from2samples.
+  Elapsed5.726s,peak45882880B,source4689409edc64b047b0822dfe966e377fda4e0fcd4c4f398eab19a11365f2e297.
+- Next:requested83image explanatory audit launched detached after smoke. No mask redesign or
+  independent-test run;do not choose a new method from inspected holdout ranking.
+  Runperceptual-audit-full83-t4-20261106T065328Z,appap-VmGU48SYKuWh8W685WGCf6;
+  durable manifest confirmsrunning,TeslaT4,source identical to smoke,zeroDDPM calls.
 
 ### 2026-11-06 — Publish memory fusion and LPIPS AutoDDPM findings to Git
 - User requested pushing the latest measured results. Collected implementation,

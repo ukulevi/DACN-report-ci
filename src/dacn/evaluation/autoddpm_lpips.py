@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import time
 from pathlib import Path
 
 import numpy as np
@@ -77,7 +78,22 @@ def evaluate_lpips_resampling(
     device,
     smoke=False,
     on_progress=None,
+    initial_sampler="ancestral300",
+    inpainting_sampler="ancestral50",
 ):
+    if initial_sampler not in {"ancestral300", "ddim10"} or inpainting_sampler not in {
+        "ancestral50",
+        "ddim10",
+    }:
+        raise ValueError("Unsupported AutoDDPM sampler pair")
+    if inpainting_sampler == "ddim10":
+        from dacn.evaluation.ddim_inpainting import ddim_stitch_resample
+
+        resample = ddim_stitch_resample
+        resample_kwargs = {"repeats": 5}
+    else:
+        resample = stitch_resample
+        resample_kwargs = {"steps": 50, "repeats": 5}
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=False)
     images, initials, masks, labels = [
@@ -112,6 +128,10 @@ def evaluate_lpips_resampling(
         "repeats": 5,
         "sampling_base_seed": 17,
         "perceptual": perceptual_provenance(perceptual_model),
+        "initial_sampler": initial_sampler,
+        "inpainting_sampler": inpainting_sampler,
+        "inpainting_model_calls_per_image": 50 if inpainting_sampler == "ddim10" else 250,
+        "ddim_eta": 0 if "ddim10" in {initial_sampler, inpainting_sampler} else None,
     }
     (output / "mask_parameters.json").write_text(json.dumps(parameters, indent=2) + "\n")
     if on_progress:
@@ -133,6 +153,7 @@ def evaluate_lpips_resampling(
     finals, predicted_masks = [], []
     normal_set = set(normal_calibration)
     max_context_error = 0.0
+    inpainting_seconds = []
     for position, index in enumerate(selected):
         if index not in normal_set:
             heatmaps[index] = lpips_heatmap(
@@ -142,16 +163,21 @@ def evaluate_lpips_resampling(
         padded = np.pad(predicted, 8)
         mask_tensor = torch.from_numpy(padded)[None, None].to(device)
         image_tensor = torch.from_numpy(images[index])[None, None].to(device)
-        final = stitch_resample(
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        sample_started = time.perf_counter()
+        final = resample(
             model,
             image_tensor,
             torch.from_numpy(initials[index])[None, None].to(device),
             mask_tensor,
             diffusion=diffusion,
             seed=derive_sampling_seed(17, sample_ids[index]),
-            steps=50,
-            repeats=5,
+            **resample_kwargs,
         )
+        if device.type == "cuda":
+            torch.cuda.synchronize(device)
+        inpainting_seconds.append(time.perf_counter() - sample_started)
         if not torch.isfinite(final).all():
             raise ValueError("Nonfinite inpainting output")
         context_error = float((final - image_tensor)[~mask_tensor].abs().max())
@@ -195,7 +221,7 @@ def evaluate_lpips_resampling(
     if not all(np.isfinite(v).all() for v in maps.values()):
         raise ValueError("Nonfinite anomaly scores")
     result = {
-        "method": "autoddpm_lpips_EMA30_t300_adaptation",
+        "method": f"autoddpm_lpips_EMA30_t300_{initial_sampler}_{inpainting_sampler}",
         "smoke": smoke,
         "samples": len(selected),
         "held_out_test_used": False,
@@ -203,6 +229,12 @@ def evaluate_lpips_resampling(
         "parameters": parameters,
         "max_outside_mask_error": max_context_error,
         "metrics": {},
+        "phase2_synchronized_seconds": {
+            "total": float(sum(inpainting_seconds)),
+            "mean_per_image": float(np.mean(inpainting_seconds)),
+            "median_per_image": float(np.median(inpainting_seconds)),
+            "scope": "inpainting model/transitions incl forward noise and context; excludes LPIPS/scoring/transfers/cache/metrics",
+        },
     }
     if not smoke:
         truth = masks[:, 8:-8, 8:-8]
@@ -238,11 +270,16 @@ def evaluate_lpips_resampling(
                 "roi_fraction": float(roi.mean()),
                 "normal_roi_fraction_after_dilation": float(roi[labels[indices] == 0].mean()),
             }
-        for name, expected in (
-            ("initial_absolute", 0.101065919667),
-            ("initial_ssim", 0.102402212970),
-            ("brightness", 0.389505655716),
-        ):
+        references = (
+            (
+                ("initial_absolute", 0.101065919667),
+                ("initial_ssim", 0.102402212970),
+                ("brightness", 0.389505655716),
+            )
+            if initial_sampler == "ancestral300"
+            else (("brightness", 0.389505655716),)
+        )
+        for name, expected in references:
             if not np.isclose(
                 result["metrics"][name]["group_holdout"]["pixel"]["average_precision"],
                 expected,

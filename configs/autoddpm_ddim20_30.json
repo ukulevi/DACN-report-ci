@@ -1,0 +1,12 @@
+{
+  "seed": 17,
+  "phase1_starting_timestep": 300,
+  "phase1_inference_steps": 20,
+  "phase2_starting_timestep": 50,
+  "phase2_inference_steps": 30,
+  "resampling_passes": 1,
+  "eta": 0,
+  "mask_percentile": 95,
+  "mask_dilation": 3,
+  "residual_epsilon": 1e-8
+}

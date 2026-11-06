@@ -607,3 +607,94 @@ Run `autoddpm-lpips-full83-t4-20261106T061833Z`,private revision
 là kiểm chứng khả năng bổ sung của **LPIPS x residual scoring** trước khi tăng
 chi phí re-sampling;đây là đề xuất,chưa có run mới. Xem
 [AUTODDPM_LPIPS.md](AUTODDPM_LPIPS.md) vàRESULT_TRACKING cho đủmetrics/provenance.
+
+## 18. Tách LPIPS-only: đóng góp scoring rõ hơn đóng góp re-sampling
+
+Audit theo lộ trình người dùng đã hoàn tất trên83cặp ảnh đã cache,không train,
+không chạy lại DDPM. Giữ nguyên LPIPS state,240crop và40/43group partition.
+Tích hai term tái lập heatmap cũ sai khác0,pseudo-mask cũng khớp hoàn toàn.
+
+| Score | Pixel AP | Micro Dice | Recall | Normal FPR | Image AP |
+|---|---:|---:|---:|---:|---:|
+| Gaussian absolute | 0.101066 | 0.173678 | 0.314702 | 0.058079 | 0.430006 |
+| Normalized absolute only | 0.102264 | 0.167640 | 0.299978 | 0.057595 | 0.558140 |
+| LPIPS only | 0.266899 | 0.339668 | 0.422469 | 0.007686 | 0.868242 |
+| LPIPS x normalized absolute | 0.204298 | 0.274354 | 0.280623 | 0.010727 | 0.887665 |
+| Weighted final re-sampled residual | 0.154785 | 0.226256 | 0.290408 | 0.026640 | 0.814398 |
+| Brightness | 0.389506 | 0.268051 | 0.788577 | 0.134935 | 0.770309 |
+
+Trong checkpoint/cohort này,nhân thêm normalized residual làm giảm pixelAP so
+với LPIPS-only. CalibrationAP cũng theo cùng thứ tựLPIPS0.316582 >product0.285192
+>weightedfinal0.196476. Đây là bằng chứng về đóng góp scoring trên ảnh tái tạo
+cố định,không chứng minh một cải tiến mask-guided diffusion độc lập đã thành công.
+LPIPS-onlyimageAP thấp hơn product;brightnesspixelAP vẫn cao hơn. HigherDice/
+lowernormalFPR tại thresholdcalibration córecall khác nhau,không phải kết luận
+matched sensitivity. Normalized residual cóimageAUROC0.5 vì cliptop5percent
+thành1 trong khi imageaggregation chỉ lấytop1percent:scoreảnh bị bão hòa1.
+
+Pseudo-mask bỏ sót9048/55694lesionpixels(16.2459percent). Boundary<=3pixels
+missrate18.2356percent,core>3pixels15.5972percent;72.4027percent tổngmiss nằm
+trongcore do diện tích lớn hơn. Vì thế không thể chỉ giải thích bằng thiếu dilation
+ởbiên. Mask bỏ sót hoàn toàn3/29components1–25pixels và3/6components26–100pixels;
+đó là thành phần liên thông2D,không phải số tumor hay bệnh nhân. LPIPS final
+threshold vẫn bỏ sót20/29components nhỏ nhất,dù cóAP tốt hơn.
+
+Pseudo-maskFP303007pixels:background5.7504percent,foregroundboundary17.5772percent,
+interiorhighgradient1.8524percent,interiorother74.8201percent. Highgradient córate
+cao trên diện tích nhỏ;đa sốFPcount không nằm ởproxy đó. Các vùng là thống kê
+ảnh,không có nhãn giải phẫu để kết luận não thất/vỏ não. Bốn panel kiểm tra được
+lưu private cho nhóm;chưa được review giải phẫu trong lượt check aggregate.
+
+Run`perceptual-audit-full83-t4-20261106T065328Z`,private revision
+`3b82d8b2bbfa62d887dbb2f687a790905c351113`,rootresultSHA
+`224e17448d671bf96de619efe4196a1d0a2992bc07e29915a7c0499df63ba0fa`
+đã đối chiếu manifest,total25.922s trước upload. Không chọn thiết kếmask mới bằng
+thứ hạng trênholdout đã xem. Cần chốt tiêu chí development/calibration và method
+trước xác nhận độc lập;finaltest vẫn kín. Xem
+[PERCEPTUAL_MASK_ROADMAP.md](PERCEPTUAL_MASK_ROADMAP.md) cho số liệu và lộ trình.
+
+## 19. DDIM20+30 một pass: ablation dùng LPIPS trên ảnh final
+
+Thực hiện đúngdocs/testing_Lpips.md:giữGaussianEMA30,phase1DDIM20t300,
+phase2DDIM30t50,eta0,mộtpass,tổng50U-Netcalls/ảnh. Dùng cùnginitial/final vàmask
+cho bốnscoringarms;LPIPS vànormalizedresidual củafinal đều tính lại với ảnhfinal,
+không thay bằnginitialheatmap nhưscoreprimary thí nghiệmAutoDDPM cũ.
+Full83đã hoàn tất,40calibration/43groupholdout,thresholdcalibration-only.
+
+| Required method | Pixel AP | Micro Dice | Normal FPR |
+|---|---:|---:|---:|
+| MatchedDDPM-DDIM20 + L1 | 0.090936 | 0.156053 | 0.074325 |
+| AutoDDPM-DDIM20+30 + L1 | 0.099569 | 0.200077 | 0.069091 |
+| AutoDDPM-DDIM20+30 + finalLPIPS | 0.312330 | 0.371215 | 0.005772 |
+| AutoDDPM-DDIM20+30 + finalLPIPS x finalresidual | 0.196812 | 0.272453 | 0.006499 |
+
+MatchedinitialDDIM20LPIPS-onlyAP0.157876/Dice0.246871 ->finalLPIPS0.312330/
+0.371215;calibrationAP0.238079->0.312952. FinalLPIPSimageAUROC0.914474,
+imageAP0.944386. Đây là tín hiệu tích cực cho pipeline cóphase2 khi giữ cùng
+LPIPSscoring vàinitial;chưa phải independentconfirmation hay mộtmaskdesign được
+chọn từholdout. Phải giữ mọiarm trongbáocáo,không chỉrow cóAP cao nhất.
+
+Naive-stitchL1AP0.099308 vàfinalL1AP0.099569 gầnnhư nhau. Chưa đo naive-stitch
+LPIPS để tách lợi ích learnedinpainting khỏi tác động stitching trongperceptual
+space. Vì vậy không kết luận đã chứng minh tumor được xóa hoặc thay bằng môlành.
+Historicalancestral300LPIPS-onlyAP0.266899 thuộc samplerkhác;oldAutoDDPMscore
+0.154785 còn khác địnhnghĩascoring/repeatbudget,không quy toàn bộ chênh lệchchoDDIM.
+
+Pseudo-maskholdout lesionrecall75.9256percent,precision12.3192percent,
+normalcoverage12.0276percent;miss24.0744percent lesionpixels. FinalLPIPSnormalFPR
+0.5772percent ởscorethresholdkhác. BrightnesspixelAP0.389506 vẫn cao hơn;
+Recallbrightness0.788577 vsfinalLPIPS0.493572 nên Dice/FPR không phải so tại cùng
+độnhạy. Finaloutside-mask error0 là điều kiện sampler,không chứngminh restoration.
+
+Actual4150U-Net/166LPIPScalls,mỗi83output đúng50,mộtpass,nguồn/configkhớpsmoke.
+Meanphase1/phase2denoising0.588042/0.874035s,sum1.462077s/ảnh;job186.571349s
+trước upload gồmsetup/calibration/metrics/I/O. Speedup9.187524x chỉ từ2ảnh đối
+chiếuT4 lịch sử cùngscope denoising,không phải full83end-to-end speedup.
+Private2panel/maps retainedremote,không tải ảnhy tế vềlocal.
+
+Run`autoddpm-ddim2030-full83-t4-20261106T074200Z`,revision
+`ceba5af6b7cdc46b5404554575add3c5cb09d9c7`,rootSHA
+`a8bae24bd7270b078d49f923461e43fb51aea3163ede5a2fe71c90a70b127730`
+đã kiểm với manifest. Không train/testfinal/tune thêm trênlượtcheck này.
+Xem [AUTODDPM_DDIM20_30.md](AUTODDPM_DDIM20_30.md) cho four-armtable,timing,
+diagnostics,historicalbaseline vàgiới hạn xác nhận độc lập.
