@@ -25,7 +25,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
 | `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
 | `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
-| `BLK-20261106-01` | Branch và private-cache contract chưa tích hợp | Open | B/C; A review freeze | DAC-11/12/14/15/30 | 2026-11-06 |
+| `BLK-20261106-01` | Nghiệm thu resume/cache sau tích hợp | Open | B/C; A review freeze | DAC-11/12/14/15/30 | 2026-11-06 |
 
 ## Blocker details
 
@@ -53,9 +53,14 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   hash và mode inference; Modal continuation kiểm hash last/best trên bytes thực
   và chép đúng bytes đã xác minh vào run mới. 19 test liên quan đạt, Ruff đạt.
   Prefix lịch sử thiếu sidecar sẽ bị từ chối resume và cần tạo lại.
-- **Action needed:** B/C kiểm và sửa cache-prefix, hash-before-reopen và
-  parent-checkpoint guards; kiểm cache mới bằng UUID adapter; review và nghiệm thu.
-  Theo dõi Windows temp trên CI vì test sandbox mặc định không tạo được fixture.
+- **Review mới:** GitHub CI tại `9aa42c5` đã success trên môi trường data/dev.
+  Còn thiếu donor/source identity của prefix, binding hash cache/sidecar,
+  checkpoint load/hash cùng snapshot, và test trực tiếp orchestration continuation.
+  Xem [review sau tích hợp](PROGRESS_REVIEW_2026-11-06.md). Không coi 19 test đã chạy
+  là kiểm chứng trực tiếp nhánh Modal continuation mới.
+- **Action needed:** B/C xử lý và kiểm thử các điểm review của đường shortlist;
+  A chốt phạm vi nghiệm thu. Replay AP/Dice và patient bootstrap đã hoàn thành,
+  không yêu cầu lặp lại chỉ để đóng blocker. CI tối thiểu đã xanh.
 - **Close when:** source chung có verification xanh, private-cache reproduction
   có receipt, B/C ký acceptance; C xác nhận manifest checkpoint trên Volume dùng
   đúng tên artifact/schema; không đòi model phải đạt một AP tùy ý.

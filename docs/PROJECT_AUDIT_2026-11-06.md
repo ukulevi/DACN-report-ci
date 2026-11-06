@@ -1,5 +1,8 @@
 # Audit dự án DACN — 06/11/2026
 
+> Snapshot dưới là audit trước tích hợp. Xem [review sau tích hợp](PROGRESS_REVIEW_2026-11-06.md)
+> để biết CI đã success, replay/bootstrap đã hoàn thành và các guard còn cần nghiệm thu.
+
 ## Kết luận và phạm vi
 
 Dự án đã vượt giai đoạn smoke: có data contract, DDPM được train, nhiều đối

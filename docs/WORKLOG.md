@@ -1,5 +1,14 @@
 # Worklog
 
+## 2026-11-06 — Review tiến độ sau tích hợp
+
+Fetch GitHub và kiểm live HF: revisions không đổi. GitHub Actions xác nhận 3
+commit gần nhất success, bao gồm 9aa42c5; workflow chỉ cài data/dev. Linear
+connector vẫn sai workspace. Review code phát hiện giới hạn donor/source identity,
+cache checksum binding, hash sau checkpoint load và thiếu test trực tiếp Modal
+continuation. Thêm PROGRESS_REVIEW_2026-11-06, cập nhật audit/blocker và phân công
+A/B/C tới deadline. Không chạy test mới, không thay code, không thí nghiệm/GPU.
+
 ## 2026-11-06 — Guard resumable validation prefixes and Modal continuation
 
 Prefix resume now requires a sidecar contract binding checkpoint hash, index
