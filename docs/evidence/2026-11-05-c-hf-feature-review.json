@@ -1,0 +1,1296 @@
+{
+  "revision": "73552266d80393164a2a1dcf3fb3eacbe1d15a57",
+  "status": "review of producer artifacts; no fresh reconstruction of C feature models",
+  "metrics": [
+    {
+      "model": "gaussian30_parent",
+      "score": "pixel_difference",
+      "pixel": {
+        "auroc": 0.876854224944037,
+        "auprc": 0.10106591966712639,
+        "precision": 0.11993376169263509,
+        "recall": 0.31470176320609045,
+        "f1": 0.17367823894011386,
+        "threshold": 0.25365714728832245,
+        "average_precision": 0.10106591966712639,
+        "dice_micro": 0.17367823894011386
+      },
+      "image": {
+        "auroc": 0.26315789473684215,
+        "auprc": 0.4300062935777424,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 0.4949100775742813
+      },
+      "normal_pixel_fpr": 0.05807931286549708
+    },
+    {
+      "model": "gaussian30_parent",
+      "score": "local_ssim",
+      "pixel": {
+        "auroc": 0.888869880864845,
+        "auprc": 0.10240221297015661,
+        "precision": 0.11047567733990148,
+        "recall": 0.25771178223866126,
+        "f1": 0.15465428254334262,
+        "threshold": 0.9568852878352576,
+        "average_precision": 0.10240221297015661,
+        "dice_micro": 0.15465428254334262
+      },
+      "image": {
+        "auroc": 0.37280701754385964,
+        "auprc": 0.5052575825311368,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 1.1543246817193156
+      },
+      "normal_pixel_fpr": 0.05523391812865497
+    },
+    {
+      "model": "feature_A",
+      "score": "pixel_difference",
+      "pixel": {
+        "auroc": 0.8787212622745606,
+        "auprc": 0.10464469649848107,
+        "precision": 0.12646521131304442,
+        "recall": 0.3167307070779617,
+        "f1": 0.18075715112793897,
+        "threshold": 0.25466160476207733,
+        "average_precision": 0.10464469649848107,
+        "dice_micro": 0.18075715112793897
+      },
+      "image": {
+        "auroc": 0.22149122807017546,
+        "auprc": 0.41500104591747466,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 0.4787318131986669
+      },
+      "normal_pixel_fpr": 0.05664108187134503
+    },
+    {
+      "model": "feature_A",
+      "score": "local_ssim",
+      "pixel": {
+        "auroc": 0.8880598149637611,
+        "auprc": 0.10424748486201967,
+        "precision": 0.1150898704193953,
+        "recall": 0.2521276977771394,
+        "f1": 0.1580389751439199,
+        "threshold": 0.9594686479174731,
+        "average_precision": 0.10424748486201967,
+        "dice_micro": 0.1580389751439199
+      },
+      "image": {
+        "auroc": 0.41228070175438597,
+        "auprc": 0.5275204130258542,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 1.139835233359465
+      },
+      "normal_pixel_fpr": 0.05322368421052632
+    },
+    {
+      "model": "gaussian30_parent",
+      "score": "pixel_difference",
+      "pixel": {
+        "auroc": 0.876854224944037,
+        "auprc": 0.10106591966712639,
+        "precision": 0.11993376169263509,
+        "recall": 0.31470176320609045,
+        "f1": 0.17367823894011386,
+        "threshold": 0.25365714728832245,
+        "average_precision": 0.10106591966712639,
+        "dice_micro": 0.17367823894011386
+      },
+      "image": {
+        "auroc": 0.26315789473684215,
+        "auprc": 0.4300062935777424,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 0.4949100775742813
+      },
+      "normal_pixel_fpr": 0.05807931286549708
+    },
+    {
+      "model": "gaussian30_parent",
+      "score": "local_ssim",
+      "pixel": {
+        "auroc": 0.888869880864845,
+        "auprc": 0.10240221297015661,
+        "precision": 0.11047567733990148,
+        "recall": 0.25771178223866126,
+        "f1": 0.15465428254334262,
+        "threshold": 0.9568852878352576,
+        "average_precision": 0.10240221297015661,
+        "dice_micro": 0.15465428254334262
+      },
+      "image": {
+        "auroc": 0.37280701754385964,
+        "auprc": 0.5052575825311368,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 1.1543246817193156
+      },
+      "normal_pixel_fpr": 0.05523391812865497
+    },
+    {
+      "model": "feature_B",
+      "score": "pixel_difference",
+      "pixel": {
+        "auroc": 0.8783425166324861,
+        "auprc": 0.10446415065129273,
+        "precision": 0.12643627719875664,
+        "recall": 0.3103925018853018,
+        "f1": 0.17968080075252443,
+        "threshold": 0.2576306462287903,
+        "average_precision": 0.10446415065129273,
+        "dice_micro": 0.17968080075252443
+      },
+      "image": {
+        "auroc": 0.22807017543859648,
+        "auprc": 0.417368623730099,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 0.4783294872193235
+      },
+      "normal_pixel_fpr": 0.05567799707602339
+    },
+    {
+      "model": "feature_B",
+      "score": "local_ssim",
+      "pixel": {
+        "auroc": 0.8877081718972964,
+        "auprc": 0.10408414772311088,
+        "precision": 0.11509660643165136,
+        "recall": 0.25114015872445866,
+        "f1": 0.1578507826518751,
+        "threshold": 0.9600075115574407,
+        "average_precision": 0.10408414772311088,
+        "dice_micro": 0.1578507826518751
+      },
+      "image": {
+        "auroc": 0.4144736842105263,
+        "auprc": 0.528225998290263,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 1.1380006383733368
+      },
+      "normal_pixel_fpr": 0.053144188596491226
+    }
+  ],
+  "condition_ablation": {
+    "self": {
+      "pixel_difference": {
+        "auroc": 0.8783425166324861,
+        "auprc": 0.10446415065129273,
+        "precision": 0.12643627719875664,
+        "recall": 0.3103925018853018,
+        "f1": 0.17968080075252443,
+        "threshold": 0.2576306462287903,
+        "average_precision": 0.10446415065129273,
+        "dice_micro": 0.17968080075252443
+      },
+      "local_ssim": {
+        "auroc": 0.8877081718972964,
+        "auprc": 0.10408414772311088,
+        "precision": 0.11509660643165136,
+        "recall": 0.25114015872445866,
+        "f1": 0.1578507826518751,
+        "threshold": 0.9600075115574407,
+        "average_precision": 0.10408414772311088,
+        "dice_micro": 0.1578507826518751
+      }
+    },
+    "zero": {
+      "pixel_difference": {
+        "auroc": 0.8798535464401741,
+        "auprc": 0.10457915956857536,
+        "precision": 0.12534794898905985,
+        "recall": 0.31290623765576187,
+        "f1": 0.1789927229962562,
+        "threshold": 0.2613653987646103,
+        "average_precision": 0.10457915956857536,
+        "dice_micro": 0.1789927229962562
+      },
+      "local_ssim": {
+        "auroc": 0.8900247506257017,
+        "auprc": 0.10441597712144646,
+        "precision": 0.11456052422428754,
+        "recall": 0.25363593923941535,
+        "f1": 0.15783240223463688,
+        "threshold": 0.9656636847815867,
+        "average_precision": 0.10441597712144646,
+        "dice_micro": 0.15783240223463688
+      }
+    },
+    "normal_donor": {
+      "pixel_difference": {
+        "auroc": 0.88010724670806,
+        "auprc": 0.10513176589865453,
+        "precision": 0.12623159270598766,
+        "recall": 0.31906489029338886,
+        "f1": 0.18089551934930548,
+        "threshold": 0.25721684098243713,
+        "average_precision": 0.10513176589865453,
+        "dice_micro": 0.18089551934930548
+      },
+      "local_ssim": {
+        "auroc": 0.8898127147942138,
+        "auprc": 0.10469893755398843,
+        "precision": 0.11523445426579329,
+        "recall": 0.25491076238014865,
+        "f1": 0.1587188015316247,
+        "threshold": 0.9634958579008652,
+        "average_precision": 0.10469893755398843,
+        "dice_micro": 0.1587188015316247
+      }
+    }
+  },
+  "reconstruction_change": {
+    "zero": {
+      "mean_absolute_change_01": 0.0019526241812855005,
+      "max_absolute_change_01": 0.5356520414352417,
+      "normal_mean_absolute_change_01": 0.0015149725368246436,
+      "abnormal_mean_absolute_change_01": 0.0023405426181852818
+    },
+    "normal_donor": {
+      "mean_absolute_change_01": 0.0017102283891290426,
+      "max_absolute_change_01": 0.506980836391449,
+      "normal_mean_absolute_change_01": 0.0015857128892093897,
+      "abnormal_mean_absolute_change_01": 0.0018205943051725626
+    }
+  },
+  "protocol": "Zero bypasses all condition injection, including bias. Normal donor from train, deterministic UUID seed77 mapping. Same evaluated image/noise/reverse RNG; no mask as model input. Thresholds independently fitted on40calibration, frozen on43group holdout; all83 descriptive only. One exploratory seed, no training/test access.",
+  "checksum_review": {
+    "revision": "73552266d80393164a2a1dcf3fb3eacbe1d15a57",
+    "checks": [
+      {
+        "path": "runs/anoddpm-local-smoke-20261029T055620Z-b71e/anoddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-local-smoke-20261029T055620Z-b71e/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-local-smoke-20261029T055620Z-b71e/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-local-smoke-20261029T055620Z-b71e/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-local-smoke-20261029T055620Z-b71e/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-smoke-cardfix-20261029T0524Z/anoddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-smoke-cardfix-20261029T0524Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-smoke-cardfix-20261029T0524Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-smoke-cardfix-20261029T0524Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/anoddpm-smoke-cardfix-20261029T0524Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-seed-17-retry-1/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-seed-17-retry-1/dae_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-seed-17-retry-1/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-seed-17-retry-1/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-smoke-seed-17-1ep/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-smoke-seed-17-1ep/dae_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-smoke-seed-17-1ep/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/dae-smoke-seed-17-1ep/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-20261030T165258Z/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-20261030T165258Z/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-20261030T165258Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-20261030T165258Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-20261030T165258Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z/ddpm_epoch_010.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-a100-s17-e30-milestones-rngfix-20261031T041542Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-smoke-20261030T044737Z-79f605/validation_reconstruction.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/ddpm_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e1-20261102T032740Z/validation_reconstruction.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_005.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_010.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_020.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_030.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/validation_reconstruction.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_epoch_005.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_epoch_010.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e10-20261102T074257Z/validation_reconstruction.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_epoch_015.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_epoch_020.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-simplex-t4-b8-e20-cont-20261104T070341Z/validation_reconstruction.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/ddpm_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/ddpm_epoch_031.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/ddpm_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/initialization.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/validation_metrics.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/ddpm-uncond-control-smoke-t4-20261105T082204Z/validation_reconstruction.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/feature_condition_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/feature_condition_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/feature_condition_epoch_005.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/feature_condition_epoch_010.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/feature_condition_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/initialization.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-joint-t4-b8-e10-20261104T174552Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/feature_condition_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/feature_condition_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/feature_condition_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/initialization.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-A-smoke2-t4-20261104T174325Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/feature_condition_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/feature_condition_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/feature_condition_epoch_005.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/feature_condition_epoch_010.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/feature_condition_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/initialization.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/encoder_pretrain_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/encoder_pretrain_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/encoder_pretrain_epoch_005.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/encoder_pretrain_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-pretrain5-joint10-t4-20261105T053132Z-enc/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/feature_condition_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/feature_condition_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/feature_condition_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/initialization.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z-enc/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z-enc/encoder_pretrain_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z-enc/encoder_pretrain_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z-enc/encoder_pretrain_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z-enc/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/feature-B-smoke-t4-20261104T202500Z-enc/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/config.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/initialization.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_best.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_epoch_001.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_epoch_003.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_epoch_005.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/patch_context_last.pt",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/private_normal_preview.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "runs/patch-context-ft5-t4-b8-20261102T155628Z/training_history.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/autoddpm-style-ssim-e30-20261102T140011Z/results/private_maps.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/autoddpm-style-ssim-e30-20261102T140011Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/autoddpm-style-ssim-e30-20261102T140011Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/normal_donor/private_examples.png",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/normal_donor/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/normal_donor/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/normal_donor/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/zero/private_examples.png",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/zero/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/zero/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-full83-t4-20261105T072451Z/zero/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-smoke-t4-20261105T072319Z/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/B-condition-smoke-t4-20261105T072319Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-denoising-e30-3t4r-20261102T103159Z/results/private_score_maps.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-denoising-e30-3t4r-20261102T103159Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-denoising-e30-3t4r-20261102T103159Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e10-t300-posterior-mean-t4-b8-20261101T182333Z/ddpm_epoch_010_t0300_posterior_mean_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e10-t300-posterior-mean-t4-b8-20261101T182333Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e10-t300-posterior-mean-t4-b8-20261101T182333Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e30-t100-200-diag-20261102T094115Z/ddpm_epoch_030_t0100_ancestral_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e30-t100-200-diag-20261102T094115Z/ddpm_epoch_030_t0200_ancestral_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e30-t100-200-diag-20261102T094115Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e30-t100-200-diag-20261102T094115Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e5-e10-t100-200-300-20261031T074028Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-e5-e10-t100-200-300-20261031T074028Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-simplex-e10-t300-20261102T090806Z/ddpm_epoch_010_t0300_ancestral_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-simplex-e10-t300-20261102T090806Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-simplex-e10-t300-20261102T090806Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-simplex-e20-t300-20261104T105703Z/ddpm_epoch_020_t0300_ancestral_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-simplex-e20-t300-20261104T105703Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-simplex-e20-t300-20261104T105703Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-smoke-e5-t100-20261031T073859Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-smoke-e5-t100-20261031T073859Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-t4b8-e30-t300-20261102T071516Z/ddpm_epoch_030_t0300_ancestral_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-t4b8-e30-t300-20261102T071516Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/ddpm-val-t4b8-e30-t300-20261102T071516Z/validation_results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-A-joint-t4-b8-e10-20261104T174552Z-val/results/private_examples.png",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-A-joint-t4-b8-e10-20261104T174552Z-val/results/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-A-joint-t4-b8-e10-20261104T174552Z-val/results/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-A-joint-t4-b8-e10-20261104T174552Z-val/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-A-joint-t4-b8-e10-20261104T174552Z-val/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-B-pretrain5-joint10-t4-20261105T053132Z-val/results/private_examples.png",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-B-pretrain5-joint10-t4-20261105T053132Z-val/results/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-B-pretrain5-joint10-t4-20261105T053132Z-val/results/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-B-pretrain5-joint10-t4-20261105T053132Z-val/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/feature-B-pretrain5-joint10-t4-20261105T053132Z-val/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-contract-audit-20261102T153939Z/results/private_comparison.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-contract-audit-20261102T153939Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-contract-audit-20261102T153939Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/results/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/results/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-onestep-val83-t100-20261104T061451Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/results/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/results/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/gaussian-e30-t300-samplers-val83-20261104T062253Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/results/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/results/progress.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-onestep-val83-t100-20261104T060533Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-recon4-t100-20261102T163928Z/results/private_reconstructions.npz",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-recon4-t100-20261102T163928Z/results/results.json",
+        "kind": "downloaded_bytes",
+        "matches": true
+      },
+      {
+        "path": "evaluations/patch-context-e5-recon4-t100-20261102T163928Z/source_snapshot.zip",
+        "kind": "hub_lfs_metadata_only",
+        "matches": true
+      }
+    ],
+    "checked": 202,
+    "mismatches": 0
+  },
+  "caveats": [
+    "single model seed",
+    "previously inspected validation",
+    "parent-plus-finetuning compute differs from raw Gaussian baseline",
+    "checkpoint LFS hashes verified via metadata only; no deserialization of feature checkpoints"
+  ]
+}

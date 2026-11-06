@@ -1466,3 +1466,67 @@ and the checkpoints have different optimizer budgets. Held-out test remains seal
 - Subsequent authentication returned401 at whoami (invalid user token), before
   checkpoint/data download. User instructed to enter a valid read token directly
   in getpass and rerun that cell. No actual inference started.
+
+### gaussian20-colab-20261105 — completed; artifact verified 2026-11-06
+
+- User re-entered HF credential; checkpoint/dataset verification succeeded.
+  Colab notebook5361635 with SHA-verified archive source7a0f024, T4 GPU.
+  Model revision1788b1232aa19b3c9ae96aa95a74e2975f4b592a; dataset revision
+  350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7. Gaussian epoch20 checkpoint SHA
+  b4fc177db493fce2143a6412161068c7af73a25e8ae7ef9d88c117863c7e37f1.
+- Smoke4/4 completed at t3; notebook elapsed9.633s includes checkpoint/backend
+  initialization, not pure reconstruction latency. Model epoch20/18,760steps/
+  train seed17 checked against checkpoint state.
+- Full83 validation inference started around15:37 Asia/Saigon,2026-11-05,
+  ancestral t300, EMA, batch1, UUID-derived sampling base17. No training/test.
+  Scope: same-budget comparison against Simplex20, not new checkpoint selection.
+- Status: completed. Private UUID cache receipt:83samples, SHA256
+  `e9138335394d86278badea560bbdbff2a98d67fa9328ec5680c2d2480c25d7df`.
+  User downloaded bundle/checkpoint; moved to ignored runs/checkpoints folders
+  and verified actual bytes. No weights, arrays or UUIDs committed.
+- Full elapsed1049.814489406s includes reconstruction loop, dataset checks and
+  compressed artifact writing, not isolated CUDA model latency. Manifest smoke
+  timing5.237s differs from notebook wall9.633s. Peak allocated CUDA110219776bytes
+  is since initialization across smoke/full, not total GPU reserved memory.
+  Packages:torch2.11.0+cu130,numpy2.4.6,scipy1.16.3,sklearn1.6.1.
+- Manifest and descriptive full83 spatial results:
+  [manifest](evidence/2026-11-05-b-gaussian20-colab-manifest.json),
+  [spatial report](evidence/2026-11-05-b-gaussian20-spatial.json).
+  Baseline pixel AP difference .095659, localSSIM .098979; respective F1 .175333,
+  .165446 with thresholds fitted/evaluated on all83(descriptive only).
+  Colab runtime released after verified local handoff; disconnected state checked
+  2026-11-06. No model training or held-out test evaluation.
+
+### b-matched-g20-s20-20261105 — completed; recorded 2026-11-06
+
+- Both checkpoints20epochs/18,760optimizer updates, batch8/150,000presentations;
+  train/sampling seed17,EMA,ancestral t300,crop240. Pinned dataset/model revisions
+  as above. UUID-aligned join and checked index reproduce the registered40/43
+  fold; patient groups disjoint. Same budget does not remove all source,
+  dependency or noise-path differences. This remains exploratory validation.
+- Candidates in fixed order:Gaussian difference/SSIM,Simplex difference/SSIM.
+  Brightness control excluded from selection. Calibration40 selected Gaussian20
+  localSSIM by pixel AP. Thresholds and candidate choice persisted before scoring
+  holdout43. No reselection from holdout. CPU48.042s including scoring/bootstrap.
+
+| Holdout candidate | Pixel AP | Pixel AUROC | Precision | Recall | F1/Dice | Normal pixel FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| Gaussian20 difference | .096786 | .872316 | .113693 | .310428 | .166431 | .060161 |
+| Gaussian20 localSSIM | .099777 | .886228 | .107557 | .265253 | .153053 | .058109 |
+| Simplex20 difference | .043395 | .701968 | .046950 | .478956 | .085517 | .232669 |
+| Simplex20 localSSIM | .087416 | .768279 | .108888 | .372841 | .168550 | .087886 |
+| Brightness control | .389506 | .950197 | .161469 | .788577 | .268051 | .134935 |
+
+- Paired group bootstrap1000draws,seed17,25holdoutgroups:999valid/1missing-class.
+  LocalSSIM delta AP(Simplex20 minus Gaussian20)95%CI[-.030666,.011189]; delta
+  Dice CI[-.046426,.074146]. Neither supports a stable model advantage. Gaussian
+  AP CI[.036366,.144901],Simplex AP CI[.028685,.147591]. Thresholds fixed.
+- Gaussian localSSIM image AUROC .357456 and all-positive threshold(TP24,FP19);
+  Simplex image AUROC .212719. Image-level classification remains unresolved.
+- [Complete aggregate results](evidence/2026-11-05-b-matched-g20-s20.json)
+  contain provenance/cache/source hashes, fixed selection, all83 descriptive,
+  holdout pixel/image metrics and conditional CI. Existing full83 Simplex pixel
+  AP/AUROC/Precision/Recall/F1 reproduce the saved baseline to1e-12.
+- Driver: `scripts/evaluate_budget_pair.py` (executed as private runs copy before
+  import/format cleanup; executed hash retained in evidence). No additional
+  inference/training or held-out-test access for this CPU analysis.

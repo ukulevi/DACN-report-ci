@@ -155,10 +155,9 @@ decision, not code tests. See B_REVIEW_2026-11-05.md. No Linear status changed.
 
 ### BLK-20261105-02 — Colab HF credential rejected before Gaussian20 inference
 
-- **Status:** Waiting
-- **Reported / updated:** 2026-11-05 / 2026-11-05
-- **Owner / next handoff:** B(account holder) enters a valid HF read credential
-  directly into masked Colab getpass; agent continues smoke/inference afterwards.
+- **Status:** Resolved
+- **Reported / updated:** 2026-11-05 / 2026-11-06
+- **Owner / next handoff:** B; access action completed.
 - **Affected work:** Gaussian20 full83 inference and budget-matched comparison.
 - **Evidence:** T4 connected and pinned source7a0f024 installed. HF whoami
   returned401/invalid user token before downloading checkpoint or dataset.
@@ -167,11 +166,13 @@ decision, not code tests. See B_REVIEW_2026-11-05.md. No Linear status changed.
 - **Attempts / constraints:** Source clone access failure bypassed with authorized
   SHA-verified source archive. Supplied read/fine-grained token creation guide.
   Do not send credentials through Git, Linear or chat.
-- **Action needed:** Account holder reruns notebook cell2 and enters a valid
-  read token with access to dacn-bmad-team's dataset/model repos in getpass.
+- **Action needed:** None for this access blocker.
 - **Close when:** HF authentication and pinned checkpoint/validation checks pass.
   Closing this access blocker does not mean smoke/full evaluation is completed.
-- **Resolution:** Pending. The separate anomaly-score blocker remains Investigating.
+- **Resolution:** User re-entered credential; whoami and pinned dataset/checkpoint
+  checks passed. Smoke4/full83 completed2026-11-05; downloaded private artifact
+  and checkpoint hashes verified. Recorded2026-11-06 with manifest evidence in
+  RESULT_TRACKING. The separate anomaly-score blocker remains Investigating.
 
 2026-11-05 update for BLK-20261101-02: paired group bootstrap completed999valid
 of1000draws on43validation rows/25groups. Aggregate evidence in RESULT_TRACKING;
@@ -179,3 +180,11 @@ fusion delta-AP CI is positive conditional on the examined cohort, but differs
 in training budget and does not change calibration selection. Uncertainty for
 Gaussian20/Simplex20 still needs the pending Gaussian20 cache. No Linear status
 changed and no model-quality blocker closed.
+
+2026-11-06 update for BLK-20261101-02: Gaussian20/Simplex20 same-budget CPU
+comparison and paired patient-group CI completed. AP .099777/.087416,deltaCI
+[-.030666,.011189]; no stable noise-family advantage demonstrated. C feature A/B
+HF review added:small AP gains, no demonstrated pretrained/self-conditioning
+benefit, image classification/FP remain weak. Keep Investigating; A/B/C need to
+review the aggregate evidence and choose the next bounded scoring/control
+experiment before final freeze. No new training requested or started.

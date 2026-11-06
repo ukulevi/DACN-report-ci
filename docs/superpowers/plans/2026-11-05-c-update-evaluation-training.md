@@ -217,3 +217,31 @@ evidence/2026-11-05-b-group-bootstrap-g30-s20.json. Đây là uncertainty cho
 comparison khác budget, chưa thay uncertainty của NEXT-05.
 NEXT-04: T4 Colab/source đã sẵn sàng; HF token bị401 trước download, đang chờ
 người dùng nhập credential read hợp lệ trong getpass(BLK-20261105-02).
+
+### Gaussian20 inference và đối chứng CPU — 05/11, trước khi nhận output
+
+HF xác thực/checksum đã pass; smoke4/t3 pass và full83/t300/seed17 bắt đầu.
+Phần CPU dùng UUID join, giữ fold đã đăng ký bằng thứ tự index CSV rồi ánh xạ
+vào vị trí artifact; không dựa vào row order hoặc labels để ghép patient group.
+Các candidate raw theo thứ tự: Gaussian20 difference, Gaussian20 localSSIM,
+Simplex20 difference, Simplex20 localSSIM; brightness là control loại khỏi
+selection. Chọn AP cao nhất trên calibration40; tie ưu tiên candidate đứng trước.
+Fit threshold image/pixel trên calibration, lưu selection trước holdout43.
+Ghi riêng full83 descriptive với threshold fit trên full83; không ghép hai bảng.
+Bootstrap1000/seed17 trên cùng25holdoutgroups, reference Gaussian20 localSSIM,
+candidates Simplex20 localSSIM và brightness; mọi threshold giữ nguyên.
+Fusion khác budget đã báo riêng, không đưa vào raw matched-budget selection này.
+Kiểm full83 Simplex outputs với evidence đã tái lập làm regression thực dữ liệu.
+Không dùng kết quả để mở test hoặc tự chọn/freeze protocol cuối.
+
+### Handoff hoàn tất — 06/11/2026
+
+NEXT-04/05 và uncertainty cho matched comparison đã hoàn tất:Gaussian20 full83
+receipt được kiểm SHA, đối chứng cùng18.760updates với Simplex20, UUID join và
+calibration/holdout40/43;1000bootstrap/999valid. Gaussian20localSSIM được chọn
+bằng calibration;holdout AP .099777 so với Simplex .087416;deltaCI bao gồm0.
+Artifact/checkpoint private đã chuyển từ Downloads vào runs/checkpoints;Colab
+ngắt runtime. Không cần train lại để bổ sung bảng cùng budget này.
+Review feature A/B mới của C ở C_HF_REVIEW_2026-11-05.md. Nhiệm vụ tiếp theo là
+nhóm review kết quả/giả thuyết cải tiến và chọn một control có budget rõ ràng;
+NEXT-07 vẫn có điều kiện, không tự bắt đầu training từ các số validation này.

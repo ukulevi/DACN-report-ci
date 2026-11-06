@@ -1037,3 +1037,26 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
 - Checks: full CPU suite166passed/28.38s; bootstrap CLI help runs. Colab HF
   authentication later returned401 before data/model download; handoff recorded
   as BLK-20261105-02. No credential copied into chat/repository.
+
+## 2026-11-06 — Finish B Gaussian20 handoff, matched evaluation and C review
+
+- Gaussian20 inference finished83/83 on05Nov,1049.814s. User-downloaded132MB
+  checkpoint and16MBprivate bundle moved into ignored project folders; verified
+  SHA before accepting local results. Colab runtime disconnected after handoff.
+- Completed CPU same-budget Gaussian20/Simplex20 evaluation, frozen calibration
+  selection/thresholds, UUID-group alignment and1000paired group replicates
+  (999valid). Pixel AP .099777/.087416; deltaCI includes0. Full83 Simplex metric
+  regression matches prior evidence. Recorded manifest, spatial and matched
+  aggregate JSON; source/private arrays and credentials remain uncommitted.
+- Reviewed C HF revision73552266:202manifest-artifact hash comparisons match;
+  evaluated feature A/B and condition controls from producer JSON. Added review
+  distinguishing implementation success from small/unconfirmed quality gains.
+  No independent feature-model reconstruction performed.
+- Resolved BLK-20261105-02 with actual authentication/run evidence. Keep
+  BLK-20261101-02 Investigating. No new model training, test-set tuning or Linear
+  status update. Added reproducible CPU analysis driver; checks recorded below.
+- Final checks06Nov:166tests passed43.65s;Ruff check/format and git whitespace
+  check passed.16cloud/local Gaussian20 aggregate metric comparisons within1e-10;
+  calibration winner verified; new evidence scanned for HF credentials/private
+  UUIDs. Checkpoint/bundle ignored by Git. CPU driver help works. No new run was
+  started merely to repeat an already completed experiment.
