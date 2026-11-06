@@ -1,5 +1,7 @@
+import argparse
 import csv
 import hashlib
+import io
 import json
 from pathlib import Path
 
@@ -9,6 +11,11 @@ from sklearn.model_selection import StratifiedGroupKFold
 
 from dacn.data.shards import ShardDataset
 from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+from dacn.evaluation.validation import evaluate_maps
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--metrics-only", action="store_true")
+args = parser.parse_args()
 
 root = Path("runs/audit-2026-11-06")
 out = root / "b-ddim-bootstrap-results.json"
@@ -23,11 +30,9 @@ def manifest(p):
 
 def cache(prefix, name):
     p = Path(try_to_load_from_cache("dacn-bmad-team/dacn-runs", prefix + name, revision=rev))
-    assert (
-        hashlib.file_digest(p.open("rb"), "sha256").hexdigest()
-        == manifest(prefix)["artifacts"][name]
-    )
-    return np.load(p, allow_pickle=False)
+    payload = p.read_bytes()
+    assert hashlib.sha256(payload).hexdigest() == manifest(prefix)["artifacts"][name]
+    return np.load(io.BytesIO(payload), allow_pickle=False)
 
 
 a = cache(base, "comparison/private_ablation.npz")
@@ -70,6 +75,57 @@ maps["naive_stitch_lpips"] = b["naive_stitch_lpips"][hold]
 metrics = {k: results[k]["group_holdout"]["pixel"] for k in maps if k != "naive_stitch_lpips"}
 metrics["naive_stitch_lpips"] = nr["group_holdout"]["pixel"]
 thresholds = {k: v["threshold"] for k, v in metrics.items()}
+if args.metrics_only:
+    candidates = {k: a[k] for k in ["autoddpm_lpips", "initial_lpips_only", "brightness"]}
+    candidates["naive_stitch_lpips"] = b["naive_stitch_lpips"]
+    report = {
+        "status": "completed",
+        "test_used": False,
+        "model_revision": rev,
+        "calibration_samples": 40,
+        "holdout_samples": 43,
+        "holdout_groups": 25,
+        "scope": "Replay cached score maps; no new model inference; exploratory validation",
+        "candidates": {},
+    }
+    for name, values in candidates.items():
+        reference = nr if name == "naive_stitch_lpips" else results[name]
+        fitted = evaluate_maps(
+            values[cal], a["masks"][cal, 8:-8, 8:-8], labels[cal], split="validation"
+        )
+        frozen = {level: fitted[level]["threshold"] for level in ("pixel", "image")}
+        measured = evaluate_maps(
+            values[hold],
+            a["masks"][hold, 8:-8, 8:-8],
+            labels[hold],
+            split="validation",
+            thresholds=frozen,
+        )
+        for level in ("pixel", "image"):
+            for metric in (
+                "auroc",
+                "average_precision",
+                "auprc",
+                "precision",
+                "recall",
+                "f1",
+                "threshold",
+            ):
+                if metric in measured[level]:
+                    assert np.isclose(
+                        measured[level][metric],
+                        reference["group_holdout"][level][metric],
+                        atol=1e-10,
+                        rtol=0,
+                    ), (name, level, metric)
+        for metric in ("pixel_dice_macro_lesion_slices", "empty_mask_pixel_false_positive_rate"):
+            assert np.isclose(
+                measured[metric], reference["group_holdout"][metric], atol=1e-10, rtol=0
+            )
+        report["candidates"][name] = {"calibration": fitted, "group_holdout": measured}
+    (root / "b-full-metrics-results.json").write_text(json.dumps(report, indent=2, allow_nan=False))
+    print("All four candidates matched image/pixel metrics and calibration thresholds")
+    raise SystemExit(0)
 report = paired_group_bootstrap(
     a["masks"][hold, 8:-8, 8:-8],
     maps,

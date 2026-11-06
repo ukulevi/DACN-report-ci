@@ -1,5 +1,17 @@
 # Worklog
 
+## 2026-11-06 — Complete full metric replay and prepare group execution
+
+Extended the provenance replay script with metrics-only mode. Ran CPU replay:
+calibration thresholds refit only on the same 40 calibration slices; all four
+cached-score candidates matched C's image/pixel AUROC/AP/P/R/F1, thresholds,
+macro lesion Dice and empty-normal FPR to 1e-10 on 43 holdout slices. Saved
+aggregate receipt; no new inference, GPU or held-out test. Role boundaries no
+longer block work. Added FINAL_EVALUATION_CANDIDATE with measured settings,
+controls, remaining provenance and runner requirements; explicitly not frozen.
+Ruff check/format and git diff --check passed. Next shared tasks are resume
+verification and freeze/test setup.
+
 ## 2026-11-06 — Review tiến độ sau tích hợp
 
 Fetch GitHub và kiểm live HF: revisions không đổi. GitHub Actions xác nhận 3

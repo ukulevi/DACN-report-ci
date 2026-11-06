@@ -53,6 +53,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   hash và mode inference; Modal continuation kiểm hash last/best trên bytes thực
   và chép đúng bytes đã xác minh vào run mới. 19 test liên quan đạt, Ruff đạt.
   Prefix lịch sử thiếu sidecar sẽ bị từ chối resume và cần tạo lại.
+- **Progress toàn bộ nhóm:** B đã đối chiếu cả image/pixel AUROC/AP/P/R/F1,
+  thresholds, macro lesion Dice và normal FPR từ 4 cache với C; tolerance 1e-10,
+  tất cả khớp. Không cần bàn giao theo role để tiếp tục các việc A/C. Remaining
+  acceptance tập trung source/cache guard và runner/freeze, không còn thiếu metric replay.
 - **Review mới:** GitHub CI tại `9aa42c5` đã success trên môi trường data/dev.
   Còn thiếu donor/source identity của prefix, binding hash cache/sidecar,
   checkpoint load/hash cùng snapshot, và test trực tiếp orchestration continuation.

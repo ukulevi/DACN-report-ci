@@ -1,5 +1,17 @@
 # Experiment and result tracking
 
+## 2026-11-06 — Full image/pixel metric replay
+
+Status: completed. CPU replay of cached DDIM final LPIPS, initial LPIPS, naive
+stitch LPIPS and brightness. Same HF revision fae9b50, 40 calibration / 43
+holdout validation slices, 25 holdout groups; seed 17 partition. Refit thresholds
+on calibration only and compare image/pixel AUROC/AP/P/R/F1, Dice and normal FPR
+with C's immutable results. All four candidates matched with absolute tolerance
+1e-10, including calibration-derived thresholds, macro lesion Dice and normal FPR.
+No GPU, inference or held-out test. Reused the prior verified data/index alignment.
+[Aggregate receipt](evidence/2026-11-06-b-full-metrics-results.json), reproduced by
+`python docs/evidence/2026-11-06-b-ddim-bootstrap-replay.py --metrics-only`.
+
 ## 2026-11-06 — B CPU replay / paired bootstrap
 
 Status: **completed**. Validation only, source HF revision `fae9b50a4b78114fb51d87e803c77d019668f523`, dataset revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`. DDIM final LPIPS, initial LPIPS, naive stitch LPIPS and brightness; fixed calibration thresholds, patient-group paired bootstrap seed 17, 1,000 draws, 999 valid (one lacked a class), 25 patient groups / 43 slices. No held-out test or GPU.
