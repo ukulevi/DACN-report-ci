@@ -67,6 +67,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   Prefix gắn checksum NPZ + source digest + donor index; evaluator load checkpoint
   từ cùng captured bytes được hash. 24 test liên quan đạt. Chưa chạy remote Modal;
   helper verification không tương đương kiểm chứng toàn bộ orchestration.
+- **Chuẩn bị runner cuối:** frozen-input gate có test CPU cho candidate, thiếu
+  pin, revision mutable, threshold NaN và artifact bị thay. Candidate JSON giữ
+  source/LPIPS/dependency pins chưa xác minh ở null. Gate chưa nối inference;
+  cần lấy weights hashes từ môi trường thực tế, không coi candidate là freeze.
 - **Action needed:** Review tích hợp và xác nhận manifest/schema trên artifact
   thực tế, pin dependency/weights cho runner cuối. Donor index/source digest không
   thay dataset revision/hash shard: nếu dùng normal-donor trong shortlist phải

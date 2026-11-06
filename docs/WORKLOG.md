@@ -1,5 +1,14 @@
 # Worklog
 
+## 2026-11-06 — Add frozen-input boundary for the future final runner
+
+Added CPU-only capture_frozen_inputs: rejects candidate/mutable revision,
+incomplete pins, non-finite thresholds and changed artifacts; returns exact
+verified bytes. Added measured candidate JSON with null pending source/LPIPS/
+dependency pins. Local LPIPS package/cache unavailable; no fabricated hashes.
+11 freeze/checkpoint tests passed; Ruff check/format and diff check passed.
+The gate is not yet wired to final inference, and no test split/GPU was opened.
+
 ## 2026-11-06 — Verify continuation capture and bind prefix payload
 
 Extracted continuation capture/write logic used by Modal into a CPU-only helper.

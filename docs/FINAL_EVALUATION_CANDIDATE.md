@@ -3,6 +3,19 @@
 Trạng thái: **candidate, chưa frozen, chưa cho phép mở test**. Nhóm làm chung,
 thứ tự công việc dựa vào prerequisite thay vì chờ người mang role A/B/C.
 
+Manifest máy đọc: [final_evaluation_candidate.json](../configs/final_evaluation_candidate.json).
+Các pin chưa xác minh để `null`; không điền hash suy đoán. Gate
+`dacn.evaluation.frozen_inputs.capture_frozen_inputs(manifest, artifact_paths)`
+kiểm status/schema, immutable dataset revision, artifact hashes và finite
+thresholds, rồi trả lại captured bytes. Runner tương lai phải dùng đúng bytes
+này, không đọc lại file paths. Gate chưa nối với inference runner và không tự
+chạy test. Đây chỉ là contract final LPIPS; controls cần contract riêng.
+
+Gate yêu cầu source snapshot, config, checkpoint, LPIPS backbone/calibration,
+dependency lock, validation index và mask parameters. Các file private ở runtime;
+manifest chỉ chứa hash và thông số tổng hợp. LPIPS hiện chưa cài tại local và
+không có weights trong cache được kiểm tra; cần chụp hashes từ môi trường thực thi.
+
 ## Bằng chứng đã hoàn thành
 
 Replay pixel/image AUROC, AP, Precision, Recall, F1, threshold, macro lesion Dice

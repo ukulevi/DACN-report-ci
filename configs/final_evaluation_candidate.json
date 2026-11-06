@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "status": "candidate",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
+  "artifacts": {
+    "source_snapshot": null,
+    "config": "1d731fe0b773df643a5d03f19dd84a85ae2de3c0347783186a84c0f5c6e69c9f",
+    "checkpoint": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+    "lpips_backbone": null,
+    "lpips_calibration": null,
+    "dependency_lock": null,
+    "validation_index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+    "mask_parameters": "39ee181e3c783fa516c3f2f1294de31aab8239eb09ce9bed3c287872aef8bd16"
+  },
+  "thresholds": {
+    "pixel": 0.26617634296417236,
+    "image": 0.24719371760470998
+  },
+  "pending": [
+    "Pin execution source snapshot after changes",
+    "Capture actual LPIPS backbone and calibration weights",
+    "Pin dependency lock for execution environment"
+  ],
+  "scope": "Candidate for final LPIPS scoring only; controls require their own frozen contracts; no test authorization from this file"
+}
