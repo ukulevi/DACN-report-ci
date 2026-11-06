@@ -1,0 +1,15 @@
+{
+  "epochs": 1,
+  "batch_size": 2,
+  "seed": 17,
+  "unet_lr": 0.00001,
+  "encoder_lr": 0.0001,
+  "projection_lr": 0.0001,
+  "ema_decay": 0.9992,
+  "checkpoint_epochs": [1],
+  "log_every_steps": 2,
+  "max_train_samples": 16,
+  "max_normal_validation_samples": 4,
+  "source_run_id": "ddpm-partial-t4-b8-e30-cont-20261102T034644Z",
+  "source_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946"
+}

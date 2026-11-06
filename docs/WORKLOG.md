@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-11-06 — Integrate C into B and repair CI collection
+
+Merged C `c02addb` into B `5aa4823`, preserving both result/worklog histories.
+Torch-dependent test modules now skip when the optional dependency is absent;
+epsilon-MSE comparison permits float32 reduction rounding. Branch push now
+triggers CI, and a Markdown code block was formatted for Ruff. On Windows with
+distinct writable basetemp outside sandbox: data/dev environment 121 passed,
+22 skipped; Torch environment 237 passed. Sandboxed default temp runs produced
+fixture permission errors and are not reported as passing. Private-cache and
+checkpoint guard review remains open in BLK-20261106-01; no new MRI/GPU run.
+
 ## 2026-11-06 — Start B replay
 
 Downloaded private DDIM and naive-stitch validation caches; their SHA-256 values match C's manifests. CPU replay completed with image/mask/index alignment and metric checks, followed by paired group bootstrap (999 valid/1,000); results and caveats are tracked in RESULT_TRACKING. Two group-bootstrap unit tests passed. No GPU or test split used.
@@ -19,6 +30,38 @@ Kiểm tra cuối: JSON hợp lệ, 94/94 checks matched, không có UUID/token 
 patient/sample identity trong evidence; local documentation links và git diff --check pass.
 Chưa merge source C, chưa thay Linear status/owner; bước tiếp là integration và
 private-cache reproduction trước paired bootstrap/freeze.
+### 2026-11-06 — Implement frozen RAD-DINO score comparison
+
+- User requested RAD-DINO. Pinned official public weights revision and processor;
+  added frozen blocks3/6/9/12 patch distance, equal mean raw primary and fixed
+  normal-calibration secondary on immutable finalDDIM20+30 pairs; LPIPS control.
+- Added bounded T4 runner with strict loading/source alignment, private artifacts
+  and fixed protocol. No training or new reconstruction. CPU targeted8tests
+  passed in3.82s; full suite182tests passed in30.37s; Ruff and whitespace passed.
+- Modal smoke completed with strict weight load, zero identical-pair distance
+  and no scale floors; full83completed. PixelAP raw RAD-DINO .289211 vs LPIPS
+  .312330; normal-calibration .284124. Full metrics/provenance in RESULT_TRACKING.
+
+### 2026-11-06 — Check full83 calibrated LPIPS results
+
+- Verified completed/uploaded Modal manifest and aggregate JSON checksum.
+  Recorded all four arms' pixel/image AP, AUROC, P/R/F1, normal FPR and runtime.
+- Calibration did not improve primary holdout PixelAP (.312330→.307160);
+  final re-sampling LPIPS exceeded naive stitching (.312330 vs .180593).
+  Interpretation is exploratory on inspected validation; test remains sealed.
+- Documentation only; no new GPU jobs. Exact checksum and numerical control
+  checks performed; no implementation change requiring another test suite.
+
+### 2026-11-06 — Implement normal-calibrated LPIPS scoring trial
+
+- Added seven-layer extraction/replay checks, normal-calibration-only median/IQR
+  statistics, equal-weight calibrated score, original LPIPS and naive-stitch
+  controls on immutable final DDIM20+30 cache; no training/reverse calls.
+- Added T4 runner with source/index/weights checksums and private artifact storage,
+  fixed protocol and five meaningful calibration/replay/isolation tests.
+- Validation: targeted5 tests passed; complete suite179 passed in28.30s.
+  Smoke completed with zero layer-sum/cache replay error and no scale floors;
+  full83started detached with same protocol. Actual provenance/status in RESULT_TRACKING.
 
 This log records completed repository work. Linear remains the source of task
 status; this file records changes and evidence, not a second task board. Keep
@@ -39,6 +82,504 @@ artifacts when known. Do not put credentials, patient identifiers, or private
 source data in this file.
 
 ## Entries
+
+### 2026-11-06 — Review test.md and separate encoder roles for perceptual research
+- Changes: Added LPIPS_ENCODER_RESEARCH.md answering the requested foundation
+  model, attention, multi-contrast and A–D experiment questions, with primary
+  links, input/license/weights readiness, formulas, layer taps, relative compute
+  and a staged implementation plan. Incorporated the user's SqueezeNet baseline /
+  RAD-DINO cross-domain / brain-MRI-domain hypothesis table and architecture controls.
+- Evidence: Inspected official LPIPS, RadImageNet, RAD-DINO, MedSAM, RadFM,
+  BrainFound, BrainDINO, MM-DINOv2 and 3DINO sources/model cards. RAD-DINO is CXR;
+  some MRI artifacts are not runnable from the sources checked; 3DINO is gated
+  with a separate license; arXiv2608.28773 is withdrawn. RadImageNet weight bytes,
+  exact processor and strict load were not verified; did not claim they were.
+- Recommendation: Normal-calibrated per-layer perceptual scoring on fixed
+  DDIM20+30 final pairs, followed by controlled medical-encoder comparisons.
+  No new AP prediction or claim of novelty; all A–D remain proposals.
+- Checks: Local baseline values, Markdown links and whitespace. Documentation
+  only; no unit tests, new pretrained downloads, training, GPU calls or final test.
+
+### 2026-11-06 — Verify completed DDIM20+30 four-score ablation
+- Evidence:Full83completed/uploadedceba5af6;root aggregate SHA matches manifest,
+  exactsmokesource/config,all83callcounts50,4150U-Net/166LPIPS,onephase2pass,
+  outsideerror0,no-testflag. Recorded all8currentpixel/image arms,matched vs
+  historical controls,maskcoverage,timing scopes and privateexample availability.
+- Findings:FinalLPIPSAP0.312330/Dice0.371215 vs matchedinitialDDIM20LPIPS
+  0.157876/0.246871. FourrequiredAPs0.090936/0.099569/0.312330/0.196812;
+  no suppressed arms or post-hoc design selection. Naive-stitchL1 andfinalL1
+  AP are nearlyequal;naive-stitchLPIPS unmeasured,so avoid over-attributing gains
+  to learnedinpainting. BrightnesspixelAP0.389506 remainshigher.
+- Checks:Result checksum/count/no-test/numeric records andwhitespace only,no
+  newunit/GPUrun. Updated report/tracking/conclusions. Actualdenoisingmean1.462s
+  perimage,rootjob186.571s;9.1875xspeed reference is onlytwohistoricalT4samples,
+  not83image end-to-end speed. Independentmethod confirmation remainsfuturework.
+
+### 2026-11-06 — Launch authorized full DDIM20+30 ablation
+- User approved full83after concrete50-callsmoke. Launched detached
+  autoddpm-ddim2030-full83-t4-20261106T074200Z,
+  appap-98lEz64JkA8I5USQcgE4CR with unchangedJSONpreset and source. Fourrequired
+  matchedscore rows share the finalDDIM30image;onephase2pass,notfive repeats.
+- Evidence:Modal initialized and createdrun_ddim_ablation_remote. Existing174tests
+  and successfulsmoke remain applicable;no source edits or newtests for launch.
+- Durablemanifest confirmsrunning07:42:26UTC,TeslaT4,20+30,repeats1,exactsmoke
+  source hash and no-testflag.
+- Next:Check artifacts on user request. No training,
+  finaltest or continuing monitoring;fullmetrics pending.
+
+### 2026-11-06 — Apply supplied testing_Lpips.md DDIM20+30 requirements
+- User asked to read test_lpips.md;found actualdocs/testing_Lpips.md and read it
+  in full. It supersedes the earlier10+10x5proposal with exact20+30U-Net budget,
+  onephase2pass,four matched scoring arms and explicit full83authorizationgate.
+  Preserved that supplied document and completedolder smoke;no oldfulljob started.
+- Changes:Added validated flatJSONpreset,explicit uniform endpoint-correct grids,
+  DDIM20initial/DDIM30singlepass,four-arm scores usingactualfinalLPIPS/final
+  normalizedresidual,samefinaltensor for3AutoDDPMscores,initial/historical controls,
+  calibrated mask/thresholds,private examples,component timing and hooked callcounts.
+- Checks:174tests passed17.66s,targeted Ruff/format,whitespace. Five newtests
+  verify20/30grids,actual50calls/context,four score identities,LPIPSfinalnotinitial,
+  fixedonepassconfig. Previous10+10x5smoke completed/uploadedd3d088ed with1510calls,
+  exactancestralreplay and noAP;aggregatehashverified,retainedtimingreference.
+- Attempt:newautoddpm-ddim2030-smoke-t4-20261106T073737Z completed/uploadedac8aaaa0,
+  appap-mSM7Tlr1zK7LHFEEoS2fiu;rootresultchecksumverified. Bothoutputs50calls,
+  onephase2pass,outsideerror0,23LPIPS/480totalU-Netcalls incl380calibrationextra.
+  Denoising-only2image speedup8.7275x vs prior matchedancestral timing;not83image
+  end-to-end speed. No smokeAP. Recorded actualcounts,timings,scope,config/source
+  hashes and privateartifact provenance;no source change after successful smoke.
+- Full83notstarted,must await explicit confirmation after smoke,as suppliedtask
+  requires. Exact reviewable command and protocol inAUTODDPM_DDIM20_30.md.
+
+### 2026-11-06 — Implement DDIM acceleration for both AutoDDPM phases
+- Changes:Added eta0 arbitrary reverse jumps and cumulative-alpha forward gap
+  re-noising for masked re-sampling. Phase1ten DDIMcalls at t300,phase2tenjumps
+  x5repeats at t50;preserve seed/RNG/context contracts. Extended shared evaluator
+  with explicit sampler pair and synchronized inpainting timings. Added cached
+  ancestral,phase2-only and both-phase comparison,T4 lifecycle,exact U-Net hook
+  counts,two-image fresh ancestral timing/cache replay and calibrated maskrule.
+- Checks:169tests passed18.88s,targeted Ruff/format and whitespace. Six newtests
+  verify multi-step/clean-terminal forward gaps,existing DDIM clipping parity,
+  shared phase1noise/ten calls,phase2fifty calls/context/RNG,oracle inversion,
+  invalid indices/repeats and empty-mask preservation. No new mask design chosen.
+- Attempt:autoddpm-ddim-smoke-t4-20261106T072722Z,
+  appap-ghqmk2bcm1tRiBMyajKhEu started;timing/finite/cache replay pending.
+- Next:After bounded smoke,requested full83sampler-speed comparison. Do not
+  equate theoretical550/60NFE with actual full-pipeline wall-clock acceleration.
+
+### 2026-11-06 — Verify LPIPS-only attribution and pseudo-mask error audit
+- Evidence:Full83audit completed/uploaded3b82d8b2;rootresultSHA matches manifest,
+  productreplayerror0,pseudo-mask exact across83;zeroDDPM/re-sampling calls.
+  Recorded newscore pixel/image AUROC/AP/P/R/F1,diagnostic strata and private
+  panel availability. Four private images remain remote,not visually reviewed.
+- Findings:LPIPS-onlypixelAP0.266899/Dice0.339668 vs product0.204298/0.274354,
+  weightedfinal0.154785/0.226256,brightness0.389506/0.268051. Pseudo-mask misses
+  16.2459percent lesion pixels includingcore;74.8201percent of itsFP count lies
+  inotherforegroundinterior. Distinguish area counts from rates and pseudo-mask
+  from calibrated final score threshold. No anatomical labels or matchedrecall claim.
+- Checks:Verified checksum/status/83samples/no-testflag,FP/lesion-strata count
+  consistency,numeric records and whitespace. Record-only edits,no unit rerun,
+  new GPU run,mask redesign or independent-test evaluation.
+
+### 2026-11-06 — Begin user-selected perceptual/mask research roadmap
+- Changes:Recorded four-stage roadmap with explicit no-holdout-design-selection
+  rule and independent-confirmation requirement. Implemented steps1/2 only:
+  LPIPS-only/normalized-residual ablation on cached original reconstructions,
+  exact product/mask replay,normal-calibration gradient threshold,post-hoc
+  lesion geometry/component and disjoint FP proxy strata,private fixed examples.
+  New T4 lifecycle uses no diffusion calls and preserves source artifact hashes.
+- Checks:163tests passed19.55s,targeted Ruff/format and whitespace. Five new
+  tests cover exact original product reproduction,gradient-fit leakage,
+  exhaustive/exclusive proxy regions,lesion/component misses and normal FP counts.
+- Attempt:smokeperceptual-audit-smoke-t4-20261106T065148Z,
+  appap-FvyVHTJjk0cuYi4Hso4zJw completed/uploaded402250a5;aggregate checksum
+  verified,originalproduct replayerror0,pseudo-maskexactmatchTrue,no AP from2samples.
+  Elapsed5.726s,peak45882880B,source4689409edc64b047b0822dfe966e377fda4e0fcd4c4f398eab19a11365f2e297.
+- Next:requested83image explanatory audit launched detached after smoke. No mask redesign or
+  independent-test run;do not choose a new method from inspected holdout ranking.
+  Runperceptual-audit-full83-t4-20261106T065328Z,appap-VmGU48SYKuWh8W685WGCf6;
+  durable manifest confirmsrunning,TeslaT4,source identical to smoke,zeroDDPM calls.
+
+### 2026-11-06 — Publish memory fusion and LPIPS AutoDDPM findings to Git
+- User requested pushing the latest measured results. Collected implementation,
+  tests, fixed protocols and full memory-bank/LPIPS AutoDDPM aggregate reports
+  on `feat/anoddpm-notebook-training`; preserved the supplied method document.
+- Evidence: Existing full suite158passed and both smoke/full GPU attempts are
+  recorded above. No implementation edits since those checks; no test rerun or
+  new GPU run for this publication. Reviewed staged files, whitespace and
+  credential patterns; private data, banks, weights and run arrays stay ignored.
+- Scientific conclusion preserved: initial LPIPS x residual scoring beats final
+  re-sampling scores in this exploratory fold; brightness still has higher AP.
+
+### 2026-11-06 — Verify full LPIPS AutoDDPM validation outcome
+- Evidence:Completed/uploadedbab00576 for83samples;verified aggregate JSON SHA
+  against manifest,source/checkpoint/cache hashes,normal-calibration mask
+  threshold and no-test flag. Recorded all8pixel/image metric arms,mask coverage,
+  normal ROI and timing. No new GPU job,training,threshold search or unit rerun.
+- Conclusion:Primaryweighted finalAP0.154785 improves baseline0.101066,finalSSIM
+  0.149446 improves0.102402,but initialLPIPSxresidual heatmapAP0.204298 is higher
+  than any re-sampled arm. Absolute re-samplingAP0.129407 vs naive stitch0.118781
+  is a modest incremental gain. Brightness pixelAP0.389506 remains stronger.
+  Maskrecall83.7541%/precision13.3407%;outside-context error0 is imposed.
+- Records:Updated protocol,full results and consolidated conclusions;numeric
+  and whitespace checks only. Treat results as exploratory on inspectedvalidation.
+
+### 2026-11-06 — Implement LPIPS pseudo-mask/stitch/re-sample on Gaussian EMA30
+- Changes: Added frozen spatial SqueezeNet LPIPS0.1 mask branch on verifiedt300
+  cache,normal-calibration95percentile mask threshold,existing50step x5repeat
+  tested inpainting sampler,strict outside-context check and naive-stitch control.
+  Eight fixed score arms,calibration-only score thresholds,private prefix/maps
+  and T4 smoke/full lifecycle;no DDPM training. Documented departures from
+  official AutoDDPM and prior unsuccessful t200 SSIM-proxy trial.
+- Checks:158tests passed18.44s,targeted Ruff/format and whitespace passed.
+  New tests cover LPIPS range/channel/crop,normal-only mask calibration leakage,
+  fixed threshold/dilation. Existing sampler tests cover RNG/context/repeats.
+- GPU attempt:bounded2image smokeautoddpm-lpips-smoke-t4-20261106T061700Z,
+  appap-852Pcx7xpt7qW71tJ7MVbD completed/uploaded87d0943c;real LPIPS outputs
+  finite,outside-maskerror0,threshold0.13774138689,elapsed24.315s,no AP. Verified
+  aggregate result checksum against manifest. Exact sourceb4a1fb55cfed8acb8aaa2004b04ae76e581e6f0b05d71e4bc07a7f7f4bea18b2.
+- Next:Full83comparison launched detached asautoddpm-lpips-full83-t4-20261106T061833Z,
+  appap-Q53OLMLNmmu3h6rZCVv2cV,same implementation;metrics pending.
+  Durable manifest confirms running,TeslaT4,source identical to smoke,1/83.
+  No final test or retraining. Check on user request,not continuous monitoring.
+
+### 2026-11-06 — Verify completed full normal memory fusion results
+- Evidence: Full run completed/uploaded01c5995f; verified downloaded aggregate
+  result SHA against manifest,all7500normal train/10000bank/83validation,
+  exactsource and no-test flag. Recorded six-arm pixel/image metrics,20normal
+  calibration normalization,recall operating points,bank hash and timing.
+- Conclusion: absolute-fusion pixelAP0.102374 vs baseline0.101066 is a tiny gain;
+  SSIM-fusion0.087033 vs0.102402 declines. Memory-only pixelAP0.064212 but imageAP
+  0.822745: distinguish image ranking from localization, and note calibrated
+  image threshold predicts allholdout images positive. Brightness pixelAP0.389506
+  remains much stronger. Updated protocol/report and tracking from real artifacts.
+- Checks: Result checksum/status/numeric records; whitespace for record-only
+  edits. No new tests,training,GPU inference,alpha tuning or final-test access.
+
+### 2026-11-06 — Launch authorized full DDPM memory fusion validation
+- User explicitly approved the full run after the successful bounded smoke.
+- Launched detached `memory-fusion-full83-t4-20261106T055134Z` on team T4,
+  app `ap-UiDz4LoIR7Zey5Ld1cUuoA`. Fixed seed17/alpha0.5; all7500normal
+  training slices,10000-vector bank,83validation samples and existing40/43
+  calibration/group holdout. Reuses Gaussian EMA30 ancestral t300 cache.
+- Evidence: Durable manifest confirms running at05:51:56UTC,TeslaT4,bank10000,
+  no train subset cap and no test use; exact source hash matches successful smoke.
+  Source/config unchanged since155-test/smoke checks. No new unit run for launch-only work.
+- Next: Check artifacts on user request; no continuous polling or new experiment.
+
+### 2026-11-06 — Implement frozen normal memory bank fusion with DDPM
+- Changes: Added frozen official ImageNet grayscale ResNet18 layer2/layer3
+  extraction, normal-train-only random bank construction/persistence/checksums,
+  bounded exact neighbor search, padded-grid/crop alignment and separate fixed
+  alpha0.5 absolute/SSIM fusion. Reused verified Gaussian EMA30 cache without
+  changing DDPM training or sampling. Added normal-calibration median/IQR,
+  frozen thresholds/recall operating points, six-arm grouped evaluation and
+  private maps/predictions/examples. Preserved user method specification.
+- Checks:155 tests passed17.48s, targeted Ruff passed, whitespace checked. New9
+  tests cover frozen BN/feature dimensions, deterministic chunk-independent
+  sampling, foreground/alignment, exact neighbors, bank metadata/checksum,
+  normal-only guard, normalization leakage, recall threshold and cache ordering.
+  T4 smoke16normaltrain/128bank/2validation completed/uploaded56552b57;
+  finite aligned fusion maps and bank roundtrip passed, no AP measured.
+- Next: Full7500normal/10000bank/83validation is explicitly gated by the supplied
+  method specification. Exact command and caveats in DDPM_MEMORY_FUSION.md.
+
+### 2026-11-06 — Prepare research implementation and results for Git push
+- Changes: Collected global A/B and spatial conditioning, matched unconditional
+  fine-tuning, condition ablation, K4 uncertainty scoring, configs, tests and
+  experiment reports on `feat/anoddpm-notebook-training`. Included the existing
+  method specification without changing its contents.
+- Checks: Full suite passed (146 tests, 28.76s); Ruff passed for cloud,
+  evaluation, training, tests and new conditioning models. Reviewed U-Net diff,
+  checked whitespace and scanned code/configs/docs/tests for credential patterns.
+  Checkpoints, private MRI data and local run artifacts remain ignored.
+- Next: Commit and push the current research branch as requested; no GPU run.
+
+### 2026-11-06 — Verify K4 uncertainty results and scoring tradeoffs
+- Changes: Recorded completed83image/K4 inference,all249new reconstructions,
+  six-score pixel/image metrics,normal calibration parameters,quality/variance
+  diagnostics and private provenance. Updated uncertainty and consolidated reports.
+- Evidence: Completed/uploadedaf0bf4006db4c948292b9bc50748073e1b421bb4;
+  resultSHA matches manifest,sourcecheckpoint/83samples/sealed-test flag verified.
+  PixelAP singleabs0.101066,mean4abs0.103810,normalized0.045729,Mahalanobis
+  0.077657. Normalized imageAP0.720711 improves image ranking but not segmentation;
+  existing brightness imageAP0.770309 remains higher. Parameters fit20normalcal
+  only. Timing counters indicate resumed prefixes;report fullwall41.80min rather
+  than finalattempt7.83min as whole-job latency.
+- Checks: Numeric/link/whitespace checks for record-only edits;no unit rerun,new
+  GPU inference/training or test access. Do not claim normalization improves AP.
+
+### 2026-11-05 — Implement K4 uncertainty scoring on original Gaussian EMA30
+- Changes: Added fixed4draw mean/unbiased variance,normal-calibration variance
+  floor and shrinkage9D signed3x3patch Mahalanobis,sixscore controls,grouped
+  thresholds and score/variance diagnostics. Added atomic per-draw prefix caches,
+  calibration parameter freeze before holdout,T4 smoke/full lifecycle and private
+  uploads. Reuses baseline draw1;only3new draws per image,no training/encoder.
+- Evidence/checks:146tests passed27.89s,targeted Ruff/format and whitespace
+  passed. New6tests verify mean/variance,normal-calibration-only fit invariance
+  under abnormal/holdout perturbation,singular covariance regularization,patch
+  covariance,cache provenance and threshold/calibration freeze ordering.
+- Next: Bounded2image K4/t300 T4smoke before full83. K4variance is stochastic
+  reconstruction variation,not certified uncertainty;normalization may reduce
+  lesion scores. No AP improvement claim or held-out-test access.
+- T4smoke app ap-XWKFboy5nw35LHkFTNev1O completed/uploaded
+  501d5f86ee79ddd3d81b1cfa7b62c53a620670a8. Replay errors[0,0],6newchains,
+  finite K4variance/normalized/Mahalanobis;no AP on2images. Source frozen at
+  15a90894fc8dcd6578a64256710af85604ae4fac3d1ef66e147ecd9d7f878583.
+- Full ddpm-uncertainty-k4-val83-t4-20261105T163529Z,
+  app ap-R0EC27PZnPnALYHMySkxkH started16:35:52UTC,TeslaT4. Durable manifest
+  confirms exactsource/replayerrors[0,0],draw2progress5/83. Detached client;
+  metrics pending,check on user request. No training or extra GPU experiment.
+
+### 2026-11-05 — Verify spatial grayscale completion and negative AP outcome
+- Changes: Recorded completed10epoch/9380update spatial training,selectedEMA10,
+  full83 validation,private revisions/hash checks,pixel/image metrics,quality,
+  lesion/nonlesion means and timing. Updated spatial/consolidated conclusions.
+- Evidence: Training29777bf14204bdc7b4450f2b9a0746b1a537911c and eval
+  a6e21e5c2553e683fda3e51496fdc52a31662b60 completed/uploaded. Results hash
+  matches manifest;checkpointSHA/83samples/sealed-test flag verified. Holdout
+  AP difference0.063110/SSIM0.065459 versus control0.104391/0.104004;
+  normal foreground SSIM0.688031 versus control0.295441. Lesion/nonlesion error
+  means converge;pathology retention plausible,not proven mechanism.
+- Checks: Record-only numeric/link/whitespace checks;no unit-suite rerun,new GPU
+  training/inference or test access. No AP benefit inferred from lower noiseMSE.
+
+### 2026-11-05 — Implement grayscale spatial ImageNet conditioning pilot
+- Changes: Added four-scale ResNet18 with1channel stem adapted by meanRGB
+  official ImageNet filters,removed global pooling,kept MRI[-1,1]/256geometry.
+  Added zero1x1 spatial residuals at U-Net down blocks64/32/16/8 without changing
+  baseline state keys. Shared training/loader selects spatial method,encoder/
+  fusion/U-Net optimizer groups,full-state resume,ImageNet provenance and
+  automatic matched baseline/A/B/unconditional validation. New T4 wrapper bakes
+  public weights before GPU allocation; separate smoke/full configs.
+- Evidence/checks:140tests passed17.19s,new tests cover grayscale weight mapping/
+  hash checks,feature shapes/no pooling,zero output equivalence,spatial effect,
+  gradient gate opening,encode-once reverse,RNG,inference without ImageNet
+  download,and spatial checkpoint/optimizer resume. Actual official46,830,571B
+  weights hash verified locally; adapted conv1 and expected4map dimensions
+  checked on synthetic1channel input. Targeted Ruff/format and whitespace passed.
+- Limitation: unet.py retains2pre-existing Ruff findings SIM114/PLC0206 unrelated
+  to optional spatial fusion. MRI adaptation differs from official RGB ImageNet
+  normalization; trial also changes encoder initialization/LR,so not isolated
+  spatial-only ablation. No AP result or test-set access.
+- Next: Submit bounded T4 smoke then independent10epoch/9380update pilot with
+  full83 t300 validation only after smoke succeeds. User grayscale steering
+  supersedes initial RGB-repeat plan before any GPU training.
+- GPU evidence: First2 attempts failed in CPU image build(no training),recorded
+  with cause/resolution. Smoke3 app ap-Gkt1RTxe4nYswmOMDt2AnX succeeded,
+  private revision4d47de2f38c281e14401ed80a79ab315ef5186ba,15updates,finite3step
+  reverse,3.862974s train+val,peak1710858752B. Then submitted independent full
+  spatial-imagenet-gray-t4-b8-e10-20261105T141939Z,
+  app ap-z896lVzq2nUac9XbgTsY4L,10epochs and auto83slice validation.
+- Full start14:27:12UTC,TeslaT4,durable running/training manifest,epoch0 recovery,
+  frozen source2f6c5005dd22618a4d49fa56707b9779143f12fab04467b580681cdd6c1118e8.
+  Epoch1/10 step150/938 finite loss0.008948 confirmed. Detached client;no long
+  polling or AP claim. Full results pending user-requested check.
+
+### 2026-11-05 — Verify control training and prepare matched validation
+- Changes: Recorded control completed/uploaded375bc6ba5578f5c27953f3306cecdabb531f073b,
+  epoch40/9380updates,best36/MSE0.007353029596. Added unconditional EMA loader
+  path to shared grouped evaluator, original ancestral helper with noisy arrays,
+  partial-cache resume, matched baseline/A/B comparisons and resumable T4 smoke/
+  full validation worker. Training/conditional inference defaults preserved.
+- Evidence/checks:21focused tests passed8.01s,including original-chain equality,
+  RNG preservation,actual selectedepoch36,calibration-only thresholds and partial
+  recovery for unconditional mode. Targeted Ruff passed. Profile/shared Secret
+  name verified; checkpoint SHA from completed manifest recorded before GPU eval.
+- Next: Full test suite and bounded T4 replay smoke before full83 validation.
+  No validation AP result yet; no new training or held-out-test use.
+- Full suite135tests passed12.83s,targeted Ruff/format and whitespace passed.
+  Submitted bounded smoke ddpm-uncond-val-smoke-t4-20261105T094736Z,
+  app ap-7Hot55hkZx47D5XtcOaMrd,training/checkpoint references frozen.
+- Smoke completed/uploaded0ad3619e2aa19d0d04a37069e4c750f7d263f37f,
+  original replay maxerrors[0,0],exactpaired-noise,target36 finite2image/3steps.
+  Frozen source68092ef7fe5e470d833a1ce0909c84011438e7b41414e91f1761f5dc4968c93a.
+  Then submitted full83 t300 best36 validation with matched baseline/A/B outputs.
+- Full app ap-2AEvfGt80K4eoxODBlGW4g durable start09:50:15UTC,TeslaT4,
+  exactsnapshot,checkpoint36; preflight passed,reconstruction1/83 confirmed.
+  Job subsequently completed83/83 before local disconnect; completed/uploaded
+  revision38491cba20168ac41a038e98cfaffe1bc3fb51b5,results hash matches manifest,
+  checksum/samples/sealed-test flag verified. Control holdout AP difference
+  0.104391/SSIM0.104004,nearly A0.104645/0.104247 and B0.104464/0.104084.
+  Added full metrics/timing and updated consolidated conclusions: unconditional
+  extra training explains nearly equivalent gain; no clear encoder benefit
+  established by this one-seed comparison. No extra training or test access.
+
+### 2026-11-05 — Implement unconditional EMA30 fine-tuning control
+- Changes: Added strict EMA-only warm initialization to original DDPM loop,
+  fresh optimizer/counters/best selection, metadata and epoch30 recovery state.
+  Added no-encoder trainer/configs for smoke31 and full31..40,source-checked
+  T4 lifecycle/resume. Native full-state extension safeguards unchanged.
+- Evidence/checks:22 focused tests passed4.42s; synthetic test distinguishes
+  online/EMA weights, verifies strict source/no-encoder state keys, LR1e-5/fresh
+  optimizer, source immutability, epoch31/32 resume and original loader support.
+  Wrapper rejects unmatched/unbounded budgets. Targeted Ruff passed; source
+  manifest completed/uploaded and registered epoch30 SHA verified. Shared
+  Workspace/profile and Secret name checked without credential inspection.
+- Next: Bounded smoke before independently initialized full10epoch job. No AP
+  improvement claim, automatic83-image evaluation or test access authorized.
+- Full suite133tests passed12.79s,targeted Ruff/format and whitespace passed.
+  Smoke submitted as ddpm-uncond-control-smoke-t4-20261105T082204Z after initial
+  sandbox connection failure; network retry app ap-uW93yqQAyW93cmX0gdbFuY
+  created successfully. GPU smoke results pending, source frozen for resume.
+- GPU smoke subsequently completed/uploaded73552266d80393164a2a1dcf3fb3eacbe1d15a57,
+  epoch31/15updates,16normal train/4normal-val,2image3step preview artifact.
+  Manifest confirms EMA30/freshoptimizer/noencoder,finite normalMSE0.000374397350,
+  4.466861s,peak1466632704B. Then submitted independent full epoch31..40 run;
+  frozen source03f0be1c2c2991db35952c492372b51e9cbad3afcc05307a3b60e80c0034ffd2.
+- Full run ddpm-uncond-control-t4-b8-e40-20261105T082502Z,
+  app ap-kpcgyltxZ55ANmBYWC1N2O started08:26:49UTC. Durable manifest
+  running/training,TeslaT4,epoch30 initial checkpoint. Actual epoch31/40
+  step50/938 finite loss0.008318; detached client after start confirmation.
+  Full run remains active; no AP evaluation or improvement claim.
+
+### 2026-11-05 — Authenticate requested new account and verify its T4 startup
+- Changes: After user clarification, authenticated/activated profile taitrang2005
+  through Modal browser flow. Actual Workspace taihongtran2005 verified; older
+  modal-new profile still maps to phutungcogioihaitan and was not the requested
+  personal Workspace. Recorded distinction and new startup result.
+- Evidence/checks: Profile current/list confirms active taitrang2005. Reused
+  standalone Secret-free probe; app ap-HEmpKNsuPAviG0hKdP2KzN in taihongtran2005
+  completed/stopped,statuspassed,TeslaT4/15360MiB. No HF/Volumes/training or
+  source changes. Whitespace check passed; no test-suite rerun or secrets logged.
+
+### 2026-11-05 — Minimal new-profile T4 test without project credentials
+- Changes: Added standalone modal_gpu_smoke.py with no Secret/Volume/HF
+  dependency; T4 startup and nvidia-smi only,60s function timeout.
+- Evidence/checks: Ran with --profile modal-new; app ap-t4QbkUQSa8RZ6Sc97R7us9
+  completed/stopped, TeslaT4/15360MiB/driver610.57.04,statuspassed. Ruff/format
+  and whitespace checks passed; no tensor benchmark, training or test-suite run.
+
+### 2026-11-05 — Verify Modal startup using newly added profile
+- Changes: Added short T4 access-check entrypoint with existing Secret/Volumes,
+  cache/checkpoint existence checks and private HF metadata requests. Uses
+  create_if_missing=false, prints no credentials or private sample information.
+- Evidence/checks: Explicit profile modal-new lists required resources and runs
+  TeslaT4/15360MiB successfully; both HF read checksHTTP200/private. App
+  ap-jGYAyb2PvLTaOey1nSFXb5 completed/stopped without training. Targeted Ruff,
+  format and whitespace checks passed; no unit suite rerun for startup probe.
+- Limitation: Default CLI profile remains phutungcogioihaitan; select modal-new
+  explicitly for later commands. No remaining-credit or HF write-access claim.
+
+### 2026-11-05 — Consolidate feature conditioning results in Vietnamese
+- Changes: Added FEATURE_CONDITION_CONCLUSIONS.md with baseline/A/B designs,
+  preprocessing/evaluation contract, actual training budgets, holdout pixel/image
+  metrics, all83 descriptive outcomes, zero/donor intervention, reconstruction
+  quality/deltas, costs, caveats, reproducibility hashes/private artifact links,
+  proposed next steps and a report-ready conclusion. Preserved newmethod.md.
+- Evidence/checks: Read existing protocols and local aggregate result artifacts;
+  21metric table rows and3results hashes checked against produced A/B/intervention
+  JSONs. Only documentation changed; whitespace and all relative links passed.
+  No new GPU experiment, inference, test-set access or test-suite rerun.
+
+### 2026-11-05 — Verify B condition diagnostic completion
+- Changes: Recorded both83-slice interventions completed/uploaded, paired
+  preflight/cache validation, full holdout pixel/image metrics, descriptive
+  all83 AP, normal FPR, reconstruction changes and runtime/VRAM.
+- Evidence: Manifest completed withzero/donor83/83 and no failure, private
+  revisionc22ee10da5f0193e99d3f3c097ab37e120cb7737. Results SHA matches manifest;
+  checkpoint/sample count/sealed-test flag verified. Holdout SSIM AP
+  self0.104084,zero0.104416,donor0.104699. No clear correct-image condition
+  benefit; mean changes small but some localized pixel changes large, so no
+  claim that the encoder is entirely ignored. One exploratory seed only.
+- Checks: Git whitespace check for record-only edits; no tests rerun, new
+  training, inference or held-out-test evaluation started.
+
+### 2026-11-05 — Implement fixed B condition intervention diagnostic
+- Changes: Added zero-injection and normal-training-donor wrappers, paired
+  full83 validation modes, immutable reference/checkpoint/index/cache checks,
+  bounded GPU replay/finite preflight, cached correct-condition reuse, private
+  reconstruction deltas/examples and resumable T4 evaluation/upload lifecycle.
+  Zero mode bypasses learned bias; donor changes encoder input only. Training
+  code/weights and original default evaluator behavior preserved.
+- Evidence/checks:129 tests passed13.27s, targeted Ruff/format and whitespace
+  checks passed. Tests cover bias bypass, donor-only encoding, identical initial
+  noise/RNG restoration, fixed donor mapping/cropped delta, calibration-only
+  thresholds and partial-cache recovery under both new intervention modes.
+- Next: Bounded T4 smoke must pass before full paired83-slice diagnostic. No
+  training, AP improvement claim or held-out-test access. Shared Workspace and
+  Secret name checked without reading credentials.
+- GPU smoke evidence: completed/uploaded92df7e4ef60628e019d7a2b85146b393f2d28450,
+  correct300-step replay matched both images exactly(maxerror0,initial noise
+  identical), finite3step zero/donor controls. Source frozen at
+  b5e4fccffe407d80914106884b49a41567a1fab134bfa025a89f77799d1f41c0.
+  Then submitted full83 zero/donor validation, correct-condition cache reused.
+  Full app ap-nxZTHthEc7ebwJkuTlTOi0 manifest running; preflight passed and
+  zero-condition progress1/83 confirmed before detaching the local client.
+
+### 2026-11-05 — Verify experiment B completion and A/baseline comparison
+- Changes: Recorded completed5epoch encoder pretraining,10epoch joint training
+  and83-slice validation, private upload revisions, full grouped-holdout metrics,
+  normal reconstruction quality, timing and matched A/baseline comparison.
+- Evidence: All3 manifests completed/uploaded;4690pretrain+9380joint updates,
+  best encoder5/best fine-tune6. Result JSON hash matches manifest artifact;
+  best EMA SHA,83samples,t300,seed17 and sealed-test flag verified. B holdout
+  AP difference0.104464/SSIM0.104084 vs A0.104645/0.104247: near-identical,
+  no demonstrated gain from this encoder pretraining pilot. Additional pretrain
+  compute recorded separately; no significance or general-method failure claim.
+- Checks: Whitespace check only for status records; no new GPU job or test rerun.
+
+### 2026-11-05 — Implement experiment B normal-only encoder pretraining
+- Changes: Added bounded dense masked-reconstruction ResNet-18 pretraining,
+  foreground-only masked loss, private full-state checkpoints/resume and best
+  selection on normal validation. B transfers encoder only, independently loads
+  original Gaussian EMA30, resets optimizer and matches A's9380 joint updates.
+  Added one-T4 chained worker/configs, automatic fixed83-slice t300 validation
+  and immutable A aggregate comparison. Preserved user-authored newmethod.md.
+- Evidence/checks:124 tests passed17.12s, including masked-target hiding,
+  foreground loss, decoder shape/encoder gradients, normal-only pretrain resume,
+  B encoder transfer, fresh optimizer/zero projection/original U-Net and existing
+  A/evaluation regression checks. Targeted Ruff passed. Modal shared Workspace
+  and Secret name verified without accessing secret contents.
+- GPU evidence: Bounded B smoke passed, both phases15updates, finite3-step
+  reconstruction, private uploads60fd76a2/0f4de9f4 confirmed. Then submitted
+  fresh full5pretrain+10joint T4 chain with automatic83-slice validation;
+  app ap-UKIL1QqcsgKzhIzGNO0m50. Source snapshot frozen at
+  bcc65e702e23a2ca97179cf066c7d38c9a40d1bd1c3f3c58b8f726c9d67aadf2.
+  No B AP improvement claimed; additional pretraining compute separate. Leave
+  full job detached after confirming start; check results when user requests.
+- Full start confirmed: durable manifest05:31:54UTC,TeslaT4,training stage,
+  exact source hash; encoder epoch1/5 step150/938 with finite running loss.
+  Detached client after confirmation; no continuous long-job monitoring.
+
+### 2026-11-05 — Verify experiment A completion and validation
+- Changes: Recorded10-epoch joint feature training and83-slice t300 evaluation
+  completion/upload revisions, actual selected bestepoch6, full metrics,
+  baseline/brightness comparison, normal reconstruction quality and limitations.
+- Evidence: Training manifest completed/uploaded,9,380updates,best normal MSE
+  0.007343506560. Eval manifest completed/uploaded at56f13bc33a470858475058cb961b1e904f680946,
+  correct best checkpoint SHA,83 samples,held_out_test_used=false. Results JSON
+  hash a8e57ed824c9e6a00404d82296f15fb208eabb9d8d911c06fcd983dfb8b5a962 verified
+  locally. App stopped withzero tasks. Holdout SSIM AP0.102402->0.104247,
+  difference0.101066->0.104645; modest gains, no isolated conditioning claim.
+- Checks: Git whitespace check passed; no tests rerun for status-only records.
+  No new GPU job, B pretraining or evaluation sweep started.
+
+### 2026-11-05 — Implement experiment A ResNet-18 feature-conditioned DDPM
+- Changes: Read user-provided newmethod.md; added grayscale ResNet-18 pooled
+  features,128dim projection/zero injection into existing timestep embedding,
+  joint normal-only fine-tune, buffer-aware EMA, full-state checkpoint/resume,
+  t300 grouped evaluation with baseline/brightness controls, tissue quality,
+  lesion separation and private figures. Added separate configs/entrypoint for
+  smoke and10epoch A with automatic post-training validation. B not run.
+- Evidence/checks:119 tests passed16.99s; new tests cover zero-injection output
+  equivalence, dimensions/ResNet parameter count, gradient opening, exact MSE,
+  deterministic fixed-condition reverse without masks, loader separation,
+  BN buffers, full-state resume and partial evaluation cache recovery. Targeted
+  Ruff checks/format passed, original baseline loaders remain exercised.
+- Smoke: First Modal submission failed at image build ordering before training;
+  corrected dependency installation before source mount. Fresh smoke2 image
+  built successfully and dataset setup began. Recorded both attempts in tracking.
+- Next: Require real normal-only smoke success before10epoch full job; preserve
+  baseline and user-authored newmethod.md, no external pretrained weights.
+- Smoke2 evidence: Completed/uploaded revision2e89ab1e4ad5469656bb53065fdccbfb5cd49b59,
+  16 normal train/4normal val,15 shard-aware optimizer updates,3.860s train/val,
+  peakVRAM1.71GB; remote smoke=passed and finite3-step reconstruction. This is
+  not an AP result. Submitted fresh full A10 run after smoke success, with
+  automatic t300 grouped validation and private baseline/quality/figure outputs.
+  Full-run source is frozen for safe preemption resume; no further Python edits.
+- Full start evidence: Durable manifest2026-11-04 17:46:35UTC,TeslaT4,source
+  72e43a42c623d123c29ec5ebb707de3de3b22c63a859148e662a7e4ceaef9ee1,epoch0 recovery
+  checkpoint committed. Log epoch1/10 step25/938,finite running MSE0.008372.
+  Detached client; no continuous monitoring or anomaly improvement claim.
 
 ### 2026-11-04 — Publish diffusion experiments on the existing feature branch
 - Changes: Prepared accumulated T4 Gaussian/Simplex continuation, context training,

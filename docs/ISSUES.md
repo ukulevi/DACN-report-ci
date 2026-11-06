@@ -41,8 +41,13 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   B full suite có Windows rename lỗi lặp ở hai test khác nhau, cả ngoài sandbox.
 - **Attempts:** fetch/isolated source review, CPU suites, minimal dependency
   collection, HF JSON/LFS checksum audit; không GPU hay mở test.
-- **Action needed:** Tích hợp branch, sửa guards/test/CI, điều tra Windows rename,
-  kiểm cache mới bằng UUID adapter; chạy hai dependency environments và review.
+- **Progress 06/11:** C `c02addb` đã tích hợp vào B; conflict hai log giữ cả
+  hai phía. Đã sửa test optional Torch và sai khác rounding; full suite 237 pass,
+  data/dev 121 pass / 22 skip với basetemp riêng ngoài sandbox. Branch push đã
+  bật CI. Các guard cache/checkpoint và team acceptance vẫn cần review.
+- **Action needed:** B/C kiểm và sửa cache-prefix, hash-before-reopen và
+  parent-checkpoint guards; kiểm cache mới bằng UUID adapter; review và nghiệm thu.
+  Theo dõi Windows temp trên CI vì test sandbox mặc định không tạo được fixture.
 - **Close when:** source chung có verification xanh, private-cache reproduction
   có receipt, B/C ký acceptance; không đòi model phải đạt một AP tùy ý.
 - **Resolution:** Chưa có; xem PROJECT_AUDIT_2026-11-06.md.

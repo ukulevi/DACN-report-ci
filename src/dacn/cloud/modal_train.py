@@ -27,19 +27,16 @@ RUN_ROOT = "/mnt/dacn/runs"
 dataset_volume = modal.Volume.from_name("dacn-bmad-datasets", create_if_missing=True)
 run_volume = modal.Volume.from_name("dacn-bmad-runs", create_if_missing=True)
 
-image = (
-    modal.Image.debian_slim(python_version="3.11")
-    .pip_install(
-        "huggingface_hub>=0.28,<3",
-        "numpy>=1.24,<3",
-        "numba>=0.60,<1",
-        "scikit-learn>=1.3,<2",
-        "PyYAML>=6,<7",
-        "torch>=2.2",
-        "tqdm>=4.66",
-    )
-    .add_local_python_source("dacn")
+base_image = modal.Image.debian_slim(python_version="3.11").pip_install(
+    "huggingface_hub>=0.28,<3",
+    "numpy>=1.24,<3",
+    "numba>=0.60,<1",
+    "scikit-learn>=1.3,<2",
+    "PyYAML>=6,<7",
+    "torch>=2.2",
+    "tqdm>=4.66",
 )
+image = base_image.add_local_python_source("dacn")
 
 
 def _json_safe(value):
@@ -203,7 +200,15 @@ def _train_remote_impl(
             raise TypeError("continue_from_run_id must be a string")
         if resume and continue_from_run_id:
             raise ValueError("resume and continue_from_run_id are mutually exclusive")
-        if (resume or continue_from_run_id) and trainer != "dacn.training.ddpm_partial:train":
+        resumable_trainers = {
+            "dacn.training.ddpm_partial:train": "ddpm_last.pt",
+            "dacn.training.feature_condition:train": "feature_condition_last.pt",
+            "dacn.training.encoder_pretrain:train": "encoder_pretrain_last.pt",
+            "dacn.training.ddpm_unconditional_control:train": "ddpm_last.pt",
+        }
+        if resume and trainer not in resumable_trainers:
+            raise ValueError("Trainer does not support resume")
+        if continue_from_run_id and trainer != "dacn.training.ddpm_partial:train":
             raise ValueError(
                 "Checkpoint continuation is supported only by the partial DDPM trainer"
             )
@@ -232,7 +237,7 @@ def _train_remote_impl(
                 and previous_manifest.get("artifact_sync_status") == "uploaded"
             ):
                 raise ValueError("Cannot resume a completed and uploaded run; choose a new run_id")
-            if not (run_dir / "ddpm_last.pt").is_file():
+            if not (run_dir / resumable_trainers[trainer]).is_file():
                 raise ValueError("Cannot resume: no completed-epoch DDPM checkpoint is available")
         elif run_dir.exists():
             raise ValueError(f"Run output already exists: {run_id}; choose a new run_id")
@@ -482,7 +487,7 @@ def _train_remote_impl(
         if resume:
             if "resume_from_checkpoint" not in parameters:
                 raise TypeError("DDPM trainer does not expose checkpoint resume")
-            train_kwargs["resume_from_checkpoint"] = run_dir / "ddpm_last.pt"
+            train_kwargs["resume_from_checkpoint"] = run_dir / resumable_trainers[trainer]
         elif continuation_dir is not None:
             if not {"resume_from_checkpoint", "allow_epoch_extension"}.issubset(parameters):
                 raise TypeError("DDPM trainer does not expose safe epoch extension")

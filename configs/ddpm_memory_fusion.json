@@ -1,0 +1,17 @@
+{
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "bank_budget": 10000,
+  "seed": 17,
+  "encoder": "official_imagenet_resnet18_grayscale_mean_conv1",
+  "layers": ["layer2", "layer3"],
+  "foreground_threshold": -0.95,
+  "foreground_cell_fraction": 0.5,
+  "alpha": 0.5,
+  "normalization": "normal_calibration_median_IQR_floor_1e-6",
+  "ddpm_checkpoint_epoch": 30,
+  "ddpm_timestep": 300,
+  "ddpm_sampler": "ancestral",
+  "smoke_train_samples": 16,
+  "smoke_bank_budget": 128,
+  "smoke_validation_samples": 2
+}

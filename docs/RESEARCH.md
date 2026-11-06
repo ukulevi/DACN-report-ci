@@ -11,6 +11,166 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 
 ## Hợp đồng mô hình và thực nghiệm
 
+### Authorized normal-calibrated LPIPS trial — 2026-11-06
+
+The user approved running the prioritized review direction. First retain
+SqueezeNet and unchanged cachedfinalDDIM20+30 pairs;capture7pretrained layer
+contributions,fit median/IQR only on20normalcalibration foreground,and use equal
+mean zscore onfull240crop. Fixed controls are originalLPIPS,aggregate/7 and
+naive-stitchLPIPS with originalmask. No new encoder,training,U-Netcalls ormask
+design. Same40/43partition and frozen calibrationthresholds. Bounded smoke then
+full83after replay/finite checks;no score/layer/weight sweep. See
+[NORMAL_CALIBRATED_LPIPS.md](NORMAL_CALIBRATED_LPIPS.md) for the fixed protocol.
+
+### User-requested LPIPS encoder review — 2026-11-06
+
+Completed the research/design request in [test.md](test.md), refined by the
+user's encoder-role table: SqueezeNet LPIPS is the current baseline; RAD-DINO
+is chest-X-ray domain transfer; a brain-MRI/FLAIR-pretrained encoder is a
+domain-match hypothesis, not a guaranteed improvement. Add same-architecture
+DINOv2 and ResNet50 controls before attributing effects to pretraining domain.
+See [LPIPS_ENCODER_RESEARCH.md](LPIPS_ENCODER_RESEARCH.md) for primary sources,
+weights/license/input readiness, A–D proposals and attention/multi-contrast limits.
+Prioritize normal-calibrated multi-layer scoring on the unchanged cached DDIM20+30
+final pairs; keep medical encoders as controlled extensions after artifact checks.
+This entry records a review/proposal only: no new weights loaded, training, GPU
+experiment, AP result, mask redesign or final-test access. Changing a trunk does
+not preserve the original learned LPIPS head or establish method novelty.
+
+### User-requested two-phase DDIM acceleration — 2026-11-06
+
+Superseded after the bounded10+10x5smoke by the user's supplied
+[testing_Lpips.md](testing_Lpips.md):fixedDDIM20+DDIM30,onephase2pass,exact50U-Net
+calls and four scoring arms that compute LPIPS against the actualfinal tensor.
+Implement/smoke per [AUTODDPM_DDIM20_30.md](AUTODDPM_DDIM20_30.md);full83must
+wait for the explicit authorization required in that task. No oldfullrun started.
+The original proposal below is retained as history,not the current run contract.
+After successful20+30smoke,the user explicitly approved full83on2026-11-06;
+launched`autoddpm-ddim2030-full83-t4-20261106T074200Z` with unchanged preset.
+
+Keep EMA30/LPIPS/maskrule/protocol and test fixed DDIM10initial t300 plus
+DDIM10inpaint t50 x5repeats,eta0. Add cachedancestral and phase2-only acceleration
+controls; no full factorial or step sweep. Repeat re-noising uses cumulative
+alpha ratio across skipped timesteps,not adjacent beta. Context stays original
+outside mask;eta0reverse still has stochastic forward/context draws.
+Recalibrate DDIMphase1 mask only by unchanged20normal-calibration95percentile
+rule. Freeze score thresholds on40calibration before43holdout metrics.
+Document timings/NFE separately;550->60calls is not measured9.17xwall speedup.
+See [AUTODDPM_DDIM.md](AUTODDPM_DDIM.md). Bounded smoke before full83comparison;
+no training,holdoutmask-design selection or final-test use.
+
+### User-selected roadmap — LPIPS attribution and mask audit — 2026-11-06
+
+Implement steps1/2 of the user's roadmap:LPIPS-only and normalized-absolute-only
+ablation on the same cached EMA30 reconstructions,then descriptive pseudo-mask
+FN/FP analysis. Verify existing product/mask replay and keep all8original controls.
+No new diffusion chains,training,mask redesign or score-weight search. Existing
+40/43group partition with calibration-only thresholds. Anatomy is not annotated;
+use named geometric/gradient proxies without claiming anatomical structures.
+See [PERCEPTUAL_MASK_ROADMAP.md](PERCEPTUAL_MASK_ROADMAP.md) for preregistered
+diagnostics,smoke/full commands,and the step3/4 independent-confirmation boundary.
+Do not select a new mask design from outcomes on the repeatedly inspectedholdout.
+
+### User-requested LPIPS AutoDDPM adaptation — 2026-11-06
+
+Reuse Gaussian EMA30/t300 cache for pseudo-mask -> stitch ->50step x5repeat
+re-sampling, no retraining. The previous t200 SSIM-proxy adaptation already had
+no overall AP benefit. This requested new arm uses frozen spatial SqueezeNet
+LPIPS0.1, residual weighting and a pooled95percentile mask threshold fit only
+on20normal calibration images. Primary finalweighted residual; fixed8scores
+and naive-stitch control. Bounded2image smoke before83validation, existing40/43
+partition and calibration-only scoring thresholds. No final test or mask sweep.
+See [AUTODDPM_LPIPS.md](AUTODDPM_LPIPS.md) for fixed protocol and differences from
+official AutoDDPM; do not call this an exact reproduction or guaranteed lesion
+removal. LPIPS,timestep and threshold differ from the previous pilot together.
+
+### K4 uncertainty scoring — authorized2026-11-05
+
+User explicitly requests inference-only trial after proposing uncertainty-aware
+scoring. Freeze original GaussianEMA30,t300,K4 bases17/1017/2017/3017,
+reuse immutable first draw,three new draws per83validation. Six fixedscores:
+single absolute/SSIM,mean4 absolute/SSIM,variance-normalized squared residual,
+pooled normal-calibration3x3patch Mahalanobis. Parameters normal-calibration only,
+thresholds40calibration,freeze43group holdout,no test/training/sweep. Bounded
+2image K4smoke before full. Exact formulas/cache/reproducibility and limits in
+UNCERTAINTY_SCORING.md;do not infer uncertainty guarantees tumor localization.
+
+### Spatial ImageNet conditioning, grayscale — authorized2026-11-05
+
+User requests Spatial ResNet18 ImageNet pretrained +original U-Net EMA30,then
+explicitly keeps1channel grayscale. Follow SPATIAL_IMAGENET_GRAYSCALE.md:
+meanRGB conv1 adaptation,MRI[-1,1],noRGB repeat/norm/crop,4spatial maps,
+zero1x1 residual fusion at64/32/16/8. Joint10epoch/9380update pilot after bounded
+T4 smoke,encoderLR1e-5,U-Net1e-5,fusion1e-4,normal-only checkpoint selection,
+automatic same83slice t300 evaluation with baseline/A/B/unconditional control.
+No test access or claim that this isolates spatial fusion from pretraining.
+
+### Unconditional control validation — authorized2026-11-05
+
+User requests validation after completed control training. Freeze normal-val
+best36(FT6),9380updates,EMA,noencoder. Same full83,ancestral t300,batch1,seed17,
+40calibration/43group holdout/calibration-only thresholds as A/B. Bounded
+replay/source-noise smoke before full. Baseline/A/B private artifacts immutable,
+aligned input/noise checks,quality/latency/VRAM/private examples. No extra
+training,sweep,test access or selection using AP. Exact protocol appended to
+UNCONDITIONAL_FINETUNE_CONTROL.md. Earlier training-only scope is superseded by
+this explicit validation request.
+
+### Matched unconditional fine-tune — authorized2026-11-05
+
+User requests original Gaussian DDPM epoch30 plus10fine-tune epochs without
+encoder, following A/B conclusion. See UNCONDITIONAL_FINETUNE_CONTROL.md:
+EMA30 warm start,freshAdamW/U-NetLR1e-5,batch8,seed17,9380new updates,epoch31..40,
+same39normal-val selection and EMA as A/B. Preserve existing full-state resume
+contract; do not confuse this control with LR1e-4 native continuation.
+Bounded smoke precedes full job; training/private preview only,no automatic
+AP sweep/full83 inference or held-out-test access.
+
+### B condition intervention — authorized2026-11-05
+
+User requests inference-only diagnostic after B's AP approximately matches A.
+Freeze B normal-val-selected EMA fine-tuneepoch6,checkpoint SHA
+0c4f21705830f5dd6054174fc6b2c1591263779413737ce87b4407e3ca8b01b7,
+ancestral t300,batch1,seed17 and all83 validation samples. Three cases:
+original-image condition(reuse immutable B cache), zero entire injected embedding
+(bypass projection including bias), and condition from a deterministic normal
+training donor(UUID-derived seed77 modulo7500,never chosen using masks/metrics).
+Donor affects encoder input only; forward image/noise/reverse RNG are paired.
+No checkpoint changes, fine-tuning, timestep sweep or held-out-test access.
+
+Before full evaluation, bounded T4 smoke replays one normal/one abnormal image
+through original300steps and requires identical initial noise/max reconstruction
+error<=1e-6 against registered B cache, then finite3step zero/donor controls.
+Full run reuses self-condition cache, computes two83-image interventions and
+checks exact input/mask/label/noisy-image alignment. Separate prefix caches and
+source-checked manifests support resume. Metrics follow existing40calibration/
+43group holdout with calibration-only thresholds; all83 metrics descriptive.
+Report AP,ROC-AUC,Precision/Recall/F1,normal pixel FPR and reconstruction changes
+versus self on240crop scaled[0,1], separately normal/abnormal. Thresholds are
+independently calibrated per intervention; AP does not depend on threshold.
+One donor per image/one exploratory seed; similar results would show weak
+sensitivity under these interventions, not proof the encoder is always ignored.
+Private caches/figures and model artifacts remain on Modal/private HF.
+
+### ResNet-18 feature conditioning B — authorized2026-11-05
+
+After completed A, user requests B. Follow FEATURE_CONDITION_B.md:5epochs
+normal-only masked ResNet-18 pretraining, then independently initialize the same
+Gaussian EMA30 U-Net and fine-tune10epochs/9380joint updates with A's exact
+settings. Additional encoder pretraining compute is separate. Bounded smoke
+precedes full T4 chain with automatic fixed t300 validation/A/baseline comparison;
+no timestep search, external encoder weights or held-out-test use.
+
+### ResNet-18 feature conditioning A — authorized2026-11-05
+
+User supersedes the initial pretraining preference in docs/newmethod.md and
+requests experiment A first: random ResNet-18, zero condition projection,
+original Gaussian epoch30 EMA U-Net, joint10-epoch fine-tune then Pixel AP
+validation. Follow FEATURE_CONDITION_A.md for exact architecture/learning rates,
+EMA buffers, update budget, normal-only selection, bounded smoke and automatic
+t300 validation with existing grouped calibration/holdout and baseline cache.
+This entry records A's original scope; B is subsequently authorized above.
+
 ### Simplex epoch20 validation — authorized2026-11-04
 
 After completed Simplex continuation, user requests validation. Evaluate explicit
@@ -338,3 +498,16 @@ Caller phải dùng cùng tensor reconstruction cho hai map, không công bố U
 ## Kết quả và giới hạn
 
 Theo dõi mọi run thực bắt đầu, cả lỗi/gián đoạn, trong RESULT_TRACKING với manifest khi có. Hình validation: ảnh đầu vào/noisy/reconstruction/map và trường hợp lỗi; test chỉ xem sau freeze. PNG không giữ intensity MRI gốc; train normal slice có thể thuộc bệnh nhân u; chưa chứng minh generalization hoặc tính lâm sàng. Dùng shared private artifacts và chỉ đưa số aggregate an toàn vào Linear.
+
+## Authorized extension: normal memory fusion (2026-11-06)
+
+The user requested implementation of [fusionmemorybank.md](fusionmemorybank.md).
+Keep Gaussian EMA30 fixed and reuse its verified ancestral t300 reconstruction
+cache. Add a separate frozen ImageNet grayscale ResNet18 layer2/layer3 normal
+feature bank, fixed random10000-vector budget/seed17, normal-calibration median/IQR
+and equal-weight absolute/SSIM fusion. Include memory-only, DDPM and brightness
+controls on the existing40/43 group partition. No test access or training.
+See [implementation protocol](DDPM_MEMORY_FUSION.md). Bounded16train/2validation
+smoke is in scope; full GPU validation needs explicit separate authorization.
+The user supplied that authorization on2026-11-06 ("ok chạy full"); launched
+`memory-fusion-full83-t4-20261106T055134Z` with the same fixed protocol.
