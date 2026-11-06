@@ -2,6 +2,7 @@
 
 import csv
 import hashlib
+import io
 import json
 import os
 import time
@@ -126,6 +127,22 @@ def evaluate_patch_validation(
     if [row["sample_id"] for row in rows] != data.sample_ids:
         raise ValueError("Group index order differs from validation data")
     groups = np.asarray([row["patient_group_id"] for row in rows])
+    checkpoint_bytes = Path(checkpoint_path).read_bytes()
+    checkpoint_sha = hashlib.sha256(checkpoint_bytes).hexdigest()
+    index_bytes = (Path(validation_dir) / "index.csv").read_bytes()
+    prefix_contract = {
+        "schema_version": 1,
+        "checkpoint_sha256": checkpoint_sha,
+        "index_sha256": hashlib.sha256(index_bytes).hexdigest(),
+        "sample_count": len(data),
+        "starting_timestep": starting_timestep,
+        "sampling_base_seed": 17,
+        "one_step": one_step,
+        "gaussian_baseline": gaussian_baseline,
+        "feature_condition": feature_condition,
+        "condition_mode": condition_mode,
+        "unconditional_finetune": unconditional_finetune,
+    }
     calibration, holdout = next(
         StratifiedGroupKFold(2, shuffle=True, random_state=17).split(
             np.zeros(len(data)), data.labels, groups
@@ -155,9 +172,17 @@ def evaluate_patch_validation(
         reconstruct, reconstruction_kwargs = gaussian_ancestral_with_noisy, {}
     previous = None
     if stores_noisy and resume_partial and (output_dir / "private_reconstructions.npz").is_file():
-        with np.load(output_dir / "private_reconstructions.npz", allow_pickle=False) as cache:
+        contract_path = output_dir / "prefix_contract.json"
+        if not contract_path.is_file() or json.loads(contract_path.read_text()) != prefix_contract:
+            raise ValueError("Partial evaluation cache contract differs or is missing")
+        cache_bytes = (output_dir / "private_reconstructions.npz").read_bytes()
+        with np.load(io.BytesIO(cache_bytes), allow_pickle=False) as cache:
             previous = {key: cache[key].copy() for key in cache.files}
-        if not np.array_equal(previous["labels"], data.labels[: len(previous["labels"])]):
+        if (
+            len(previous["images"]) > len(data)
+            or len(previous["labels"]) != len(previous["images"])
+            or not np.array_equal(previous["labels"], data.labels[: len(previous["labels"])])
+        ):
             raise ValueError("Partial evaluation cache labels differ")
     for index in range(len(data)):
         image, mask, _ = data[index]
@@ -216,6 +241,9 @@ def evaluate_patch_validation(
                     **({"noisy_images": np.asarray(noisy_images)} if stores_noisy else {}),
                 )
             os.replace(temporary, cache_path)
+            contract_tmp = output_dir / "prefix_contract.json.tmp"
+            contract_tmp.write_text(json.dumps(prefix_contract, sort_keys=True) + "\n")
+            os.replace(contract_tmp, output_dir / "prefix_contract.json")
             progress = {
                 "completed_samples": completed,
                 "total_samples": len(data),
@@ -257,8 +285,8 @@ def evaluate_patch_validation(
         "stride": None if gaussian_baseline or stores_noisy else 48,
         "patches_per_image": None if gaussian_baseline or stores_noisy else 25,
         "samples": len(data),
-        "checkpoint_sha256": hashlib.sha256(checkpoint_path.read_bytes()).hexdigest(),
-        "index_sha256": hashlib.sha256((validation_dir / "index.csv").read_bytes()).hexdigest(),
+        "checkpoint_sha256": checkpoint_sha,
+        "index_sha256": prefix_contract["index_sha256"],
         "inference_seconds": inference_seconds,
         "peak_vram_bytes": torch.cuda.max_memory_allocated(device) if device.type == "cuda" else 0,
         "partition": {

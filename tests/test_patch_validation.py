@@ -1,4 +1,5 @@
 import csv
+import json
 import uuid
 
 import numpy as np
@@ -185,6 +186,23 @@ def test_full_validation_freezes_calibration_thresholds_and_saves_prefix(
             resume_partial=True,
         )
         assert len(seen) == 5
+        contract_path = output / "prefix_contract.json"
+        contract = json.loads(contract_path.read_text())
+        contract["starting_timestep"] += 1
+        contract_path.write_text(json.dumps(contract))
+        with pytest.raises(ValueError, match="contract differs"):
+            patch_validation.evaluate_patch_validation(
+                validation_dir=tmp_path,
+                checkpoint_path=checkpoint,
+                output_dir=output,
+                device=torch.device("cpu"),
+                feature_condition=feature_condition,
+                unconditional_finetune=unconditional_finetune,
+                condition_mode=condition_mode,
+                donor_train_dir=tmp_path if condition_mode == "normal_donor" else None,
+                starting_timestep=300,
+                resume_partial=True,
+            )
 
 
 def test_gaussian_one_step_calls_original_one_channel_model_once_and_inverts_noise():

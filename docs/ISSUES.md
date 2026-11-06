@@ -49,11 +49,16 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   NPZ từ đúng bytes được hash; 2 regression tests tái hiện lỗi cũ và 14 tests liên
   quan pass. Hash của checkpoint trong condition-intervention vẫn được xác minh
   riêng trước khi caller tải checkpoint; chưa tuyên bố đường đó đã an toàn.
+- **Progress 06/11:** prefix resume yêu cầu contract sidecar gắn checkpoint/index
+  hash và mode inference; Modal continuation kiểm hash last/best trên bytes thực
+  và chép đúng bytes đã xác minh vào run mới. 19 test liên quan đạt, Ruff đạt.
+  Prefix lịch sử thiếu sidecar sẽ bị từ chối resume và cần tạo lại.
 - **Action needed:** B/C kiểm và sửa cache-prefix, hash-before-reopen và
   parent-checkpoint guards; kiểm cache mới bằng UUID adapter; review và nghiệm thu.
   Theo dõi Windows temp trên CI vì test sandbox mặc định không tạo được fixture.
 - **Close when:** source chung có verification xanh, private-cache reproduction
-  có receipt, B/C ký acceptance; không đòi model phải đạt một AP tùy ý.
+  có receipt, B/C ký acceptance; C xác nhận manifest checkpoint trên Volume dùng
+  đúng tên artifact/schema; không đòi model phải đạt một AP tùy ý.
 - **Resolution:** Chưa có; xem PROJECT_AUDIT_2026-11-06.md.
 
 ### BLK-20261101-01 — Terminal status của primary run batch-1 cũ

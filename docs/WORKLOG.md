@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-11-06 — Guard resumable validation prefixes and Modal continuation
+
+Prefix resume now requires a sidecar contract binding checkpoint hash, index
+hash, inference mode, condition and sampling settings; it validates cache length
+and labels and reads NPZ from captured bytes. Modal continuation verifies actual
+`ddpm_last.pt` and `ddpm_best.pt` against parent manifest before creating the new
+run, then seeds both child files from those verified bytes before trainer load.
+Regression tests: 19 related patch-validation and DAC-8 tests pass; Ruff passes.
+No Modal/GPU job started. Existing legacy prefixes without a contract are
+rejected for resume and must be regenerated.
+
 ## 2026-11-06 — Verify evaluator inputs from the same bytes
 
 For feature-condition and condition-intervention comparisons, parse verified
