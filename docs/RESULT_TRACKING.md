@@ -1,5 +1,13 @@
 # Experiment and result tracking
 
+## 2026-11-06 — B CPU replay / paired bootstrap
+
+Status: **completed**. Validation only, source HF revision `fae9b50a4b78114fb51d87e803c77d019668f523`, dataset revision `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`. DDIM final LPIPS, initial LPIPS, naive stitch LPIPS and brightness; fixed calibration thresholds, patient-group paired bootstrap seed 17, 1,000 draws, 999 valid (one lacked a class), 25 patient groups / 43 slices. No held-out test or GPU.
+
+Verified both NPZ hashes against manifests, the source-cache linkage, index hash, each cached image/mask/label against the dataset, group order, disjoint partition and replayed AP/Dice against C's results. Final LPIPS AP .312330, Dice .371215. Paired delta AP (final minus initial) 95% percentile interval [.039686, .204806]; final minus naive stitch [.026164, .177945]; final minus brightness [-.287385, .232914]. These intervals are exploratory and conditional on this previously inspected validation cohort, selected model/protocol and one sampling seed; they do not quantify training-seed variability or fix selection bias.
+
+[Aggregate output](evidence/2026-11-06-b-ddim-bootstrap-results.json); [replay script](evidence/2026-11-06-b-ddim-bootstrap-replay.py) (format/import cleanup after execution; paths refer to local private caches). No private images, group IDs, or per-sample output are published.
+
 ## 2026-11-06 — Audit receipt for C's completed runs
 
 Đây là đối chiếu artifact đã được C tạo, không phải run mới của B. HF snapshot

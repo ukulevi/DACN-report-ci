@@ -1,0 +1,97 @@
+{
+  "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+  "reference": "autoddpm_lpips",
+  "seed": 17,
+  "requested_replicates": 1000,
+  "valid_replicates": 999,
+  "skipped_missing_class": 1,
+  "groups": 25,
+  "samples": 43,
+  "candidates": {
+    "autoddpm_lpips": {
+      "pixel_ap": 0.3123301640701599,
+      "pixel_dice_micro": 0.3712146276577787,
+      "threshold": 0.26617634296417236,
+      "ap_ci95": [
+        0.0989677994105857,
+        0.4846912219482891
+      ],
+      "dice_ci95": [
+        0.1495634442052259,
+        0.47926998537252463
+      ],
+      "delta_ap_ci95": [
+        0.0,
+        0.0
+      ],
+      "delta_dice_ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "initial_lpips_only": {
+      "pixel_ap": 0.157875670665664,
+      "pixel_dice_micro": 0.24687113008194345,
+      "threshold": 0.2501829266548157,
+      "ap_ci95": [
+        0.061828041592009345,
+        0.3424142875027397
+      ],
+      "dice_ci95": [
+        0.09971722370893867,
+        0.35637164205728245
+      ],
+      "delta_ap_ci95": [
+        -0.204805808619385,
+        -0.03968622413789687
+      ],
+      "delta_dice_ci95": [
+        -0.1744196833397193,
+        -0.0515096908667555
+      ]
+    },
+    "brightness": {
+      "pixel_ap": 0.3895056557159785,
+      "pixel_dice_micro": 0.2680513044300881,
+      "threshold": 0.48235294222831726,
+      "ap_ci95": [
+        0.10377847643653142,
+        0.5832932564841332
+      ],
+      "dice_ci95": [
+        0.09845356122152453,
+        0.44401818975731744
+      ],
+      "delta_ap_ci95": [
+        -0.23291415928325473,
+        0.287385060206417
+      ],
+      "delta_dice_ci95": [
+        -0.2980202515484681,
+        0.11310355538022228
+      ]
+    },
+    "naive_stitch_lpips": {
+      "pixel_ap": 0.18059333282173007,
+      "pixel_dice_micro": 0.2968487528357761,
+      "threshold": 0.21649277210235596,
+      "ap_ci95": [
+        0.07263493418830566,
+        0.39963438665149525
+      ],
+      "dice_ci95": [
+        0.11213137056478302,
+        0.4209358783587242
+      ],
+      "delta_ap_ci95": [
+        -0.17794468511266553,
+        -0.026163872358109134
+      ],
+      "delta_dice_ci95": [
+        -0.12625080668747257,
+        -0.028257970336898527
+      ]
+    }
+  },
+  "scope": "Exploratory validation, thresholds fixed; conditional on one model and selected protocol; test unused."
+}

@@ -1,5 +1,9 @@
 # Worklog
 
+## 2026-11-06 — Start B replay
+
+Downloaded private DDIM and naive-stitch validation caches; their SHA-256 values match C's manifests. CPU replay completed with image/mask/index alignment and metric checks, followed by paired group bootstrap (999 valid/1,000); results and caveats are tracked in RESULT_TRACKING. Two group-bootstrap unit tests passed. No GPU or test split used.
+
 ## 2026-11-06 — Audit GitHub/HF/Linear và cập nhật LPIPS/DDIM
 
 Đọc live Linear DACN-KHMT, Git đến C c02addb và HF fae9b50; kiểm dataset unchanged,

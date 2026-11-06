@@ -86,7 +86,9 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   test hoặc đưa ra kết luận nghiên cứu cuối.
 - **Current evidence (06/11):** LPIPS/DDIM20+30 có AP .312330 / Dice .371215,
   naive-stitch LPIPS AP .180593 trên 43 internal holdout slices. Giữ Investigating
-  cho independent reproduction/uncertainty/freeze; không yêu cầu chạy lại đối
+  cho freeze. B đã replay score maps và paired bootstrap 999/1000 draws thành công;
+  CI delta AP final minus naive stitch [.0262, .1779], final minus brightness
+  [-.2874, .2329], conditional on one selected run. Xem RESULT_TRACKING. Không yêu cầu chạy lại đối
   chứng đã có hoặc tăng epoch. Xem [audit](PROJECT_AUDIT_2026-11-06.md), HF fae9b50.
 - **Historical evidence:** Trên 83 validation slices, candidate epoch 10, `t*=300`, local
   one-minus-SSIM đạt pixel AUROC `0.892010` nhưng Precision `0.101571`, Recall
@@ -108,9 +110,8 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Attempts / constraints:** Đã so checkpoint epoch 5/10, timestep 100/200/300
   và pixel-difference/local-SSIM theo validation protocol. Noise-MSE thấp đo
   epsilon prediction trên normal validation, không đo segmentation quality.
-- **Action needed:** B tái tính LPIPS/DDIM, naive-stitch và brightness trên cache
-  được xác minh; paired group bootstrap với threshold cố định. C hỗ trợ artifact
-  contract. A/B/C freeze shortlist và quy tắc test; không tune bằng test.
+- **Action needed:** B/C review replay và contract source chung; A/B/C freeze
+  shortlist và quy tắc test, cân nhắc repeat sampling seed theo budget; không tune bằng test.
 - **Close when:** Nhóm có diagnosis dựa trên artifact, chọn/freeze protocol hoặc
   phê duyệt ablation mới, và ghi rõ giới hạn cùng số seed thực chạy.
 - **Resolution:** Chưa có.
