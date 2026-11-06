@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import math
 import os
@@ -381,7 +382,11 @@ def load_ema_checkpoint(
 ) -> UNetModel:
     """Load the validation-selected EMA U-Net for reconstruction/evaluation."""
     resolved = _resolved_config(config)
-    checkpoint = torch.load(Path(checkpoint_path), map_location="cpu", weights_only=False)
+    checkpoint = torch.load(
+        checkpoint_path if isinstance(checkpoint_path, io.BytesIO) else Path(checkpoint_path),
+        map_location="cpu",
+        weights_only=False,
+    )
     if checkpoint.get("schema_version") != 1 or checkpoint.get("method") != METHOD:
         raise ValueError("Checkpoint schema or method does not match partial DDPM")
     _validate_resume_config(

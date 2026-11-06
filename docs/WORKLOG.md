@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-11-06 — Verify continuation capture and bind prefix payload
+
+Extracted continuation capture/write logic used by Modal into a CPU-only helper.
+Five filesystem tests cover missing file/hash, changed bytes, parent mutation
+after capture and interrupted replace/restart. Prefix sidecar now binds NPZ
+checksum, source digest and donor index; a torn cache/receipt pair fails closed.
+Evaluator checkpoint loads now use the same captured bytes as the recorded hash;
+DDPM EMA loader supports BytesIO as well as paths. Ran 24 related tests: passed.
+Ruff check/format and diff check passed. No training/evaluation run or GPU started.
+These tests exercise the shared helper, not an end-to-end remote Modal job.
+
 ## 2026-11-06 — Complete full metric replay and prepare group execution
 
 Extended the provenance replay script with metrics-only mode. Ran CPU replay:

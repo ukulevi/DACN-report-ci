@@ -19,6 +19,8 @@ from pathlib import Path
 
 import modal
 
+from dacn.training.checkpoint_artifacts import capture_continuation, write_continuation
+
 app = modal.App("dacn-bmad-flair")
 
 DATA_ROOT = "/mnt/dacn/datasets"
@@ -249,20 +251,9 @@ def _train_remote_impl(
                 continuation_manifest = _read_run_manifest(continuation_dir)
                 if continuation_manifest.get("status") != "completed":
                     raise ValueError("Continuation source run is not completed")
-                for filename in ("ddpm_last.pt", "ddpm_best.pt"):
-                    checkpoint_path = continuation_dir / filename
-                    if not checkpoint_path.is_file():
-                        raise ValueError(
-                            f"Continuation source is missing required checkpoint: {filename}"
-                        )
-                    checkpoint_bytes = checkpoint_path.read_bytes()
-                    expected_sha = continuation_manifest.get("artifacts", {}).get(filename)
-                    if (
-                        not expected_sha
-                        or hashlib.sha256(checkpoint_bytes).hexdigest() != expected_sha
-                    ):
-                        raise ValueError(f"Continuation checkpoint hash differs: {filename}")
-                    continuation_checkpoint_bytes[filename] = checkpoint_bytes
+                continuation_checkpoint_bytes = capture_continuation(
+                    continuation_dir, continuation_manifest
+                )
                 expected_parent = {
                     "dataset_repo_id": dataset_repo_id,
                     "requested_dataset_revision": dataset_revision,
@@ -500,11 +491,7 @@ def _train_remote_impl(
         elif continuation_dir is not None:
             if not {"resume_from_checkpoint", "allow_epoch_extension"}.issubset(parameters):
                 raise TypeError("DDPM trainer does not expose safe epoch extension")
-            for filename, payload in continuation_checkpoint_bytes.items():
-                destination = run_dir / filename
-                temporary = destination.with_suffix(destination.suffix + ".tmp")
-                temporary.write_bytes(payload)
-                os.replace(temporary, destination)
+            write_continuation(run_dir, continuation_checkpoint_bytes)
             train_kwargs["resume_from_checkpoint"] = run_dir / "ddpm_last.pt"
             train_kwargs["allow_epoch_extension"] = True
         train_result = training_function(**train_kwargs)

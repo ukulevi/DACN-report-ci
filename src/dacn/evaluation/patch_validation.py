@@ -79,8 +79,12 @@ def evaluate_patch_validation(
     ):
         raise ValueError("Invalid conditional intervention")
     output_dir.mkdir(parents=True, exist_ok=stores_noisy and resume_partial)
+    checkpoint_bytes = Path(checkpoint_path).read_bytes()
+    checkpoint_sha = hashlib.sha256(checkpoint_bytes).hexdigest()
     if unconditional_finetune:
-        checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+        checkpoint = torch.load(
+            io.BytesIO(checkpoint_bytes), map_location="cpu", weights_only=False
+        )
         initialization = checkpoint.get("ema_initialization", {})
         if (
             checkpoint.get("method") != "ddpm_partial_reconstruction_bmad_flair"
@@ -90,30 +94,32 @@ def evaluate_patch_validation(
         ):
             raise ValueError("Expected unconditional EMA30 fine-tune checkpoint")
         selected_epoch = checkpoint["epoch"]
-        model = load_ema_checkpoint(checkpoint_path, checkpoint["config"], device)
+        model = load_ema_checkpoint(io.BytesIO(checkpoint_bytes), checkpoint["config"], device)
         diffusion = build_diffusion(checkpoint["config"])
         del checkpoint
     elif feature_condition:
         from dacn.training.feature_condition import load_feature_checkpoint
 
-        model, diffusion = load_feature_checkpoint(checkpoint_path, device)
-        selected_epoch = torch.load(checkpoint_path, map_location="cpu", weights_only=False)[
-            "epoch"
-        ]
+        model, diffusion = load_feature_checkpoint(io.BytesIO(checkpoint_bytes), device)
+        selected_epoch = torch.load(
+            io.BytesIO(checkpoint_bytes), map_location="cpu", weights_only=False
+        )["epoch"]
     elif gaussian_baseline:
         if not one_step:
             raise ValueError("Gaussian control is one-step only")
-        checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+        checkpoint = torch.load(
+            io.BytesIO(checkpoint_bytes), map_location="cpu", weights_only=False
+        )
         if (
             checkpoint["epoch"] != 30
             or checkpoint["method"] != "ddpm_partial_reconstruction_bmad_flair"
         ):
             raise ValueError("Expected registered Gaussian epoch30 checkpoint")
-        model = load_ema_checkpoint(checkpoint_path, checkpoint["config"], device)
+        model = load_ema_checkpoint(io.BytesIO(checkpoint_bytes), checkpoint["config"], device)
         diffusion = build_diffusion(checkpoint["config"])
         del checkpoint
     else:
-        model, diffusion = load_context_checkpoint(checkpoint_path, device)
+        model, diffusion = load_context_checkpoint(io.BytesIO(checkpoint_bytes), device)
     data = ShardDataset(validation_dir, "val", include_masks=True)
     donors = None
     if condition_mode == "normal_donor":
@@ -127,8 +133,6 @@ def evaluate_patch_validation(
     if [row["sample_id"] for row in rows] != data.sample_ids:
         raise ValueError("Group index order differs from validation data")
     groups = np.asarray([row["patient_group_id"] for row in rows])
-    checkpoint_bytes = Path(checkpoint_path).read_bytes()
-    checkpoint_sha = hashlib.sha256(checkpoint_bytes).hexdigest()
     index_bytes = (Path(validation_dir) / "index.csv").read_bytes()
     prefix_contract = {
         "schema_version": 1,
@@ -142,7 +146,18 @@ def evaluate_patch_validation(
         "feature_condition": feature_condition,
         "condition_mode": condition_mode,
         "unconditional_finetune": unconditional_finetune,
+        "donor_index_sha256": hashlib.sha256(
+            (Path(donor_train_dir) / "index.csv").read_bytes()
+        ).hexdigest()
+        if condition_mode == "normal_donor"
+        else None,
     }
+    package_root = Path(__file__).resolve().parents[1]
+    source_digest = hashlib.sha256()
+    for source in sorted(package_root.rglob("*.py")):
+        source_digest.update(source.relative_to(package_root).as_posix().encode() + b"\0")
+        source_digest.update(hashlib.sha256(source.read_bytes()).digest())
+    prefix_contract["source_sha256"] = source_digest.hexdigest()
     calibration, holdout = next(
         StratifiedGroupKFold(2, shuffle=True, random_state=17).split(
             np.zeros(len(data)), data.labels, groups
@@ -173,9 +188,13 @@ def evaluate_patch_validation(
     previous = None
     if stores_noisy and resume_partial and (output_dir / "private_reconstructions.npz").is_file():
         contract_path = output_dir / "prefix_contract.json"
-        if not contract_path.is_file() or json.loads(contract_path.read_text()) != prefix_contract:
+        receipt = json.loads(contract_path.read_text()) if contract_path.is_file() else {}
+        expected_cache_sha = receipt.pop("cache_sha256", None)
+        if receipt != prefix_contract:
             raise ValueError("Partial evaluation cache contract differs or is missing")
         cache_bytes = (output_dir / "private_reconstructions.npz").read_bytes()
+        if not expected_cache_sha or hashlib.sha256(cache_bytes).hexdigest() != expected_cache_sha:
+            raise ValueError("Partial evaluation cache checksum differs or is missing")
         with np.load(io.BytesIO(cache_bytes), allow_pickle=False) as cache:
             previous = {key: cache[key].copy() for key in cache.files}
         if (
@@ -242,7 +261,11 @@ def evaluate_patch_validation(
                 )
             os.replace(temporary, cache_path)
             contract_tmp = output_dir / "prefix_contract.json.tmp"
-            contract_tmp.write_text(json.dumps(prefix_contract, sort_keys=True) + "\n")
+            receipt = {
+                **prefix_contract,
+                "cache_sha256": hashlib.sha256(cache_path.read_bytes()).hexdigest(),
+            }
+            contract_tmp.write_text(json.dumps(receipt, sort_keys=True) + "\n")
             os.replace(contract_tmp, output_dir / "prefix_contract.json")
             progress = {
                 "completed_samples": completed,

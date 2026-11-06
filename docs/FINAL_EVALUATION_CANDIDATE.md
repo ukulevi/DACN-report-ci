@@ -38,6 +38,10 @@ source đã sinh kết quả lịch sử.
 
 ## Thứ tự thực hiện chung
 
+Tiến độ sau review: helper continuation đã có test CPU và prefix đã gắn checksum
+NPZ/source/donor-index; checkpoint load dùng snapshot bytes. Còn nghiệm thu source
+tích hợp và kiểm manifest thực tế; chưa có remote continuation job mới.
+
 1. Hoàn thiện guard và regression tests đã nêu trong PROGRESS_REVIEW; xác minh
    thật sự path continuation dùng đúng artifact schema. Không yêu cầu quyền
    workspace C để kiểm logic filesystem/mocks tại local.

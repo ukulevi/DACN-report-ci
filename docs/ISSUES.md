@@ -62,9 +62,15 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   checkpoint load/hash cùng snapshot, và test trực tiếp orchestration continuation.
   Xem [review sau tích hợp](PROGRESS_REVIEW_2026-11-06.md). Không coi 19 test đã chạy
   là kiểm chứng trực tiếp nhánh Modal continuation mới.
-- **Action needed:** B/C xử lý và kiểm thử các điểm review của đường shortlist;
-  A chốt phạm vi nghiệm thu. Replay AP/Dice và patient bootstrap đã hoàn thành,
-  không yêu cầu lặp lại chỉ để đóng blocker. CI tối thiểu đã xanh.
+- **Tiến độ sau review:** helper continuation dùng trong Modal có 5 test local
+  (missing file/hash, byte mismatch, parent mutation, interrupted write/restart).
+  Prefix gắn checksum NPZ + source digest + donor index; evaluator load checkpoint
+  từ cùng captured bytes được hash. 24 test liên quan đạt. Chưa chạy remote Modal;
+  helper verification không tương đương kiểm chứng toàn bộ orchestration.
+- **Action needed:** Review tích hợp và xác nhận manifest/schema trên artifact
+  thực tế, pin dependency/weights cho runner cuối. Donor index/source digest không
+  thay dataset revision/hash shard: nếu dùng normal-donor trong shortlist phải
+  pin donor dataset riêng. Replay metric và bootstrap đã hoàn thành.
 - **Close when:** source chung có verification xanh, private-cache reproduction
   có receipt, B/C ký acceptance; C xác nhận manifest checkpoint trên Volume dùng
   đúng tên artifact/schema; không đòi model phải đạt một AP tùy ý.

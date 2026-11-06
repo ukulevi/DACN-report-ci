@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import json
 import uuid
 
@@ -172,6 +173,13 @@ def test_full_validation_freezes_calibration_thresholds_and_saves_prefix(
         with np.load(output / "private_reconstructions.npz") as cache:
             prefix = {key: cache[key][:3].copy() for key in cache.files}
         np.savez_compressed(output / "private_reconstructions.npz", **prefix)
+        contract_path = output / "prefix_contract.json"
+        receipt = json.loads(contract_path.read_text())
+        # Simulate a committed interrupted prefix; bind the synthetic truncation.
+        receipt["cache_sha256"] = hashlib.sha256(
+            (output / "private_reconstructions.npz").read_bytes()
+        ).hexdigest()
+        contract_path.write_text(json.dumps(receipt))
         seen.clear()
         patch_validation.evaluate_patch_validation(
             validation_dir=tmp_path,
@@ -186,6 +194,21 @@ def test_full_validation_freezes_calibration_thresholds_and_saves_prefix(
             resume_partial=True,
         )
         assert len(seen) == 5
+        with (output / "private_reconstructions.npz").open("ab") as stream:
+            stream.write(b"changed bytes")
+        with pytest.raises(ValueError, match="checksum differs"):
+            patch_validation.evaluate_patch_validation(
+                validation_dir=tmp_path,
+                checkpoint_path=checkpoint,
+                output_dir=output,
+                device=torch.device("cpu"),
+                feature_condition=feature_condition,
+                unconditional_finetune=unconditional_finetune,
+                condition_mode=condition_mode,
+                donor_train_dir=tmp_path if condition_mode == "normal_donor" else None,
+                starting_timestep=300,
+                resume_partial=True,
+            )
         contract_path = output / "prefix_contract.json"
         contract = json.loads(contract_path.read_text())
         contract["starting_timestep"] += 1
