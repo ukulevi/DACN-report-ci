@@ -11,6 +11,19 @@ Giả thuyết: nhiễu ít có thể giữ cả tổn thương; nhiễu nhiều
 
 ## Hợp đồng mô hình và thực nghiệm
 
+### User-requested LPIPS AutoDDPM adaptation — 2026-11-06
+
+Reuse Gaussian EMA30/t300 cache for pseudo-mask -> stitch ->50step x5repeat
+re-sampling, no retraining. The previous t200 SSIM-proxy adaptation already had
+no overall AP benefit. This requested new arm uses frozen spatial SqueezeNet
+LPIPS0.1, residual weighting and a pooled95percentile mask threshold fit only
+on20normal calibration images. Primary finalweighted residual; fixed8scores
+and naive-stitch control. Bounded2image smoke before83validation, existing40/43
+partition and calibration-only scoring thresholds. No final test or mask sweep.
+See [AUTODDPM_LPIPS.md](AUTODDPM_LPIPS.md) for fixed protocol and differences from
+official AutoDDPM; do not call this an exact reproduction or guaranteed lesion
+removal. LPIPS,timestep and threshold differ from the previous pilot together.
+
 ### K4 uncertainty scoring — authorized2026-11-05
 
 User explicitly requests inference-only trial after proposing uncertainty-aware
@@ -425,3 +438,16 @@ Caller phải dùng cùng tensor reconstruction cho hai map, không công bố U
 ## Kết quả và giới hạn
 
 Theo dõi mọi run thực bắt đầu, cả lỗi/gián đoạn, trong RESULT_TRACKING với manifest khi có. Hình validation: ảnh đầu vào/noisy/reconstruction/map và trường hợp lỗi; test chỉ xem sau freeze. PNG không giữ intensity MRI gốc; train normal slice có thể thuộc bệnh nhân u; chưa chứng minh generalization hoặc tính lâm sàng. Dùng shared private artifacts và chỉ đưa số aggregate an toàn vào Linear.
+
+## Authorized extension: normal memory fusion (2026-11-06)
+
+The user requested implementation of [fusionmemorybank.md](fusionmemorybank.md).
+Keep Gaussian EMA30 fixed and reuse its verified ancestral t300 reconstruction
+cache. Add a separate frozen ImageNet grayscale ResNet18 layer2/layer3 normal
+feature bank, fixed random10000-vector budget/seed17, normal-calibration median/IQR
+and equal-weight absolute/SSIM fusion. Include memory-only, DDPM and brightness
+controls on the existing40/43 group partition. No test access or training.
+See [implementation protocol](DDPM_MEMORY_FUSION.md). Bounded16train/2validation
+smoke is in scope; full GPU validation needs explicit separate authorization.
+The user supplied that authorization on2026-11-06 ("ok chạy full"); launched
+`memory-fusion-full83-t4-20261106T055134Z` with the same fixed protocol.

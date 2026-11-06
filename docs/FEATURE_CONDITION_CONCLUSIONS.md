@@ -528,3 +528,82 @@ Nguồn đầy đủ ở [UNCERTAINTY_SCORING.md](UNCERTAINTY_SCORING.md),
 private revisionaf0bf4006db4c948292b9bc50748073e1b421bb4,resultSHA
 fc12e2093045f9b6f7c0850e683a7c0258c05529d6a92580419101bf77f8ce16
 đã đối chiếu manifest. Đây là inference-only,không có training mới.
+
+## 16. Normal memory bank fusion: full validation đã hoàn tất
+
+Thí nghiệm inference riêng,không đưa feature vào U-Net:ResNet18 ImageNet chính
+thức đóng băng,grayscale mean-conv1,layer2/layer3 tạo descriptor384D. Dùng7500
+normal train slices,foreground heuristic,random seed17 giữ10000vectors từ
+1929258eligible descriptors;không phải PatchCore coreset. Tái dùng GaussianEMA30
+ancestral t300 cache. Median/IQR fit20normal calibration,alpha0.5 cố định cho
+hai fusion arms,threshold fit40calibration và đóng băng khi đánh giá43holdout.
+
+| Method | Pixel AP | Micro Dice | Normal FPR | Image AP |
+|---|---:|---:|---:|---:|
+| DDPM absolute | 0.101066 | 0.173678 | 0.058079 | 0.430006 |
+| DDPM SSIM | 0.102402 | 0.154654 | 0.055234 | 0.505258 |
+| Memory only | 0.064212 | 0.139943 | 0.134794 | 0.822745 |
+| Absolute + memory | 0.102374 | 0.180837 | 0.061204 | 0.434041 |
+| SSIM + memory | 0.087033 | 0.151198 | 0.079000 | 0.638276 |
+| Brightness | 0.389506 | 0.268051 | 0.134935 | 0.770309 |
+
+Absolute fusion tăngAP rất ít(+0.001308),SSIM fusion giảmAP(-0.015370). Chưa có
+cải thiện segmentation đáng kể;brightness còn mạnh hơn nhiều. Absolute fusion
+tăngRecall/F1 nhưng cũng tăngnormal FPR,không kết luận giảm false positive tại
+cùng độ nhạy. Các operating points fit theo calibration recall không tạo cùng
+recall thực tế trên holdout,không được tune lại để khẳng định matched sensitivity.
+
+Memory-only có imageAP0.822745 và imageAUROC0.703947,cao hơn brightness trong
+fold này;đây là tín hiệu image ranking,không chứng minh định vị tumor tốt. Tại
+threshold image maxF1 chọn ở calibration,nó dự đoán toàn bộ holdout positive:
+precision0.558140,recall1,F1=0.716418. Fusion cũng chưa vượt memory-only ở
+imageAP. Không đồng nhất image-level detection với pixel-level segmentation.
+
+Full run `memory-fusion-full83-t4-20261106T055134Z` completed/uploaded private
+revision `01c5995f6ec19092df7bb4ac302861399f2de868`. Root resultSHA
+`bfeb1f4573a6a0cef68cc68df6e8d86f0a3d7824080674cfb39e39547faaf476`
+đã đối chiếu manifest. Tổng145.25s trước upload,không train mới,không dùng final
+test hay alpha search. One model/bank seed trên validation đã xem nhiều lần;
+kết quả exploratory. Xem [DDPM_MEMORY_FUSION.md](DDPM_MEMORY_FUSION.md) và
+[RESULT_TRACKING.md](RESULT_TRACKING.md) cho protocol và đầy đủ chỉ số.
+
+## 17. LPIPS pseudo-mask -> re-sampling: có tiến bộ so với DDPM baseline
+
+GaussianEMA30 không train lại,tái dùng t300cache. SpatialLPIPS SqueezeNet kết hợp
+residual chuẩn hóa95percentile tạo pseudo-mask;threshold fit20normalcalibration,
+dilation3,reverse50steps x5repeats,seed17. Tất cả83validation hoàn tất,đánh giá
+43group holdout sau40calibration,không dùng finaltest. Đây là AutoDDPM adaptation,
+không tái lập chính xác paper hoặc cô lập LPIPS khỏi mọi thay đổi của pilot cũ.
+
+| Phương án | Pixel AP | Micro Dice | Normal FPR | Image AP |
+|---|---:|---:|---:|---:|
+| Initial DDPM absolute | 0.101066 | 0.173678 | 0.058079 | 0.430006 |
+| Initial DDPM SSIM | 0.102402 | 0.154654 | 0.055234 | 0.505258 |
+| Initial LPIPS x normalized residual | 0.204298 | 0.274354 | 0.010727 | 0.887665 |
+| Chỉ stitch,absolute | 0.118781 | 0.204641 | 0.047041 | 0.481000 |
+| Re-sampling absolute | 0.129407 | 0.227416 | 0.044342 | 0.534048 |
+| Re-sampling SSIM | 0.149446 | 0.223469 | 0.045201 | 0.581114 |
+| Final residual x initialheatmap (primary) | 0.154785 | 0.226256 | 0.026640 | 0.814398 |
+| Brightness | 0.389506 | 0.268051 | 0.134935 | 0.770309 |
+
+Có tăngAP so baseline,nhưng **heatmap trước re-sampling tốt hơn các score sau
+re-sampling**. Khi giữ scoreabsolute để so với naive stitch,re-sampling tăngAP
+0.010626;chưa có bằng chứng rằng thêm chuỗi inpainting là lựa chọn tốt nhất.
+Heatmapcontrol đã được đăng ký trước,không đổi primaryscore theoholdout.
+Chưa đo LPIPS-only nên không quy tất cả cải thiện riêng cho perceptual distance.
+
+Pseudo-mask holdout lesionrecall83.7541%,precision13.3407%;còn16.2459% lesion
+pixels ngoài vùng sửa. Normal ROI sau dilation11.7060%;không nhầm với target5%
+trước dilation hoặc FPR ởscorethreshold. Outside-mask error0 là điều kiện stitch,
+không chứng minh tái tạo mô lành tốt hơn. Các FPR ởthresholdcalibration córecall
+khác nhau;không tuyên bố cải thiện ởmatched sensitivity. Brightness vẫn tốt hơn
+vềpixelAP,LPIPSheatmapimageAP tốt hơn nhưng đây là nhiệm vụ khác.
+
+Run `autoddpm-lpips-full83-t4-20261106T061833Z`,private revision
+`bab00576bb8271ddb191c8fcd13840eff40f1919`,root resultSHA
+`6fb277491308c63b2cc52fa614fc912486266a9c3322f7f099aff850cb51a7e0`
+đã đối chiếu manifest,total715.98s trước upload. One model/seed,validation đã
+được xem nhiều lần nên chưa có independent confirmation. Hướng tiếp theo hợp lý
+là kiểm chứng khả năng bổ sung của **LPIPS x residual scoring** trước khi tăng
+chi phí re-sampling;đây là đề xuất,chưa có run mới. Xem
+[AUTODDPM_LPIPS.md](AUTODDPM_LPIPS.md) vàRESULT_TRACKING cho đủmetrics/provenance.

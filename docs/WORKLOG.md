@@ -20,6 +20,90 @@ source data in this file.
 
 ## Entries
 
+### 2026-11-06 — Publish memory fusion and LPIPS AutoDDPM findings to Git
+- User requested pushing the latest measured results. Collected implementation,
+  tests, fixed protocols and full memory-bank/LPIPS AutoDDPM aggregate reports
+  on `feat/anoddpm-notebook-training`; preserved the supplied method document.
+- Evidence: Existing full suite158passed and both smoke/full GPU attempts are
+  recorded above. No implementation edits since those checks; no test rerun or
+  new GPU run for this publication. Reviewed staged files, whitespace and
+  credential patterns; private data, banks, weights and run arrays stay ignored.
+- Scientific conclusion preserved: initial LPIPS x residual scoring beats final
+  re-sampling scores in this exploratory fold; brightness still has higher AP.
+
+### 2026-11-06 — Verify full LPIPS AutoDDPM validation outcome
+- Evidence:Completed/uploadedbab00576 for83samples;verified aggregate JSON SHA
+  against manifest,source/checkpoint/cache hashes,normal-calibration mask
+  threshold and no-test flag. Recorded all8pixel/image metric arms,mask coverage,
+  normal ROI and timing. No new GPU job,training,threshold search or unit rerun.
+- Conclusion:Primaryweighted finalAP0.154785 improves baseline0.101066,finalSSIM
+  0.149446 improves0.102402,but initialLPIPSxresidual heatmapAP0.204298 is higher
+  than any re-sampled arm. Absolute re-samplingAP0.129407 vs naive stitch0.118781
+  is a modest incremental gain. Brightness pixelAP0.389506 remains stronger.
+  Maskrecall83.7541%/precision13.3407%;outside-context error0 is imposed.
+- Records:Updated protocol,full results and consolidated conclusions;numeric
+  and whitespace checks only. Treat results as exploratory on inspectedvalidation.
+
+### 2026-11-06 — Implement LPIPS pseudo-mask/stitch/re-sample on Gaussian EMA30
+- Changes: Added frozen spatial SqueezeNet LPIPS0.1 mask branch on verifiedt300
+  cache,normal-calibration95percentile mask threshold,existing50step x5repeat
+  tested inpainting sampler,strict outside-context check and naive-stitch control.
+  Eight fixed score arms,calibration-only score thresholds,private prefix/maps
+  and T4 smoke/full lifecycle;no DDPM training. Documented departures from
+  official AutoDDPM and prior unsuccessful t200 SSIM-proxy trial.
+- Checks:158tests passed18.44s,targeted Ruff/format and whitespace passed.
+  New tests cover LPIPS range/channel/crop,normal-only mask calibration leakage,
+  fixed threshold/dilation. Existing sampler tests cover RNG/context/repeats.
+- GPU attempt:bounded2image smokeautoddpm-lpips-smoke-t4-20261106T061700Z,
+  appap-852Pcx7xpt7qW71tJ7MVbD completed/uploaded87d0943c;real LPIPS outputs
+  finite,outside-maskerror0,threshold0.13774138689,elapsed24.315s,no AP. Verified
+  aggregate result checksum against manifest. Exact sourceb4a1fb55cfed8acb8aaa2004b04ae76e581e6f0b05d71e4bc07a7f7f4bea18b2.
+- Next:Full83comparison launched detached asautoddpm-lpips-full83-t4-20261106T061833Z,
+  appap-Q53OLMLNmmu3h6rZCVv2cV,same implementation;metrics pending.
+  Durable manifest confirms running,TeslaT4,source identical to smoke,1/83.
+  No final test or retraining. Check on user request,not continuous monitoring.
+
+### 2026-11-06 — Verify completed full normal memory fusion results
+- Evidence: Full run completed/uploaded01c5995f; verified downloaded aggregate
+  result SHA against manifest,all7500normal train/10000bank/83validation,
+  exactsource and no-test flag. Recorded six-arm pixel/image metrics,20normal
+  calibration normalization,recall operating points,bank hash and timing.
+- Conclusion: absolute-fusion pixelAP0.102374 vs baseline0.101066 is a tiny gain;
+  SSIM-fusion0.087033 vs0.102402 declines. Memory-only pixelAP0.064212 but imageAP
+  0.822745: distinguish image ranking from localization, and note calibrated
+  image threshold predicts allholdout images positive. Brightness pixelAP0.389506
+  remains much stronger. Updated protocol/report and tracking from real artifacts.
+- Checks: Result checksum/status/numeric records; whitespace for record-only
+  edits. No new tests,training,GPU inference,alpha tuning or final-test access.
+
+### 2026-11-06 — Launch authorized full DDPM memory fusion validation
+- User explicitly approved the full run after the successful bounded smoke.
+- Launched detached `memory-fusion-full83-t4-20261106T055134Z` on team T4,
+  app `ap-UiDz4LoIR7Zey5Ld1cUuoA`. Fixed seed17/alpha0.5; all7500normal
+  training slices,10000-vector bank,83validation samples and existing40/43
+  calibration/group holdout. Reuses Gaussian EMA30 ancestral t300 cache.
+- Evidence: Durable manifest confirms running at05:51:56UTC,TeslaT4,bank10000,
+  no train subset cap and no test use; exact source hash matches successful smoke.
+  Source/config unchanged since155-test/smoke checks. No new unit run for launch-only work.
+- Next: Check artifacts on user request; no continuous polling or new experiment.
+
+### 2026-11-06 — Implement frozen normal memory bank fusion with DDPM
+- Changes: Added frozen official ImageNet grayscale ResNet18 layer2/layer3
+  extraction, normal-train-only random bank construction/persistence/checksums,
+  bounded exact neighbor search, padded-grid/crop alignment and separate fixed
+  alpha0.5 absolute/SSIM fusion. Reused verified Gaussian EMA30 cache without
+  changing DDPM training or sampling. Added normal-calibration median/IQR,
+  frozen thresholds/recall operating points, six-arm grouped evaluation and
+  private maps/predictions/examples. Preserved user method specification.
+- Checks:155 tests passed17.48s, targeted Ruff passed, whitespace checked. New9
+  tests cover frozen BN/feature dimensions, deterministic chunk-independent
+  sampling, foreground/alignment, exact neighbors, bank metadata/checksum,
+  normal-only guard, normalization leakage, recall threshold and cache ordering.
+  T4 smoke16normaltrain/128bank/2validation completed/uploaded56552b57;
+  finite aligned fusion maps and bank roundtrip passed, no AP measured.
+- Next: Full7500normal/10000bank/83validation is explicitly gated by the supplied
+  method specification. Exact command and caveats in DDPM_MEMORY_FUSION.md.
+
 ### 2026-11-06 — Prepare research implementation and results for Git push
 - Changes: Collected global A/B and spatial conditioning, matched unconditional
   fine-tuning, condition ablation, K4 uncertainty scoring, configs, tests and

@@ -25,6 +25,173 @@ the detailed run record; link them here and keep a compact comparison summary.
 
 ## Comparison summary
 
+### 2026-11-06 — LPIPS AutoDDPM t300 full83 comparison
+
+- Run `autoddpm-lpips-full83-t4-20261106T061833Z`: **completed/uploaded**,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-Q53OLMLNmmu3h6rZCVv2cV).
+  Same fixed source/config after successful2image LPIPS smoke; all83validation,
+  40calibration/43group holdout, no final test and no training.
+- Durable manifest started06:19:02UTC,TeslaT4,modefull;resampling1/83 confirmed.
+  Exact source SHA matches smokeb4a1fb55cfed8acb8aaa2004b04ae76e581e6f0b05d71e4bc07a7f7f4bea18b2.
+- Primary final absolute residual times initialLPIPSheatmap,8fixed score arms,
+  including initialDDPM absolute/SSIM,naive stitch and brightness. Thresholds fit
+  calibration only; report pseudo-mask lesion coverage and normal ROI fraction.
+  Do not claim selective tumor removal from imposed exact-context preservation.
+- Completed06:31:00UTC (13:31Vietnam);total715.978341s before upload,
+  peak104408576B. Private immutable revision
+  [bab00576](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/bab00576bb8271ddb191c8fcd13840eff40f1919/evaluations/autoddpm-lpips-full83-t4-20261106T061833Z).
+  Root aggregate result SHA verified against manifest:
+  `6fb277491308c63b2cc52fa614fc912486266a9c3322f7f099aff850cb51a7e0`.
+- Full83samples verified,no final test;existing40calibration/43group holdout,
+  pooled20normal-calibration mask threshold0.13774138689041138 unchanged from
+  smoke. LPIPSstate/source/checkpoint/cache hashes unchanged. Baseline and
+  brightness AP reproduce. Score thresholds fit calibration and frozen.
+- Allfollowing metrics are on43group holdout,pixel globalmicro240crop;
+  normalFPR is positive-pixel fraction on empty-mask normal images. One seed.
+
+| Method | Pixel AUROC | Precision | Recall | F1/Dice | Pixel AP | Normal FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| Initial absolute | 0.876854 | 0.119934 | 0.314702 | 0.173678 | 0.101066 | 0.058079 |
+| Initial SSIM | 0.888870 | 0.110476 | 0.257712 | 0.154654 | 0.102402 | 0.055234 |
+| Initial LPIPS heatmap | 0.915842 | 0.268360 | 0.280623 | 0.274354 | 0.204298 | 0.010727 |
+| Naive stitch absolute | 0.859269 | 0.145251 | 0.346195 | 0.204641 | 0.118781 | 0.047041 |
+| Resampled absolute | 0.863330 | 0.161567 | 0.383865 | 0.227416 | 0.129407 | 0.044342 |
+| Resampled SSIM | 0.922853 | 0.158391 | 0.379323 | 0.223469 | 0.149446 | 0.045201 |
+| Weighted resampled absolute (primary) | 0.866490 | 0.185318 | 0.290408 | 0.226256 | 0.154785 | 0.026640 |
+| Brightness | 0.950197 | 0.161469 | 0.788577 | 0.268051 | 0.389506 | 0.134935 |
+
+| Method | Image AUROC | Image AP | Precision | Recall | F1 |
+|---|---:|---:|---:|---:|---:|
+| Initial absolute | 0.263158 | 0.430006 | 0.558140 | 1.000000 | 0.716418 |
+| Initial SSIM | 0.372807 | 0.505258 | 0.558140 | 1.000000 | 0.716418 |
+| Initial LPIPS heatmap | 0.807018 | 0.887665 | 0.606061 | 0.833333 | 0.701754 |
+| Naive stitch absolute | 0.412281 | 0.481000 | 0.558140 | 1.000000 | 0.716418 |
+| Resampled absolute | 0.491228 | 0.534048 | 0.585366 | 1.000000 | 0.738462 |
+| Resampled SSIM | 0.554825 | 0.581114 | 0.600000 | 0.875000 | 0.711864 |
+| Weighted resampled absolute (primary) | 0.739035 | 0.814398 | 0.633333 | 0.791667 | 0.703704 |
+| Brightness | 0.679825 | 0.770309 | 0.571429 | 1.000000 | 0.727273 |
+
+- Holdout pseudo-mask lesion recall83.7541%,precision13.3407%,ROI14.1171%;
+  normal ROI after dilation11.7060%. Calibration lesion recall89.2360%,
+  precision11.2842%,ROI13.0640%,normal ROI11.6789%. Mask misses16.2459% of
+  holdout lesion pixels. Outside-mask reconstruction error exactly0 is imposed,
+  not proof of better healthy-tissue restoration. Fivepercent calibration target
+  is before dilation,not the final normal mask fraction or detection FPR.
+- Conclusion:primary AP0.154785 and resampledSSIM0.149446 improve on baseline
+  absolute0.101066/SSIM0.102402. Re-sampling adds0.010626 AP over naive stitch
+  for unweighted absolute,but the initial LPIPS heatmap achieves higherpixelAP
+  0.204298,imageAP0.887665,andF1/Dice0.274354 than any finalresampled score.
+  Do not attribute the entire gain to inpainting or claim re-sampling is the best
+  pipeline. Brightness remains higherpixelAP0.389506;LPIPSheatmap F1 is slightly
+  higher at a different calibrated operating point with much lower recall.
+- Exploratory inspected validation,one checkpoint/sampling seed;not significance,
+  guaranteed tumor removal or exact official AutoDDPM reproduction. No further
+  GPU job,mask tuning or final-test evaluation on this result check. Full protocol
+  inAUTODDPM_LPIPS.md.
+
+### 2026-11-06 — LPIPS AutoDDPM t300 bounded smoke
+
+- Run `autoddpm-lpips-smoke-t4-20261106T061700Z`: **completed/uploaded**,
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-852Pcx7xpt7qW71tJ7MVbD).
+  CPU image preparation installs LPIPS0.1.4/torchvision and caches official
+  SqueezeNet weights before GPU work. Private revision
+  [87d0943c](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/87d0943c3b1de7be211997c771c00edf495746b8/evaluations/autoddpm-lpips-smoke-t4-20261106T061700Z).
+- Requested Gaussian EMA30 t300/cache -> LPIPS pseudo-mask -> stitch ->50steps
+  x5repeat re-sampling. Threshold fit20normal calibration only, mask dilation3,
+  seed17,batch1,T4. Only2images re-sampled;no smoke AP. Dataset/source/cache SHAs
+  and full interpretation constraints in [protocol](AUTODDPM_LPIPS.md).
+- Code parentd282f023afee1e33e4d7444ef842b10b69b6e649 with dirty source;
+  exact snapshotb4a1fb55cfed8acb8aaa2004b04ae76e581e6f0b05d71e4bc07a7f7f4bea18b2.
+  Root results checksum matches manifest. Prior t200 SSIM-proxy
+  pilot remains separately recorded; this is an adaptation,not exact AutoDDPM.
+- Started06:17:46UTC,completed06:18:18UTC. Result elapsed24.315037s before upload,
+  peak104408576B;both2outputs finite,maximum outside-mask error0. No AP measured.
+  Maskthreshold0.13774138689041138 fit20normal calibration only,dilation3,
+  LPIPSstateSHA18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6.
+
+### 2026-11-06 — Authorized full normal memory fusion on T4
+
+- Run `memory-fusion-full83-t4-20261106T055134Z`: **completed/uploaded**.
+  Started05:51:56UTC,completed05:54:22UTC (12:54:22Vietnam).
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-UiDz4LoIR7Zey5Ld1cUuoA).
+  User explicitly authorized full validation after the bounded smoke.
+- Confirmed TeslaT4,modefull,bank budget10000,no train subset cap,
+  held_out_test_used=false. All7500normal train slices supply the bank;
+  existing83validation/40calibration/43group-holdout protocol,seed17/alpha0.5,
+  normal-calibration median/IQR and frozen thresholds. Reuses baseline cached
+  EMA30 ancestral t300 reconstructions; no DDPM/encoder optimization.
+- Dataset `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; code parent
+  `d282f023afee1e33e4d7444ef842b10b69b6e649`, dirty source snapshot
+  `10ea0e671a1adeb29939896e94df9491db721bca622231939ec93026c629546e`
+  matches successful smoke. Private output prefix
+  `evaluations/memory-fusion-full83-t4-20261106T055134Z` on team run Volume;
+  [private immutable revision](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/01c5995f6ec19092df7bb4ac302861399f2de868/evaluations/memory-fusion-full83-t4-20261106T055134Z).
+- Verified results SHA against manifest:
+  `bfeb1f4573a6a0cef68cc68df6e8d86f0a3d7824080674cfb39e39547faaf476`.
+  Bank10000vectors from1929258eligible descriptors/all7500normal training slices;
+  bank SHA `458044bfaaa8c4a3ac8dbb71fe431ed23aef9d352e43e285b071b78207ad1452`.
+  Total145.250545s before upload; bank-build phase46.909080s includes setup;
+  peak118366208B. Full83 evaluated; thresholds calibrated40,frozen43group holdout.
+- Pixel metrics below: global micro over240crop, AP from continuous maps,
+  normal FPR on empty-mask holdout images; F1 is micro Dice. One model/bank seed.
+
+| Method | Pixel AUROC | Precision | Recall | F1/Dice | Pixel AP | Normal FPR |
+|---|---:|---:|---:|---:|---:|---:|
+| DDPM absolute | 0.876854 | 0.119934 | 0.314702 | 0.173678 | 0.101066 | 0.058079 |
+| DDPM SSIM | 0.888870 | 0.110476 | 0.257712 | 0.154654 | 0.102402 | 0.055234 |
+| Memory only | 0.824773 | 0.080935 | 0.516555 | 0.139943 | 0.064212 | 0.134794 |
+| Absolute + memory | 0.882715 | 0.122895 | 0.342155 | 0.180837 | 0.102374 | 0.061204 |
+| SSIM + memory | 0.881029 | 0.097198 | 0.340198 | 0.151198 | 0.087033 | 0.079000 |
+| Brightness | 0.950197 | 0.161469 | 0.788577 | 0.268051 | 0.389506 | 0.134935 |
+
+| Method | Image AUROC | Image AP | Precision | Recall | F1 |
+|---|---:|---:|---:|---:|---:|
+| DDPM absolute | 0.263158 | 0.430006 | 0.558140 | 1.000000 | 0.716418 |
+| DDPM SSIM | 0.372807 | 0.505258 | 0.558140 | 1.000000 | 0.716418 |
+| Memory only | 0.703947 | 0.822745 | 0.558140 | 1.000000 | 0.716418 |
+| Absolute + memory | 0.271930 | 0.434041 | 0.558140 | 1.000000 | 0.716418 |
+| SSIM + memory | 0.574561 | 0.638276 | 0.615385 | 1.000000 | 0.761905 |
+| Brightness | 0.679825 | 0.770309 | 0.571429 | 1.000000 | 0.727273 |
+
+- Normalization fit20normal calibration slices only. Median/IQR:
+  absolute0.010425895/0.019146100,SSIM0.010653948/0.312484438,
+  memory1.974215567/1.045310348; IQR floor inactive. Alpha0.5 fixed independently
+  for both arms. Baseline/brightness AP reproduce registered controls.
+- Conclusion: absolute fusion AP gain only0.001308, F1 increases with higher
+  normal FPR; SSIM fusion AP decreases0.015370. No meaningful localization
+  improvement established, brightness much stronger. Memory imageAP0.822745
+  exceeds brightness0.770309 in this fold, but pixelAP0.064212 is weak; its
+  calibrated image threshold predicts every holdout image positive, so improved
+  ranking is not useful thresholded detection at this operating point.
+- Calibration recall operating points0.5/0.8 are frozen, not tuned on holdout.
+  At target0.5 absolute baseline actual holdout recall0.397422/FPR0.074755,
+  fusion0.389988/0.070659; at0.8 baseline0.744712/0.169766,
+  fusion0.731731/0.172324. Not exactly matched sensitivity; no unconditional
+  false-positive reduction claim. Repeatedly inspected validation; exploratory,
+  no final-test access or extra GPU experiment during this result check.
+
+### 2026-11-06 — Normal memory fusion bounded T4 smoke
+
+- Run `memory-fusion-smoke-t4-20261106T054850Z`: **completed/uploaded**.
+  [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-VhtxgtRhs1AZl73YfYqZHp),
+  [private immutable artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/56552b5792438971d008bb02eb1b4a72c6843902/evaluations/memory-fusion-smoke-t4-20261106T054850Z).
+- Dataset `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`; code parent
+  `d282f023afee1e33e4d7444ef842b10b69b6e649`, dirty source snapshot
+  `10ea0e671a1adeb29939896e94df9491db721bca622231939ec93026c629546e`.
+- Official frozen grayscale ImageNet ResNet18 layer2/layer3,384D descriptors,
+  seed17 uniform random priorities,16 normal train slices,4165eligible vectors,
+  bank budget128. No optimizer, no encoder/DDPM training, no final-test access.
+  Bank SHA `cdd42ae60b8a374c870d1961d7e8f2a716ca04a2e2370b554c7ce82168f30f3d`.
+- Verified original Gaussian EMA30/t300 baseline cache SHA
+  `8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959`
+  and full83image/mask/label ordering; scored only2validation images. Persisted
+  bank reload/checksum and finite240crop memory/absolute-fusion/SSIM-fusion pass.
+- Result total8.230089s before upload; bank-build phase6.018607s includes setup,
+  peak117029888B. Manifest started05:48:20UTC,completed05:48:29UTC.
+  **No AP/AUROC/P/R/F1 or threshold result measured on smoke.** Full7500normal/
+  10000bank/83validation remains unrun, pending explicit authorization per
+  [the specification](fusionmemorybank.md). See [protocol](DDPM_MEMORY_FUSION.md).
+
 Add one row per completed evaluation protocol. Split and metric level must be
 clear; do not combine metrics from different splits or score definitions.
 
