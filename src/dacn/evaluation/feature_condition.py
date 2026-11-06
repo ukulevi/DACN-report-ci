@@ -2,6 +2,7 @@
 
 import csv
 import hashlib
+import io
 import json
 
 import numpy as np
@@ -27,7 +28,8 @@ def evaluate_feature(
     experiment_control_results=None,
 ):
     baseline_sha = "8278ad18543dd87f698c36b510564b9fcd4445d4a1b0ae5d7a859093e2a4e959"
-    if hashlib.sha256(baseline_cache.read_bytes()).hexdigest() != baseline_sha:
+    baseline_bytes = baseline_cache.read_bytes()
+    if hashlib.sha256(baseline_bytes).hexdigest() != baseline_sha:
         raise ValueError("Registered Gaussian baseline cache differs")
     result = evaluate_patch_validation(
         validation_dir=validation_dir,
@@ -44,7 +46,7 @@ def evaluate_feature(
         images, reconstructed, masks, labels, noisy = [
             cache[key] for key in ("images", "reconstructions", "masks", "labels", "noisy_images")
         ]
-    with np.load(baseline_cache, allow_pickle=False) as cache:
+    with np.load(io.BytesIO(baseline_bytes), allow_pickle=False) as cache:
         for key, expected in (("images", images), ("masks", masks), ("labels", labels)):
             if not np.array_equal(cache[key], expected):
                 raise ValueError("Baseline/conditional evaluation samples differ")
@@ -132,10 +134,11 @@ def evaluate_feature(
     if experiment_A_results is not None:
         result["experiment_A_comparison"] = compare_experiment_A(result, experiment_A_results)
     if experiment_B_results is not None:
-        digest = hashlib.sha256(experiment_B_results.read_bytes()).hexdigest()
+        payload = experiment_B_results.read_bytes()
+        digest = hashlib.sha256(payload).hexdigest()
         if digest != "17cea7ce87afc15332835ffdafa514b2758883d92510339f86bb45b521ac247d":
             raise ValueError("Registered experiment B results differ")
-        reference = json.loads(experiment_B_results.read_text())
+        reference = json.loads(payload)
         for key in (
             "index_sha256",
             "partition",
@@ -156,10 +159,11 @@ def evaluate_feature(
             "B_reconstruction_quality": reference["reconstruction_quality"]["feature_condition"],
         }
     if experiment_control_results is not None:
-        digest = hashlib.sha256(experiment_control_results.read_bytes()).hexdigest()
+        payload = experiment_control_results.read_bytes()
+        digest = hashlib.sha256(payload).hexdigest()
         if digest != "babbd335d6a9c40e64d23b2e7dded4dd8f195e3522669586713488ced3f62c7e":
             raise ValueError("Registered matched control results differ")
-        reference = json.loads(experiment_control_results.read_text())
+        reference = json.loads(payload)
         for key in (
             "index_sha256",
             "partition",
@@ -188,10 +192,11 @@ def evaluate_feature(
 
 def compare_experiment_A(result, path):
     """Compare registered A aggregates without selecting B from anomaly metrics."""
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
+    payload = path.read_bytes()
+    digest = hashlib.sha256(payload).hexdigest()
     if digest != "a8e57ed824c9e6a00404d82296f15fb208eabb9d8d911c06fcd983dfb8b5a962":
         raise ValueError("Registered experiment A results differ")
-    reference = json.loads(path.read_text())
+    reference = json.loads(payload)
     for key in (
         "index_sha256",
         "partition",

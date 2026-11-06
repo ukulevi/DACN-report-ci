@@ -1,6 +1,7 @@
 """Inference-only interventions on B's fixed EMA checkpoint and validation cache."""
 
 import hashlib
+import io
 import json
 from pathlib import Path
 
@@ -50,7 +51,8 @@ def donor_index(sample_id, count):
 def verified_reference(reference_dir, checkpoint_path, validation_dir):
     reference_dir = Path(reference_dir)
     path = reference_dir / "results" / "results.json"
-    if hashlib.sha256(path.read_bytes()).hexdigest() != B_RESULTS_SHA:
+    result_bytes = path.read_bytes()
+    if hashlib.sha256(result_bytes).hexdigest() != B_RESULTS_SHA:
         raise ValueError("Registered B result differs")
     if hashlib.sha256(Path(checkpoint_path).read_bytes()).hexdigest() != B_SHA:
         raise ValueError("Registered B checkpoint differs")
@@ -58,19 +60,20 @@ def verified_reference(reference_dir, checkpoint_path, validation_dir):
         raise ValueError("Validation index differs")
     manifest = json.loads((reference_dir / "run_manifest.json").read_text())
     cache_path = reference_dir / "results" / "private_reconstructions.npz"
+    cache_bytes = cache_path.read_bytes()
     if (
-        hashlib.sha256(cache_path.read_bytes()).hexdigest()
+        hashlib.sha256(cache_bytes).hexdigest()
         != manifest["artifacts"]["results/private_reconstructions.npz"]
     ):
         raise ValueError("Registered correct-condition cache differs")
-    result = json.loads(path.read_text())
+    result = json.loads(result_bytes)
     if (
         result["checkpoint_sha256"] != B_SHA
         or result["samples"] != 83
         or result["held_out_test_used"]
     ):
         raise ValueError("Invalid B reference protocol")
-    with np.load(cache_path, allow_pickle=False) as cache:
+    with np.load(io.BytesIO(cache_bytes), allow_pickle=False) as cache:
         arrays = {key: cache[key].copy() for key in cache.files}
     return result, arrays
 

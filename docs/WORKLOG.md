@@ -1,5 +1,13 @@
 # Worklog
 
+## 2026-11-06 — Verify evaluator inputs from the same bytes
+
+For feature-condition and condition-intervention comparisons, parse verified
+result JSON and NPZ caches from the same bytes that were hashed. Two synthetic
+tests first reproduced reopening of verified inputs; after the fix the relevant
+14 tests passed. Checkpoint loading and resumable-prefix identity remain open in
+BLK-20261106-01. No training or evaluation run was started.
+
 ## 2026-11-06 — Integrate C into B and repair CI collection
 
 Merged C `c02addb` into B `5aa4823`, preserving both result/worklog histories.

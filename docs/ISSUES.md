@@ -45,6 +45,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   hai phía. Đã sửa test optional Torch và sai khác rounding; full suite 237 pass,
   data/dev 121 pass / 22 skip với basetemp riêng ngoài sandbox. Branch push đã
   bật CI. Các guard cache/checkpoint và team acceptance vẫn cần review.
+- **Progress tiếp:** feature-condition và condition-intervention giờ parse JSON/
+  NPZ từ đúng bytes được hash; 2 regression tests tái hiện lỗi cũ và 14 tests liên
+  quan pass. Hash của checkpoint trong condition-intervention vẫn được xác minh
+  riêng trước khi caller tải checkpoint; chưa tuyên bố đường đó đã an toàn.
 - **Action needed:** B/C kiểm và sửa cache-prefix, hash-before-reopen và
   parent-checkpoint guards; kiểm cache mới bằng UUID adapter; review và nghiệm thu.
   Theo dõi Windows temp trên CI vì test sandbox mặc định không tạo được fixture.

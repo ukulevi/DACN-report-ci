@@ -17,6 +17,49 @@ from dacn.training import feature_condition as training
 from dacn.training.ddpm_partial import _fixed_rng, build_diffusion, load_ema_checkpoint
 
 
+def test_experiment_a_uses_verified_bytes_without_reopening(monkeypatch):
+    import json
+
+    from dacn.evaluation import feature_condition as evaluation
+
+    keys = (
+        "index_sha256",
+        "partition",
+        "timesteps_one_based",
+        "sampling_base_seed",
+        "partition_seed",
+        "samples",
+        "ema",
+        "reconstruction_mode",
+        "baseline_cache_sha256",
+    )
+    reference = dict.fromkeys(keys, "same")
+    reference.update(
+        checkpoint_sha256="checkpoint",
+        checkpoint_epoch=1,
+        metrics={},
+        reconstruction_quality={"feature_condition": {}},
+    )
+    payload = json.dumps(reference).encode()
+
+    class ChangingPath:
+        def read_bytes(self):
+            return payload
+
+        def read_text(self):
+            raise AssertionError("verified file reopened")
+
+    class Digest:
+        def hexdigest(self):
+            return "a8e57ed824c9e6a00404d82296f15fb208eabb9d8d911c06fcd983dfb8b5a962"
+
+    monkeypatch.setattr(evaluation.hashlib, "sha256", lambda value: Digest())
+    assert (
+        evaluation.compare_experiment_A(reference, ChangingPath())["A_checkpoint_sha256"]
+        == "checkpoint"
+    )
+
+
 def trained_backbone():
     model = UNetModel(
         img_size=32,

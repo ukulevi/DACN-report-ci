@@ -90,3 +90,44 @@ def test_donor_mapping_is_fixed_and_reconstruction_delta_uses_original_crop():
     assert result["normal_mean_absolute_change_01"] == pytest.approx(0.1)
     with pytest.raises(ValueError):
         compare_reconstructions(reference, observed[:1], np.array([0, 1]))
+
+
+def test_reference_loads_the_same_cache_bytes_that_were_verified(tmp_path, monkeypatch):
+    import hashlib
+    import io
+    import json
+
+    from dacn.evaluation import condition_ablation as module
+
+    result_dir = tmp_path / "results"
+    result_dir.mkdir()
+    checkpoint = tmp_path / "checkpoint"
+    checkpoint.write_bytes(b"checkpoint")
+    index_dir = tmp_path / "validation"
+    index_dir.mkdir()
+    (index_dir / "index.csv").write_bytes(b"index")
+    result = {
+        "checkpoint_sha256": hashlib.sha256(b"checkpoint").hexdigest(),
+        "samples": 83,
+        "held_out_test_used": False,
+    }
+    payload = json.dumps(result).encode()
+    (result_dir / "results.json").write_bytes(payload)
+    cache = result_dir / "private_reconstructions.npz"
+    np.savez(cache, reconstructions=np.zeros((1, 2)))
+    digest = hashlib.sha256(cache.read_bytes()).hexdigest()
+    (tmp_path / "run_manifest.json").write_text(
+        json.dumps({"artifacts": {"results/private_reconstructions.npz": digest}})
+    )
+    monkeypatch.setattr(module, "B_SHA", result["checkpoint_sha256"])
+    monkeypatch.setattr(module, "B_RESULTS_SHA", hashlib.sha256(payload).hexdigest())
+    monkeypatch.setattr(module, "INDEX_SHA", hashlib.sha256(b"index").hexdigest())
+    original_load = np.load
+
+    def checked_load(value, **kwargs):
+        assert isinstance(value, io.BytesIO), "cache was reopened after hash verification"
+        return original_load(value, **kwargs)
+
+    monkeypatch.setattr(module.np, "load", checked_load)
+    _, arrays = module.verified_reference(tmp_path, checkpoint, index_dir)
+    assert arrays["reconstructions"].shape == (1, 2)
