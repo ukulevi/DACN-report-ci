@@ -15,6 +15,10 @@ User screenshot confirms CI blocked before job startup by account/payment
 annotation. BLK-20261107-01 now Waiting for repo owner's Billing/Actions fix;
 no workflow/budget/payment mutation performed.
 
+Follow-up: exported git archive cf7de8f and pinned source/native LPIPS/environment
+hashes in candidate JSON; status remains candidate. Source ZIP and weights remain
+private under runs. Isolated RGBA rename rerun passed (0.29s); no root-cause fix.
+
 ## 2026-11-07 — Sequential audit follow-up: workspace and frozen orchestration
 
 Linear connector now verifies DACN-KHMT. Re-ran Windows reproduction: isolated

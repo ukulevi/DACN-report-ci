@@ -4,12 +4,12 @@
   "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
   "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
   "artifacts": {
-    "source_snapshot": null,
+    "source_snapshot": "6e770b536f68027e6e6aceb20cb2c43615ca397a99804f9ed679fe84181ffc0d",
     "config": "1d731fe0b773df643a5d03f19dd84a85ae2de3c0347783186a84c0f5c6e69c9f",
     "checkpoint": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
-    "lpips_backbone": null,
-    "lpips_calibration": null,
-    "dependency_lock": null,
+    "lpips_backbone": "6c58a8848413ba974fb64345adea3f5cee7888fe894c436fda33a7d87686c672",
+    "lpips_calibration": "f6e69d87ad68e0e74712addc8e06f20ed111f744fffb97411d7d2da4ef953dbf",
+    "dependency_lock": "ab0fac04da0a3103407192c98b0073588bc8375d42ae00bd407cdfe577fda929",
     "validation_index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
     "mask_parameters": "39ee181e3c783fa516c3f2f1294de31aab8239eb09ce9bed3c287872aef8bd16"
   },
@@ -18,9 +18,11 @@
     "image": 0.24719371760470998
   },
   "pending": [
-    "Pin execution source snapshot after changes",
-    "Capture actual LPIPS backbone and calibration weights",
-    "Pin dependency lock for execution environment"
+    "Verify trained DDIM reconstruction and resume end-to-end on bounded validation",
+    "Verify actual runtime source, dependencies and dataset content against captured artifacts",
+    "Benchmark memory/latency and freeze separate control contracts before final acceptance"
   ],
+  "execution_source_commit": "cf7de8f",
+  "environment_scope": "New Windows CPU environment; all83 cached LPIPS pairs match at atol1e-6; historical runtime identity not established",
   "scope": "Candidate for final LPIPS scoring only; controls require their own frozen contracts; no test authorization from this file"
 }

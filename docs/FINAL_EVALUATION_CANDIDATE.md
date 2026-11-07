@@ -16,6 +16,15 @@ dependency lock, validation index và mask parameters. Các file private ở run
 manifest chỉ chứa hash và thông số tổng hợp. LPIPS hiện chưa cài tại local và
 không có weights trong cache được kiểm tra; cần chụp hashes từ môi trường thực thi.
 
+## Cập nhật pins 07/11/2026
+
+Đã export source snapshot commit cf7de8f và native LPIPS trunk/head cùng dependency
+freeze từ môi trường Windows CPU mới; hash điền vào candidate JSON. LPIPS trên
+83 cached initial/final pairs khớp cả166maps, maxabs5.2154e-7. Đây là môi trường
+mới, không tuyên bố giống runtime lịch sử. Candidate vẫn chưa frozen: còn nghiệm
+thu trained DDIM/resume, runtime/source/dataset binding, benchmark và controls.
+Các đoạn mô tả thiếu LPIPS ở phía trên là trạng thái trước cập nhật này.
+
 ## Bằng chứng đã hoàn thành
 
 Replay pixel/image AUROC, AP, Precision, Recall, F1, threshold, macro lesion Dice
