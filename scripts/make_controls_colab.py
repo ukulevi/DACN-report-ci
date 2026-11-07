@@ -23,6 +23,7 @@ ROOT.mkdir(exist_ok=False)
 zipfile.ZipFile(io.BytesIO(SOURCE)).extractall(ROOT)
 os.chdir(ROOT)
 subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-q', '-e', '.[train,hub,perceptual]'])
+sys.path.insert(0, str(ROOT/'src'))
 import torch
 assert torch.cuda.is_available(), 'Choose GPU runtime before continuing'
 print('Source installed; GPU:', torch.cuda.get_device_name(0))
@@ -63,6 +64,8 @@ print('Checkpoint and validation only verified; Colab environment exported.')
 """
     setup = """
 import numpy as np
+import dacn
+assert Path(dacn.__file__).resolve() == ROOT/'src/dacn/__init__.py'
 from dacn.data.shards import ShardDataset
 from dacn.evaluation.frozen_inputs import capture_frozen_inputs
 from dacn.evaluation.runtime_binding import verify_runtime_inputs

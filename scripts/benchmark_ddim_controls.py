@@ -16,6 +16,7 @@ import torch
 from huggingface_hub import try_to_load_from_cache
 
 from dacn.data.shards import ShardDataset
+from dacn.evaluation.dependency_snapshot import version_snapshot
 from dacn.evaluation.frozen_ddim import FrozenDDIMAdapter
 from dacn.evaluation.frozen_inputs import capture_frozen_inputs
 from dacn.evaluation.validation import evaluate_maps
@@ -106,7 +107,7 @@ def main():
         text=True,
         check=True,
     ).stdout
-    if freeze.splitlines() != captured["dependency_lock"].decode().splitlines():
+    if version_snapshot(freeze) != version_snapshot(captured["dependency_lock"].decode()):
         raise ValueError("Dependency versions differ")
     if args.validation.name != "val":
         raise ValueError("Only validation allowed")

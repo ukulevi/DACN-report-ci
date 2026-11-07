@@ -3,8 +3,10 @@
 Notebook riêng: https://colab.research.google.com/drive/1-EsZiZ1uHxWpPXVrzC8nVmLAxjQ3cbeR
 
 User đã chọn Colab GPU cá nhân. Notebook mới giữ nguyên notebook Gaussian20 cũ.
-Source snapshot bf82522 đã cài thành công, Colab cấp Tesla T4. Chưa chạy inference:
-cell acquisition đang chờ HF read token qua getpass. Không ghi token vào code/log.
+Source snapshot bf82522 đã cài thành công, Colab cấp Tesla T4. HF auth/checksums
+đã qua. Đã sửa dependency snapshot cho direct-source Colab packages và import
+path của kernel; source thực sau patch được chụp hash76ea57a97e00a7a6d23687a2a470d801f043c5d108cbae0cdff0acaf52e5ccf6.
+Smoke2 đã hoàn tất; full83 đang chạy với báo cáo43group-holdout riêng.
 
 ## Cách tạo lại notebook
 
@@ -17,8 +19,8 @@ Chạy git archive commit cần dùng vào ZIP riêng tư rồi:
 Notebook có source embedded, tự kiểm SHA; không publish lên Git hoặc chia sẻ
 public. Generator source có thể commit, notebook tạo ra giữ riêng tư.
 Sourcebf82522 chứa adapter/runtime guard và control contracts đã nghiệm thu CPU.
-Notebook generator đang cập nhật full43holdout reporting; cần đồng bộ cell cuối
-trên notebook đã upload trước khi full83, không dùng all83 metrics làm holdout.
+Cell cuối notebook đã đồng bộ full43holdout reporting trước khi full83.
+Không dùng all83 metrics làm holdout.
 
 ## Trình tự
 
@@ -34,4 +36,5 @@ trên notebook đã upload trước khi full83, không dùng all83 metrics làm 
 
 Giới hạn45phút cooperative giữa calls, không hard GPU shutdown. Không tự mua
 compute/đổi gói. Source và data riêng tư đã được người dùng cho phép dùng trên
-Colab; token chỉ nhập ở runtime. Chưa có kết quả GPU mới để báo cáo.
+Colab; token chỉ nhập ở runtime. Kết quả GPU actual đọc từ receipt trong notebook,
+không suy từ kế hoạch hoặc kết quả CPU. Xem RESULT_TRACKING.

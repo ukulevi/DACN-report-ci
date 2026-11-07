@@ -15,6 +15,7 @@ import torch
 from huggingface_hub import try_to_load_from_cache
 
 from dacn.data.shards import ShardDataset
+from dacn.evaluation.dependency_snapshot import version_snapshot
 from dacn.evaluation.frozen_ddim import FrozenDDIMAdapter
 from dacn.evaluation.frozen_runner import run_frozen_evaluation
 
@@ -62,7 +63,9 @@ def main():
         text=True,
         check=True,
     ).stdout
-    if freeze != paths["dependency_lock"].read_text(encoding="utf-8"):
+    if version_snapshot(freeze) != version_snapshot(
+        paths["dependency_lock"].read_text(encoding="utf-8")
+    ):
         raise ValueError("Running dependency versions differ from exported environment")
     (args.output / "acceptance_manifest.json").write_text(json.dumps(manifest, indent=2))
 

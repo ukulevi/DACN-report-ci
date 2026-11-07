@@ -1,5 +1,32 @@
 # Experiment and result tracking
 
+## 2026-11-07 — Colab T4 controls preparation
+
+Preparation attempts (no U-Net inference yet): HF checkpoint/validation/mask
+downloads and checksums passed after user entered read token directly. Initial
+export and diagnostic retry failed on direct-source pip freeze entries.
+First live correction attempt failed on code-transfer newline escaping; retained
+failed cell output, then transferred checksum-verified source patch instead.
+New version-only snapshot resolves installed versions without exporting source
+URLs and is compared consistently by runtime binding. CPU regression9tests pass.
+Colab source is bf82522 plus recorded dependency-export correction; runtime ZIP
+and hashes will identify actual executed source. GPU smoke remains pending.
+
+GPU environment export completed: Torch2.14.1+cu130, torchvision0.29.1+cu130,
+LPIPS0.1.4, numpy2.4.6. LPIPS state digest matches C; source ZIP SHA256
+76ea57a97e00a7a6d23687a2a470d801f043c5d108cbae0cdff0acaf52e5ccf6.
+T4 smoke2 now starting through notebook validation-only gate;100U-Net/6LPIPS
+planned, thresholds unchanged, no test. Runtime writes start/terminal manifest.
+First smoke invocation failed at import before model/dataset access: kernel did
+not re-read editable-install .pth after pip subprocess. Added explicit verified
+ROOT/src import path, matching actual package file to source root. No inference
+calls in failed invocation; resumed preflight with same artifacts before smoke.
+
+T4 smoke completed:2samples,100U-Net/6LPIPS through fixed adapter; runtime/source
+and dependency checks passed, peak CUDA allocated112928768bytes. Full83 validation
+now starting after smoke review; separate registered40cal/43group-holdout report,
+same thresholds/seed17,4150U-Net/249LPIPS planned. No test or training.
+
 ## 2026-11-07 — Shared-trajectory controls and CPU benchmark
 
 Attempt1 failed before inference: dependency text comparison treated Windows

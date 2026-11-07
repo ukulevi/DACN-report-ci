@@ -4,10 +4,14 @@ import io
 import zipfile
 from pathlib import Path
 
+from dacn.evaluation.dependency_snapshot import version_snapshot
+
 
 def verify_runtime_inputs(captured, source_root, dependency_freeze):
     root = Path(source_root).resolve()
-    if dependency_freeze.splitlines() != captured["dependency_lock"].decode().splitlines():
+    if version_snapshot(dependency_freeze) != version_snapshot(
+        captured["dependency_lock"].decode()
+    ):
         raise ValueError("Running dependencies differ from pinned environment")
     with zipfile.ZipFile(io.BytesIO(captured["source_snapshot"])) as archive:
         names = [

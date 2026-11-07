@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-11-07 — Recover Colab environment and launch T4 validation
+
+HF authentication completed, checkpoint/val metadata/index/shard/mask hashes passed.
+Fixed direct-source pip freeze handling with version-only snapshots (no source
+URLs exported), consistent runtime checks, plus explicit verified kernel import
+path after editable pip install.22related tests pass; Ruff passes198files.
+Failed preparation/export/import attempts retained in RESULT_TRACKING.
+T4 smoke2 completed, peak CUDA allocated112928768bytes; full83 launched after
+smoke review with separate43group-holdout report. Actual Colab source is patched
+bf82522, ZIP hash recorded; not mislabeled as pristine Git source. No test/training.
+
 ## 2026-11-07 — Prepare private Colab T4 controls workflow
 
 Generated and uploaded separate private controls notebook from sourcebf82522.

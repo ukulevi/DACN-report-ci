@@ -12,6 +12,7 @@ import lpips
 import torch
 
 from dacn.evaluation.autoddpm_lpips import perceptual_provenance
+from dacn.evaluation.dependency_snapshot import version_snapshot
 
 
 def main():
@@ -37,9 +38,7 @@ def main():
         text=True,
         check=True,
     ).stdout
-    # Keep local file URLs/credentials out of exported environment records.
-    if " @ " in freeze or "://" in freeze:
-        raise ValueError("Environment contains non-version package sources; sanitize privately")
+    freeze = version_snapshot(freeze)
     (args.output / files["dependency_lock"]).write_text(freeze, encoding="utf-8")
     receipt = {
         "scope": "New environment export; not evidence of historical runtime identity",
