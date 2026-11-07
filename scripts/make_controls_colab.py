@@ -47,6 +47,7 @@ def fetch(repo, filename, rev, destination, kind='model'):
     shutil.copyfile(path, destination)
 def sha(path): return hashlib.sha256(path.read_bytes()).hexdigest()
 candidate = json.loads((ROOT/'configs/final_evaluation_candidate.json').read_text())
+assert hashlib.sha256(PARTITION_BYTES).hexdigest() == candidate['artifacts']['validation_partition']
 fetch(MODEL, 'runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_030.pt', MODEL_REV, ENV/'checkpoint.pt')
 assert sha(ENV/'checkpoint.pt') == candidate['artifacts']['checkpoint']
 VROOT = ROOT/'private_data'
@@ -63,6 +64,7 @@ fetch(MODEL, prefix+'comparison/mask_parameters.json', MODEL_REV, ENV/'mask_para
 assert sha(ENV/'mask_parameters.json') == candidate['artifacts']['mask_parameters']
 del TOKEN
 subprocess.check_call([sys.executable, 'scripts/export_lpips_environment.py', '--output', str(ENV/'lpips')])
+assert json.loads((ENV/'lpips/receipt.json').read_text())['network']['state_sha256'] == '18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6'
 print('Checkpoint and validation only verified; Colab environment exported.')
 """
     setup = """
@@ -83,7 +85,10 @@ for key in ('lpips_backbone','lpips_calibration'):
 paths['dependency_lock'] = ENV/'lpips/requirements.freeze.txt'
 paths['source_snapshot'] = ENV/'source.zip'; paths['source_snapshot'].write_bytes(SOURCE)
 manifest = json.loads(json.dumps(candidate))
-manifest['artifacts'] = {key:sha(path) for key,path in paths.items()}
+for key in ('checkpoint','config','validation_index','validation_partition','mask_parameters'):
+    assert sha(paths[key]) == manifest['artifacts'][key]
+for key in ('source_snapshot','lpips_backbone','lpips_calibration','dependency_lock'):
+    manifest['artifacts'][key] = sha(paths[key])
 captured = capture_frozen_inputs(manifest, paths, validation_only=True)
 freeze = subprocess.check_output([sys.executable,'-m','pip','freeze','--exclude-editable'],text=True)
 verify_runtime_inputs(captured, ROOT, freeze)
@@ -146,6 +151,22 @@ with np.load(RUN/'full83_private_maps.npz',allow_pickle=False) as saved:
 FULL.update(report_samples=43,calibration_samples=40,holdout_groups=len(set(groups[hold])),scope='Inspected validation group-holdout43; thresholds from original40calibration, one seed17; no test')
 (RUN/'full83_aggregate.json').write_text(json.dumps(FULL,indent=2))
 print('Full83 inference completed; separate43holdout metrics saved; test still sealed.')
+print(json.dumps({key:FULL[key] for key in ('status','samples','report_samples','calibration_samples','holdout_groups','metrics','cuda_peak_allocated_bytes')},indent=2))
+"""
+    handoff = """
+assert FULL['status']=='completed' and FULL['report_samples']==43
+shutil.copyfile(ENV/'registered_partition.json',RUN/'registered_partition.json')
+items = {'run/'+name:RUN/name for name in ('run_manifest.json','smoke_aggregate.json','full83_aggregate.json','full83_private_maps.npz','registered_partition.json')}
+items.update({'environment/'+name:ENV/'lpips'/name for name in ('lpips_backbone.pth','lpips_calibration.pth','requirements.freeze.txt','receipt.json')})
+items['environment/source.zip'] = ENV/'source.zip'
+(RUN/'bundle_manifest.json').write_text(json.dumps({'files':{key:sha(path) for key,path in items.items()},'scope':'Private validation artifacts; no token/test'},indent=2))
+items['bundle_manifest.json'] = RUN/'bundle_manifest.json'
+BUNDLE = ROOT/'dacn_g30_controls_registered_private.zip'
+with zipfile.ZipFile(BUNDLE,'w',zipfile.ZIP_DEFLATED) as archive:
+    for name,path in items.items(): archive.write(path,arcname=name)
+print('Private bundle',BUNDLE.name,'bytes',BUNDLE.stat().st_size,'SHA256',sha(BUNDLE))
+from google.colab import files
+files.download(str(BUNDLE))
 """
     cells = [
         {
@@ -157,7 +178,7 @@ print('Full83 inference completed; separate43holdout metrics saved; test still s
             ],
         }
     ]
-    for code in (bootstrap, acquire, setup, full):
+    for code in (bootstrap, acquire, setup, full, handoff):
         cells.append(
             {
                 "cell_type": "code",
