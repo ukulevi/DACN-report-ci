@@ -22,6 +22,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 | ID | Blocker | Status | Owner / next handoff | Affects | Last updated |
 |---|---|---|---|---|---|
+| `BLK-20261107-02` | Colab mới chờ HF read authentication | Waiting | Người dùng nhập qua getpass | GPU smoke/full validation | 2026-11-07 |
 | `BLK-20261107-01` | GitHub Actions bị chặn do tài khoản/billing | Waiting | Chủ repo kiểm Billing/Actions | CI head hiện tại | 2026-11-07 |
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
 | `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
@@ -29,6 +30,19 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 | `BLK-20261106-01` | Nghiệm thu resume/cache sau tích hợp | Open | B/C; A review freeze | DAC-11/12/14/15/30 | 2026-11-06 |
 
 ## Blocker details
+
+### BLK-20261107-02 — Private Colab Hugging Face read access
+
+- **Status:** Waiting, 07/11/2026.
+- **Owner/action:** Người dùng tạo token Read của tài khoản có quyền đọc hai repo
+  DACN, nhập trực tiếp vào ô getpass trong notebook controls mới và Enter.
+- **Evidence:** Colab cấp Tesla T4, source bootstrap thành công; acquisition cell
+  đang chờ input. Chưa có GPU inference hoặc metrics từ notebook mới.
+- **Attempts:** Chuẩn bị/upload notebook riêng, cài source, mở getpass; hướng dẫn
+  tạo read token bằng tài liệu HF chính thức. Không lấy token từ chat/log.
+- **Close when:** Checkpoint/validation downloads hoàn tất với checksum đúng;
+  sau đó chạy smoke và đồng bộ cell full43holdout reporting trước full83.
+- **Notebook:** Xem COLAB_CONTROLS_VALIDATION.md. Không công khai notebook/maps.
 
 ### BLK-20261107-01 — CI không khởi động job
 
