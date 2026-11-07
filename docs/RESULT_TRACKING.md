@@ -1,5 +1,23 @@
 # Experiment and result tracking
 
+## 2026-11-07 — Shared-trajectory controls and CPU benchmark
+
+Attempt1 failed before inference: dependency text comparison treated Windows
+CRLF and subprocess-normalized LF as different. Package versions unchanged;
+fixed comparison to line sequences, preserving package/version checks.
+Attempt2 completed: scripts/benchmark_ddim_controls.py, output
+runs/ddim-controls-acceptance-20261107-attempt2. Same trained G30 checkpoint, immutable
+model/dataset revisions and two validation samples as bounded acceptance.
+Four score arms share a50-call U-Net trajectory per sample: final LPIPS, initial
+LPIPS, naive-stitch LPIPS and brightness. Separate image/pixel thresholds copied
+from measured40 calibration/replay, no new fit. Three LPIPS calls/sample.
+CPU threads2/batch1. Windows process-lifetime peak working set and cold/warm
+adapter-call timing measured separately; no GPU/VRAM or held-out test.
+100 U-Net calls,6LPIPS calls, final maps match previous CPU acceptance exactly.
+Cold sample24.398705s, warm sample21.706827s; peak process working set908849152bytes
+through adapter completion before metrics. Diagnostic image/pixel metrics and
+limitations in CONTROLS_ACCEPTANCE_2026-11-07.md; no model selection from2samples.
+
 ## 2026-11-07 — Trained G30 DDIM bounded CPU acceptance
 
 Attempt 1 status: failed at preflight, before dataset/inference. Sampler config

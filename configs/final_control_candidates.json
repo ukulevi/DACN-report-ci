@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "candidate",
+  "scope": "Shared DDIM20+30 input/reconstruction; thresholds replayed from original40 calibration, no refit",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
+  "image_aggregation": "mean top576 over full240crop",
+  "score_comparison": ">=",
+  "arms": {
+    "final_lpips": {"pixel": 0.26617634296417236, "image": 0.24719371760470998},
+    "initial_lpips": {"pixel": 0.2501829266548157, "image": 0.2262084392261588},
+    "naive_stitch_lpips": {"pixel": 0.21649277210235596, "image": 0.20856854640361336},
+    "brightness": {"pixel": 0.48235294222831726, "image": 0.4997753345200585}
+  },
+  "provenance": "docs/RESULT_TRACKING.md full metric replay; runs/audit-2026-11-06/b-full-metrics-results.json",
+  "compute": "One shared50 U-Net trajectory per sample; 3 LPIPS calls for final+initial+naive; brightness no model call",
+  "pending": ["Final runtime binding and broader validation", "Budget/benchmark acceptance before freeze"]
+}

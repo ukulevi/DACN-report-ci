@@ -4,17 +4,19 @@ Trạng thái: **candidate, chưa frozen, chưa cho phép mở test**. Nhóm là
 thứ tự công việc dựa vào prerequisite thay vì chờ người mang role A/B/C.
 
 Manifest máy đọc: [final_evaluation_candidate.json](../configs/final_evaluation_candidate.json).
-Các pin chưa xác minh để `null`; không điền hash suy đoán. Gate
+Các pin hiện có provenance được điền trong JSON; không điền hash suy đoán. Gate
 `dacn.evaluation.frozen_inputs.capture_frozen_inputs(manifest, artifact_paths)`
 kiểm status/schema, immutable dataset revision, artifact hashes và finite
 thresholds, rồi trả lại captured bytes. Runner tương lai phải dùng đúng bytes
-này, không đọc lại file paths. Gate chưa nối với inference runner và không tự
-chạy test. Đây chỉ là contract final LPIPS; controls cần contract riêng.
+này, không đọc lại file paths. Gate đã nối với DDIM adapter và có bounded CPU
+acceptance. Validation-only candidate execution có scope riêng; final yêu cầu
+frozen. Controls dùng contract riêng trong final_control_candidates.json.
 
 Gate yêu cầu source snapshot, config, checkpoint, LPIPS backbone/calibration,
 dependency lock, validation index và mask parameters. Các file private ở runtime;
-manifest chỉ chứa hash và thông số tổng hợp. LPIPS hiện chưa cài tại local và
-không có weights trong cache được kiểm tra; cần chụp hashes từ môi trường thực thi.
+manifest chỉ chứa hash và thông số tổng hợp. LPIPS đã export và xác minh output
+trên83cachedpairs tại local. Runtime final vẫn phải đối chiếu đúng các artifact
+đã pin, không tự suy rằng cùng tên package thì cùng môi trường.
 
 ## Cập nhật pins 07/11/2026
 
@@ -27,9 +29,8 @@ Trạng thái vẫn candidate vì còn acceptance controls/runtime final/benchma
 Đã export source snapshot commit cf7de8f và native LPIPS trunk/head cùng dependency
 freeze từ môi trường Windows CPU mới; hash điền vào candidate JSON. LPIPS trên
 83 cached initial/final pairs khớp cả166maps, maxabs5.2154e-7. Đây là môi trường
-mới, không tuyên bố giống runtime lịch sử. Candidate vẫn chưa frozen: còn nghiệm
-thu trained DDIM/resume, runtime/source/dataset binding, benchmark và controls.
-Các đoạn mô tả thiếu LPIPS ở phía trên là trạng thái trước cập nhật này.
+mới, không tuyên bố giống runtime lịch sử. Nghiệm thu trained DDIM/resume đã đạt
+ở hai mẫu; runtime final và benchmark/controls vẫn phải có bằng chứng riêng.
 
 ## Bằng chứng đã hoàn thành
 

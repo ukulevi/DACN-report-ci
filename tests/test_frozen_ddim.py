@@ -48,7 +48,7 @@ def test_adapter_runs_fifty_calls_with_frozen_mask(monkeypatch):
         "checkpoint": checkpoint.getvalue(),
         "mask_parameters": json.dumps(params).encode(),
     }
-    adapter = frozen_ddim.FrozenDDIMAdapter()
+    adapter = frozen_ddim.FrozenDDIMAdapter(include_controls=True)
     monkeypatch.setattr(frozen_ddim, "build_diffusion", lambda _: build_diffusion({}))
     sample = {
         "image": np.zeros((256, 256), dtype=np.float32),
@@ -60,6 +60,13 @@ def test_adapter_runs_fifty_calls_with_frozen_mask(monkeypatch):
     assert result["pixel_scores"].shape == (57600,)
     assert result["image_scores"] == [0]
     assert result["image_labels"] == [0]
+    assert set(adapter.last_score_maps) == {
+        "final_lpips",
+        "initial_lpips",
+        "naive_stitch_lpips",
+        "brightness",
+    }
+    assert np.all(adapter.last_score_maps["brightness"] == 0.5)
 
 
 def test_perceptual_export_load_roundtrip():

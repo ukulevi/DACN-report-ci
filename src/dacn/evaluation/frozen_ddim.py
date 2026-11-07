@@ -3,6 +3,9 @@
 import io
 import json
 import math
+import subprocess
+import sys
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -14,7 +17,9 @@ from dacn.evaluation.ddim_inpainting import (
     ddim_initial_reconstruction,
     ddim_stitch_resample,
 )
+from dacn.evaluation.frozen_inputs import capture_frozen_inputs
 from dacn.evaluation.frozen_runner import run_frozen_evaluation
+from dacn.evaluation.runtime_binding import verify_runtime_inputs
 from dacn.training.ddpm_partial import (
     build_diffusion,
     derive_sampling_seed,
@@ -40,9 +45,10 @@ def load_perceptual(captured, device):
 class FrozenDDIMAdapter:
     """Lazy model initialization from verified bytes supplied by frozen runner."""
 
-    def __init__(self, device="cpu"):
+    def __init__(self, device="cpu", *, include_controls=False):
         self.device = torch.device(device)
         self.ready = False
+        self.include_controls = include_controls
 
     def initialize(self, captured):
         parameters = json.loads(captured["mask_parameters"])
@@ -123,6 +129,16 @@ class FrozenDDIMAdapter:
             final[0, 0].cpu().numpy(),
             self.device,
         )
+        self.last_score_maps = {"final_lpips": scores["lpips"]}
+        if self.include_controls:
+            initial_array = initial[0, 0].cpu().numpy()
+            stitched = np.where(np.pad(predicted, 8), initial_array, image)
+            naive, _ = ablation_pair_scores(self.perceptual, image, stitched, self.device)
+            self.last_score_maps.update(
+                initial_lpips=initial_scores["lpips"],
+                naive_stitch_lpips=naive["lpips"],
+                brightness=(image[8:-8, 8:-8] + 1) / 2,
+            )
         flat = scores["lpips"].reshape(-1)
         return {
             "pixel_labels": mask[8:-8, 8:-8].reshape(-1),
@@ -132,12 +148,27 @@ class FrozenDDIMAdapter:
         }
 
 
-def run_frozen_ddim(*, manifest, artifact_paths, samples, output_dir, device="cpu"):
+def run_frozen_ddim(
+    *, manifest, artifact_paths, samples, output_dir, device="cpu", source_root="."
+):
     """Connect the frozen-input gate/orchestrator to a fresh DDIM adapter.
 
-    Caller must provide a revision/content-verified dataset factory. Merely
-    pinning source and dependency files does not verify the running interpreter.
+    Caller must provide a revision/content-verified dataset factory.
     """
+    import dacn
+
+    root = Path(source_root).resolve()
+    if Path(dacn.__file__).resolve() != root / "src/dacn/__init__.py":
+        raise ValueError("Imported package is outside the pinned source root")
+    captured = capture_frozen_inputs(manifest, artifact_paths)
+    freeze = subprocess.run(
+        [sys.executable, "-m", "pip", "freeze", "--exclude-editable"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    verify_runtime_inputs(captured, root, freeze)
+    del captured
     return run_frozen_evaluation(
         manifest=manifest,
         artifact_paths=artifact_paths,

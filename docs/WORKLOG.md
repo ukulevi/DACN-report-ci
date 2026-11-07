@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-11-07 — Controls acceptance and final runtime binding
+
+Added separate control candidate thresholds and shared-trajectory score arms.
+Bounded trained CPU controls completed:100U-Net/6LPIPS calls; final map matches
+prior acceptance exactly. Recorded cold/warm timing, Windows working-set peak
+and diagnostic metrics in CONTROLS_ACCEPTANCE. Failed preflight CRLF comparison
+retained in run log, then corrected. Confirmed LPIPS state digest matches C's
+checksum-verified historical result. Added runtime source/import-root/dependency
+verification to final API,17related tests pass; Ruff check/format193files pass.
+User selected personal Colab GPU; preparing smoke-first workflow, not final test.
+
 ## 2026-11-07 — Trained DDIM bounded acceptance and resume comparison
 
 Downloaded exact G30 checkpoint by registered SHA at immutable HF revision.
