@@ -52,3 +52,11 @@ def test_returns_verified_snapshot_not_mutable_paths(tmp_path):
     captured = capture_frozen_inputs(manifest, paths)
     paths["checkpoint"].write_bytes(b"later replacement")
     assert captured["checkpoint"] == b"checkpoint"
+
+
+def test_candidate_allowed_only_for_explicit_validation_acceptance(tmp_path):
+    manifest, paths = fixture(tmp_path)
+    manifest["status"] = "candidate"
+    assert capture_frozen_inputs(manifest, paths, validation_only=True)["config"] == b"config"
+    with pytest.raises(ValueError, match="frozen"):
+        capture_frozen_inputs(manifest, paths)

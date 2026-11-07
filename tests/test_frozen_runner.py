@@ -80,3 +80,22 @@ def test_tampered_shard_cannot_resume(tmp_path):
     (output / "shard-000000.npz").write_bytes(b"changed")
     with pytest.raises(ValueError, match="checksum"):
         run_frozen_evaluation(**kwargs)
+
+
+def test_validation_receipt_cannot_resume_as_final(tmp_path):
+    manifest, paths = fixture(tmp_path)
+    kwargs = {
+        "manifest": manifest,
+        "artifact_paths": paths,
+        "samples": lambda: [("a", 0), ("b", 1)],
+        "infer": lambda s, _: {
+            "pixel_labels": [s],
+            "pixel_scores": [s],
+            "image_labels": [s],
+            "image_scores": [s],
+        },
+        "output_dir": tmp_path / "result",
+    }
+    run_frozen_evaluation(**kwargs, validation_only=True)
+    with pytest.raises(ValueError, match="contract"):
+        run_frozen_evaluation(**kwargs)

@@ -43,6 +43,13 @@ orchestration/NFE, chưa chứng minh U-Net trained replay trên môi trường 
 
 ## Điều kiện tích hợp
 
+Nghiệm thu CPU trained G30 ngày 07/11: xem ACCEPTANCE_2026-11-07.md.
+`scripts/accept_ddim_validation.py` chạy hai mẫu val, kiểm dữ liệu83/hash/deps,
+ngắt chủ động và đối chiếu resume với uninterrupted. `validation_only=True`
+cho phép candidate đầy đủ pins ở phạm vi nghiệm thu; final vẫn yêu cầu frozen.
+Receipt binds execution_scope nên không thể resume validation thành final.
+Không sửa status candidate thành frozen chỉ để vượt gate.
+
 1. Pin source/config, dependency và LPIPS weights từ môi trường thật.
 2. Nối bounded validation adapter đúng crop/normalization/seed policy.
 3. Đối chiếu cache replay, kiểm interruption/resume; bổ sung Dice/macro Dice/FPR.

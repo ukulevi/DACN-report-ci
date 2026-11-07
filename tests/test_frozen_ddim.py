@@ -23,7 +23,12 @@ def test_adapter_runs_fifty_calls_with_frozen_mask(monkeypatch):
             return torch.zeros_like(x)
 
     model = ZeroModel()
-    monkeypatch.setattr(frozen_ddim, "load_ema_checkpoint", lambda *args: model)
+
+    def load_model(checkpoint, config, device):
+        assert config == {}  # Trainer settings come from checkpoint, not sampler JSON.
+        return model
+
+    monkeypatch.setattr(frozen_ddim, "load_ema_checkpoint", load_model)
     monkeypatch.setattr(frozen_ddim, "load_perceptual", lambda *args: None)
     monkeypatch.setattr(
         frozen_ddim,
@@ -36,9 +41,11 @@ def test_adapter_runs_fifty_calls_with_frozen_mask(monkeypatch):
         "phase1_indices_zero_based": list(ddim_indices(300, 20)),
         "phase2_indices_zero_based": list(ddim_indices(50, 30)),
     }
+    checkpoint = io.BytesIO()
+    torch.save({"config": {}}, checkpoint)
     captured = {
-        "config": b"{}",
-        "checkpoint": b"checkpoint",
+        "config": json.dumps(DEFAULT_CONFIG).encode(),
+        "checkpoint": checkpoint.getvalue(),
         "mask_parameters": json.dumps(params).encode(),
     }
     adapter = frozen_ddim.FrozenDDIMAdapter()

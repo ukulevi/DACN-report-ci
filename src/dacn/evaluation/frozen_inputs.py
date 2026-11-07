@@ -19,13 +19,14 @@ ARTIFACTS = frozenset(
 )
 
 
-def capture_frozen_inputs(manifest, artifact_paths):
+def capture_frozen_inputs(manifest, artifact_paths, *, validation_only=False):
     """Return the same bytes whose hashes were checked; callers must reuse them.
 
     This is an input boundary for a future runner, not proof of scientific
     acceptance or a standalone final-test runner. No path comes from the manifest.
     """
-    if manifest.get("schema_version") != 1 or manifest.get("status") != "frozen":
+    allowed = {"candidate", "frozen"} if validation_only else {"frozen"}
+    if manifest.get("schema_version") != 1 or manifest.get("status") not in allowed:
         raise ValueError("Final evaluation requires a frozen schema-1 manifest")
     if not re.fullmatch(r"[0-9a-f]{40}", str(manifest.get("dataset_revision", ""))):
         raise ValueError("Dataset revision must be an immutable commit")

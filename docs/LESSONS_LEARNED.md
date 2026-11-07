@@ -1,5 +1,13 @@
 # Lessons learned
 
+### 2026-11-07 — Distinguish sampler configuration from trainer architecture
+
+- Evidence: acceptance preflight stopped at config checksum when sampler JSON
+  was treated as trainer settings; both files are valid JSON for different roles.
+- Practice: validate sampler preset against mask parameters; load architecture
+  and diffusion schedule from the hashed full-state checkpoint. Test the actual
+  config passed into the EMA loader, not just whether loading was invoked.
+
 ### 2026-10-28 — Record run lifecycle before GPU work
 
 - Observation/evidence: the Modal runner writes `run_manifest.json` after the

@@ -1,5 +1,17 @@
 # Worklog
 
+## 2026-11-07 — Trained DDIM bounded acceptance and resume comparison
+
+Downloaded exact G30 checkpoint by registered SHA at immutable HF revision.
+Attempt1 preflight exposed sampler/trainer config confusion; fixed architecture
+loading from hashed checkpoint, kept failure record. Attempt2 verified all83
+validation arrays/index, ran2trained samples, interrupted after first shard,
+fresh-model resume and completed-cache replay. Uninterrupted comparator matched
+all arrays/metrics exactly. 200 trained U-Net calls total, CPU only; no test,
+threshold fitting or training. Added validation-only candidate gate with scope
+bound to receipt so it cannot resume as final. 13 related tests and Ruff passed.
+See ACCEPTANCE_2026-11-07.md for measured provenance and remaining freeze limits.
+
 ## 2026-11-07 — DDIM adapter, CPU LPIPS replay and CI cause
 
 Connected frozen runner to lazy FrozenDDIMAdapter: same captured checkpoint/config,

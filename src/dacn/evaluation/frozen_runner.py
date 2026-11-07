@@ -15,7 +15,9 @@ from dacn.evaluation.frozen_inputs import capture_frozen_inputs
 from dacn.evaluation.metrics import compute_binary_metrics
 
 
-def run_frozen_evaluation(*, manifest, artifact_paths, samples, infer, output_dir):
+def run_frozen_evaluation(
+    *, manifest, artifact_paths, samples, infer, output_dir, validation_only=False
+):
     """Run/resume ordered samples with one private NPZ shard per sample.
 
     samples is a zero-argument factory yielding (stable_id, sample); infer returns four
@@ -24,7 +26,8 @@ def run_frozen_evaluation(*, manifest, artifact_paths, samples, infer, output_di
     arbitrary backend implements the registered scientific method.
     """
     manifest = json.loads(json.dumps(manifest, allow_nan=False))
-    captured = capture_frozen_inputs(manifest, artifact_paths)
+    manifest["execution_scope"] = "validation_acceptance" if validation_only else "final"
+    captured = capture_frozen_inputs(manifest, artifact_paths, validation_only=validation_only)
     contract = hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
     output = Path(output_dir)
     output.mkdir(parents=True, exist_ok=True)

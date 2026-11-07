@@ -1,5 +1,35 @@
 # Experiment and result tracking
 
+## 2026-11-07 — Trained G30 DDIM bounded CPU acceptance
+
+Attempt 1 status: failed at preflight, before dataset/inference. Sampler config
+artifact was incorrectly treated as trainer config. Checksum guard correctly
+stopped execution. Fixed adapter to read trainer config from hashed checkpoint
+and validate pinned sampler config against mask parameters. Original output
+directory retained. Attempt 2 started in runs/ddim-acceptance-20261107-attempt2.
+Two registered validation samples (one per class), fixed
+DDIM20+30, checkpoint epoch30 SHA256
+d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946
+from model revision fae9b50a4b78114fb51d87e803c77d019668f523.
+Script accept_ddim_validation.py verifies all83 local validation image/mask/label
+contents against checksum-pinned cache plus index hash, captures current source,
+checks dependency freeze and all artifact hashes before inference. Planned
+intentional interruption after first committed shard, fresh-model resume and
+completed-cache replay. CPU only; no threshold fitting or held-out test.
+Private output: runs/ddim-acceptance-20261107/aggregate_receipt.json.
+Two-sample metrics are diagnostics, not efficacy estimates. Candidate is not
+changed to frozen for this validation-only path.
+
+Attempt2 completed: 2 samples, 100 trained U-Net calls; intentional interruption,
+fresh-model resume, unchanged first shard and completed-cache resume all passed.
+Wall 58.769387s including model load and I/O. Current-source snapshot SHA256
+242e840d6134f81e8bb27083ad15bdb04a6622bf4dc1be3a881beb3c698de08e.
+Additional uninterrupted CPU comparator completed: same two samples/seed/settings,
+100 additional U-Net calls, 44.1546885 seconds. Every stored label/score array and
+metric matches interrupted/resumed output exactly (maxabs0). Receipt
+clean_compare_receipt.json. See ACCEPTANCE_2026-11-07.md for diagnostic image/pixel
+AUROC/AP/P/R/F1, thresholds, scope and limitations. No parameter selection.
+
 ## 2026-11-07 — CPU LPIPS full cached-pair replay
 
 Status: completed. After successful two-sample smoke, same pinned artifact cache,

@@ -47,6 +47,8 @@ class FrozenDDIMAdapter:
     def initialize(self, captured):
         parameters = json.loads(captured["mask_parameters"])
         self.config = resolve_ablation_config(parameters["config"])
+        if resolve_ablation_config(json.loads(captured["config"])) != self.config:
+            raise ValueError("Sampler config and mask parameters differ")
         self.mask_threshold = parameters["mask_threshold"]
         if not math.isfinite(self.mask_threshold) or self.mask_threshold < 0:
             raise ValueError("Invalid frozen mask threshold")
@@ -58,7 +60,11 @@ class FrozenDDIMAdapter:
         ):
             if parameters[key] != list(indices):
                 raise ValueError("Frozen sampling indices differ")
-        train_config = json.loads(captured["config"])
+        # The pinned config is the sampler preset, not the training architecture.
+        # Architecture/schedule are bound by the hashed full-state checkpoint.
+        train_config = torch.load(
+            io.BytesIO(captured["checkpoint"]), map_location="cpu", weights_only=False
+        )["config"]
         self.model = load_ema_checkpoint(
             io.BytesIO(captured["checkpoint"]), train_config, self.device
         )
