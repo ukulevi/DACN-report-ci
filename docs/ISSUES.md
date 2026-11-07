@@ -22,7 +22,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 | ID | Blocker | Status | Owner / next handoff | Affects | Last updated |
 |---|---|---|---|---|---|
-| `BLK-20261107-01` | GitHub Actions startup_failure chưa rõ nguyên nhân | Investigating | Nhóm / repo admin nếu cần | CI head hiện tại | 2026-11-07 |
+| `BLK-20261107-01` | GitHub Actions bị chặn do tài khoản/billing | Waiting | Chủ repo kiểm Billing/Actions | CI head hiện tại | 2026-11-07 |
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
 | `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
 | `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
@@ -32,7 +32,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 ### BLK-20261107-01 — CI không khởi động job
 
-- **Status:** Investigating; reported 07/11/2026.
+- **Status:** Waiting; reported 07/11/2026, nguyên nhân cấp tài khoản xác nhận qua ảnh người dùng.
 - **Owner / next handoff:** Nhóm cùng kiểm; repo admin hỗ trợ nếu nguyên nhân cần quyền quản trị.
 - **Evidence:** ecad491 và b986080 có Actions conclusion startup_failure.
   [Run ecad491](https://github.com/tanh1c/DACN/actions/runs/42240463952).
@@ -43,8 +43,13 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Follow-up 07/11:** Chạy riêng rename test đạt; chạy lại toàn suite 250 passed
   trong 38.88s. Không sửa code rename vì chưa tái hiện nguyên nhân. CI startup
   vẫn cần thông báo phía Actions; local green không đóng blocker này.
-- **Action needed:** Đọc thông báo Actions UI/settings, xác định lý do trước khi
-  sửa workflow, thay budget hoặc retry. Không suy đoán billing.
+- **Evidence mới:** Ảnh Summary run a6ccf41 do người dùng cung cấp hiển thị:
+  "The job was not started because recent account payments have failed or …".
+  Phần tiếp theo bị thu gọn, chưa có đầy đủ thông báo. Đây là lỗi chặn tài khoản
+  trước khi khởi động job, không phải failure của test. API xác nhận check-runs=0.
+- **Action needed:** Chủ repo mở Show more và Billing/Actions để xử lý thông báo
+  payment/account hoặc hạn mức được nêu đầy đủ. Không đổi phương thức thanh toán,
+  tăng budget hay retry hàng loạt từ agent. Sau khi xử lý, chạy lại CI trên head.
 - **Close when:** Nguyên nhân được ghi và một run trên source liên quan thực sự
   khởi động/kết thúc với bằng chứng; trạng thái test failure nếu có được tách riêng.
 
@@ -86,6 +91,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   Prefix gắn checksum NPZ + source digest + donor index; evaluator load checkpoint
   từ cùng captured bytes được hash. 24 test liên quan đạt. Chưa chạy remote Modal;
   helper verification không tương đương kiểm chứng toàn bộ orchestration.
+- **07/11 adapter follow-up:** Frozen DDIM adapter và 11 tests đạt; LPIPS83 replay
+  từ runtime CPU mới khớp cache. Full suite 254 pass/1 WinError5 rename ở RGBA
+  preparation test. Lỗi filesystem vẫn tái diễn tại test khác nhau; chưa có bằng
+  chứng thuộc inference code, cần chẩn đoán handle/locking trước khi thêm retry.
 - **Chuẩn bị runner cuối:** frozen-input gate có test CPU cho candidate, thiếu
   pin, revision mutable, threshold NaN và artifact bị thay. Candidate JSON giữ
   source/LPIPS/dependency pins chưa xác minh ở null. Gate chưa nối inference;

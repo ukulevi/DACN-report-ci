@@ -1,5 +1,33 @@
 # Experiment and result tracking
 
+## 2026-11-07 — CPU LPIPS full cached-pair replay
+
+Status: completed. After successful two-sample smoke, same pinned artifact cache,
+fresh LPIPS CPU environment and exported states; all 83 validation initial/final
+pairs, 166 calls. Compare maps against saved scores, no threshold fitting,
+U-Net/GPU or test. Receipt: private validation_full_replay.json under
+runs/lpips-environment-20261107. All 166 maps matched at atol 1e-6, max absolute
+error 5.21540641784668e-7; pair-scoring CPU time 35.770264 seconds, excluding
+model/cache loading. Cache SHA256
+22656e1f63a0047d3dbe32f7833eea8e303988414e5942dec1ba5a1d9ed1ef19.
+Output replay only, not DDIM reconstruction replay or end-to-end latency.
+Reusable equivalent entry point: scripts/replay_lpips_pairs.py.
+
+## 2026-11-07 — CPU LPIPS reconstruction-pair smoke
+
+Status: completed. Fresh CPU environment with LPIPS 0.1.4, Torch 2.15.0+cpu,
+torchvision 0.29.2+cpu. Two validation samples (one per class), four LPIPS calls
+on cached initial/final DDIM pairs. Artifact revision
+`fae9b50a4b78114fb51d87e803c77d019668f523`; exact cache checksum checked against
+the run manifest before reading arrays. New native trunk/head exports and
+dependency freeze stored privately in runs/lpips-environment-20261107.
+No U-Net calls, threshold fitting, GPU or test. This attempts output replay,
+not proof of historical environment identity. Receipt validation_smoke.json:
+four maps match cached output at atol 1e-6, maximum absolute error
+3.5762786865234375e-7, measured pair-scoring time 0.860262 seconds on CPU.
+This is not end-to-end latency. No AUROC/AP estimated from this two-sample smoke.
+State digest: 18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6.
+
 ## 2026-11-06 — Full image/pixel metric replay
 
 Status: completed. CPU replay of cached DDIM final LPIPS, initial LPIPS, naive

@@ -94,6 +94,23 @@ def run_frozen_evaluation(*, manifest, artifact_paths, samples, infer, output_di
             )
             for level in ("pixel", "image")
         }
+        metrics["pixel"]["dice_micro"] = metrics["pixel"]["f1"]
+        lesion_dice, normal_fp, normal_pixels = [], 0, 0
+        for labels, scores in zip(arrays["pixel_labels"], arrays["pixel_scores"], strict=True):
+            predicted = scores >= manifest["thresholds"]["pixel"]
+            if labels.any():
+                lesion_dice.append(
+                    float(
+                        2
+                        * np.count_nonzero(predicted & (labels > 0))
+                        / (np.count_nonzero(predicted) + np.count_nonzero(labels))
+                    )
+                )
+            else:
+                normal_fp += int(np.count_nonzero(predicted))
+                normal_pixels += len(labels)
+        metrics["pixel"]["macro_lesion_dice"] = float(np.mean(lesion_dice)) if lesion_dice else None
+        metrics["pixel"]["normal_pixel_fpr"] = normal_fp / normal_pixels if normal_pixels else None
         receipt.update(status="completed", metrics=metrics, sample_count=count)
         save()
         return receipt

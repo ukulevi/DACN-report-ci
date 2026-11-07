@@ -14,17 +14,32 @@ Entry point: `dacn.evaluation.frozen_runner.run_frozen_evaluation`.
 9 tests runner/gate đạt: từ chối candidate trước dataset access, gián đoạn/resume,
 đổi thứ tự và sửa shard. Dữ liệu chỉ là synthetic trong unit tests.
 
-## Phần tích hợp còn thiếu
+## Adapter DDIM+LPIPS — 07/11 follow-up
 
-Orchestration dùng callback, chưa phải executable MRI final-test runner.
+`dacn.evaluation.frozen_ddim.run_frozen_ddim` nối gate/orchestrator với adapter
+DDIM20+30. Load EMA checkpoint từ captured bytes; LPIPS trunk/head export được
+load offline, strict keys. Mask threshold và indices lấy từ artifact đã pin,
+không fit lại. Seed UUID theo policy cũ; crop240, LPIPS grayscale-repeatRGB,
+mean top576 image score. Kiểm đúng 50 U-Net calls/sample. Runner bổ sung micro
+Dice, macro lesion Dice và normal pixel FPR.
+
+Script `scripts/export_lpips_environment.py --output <private-dir>` export đúng
+native trunk state, các keys còn lại của LPIPS state và dependency freeze.
+Chạy trong runtime gốc nếu còn; chạy runtime mới phải ghi là môi trường mới.
+Đã thêm optional extra `perceptual`, LPIPS==0.1.4. Artifact export không đưa lên Git.
+
+## Phần nghiệm thu còn thiếu
+
+Đã có adapter và API Python; chưa có executable MRI final-test CLI được nghiệm thu.
 Adapter phải load DDIM/LPIPS từ captured bytes, kiểm source/environment thực thi,
 dataset revision/order/content và preprocessing/score đúng protocol.
 Factory trả `(stable_id, sample)`; ID hash chỉ kiểm thứ tự, không kiểm nội dung.
 Receipt và NPZ phải giữ riêng tư. Output một writer; chưa hỗ trợ concurrent jobs.
 
 Runner concatenate arrays để tính exact global metrics; cần benchmark RAM trên
-validation. Chưa có out-of-core ranking, latency/VRAM, macro lesion Dice hoặc
-adapter controls. Candidate vẫn chưa frozen khi còn null pins.
+validation. Chưa có out-of-core ranking, latency/VRAM hoặc adapter controls.
+Candidate vẫn chưa frozen khi còn null pins. Tests dùng ZeroModel chứng minh
+orchestration/NFE, chưa chứng minh U-Net trained replay trên môi trường mới.
 
 ## Điều kiện tích hợp
 

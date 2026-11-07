@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-11-07 — DDIM adapter, CPU LPIPS replay and CI cause
+
+Connected frozen runner to lazy FrozenDDIMAdapter: same captured checkpoint/config,
+offline strict LPIPS trunk/head load, registered mask/indices, seed/crop/top576,
+exact 50 U-Net-call guard. Added export/replay tools and perceptual extra.
+Exported new CPU weights/dependency snapshot privately; all 166 LPIPS maps on 83
+cached validation pairs matched historical maps at atol1e-6 (max5.2154e-7).
+No fresh trained U-Net inference, GPU or test. See RESULT_TRACKING for receipts.
+Eleven gate/runner/adapter tests passed, including synthetic 50-call model and
+LPIPS native-state roundtrip. Full suite: 254 passed/1 Windows rename failure
+in RGBA preparation test, 46.80s. Ruff check/format passed (188 files).
+User screenshot confirms CI blocked before job startup by account/payment
+annotation. BLK-20261107-01 now Waiting for repo owner's Billing/Actions fix;
+no workflow/budget/payment mutation performed.
+
 ## 2026-11-07 — Sequential audit follow-up: workspace and frozen orchestration
 
 Linear connector now verifies DACN-KHMT. Re-ran Windows reproduction: isolated

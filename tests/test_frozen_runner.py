@@ -53,6 +53,9 @@ def test_interrupted_resume_uses_global_metrics_and_checks_identity(tmp_path):
     assert result["status"] == "completed"
     assert result["metrics"]["pixel"]["auroc"] == 1
     assert result["metrics"]["image"]["f1"] == 1
+    assert result["metrics"]["pixel"]["dice_micro"] == 1
+    assert result["metrics"]["pixel"]["macro_lesion_dice"] == 1
+    assert result["metrics"]["pixel"]["normal_pixel_fpr"] == 0
     kwargs["samples"] = lambda: [("b", 1), ("a", 0)]
     with pytest.raises(ValueError, match="checksum"):
         run_frozen_evaluation(**kwargs)
