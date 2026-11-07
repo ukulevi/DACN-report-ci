@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-11-07 — Verify native Chrome download before validation retry
+
+Checked Downloads, project C:/Users/Admin/Downloads/@ukulevi/DACN and current
+worktree; prior private bundle was not found. Original Colab runtime reset;
+notebook retains compact measured outputs but full artifact copy is unverified.
+Native Chrome Files download probe succeeded:37bytes at Downloads/dacn_download_probe.txt.
+Preparing a fresh source/partition-pinned notebook; no inference retry started yet.
+Registered-partition gate/helper fixes passed27related tests before packaging.
+
+## 2026-11-07 — T4 full83 inference and registered holdout recovery
+
+Full83 inference completed after smoke; group report initially failed on
+cross-version split re-derivation, then unsupported metric split label. Reused
+saved maps, transferred checksum/index-bound original40/43 membership from
+metric-verified local replay; no extra inference or tuning.43holdout metrics
+match C closely (final AP.312330173/Dice.371214628), receipt being saved.
+Added explicit validation_partition artifact to gate/candidate and fixed
+generator/scripts to require it.27related tests pass. Actual run used earlier
+eight-input gate plus separately verified partition; future gate has nine.
+
 ## 2026-11-07 — Recover Colab environment and launch T4 validation
 
 HF authentication completed, checkpoint/val metadata/index/shard/mask hashes passed.

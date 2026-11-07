@@ -27,6 +27,17 @@ and dependency checks passed, peak CUDA allocated112928768bytes. Full83 validati
 now starting after smoke review; separate registered40cal/43group-holdout report,
 same thresholds/seed17,4150U-Net/249LPIPS planned. No test or training.
 
+Inference completed83/83. Initial group-report step failed because re-derived
+StratifiedGroupKFold membership differed from registered40/43 on Colab. Pinned
+the exact private membership from local replay (four-arm metrics matched C),
+index-bound SHA256ceffbc9b60a9cd60147775bcbc76d8df03bf780cfe379400fb52ecbe632d5490.
+A reporting retry rejected an unsupported split label; corrected to validation
+plus explicit group-holdout metadata. Neither retry re-ran inference or fit
+thresholds. Registered43holdout/25groups report completed from saved maps:
+final AP.3123301734628661, Dice.3712146276577787, image AUROC.9144736842105263.
+Adapter time sum165.661948409s; CUDA peak allocated112928768bytes. Full receipt
+and private bundle being saved before runtime shutdown; other metrics from receipt.
+
 ## 2026-11-07 — Shared-trajectory controls and CPU benchmark
 
 Attempt1 failed before inference: dependency text comparison treated Windows

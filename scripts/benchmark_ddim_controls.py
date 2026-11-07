@@ -60,6 +60,7 @@ def main():
     parser.add_argument("--environment", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--partition", type=Path, required=True)
     parser.add_argument("--full", action="store_true", help="All83 validation; default bounded2")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
@@ -91,6 +92,7 @@ def main():
         / "comparison/mask_parameters.json",
         source_snapshot=args.output / "source.zip",
     )
+    paths["validation_partition"] = args.partition
     with zipfile.ZipFile(paths["source_snapshot"], "w") as archive:
         for path in sorted(Path("src").rglob("*.py")):
             archive.writestr(path.as_posix(), path.read_bytes())

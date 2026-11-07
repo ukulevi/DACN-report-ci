@@ -14,6 +14,7 @@ ARTIFACTS = frozenset(
         "lpips_calibration",
         "dependency_lock",
         "validation_index",
+        "validation_partition",
         "mask_parameters",
     }
 )

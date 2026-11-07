@@ -29,6 +29,7 @@ def main():
     parser.add_argument("--environment", type=Path, required=True)
     parser.add_argument("--validation", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--partition", type=Path, required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     torch.set_num_threads(2)
@@ -44,6 +45,7 @@ def main():
         }.items()
     }
     paths["validation_index"] = args.validation / "index.csv"
+    paths["validation_partition"] = args.partition
     paths["config"] = Path("configs/autoddpm_ddim20_30.json")
     prefix = "evaluations/autoddpm-ddim2030-full83-t4-20261106T074200Z/"
     paths["mask_parameters"] = (

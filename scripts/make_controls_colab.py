@@ -11,12 +11,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--partition", type=Path, required=True)
     args = parser.parse_args()
     payload = args.source.read_bytes()
     bootstrap = f"""
 import base64, hashlib, zipfile, io, os, sys, subprocess
 from pathlib import Path
 SOURCE = base64.b64decode({base64.b64encode(payload).decode()!r})
+PARTITION_BYTES = base64.b64decode({base64.b64encode(args.partition.read_bytes()).decode()!r})
 assert hashlib.sha256(SOURCE).hexdigest() == {hashlib.sha256(payload).hexdigest()!r}
 ROOT = Path('/content/dacn_controls_source')
 ROOT.mkdir(exist_ok=False)
@@ -38,6 +40,7 @@ DATA_REV = '350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7'
 MODEL = 'dacn-bmad-team/dacn-runs'
 DATA = 'dacn-bmad-team/bmad-flair-patient-disjoint-v1'
 ENV = ROOT / 'private_environment'; ENV.mkdir(exist_ok=False)
+(ENV/'registered_partition.json').write_bytes(PARTITION_BYTES)
 def fetch(repo, filename, rev, destination, kind='model'):
     path = hf_hub_download(repo, filename, revision=rev, repo_type=kind, token=TOKEN)
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -72,6 +75,7 @@ from dacn.evaluation.runtime_binding import verify_runtime_inputs
 from dacn.evaluation.frozen_ddim import FrozenDDIMAdapter
 from dacn.evaluation.validation import evaluate_maps
 paths = {'checkpoint':ENV/'checkpoint.pt', 'mask_parameters':ENV/'mask_parameters.json',
+         'validation_partition':ENV/'registered_partition.json',
          'config':ROOT/'configs/autoddpm_ddim20_30.json',
          'validation_index':VROOT/'data/val/index.csv'}
 for key in ('lpips_backbone','lpips_calibration'):
@@ -130,15 +134,15 @@ assert RUN_FULL_VALIDATION, 'Enable only after successful smoke review'
 assert SMOKE['status']=='completed'
 FULL = run_stage(list(range(83)),'full83')
 import csv
-from sklearn.model_selection import StratifiedGroupKFold
+from dacn.evaluation.registered_partition import registered_partition
 rows = list(csv.DictReader((VROOT/'data/val/index.csv').open()))
 groups = np.array([row['patient_group_id'] for row in rows])
-cal, hold = next(StratifiedGroupKFold(2,shuffle=True,random_state=17).split(np.zeros(83),dataset.labels,groups))
+cal, hold = registered_partition(PARTITION_BYTES,(VROOT/'data/val/index.csv').read_bytes(),groups)
 assert (len(cal),len(hold))==(40,43) and set(groups[cal]).isdisjoint(groups[hold])
 masks = np.stack([dataset[int(i)][1].numpy()[8:-8,8:-8] for i in hold])
 FULL['engineering_all83_metrics'] = FULL.pop('metrics')
 with np.load(RUN/'full83_private_maps.npz',allow_pickle=False) as saved:
-    FULL['metrics'] = {key:evaluate_maps(saved[key][hold],masks,dataset.labels[hold],split='validation_group_holdout',thresholds=controls['arms'][key]) for key in controls['arms']}
+    FULL['metrics'] = {key:evaluate_maps(saved[key][hold],masks,dataset.labels[hold],split='validation',thresholds=controls['arms'][key]) for key in controls['arms']}
 FULL.update(report_samples=43,calibration_samples=40,holdout_groups=len(set(groups[hold])),scope='Inspected validation group-holdout43; thresholds from original40calibration, one seed17; no test')
 (RUN/'full83_aggregate.json').write_text(json.dumps(FULL,indent=2))
 print('Full83 inference completed; separate43holdout metrics saved; test still sealed.')

@@ -11,6 +11,7 @@
     "lpips_calibration": "f6e69d87ad68e0e74712addc8e06f20ed111f744fffb97411d7d2da4ef953dbf",
     "dependency_lock": "ab0fac04da0a3103407192c98b0073588bc8375d42ae00bd407cdfe577fda929",
     "validation_index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+    "validation_partition": "ceffbc9b60a9cd60147775bcbc76d8df03bf780cfe379400fb52ecbe632d5490",
     "mask_parameters": "39ee181e3c783fa516c3f2f1294de31aab8239eb09ce9bed3c287872aef8bd16"
   },
   "thresholds": {

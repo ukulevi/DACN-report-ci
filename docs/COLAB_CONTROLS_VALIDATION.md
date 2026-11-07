@@ -13,7 +13,7 @@ Smoke2 đã hoàn tất; full83 đang chạy với báo cáo43group-holdout riê
 Chạy git archive commit cần dùng vào ZIP riêng tư rồi:
 
 ```powershell
-.venv/Scripts/python.exe scripts/make_controls_colab.py --source <source.zip> --output <private-notebook.ipynb>
+.venv/Scripts/python.exe scripts/make_controls_colab.py --source <source.zip> --partition <private-registered-partition.json> --output <private-notebook.ipynb>
 ```
 
 Notebook có source embedded, tự kiểm SHA; không publish lên Git hoặc chia sẻ
@@ -30,8 +30,10 @@ Không dùng all83 metrics làm holdout.
 3. Export LPIPS weights và dependency freeze của Colab. Gate kiểm artifact;
    runtime binding kiểm source thực/import tree và packages trước dataset access.
 4. Smoke2samples, mỗi mẫu50U-Net/3LPIPS; lưu start/terminal manifests, VRAM/timing.
-5. Sau smoke đạt, full83 với cùng tham số, không refit threshold. Generator mới
-   tách metrics43group-holdout khỏi engineering all83 và giữ partition40/43.
+5. Sau smoke đạt, full83 với cùng tham số, không refit threshold. Dùng membership
+   đã pin hash/index, không re-derive bằng sklearn khác phiên bản. Tách metrics43
+   group-holdout khỏi engineering all83, giữ đúng40/43 cũ. Gate hiện yêu cầu
+   artifact thứ9 validation_partition; scripts acceptance/benchmark cần --partition.
 6. Lưu aggregate reports/provenance và private maps trước khi runtime reset.
 
 Giới hạn45phút cooperative giữa calls, không hard GPU shutdown. Không tự mua
