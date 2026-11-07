@@ -8,13 +8,14 @@ trainer baseline DAE coarse-noise, prototype AnoDDPM-BMAD tách biệt, trainer
 DDPM partial reconstruction và runner lưu kết quả Modal vào Hugging Face.
 Đến 06/11/2026, nhóm đã có checkpoint Gaussian/Simplex và kết quả validation;
 nhánh C bổ sung DDIM, mask/stitch/resample và perceptual scoring LPIPS.
-Các thay đổi mới chưa tích hợp hết vào nhánh này; cần kiểm chứng độc lập và
-freeze protocol trước held-out test. Xem audit bên dưới để phân biệt kết quả
+Cập nhật C đã tích hợp vào nhánh làm việc; replay metric từ cache hoàn tất.
+Cần hoàn thiện runner và freeze protocol trước held-out test. Xem review để phân biệt kết quả
 thực với kế hoạch cũ. Demo giả lập chỉ kiểm tra metric, không phải thí nghiệm.
 Sản phẩm phục vụ nghiên cứu, không dùng chẩn đoán.
 
 ## Bắt đầu ở đây
 
+- [Review toàn dự án 07/11 — trạng thái và việc cần hoàn thành](docs/PROJECT_REVIEW_2026-11-07.md)
 - [Audit hiện trạng 06/11 và hướng tiếp theo — đọc trước các snapshot cũ](docs/PROJECT_AUDIT_2026-11-06.md)
 - [Kế hoạch 6 tuần và việc cần làm ngay](docs/PROJECT_PLAN.md)
 - [Đề bài và yêu cầu dự án](docs/PROJECT_REQUIREMENTS.md)

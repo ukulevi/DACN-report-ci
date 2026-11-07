@@ -1,5 +1,15 @@
 # Theo dõi dự án bằng Linear
 
+## Workspace mặc định — 07/11/2026
+
+**DACN-KHMT** (`https://linear.app/dacn-khmt`) là workspace duy nhất dùng cho
+dự án. Xem `configs/project_tracking.json` và AGENTS.md; đây là lựa chọn ở cấp
+repo, không đổi OAuth. Connector hiện trả về workspace khác và đang chờ người
+dùng reconnect. Không thực hiện cập nhật issue qua kết nối sai workspace.
+Nhóm làm chung, các vai trò bên dưới là phân công lịch sử.
+
+Review hiện tại: [PROJECT_REVIEW_2026-11-07](PROJECT_REVIEW_2026-11-07.md).
+
 ## Live audit 06/11/2026
 
 Đã xem UI đúng workspace DACN-KHMT: 4 Done (DAC-5/6/7/8), 6 In Progress

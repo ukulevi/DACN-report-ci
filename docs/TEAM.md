@@ -1,7 +1,15 @@
 # Vai trò và cách phối hợp
 
-Phân công được nhóm xác nhận ngày 28/10/2026. A là người dùng/project lead; B và C
-là hai thành viên đã được thêm vào project Linear.
+## Cập nhật 07/11/2026
+
+Nhóm đã thống nhất làm chung, không phân biệt ranh giới role. Ưu tiên công việc
+theo prerequisite và bằng chứng nghiệm thu; bảng bên dưới giữ lịch sử phân công.
+Workspace Linear mặc định của dự án là **DACN-KHMT**
+(`https://linear.app/dacn-khmt`). Quyền OAuth của connector cần trỏ đúng workspace;
+đổi tài liệu hoặc workspace đang mở trong browser không tự đổi kết nối.
+
+Phân công lịch sử được nhóm xác nhận ngày 28/10/2026. A là project lead Tuấn Anh;
+người dùng trong cuộc hội thoại này là B — Chí Vĩ.
 
 | Vai trò | Trách nhiệm | Người review |
 |---|---|---|

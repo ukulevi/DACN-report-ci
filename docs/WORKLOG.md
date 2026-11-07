@@ -1,5 +1,18 @@
 # Worklog
 
+## 2026-11-07 — Whole-project progress review and workspace default
+
+Reviewed tracked structure, entry points, requirements, final candidate and
+run records. Git/HF heads unchanged; live Actions now reports startup_failure
+on ecad491/b986080 with no jobs/check-run output. Full CPU suite: 249 passed,
+1 Windows staging-rename failure; Ruff check/format passed (179 files).
+Added PROJECT_REVIEW_2026-11-07 and CI blocker, refreshed README/TEAM/tracking.
+Set DACN-KHMT as explicit repository workspace preference in AGENTS and config;
+connector OAuth still points elsewhere, user guided to reconnect via official
+OpenAI account-management documentation. No remote workspace/status mutation,
+no training/MRI evaluation or test split opened. Team role boundaries removed
+from execution guidance per user instruction.
+
 ## 2026-11-06 — Add frozen-input boundary for the future final runner
 
 Added CPU-only capture_frozen_inputs: rejects candidate/mutable revision,

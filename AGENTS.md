@@ -1,5 +1,18 @@
 # Instructions for AI coding agents
 
+## Project tracking workspace
+
+- The default and only intended Linear workspace for DACN is **DACN-KHMT**,
+  URL `https://linear.app/dacn-khmt`.
+- Project: `https://linear.app/dacn-khmt/project/dacn-diffusion-models-for-anomaly-detection-39ad392101f4`.
+- Verify the connected workspace before reading project state or writing issues.
+  A connection to `traffic-agent-assistant` is not the DACN workspace; never
+  substitute it for missing DACN access. Use the explicit DACN browser URL or
+  reconnect the app to the intended workspace.
+- This repository preference does not itself change OAuth connection settings.
+- The group now works jointly; A/B/C identify historical responsibilities and
+  do not require waiting for a particular member before progressing authorized work.
+
 Read this file before changing the repository. For research, data, training, or
 evaluation work, also read [the project requirements](docs/PROJECT_REQUIREMENTS.md)
 and the relevant protocol in `docs/`.

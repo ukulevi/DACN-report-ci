@@ -22,12 +22,28 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 | ID | Blocker | Status | Owner / next handoff | Affects | Last updated |
 |---|---|---|---|---|---|
+| `BLK-20261107-01` | GitHub Actions startup_failure chưa rõ nguyên nhân | Investigating | Nhóm / repo admin nếu cần | CI head hiện tại | 2026-11-07 |
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
 | `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
 | `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
 | `BLK-20261106-01` | Nghiệm thu resume/cache sau tích hợp | Open | B/C; A review freeze | DAC-11/12/14/15/30 | 2026-11-06 |
 
 ## Blocker details
+
+### BLK-20261107-01 — CI không khởi động job
+
+- **Status:** Investigating; reported 07/11/2026.
+- **Owner / next handoff:** Nhóm cùng kiểm; repo admin hỗ trợ nếu nguyên nhân cần quyền quản trị.
+- **Evidence:** ecad491 và b986080 có Actions conclusion startup_failure.
+  [Run ecad491](https://github.com/tanh1c/DACN/actions/runs/42240463952).
+  Jobs API rỗng; check-runs không cung cấp output.
+- **Affected work:** Chưa có CI evidence cho head, không dùng run xanh cũ để nghiệm thu.
+- **Attempts:** Đọc live run/job/check-suite API. Local full suite 249 pass/1 fail
+  WinError 5 rename staging; Ruff pass. Hai hiện tượng chưa chứng minh cùng nguyên nhân.
+- **Action needed:** Đọc thông báo Actions UI/settings, xác định lý do trước khi
+  sửa workflow, thay budget hoặc retry. Không suy đoán billing.
+- **Close when:** Nguyên nhân được ghi và một run trên source liên quan thực sự
+  khởi động/kết thúc với bằng chứng; trạng thái test failure nếu có được tách riêng.
 
 ### BLK-20261106-01 — Tích hợp và kiểm chứng branch C mới trước freeze
 

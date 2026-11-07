@@ -1,0 +1,10 @@
+{
+  "service": "linear",
+  "workspace_name": "DACN-KHMT",
+  "workspace_slug": "dacn-khmt",
+  "workspace_url": "https://linear.app/dacn-khmt",
+  "project_url": "https://linear.app/dacn-khmt/project/dacn-diffusion-models-for-anomaly-detection-39ad392101f4",
+  "issue_prefix": "DAC",
+  "scope": "Repository tracking preference; does not alter OAuth connection",
+  "collaboration": "shared work; historical A/B/C roles are not execution gates"
+}
