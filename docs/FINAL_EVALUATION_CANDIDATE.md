@@ -18,6 +18,12 @@ không có weights trong cache được kiểm tra; cần chụp hashes từ mô
 
 ## Cập nhật pins 07/11/2026
 
+Nghiệm thu trained DDIM/resume giới hạn hai mẫu CPU đã đạt; arrays khớp lượt
+liên tục tuyệt đối, tổng200 U-Net calls. Xem ACCEPTANCE_2026-11-07.md.
+Source pin mới là archive commit84382a8 có sửa config mapping; không dùng archive
+cf7de8f cho adapter cũ. ZIP source của lượt nghiệm thu được lưu riêng theo receipt.
+Trạng thái vẫn candidate vì còn acceptance controls/runtime final/benchmark.
+
 Đã export source snapshot commit cf7de8f và native LPIPS trunk/head cùng dependency
 freeze từ môi trường Windows CPU mới; hash điền vào candidate JSON. LPIPS trên
 83 cached initial/final pairs khớp cả166maps, maxabs5.2154e-7. Đây là môi trường

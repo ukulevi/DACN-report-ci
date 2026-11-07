@@ -4,7 +4,7 @@
   "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
   "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
   "artifacts": {
-    "source_snapshot": "6e770b536f68027e6e6aceb20cb2c43615ca397a99804f9ed679fe84181ffc0d",
+    "source_snapshot": "fa03087984a6bd6176f20b706e3068f9c6879821993f8d6bb133380de6c4066f",
     "config": "1d731fe0b773df643a5d03f19dd84a85ae2de3c0347783186a84c0f5c6e69c9f",
     "checkpoint": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
     "lpips_backbone": "6c58a8848413ba974fb64345adea3f5cee7888fe894c436fda33a7d87686c672",
@@ -18,11 +18,11 @@
     "image": 0.24719371760470998
   },
   "pending": [
-    "Verify trained DDIM reconstruction and resume end-to-end on bounded validation",
+    "Bounded two-sample CPU trained DDIM/resume accepted; broader validation and controls acceptance remain",
     "Verify actual runtime source, dependencies and dataset content against captured artifacts",
     "Benchmark memory/latency and freeze separate control contracts before final acceptance"
   ],
-  "execution_source_commit": "cf7de8f",
+  "execution_source_commit": "84382a8",
   "environment_scope": "New Windows CPU environment; all83 cached LPIPS pairs match at atol1e-6; historical runtime identity not established",
   "scope": "Candidate for final LPIPS scoring only; controls require their own frozen contracts; no test authorization from this file"
 }

@@ -12,6 +12,10 @@ threshold fitting or training. Added validation-only candidate gate with scope
 bound to receipt so it cannot resume as final. 13 related tests and Ruff passed.
 See ACCEPTANCE_2026-11-07.md for measured provenance and remaining freeze limits.
 
+Pinned follow-up archive84382a8 in candidate (kept candidate status). This archive
+is the committed corrected implementation; actual acceptance source ZIP remains
+separately identified in the run receipt, not overwritten or relabeled.
+
 ## 2026-11-07 — DDIM adapter, CPU LPIPS replay and CI cause
 
 Connected frozen runner to lazy FrozenDDIMAdapter: same captured checkpoint/config,
