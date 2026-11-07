@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-11-07 — Sequential audit follow-up: workspace and frozen orchestration
+
+Linear connector now verifies DACN-KHMT. Re-ran Windows reproduction: isolated
+rename test passed; full suite 250 passed in 38.88s. No rename code change or
+root-cause claim; earlier intermittent failure remains unexplained. Added CPU
+frozen runner orchestration: gate before dataset factory, captured bytes passed
+to backend, atomic private shards/receipt, hash/order-bound resume, global
+image/pixel metrics with frozen thresholds. Nine runner/gate tests passed.
+This is a backend interface, not an integrated DDIM+LPIPS final-test executable;
+see FROZEN_RUNNER.md for required adapter, memory benchmark and remaining pins.
+No GPU, training, MRI evaluation or final test opened.
+
+Added REPORT_DRAFT.md from verified validation/provenance records, retaining
+brightness control, bootstrap uncertainty and missing-final-test limitations.
+This is a Markdown content draft, not the final formatted submission.
+
 ## 2026-11-07 — Whole-project progress review and workspace default
 
 Reviewed tracked structure, entry points, requirements, final candidate and

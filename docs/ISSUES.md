@@ -40,6 +40,9 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Affected work:** Chưa có CI evidence cho head, không dùng run xanh cũ để nghiệm thu.
 - **Attempts:** Đọc live run/job/check-suite API. Local full suite 249 pass/1 fail
   WinError 5 rename staging; Ruff pass. Hai hiện tượng chưa chứng minh cùng nguyên nhân.
+- **Follow-up 07/11:** Chạy riêng rename test đạt; chạy lại toàn suite 250 passed
+  trong 38.88s. Không sửa code rename vì chưa tái hiện nguyên nhân. CI startup
+  vẫn cần thông báo phía Actions; local green không đóng blocker này.
 - **Action needed:** Đọc thông báo Actions UI/settings, xác định lý do trước khi
   sửa workflow, thay budget hoặc retry. Không suy đoán billing.
 - **Close when:** Nguyên nhân được ghi và một run trên source liên quan thực sự
