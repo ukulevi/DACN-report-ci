@@ -1,5 +1,16 @@
 # Worklog
 
+## 2026-11-07 — Prepare private Colab T4 controls workflow
+
+Generated and uploaded separate private controls notebook from sourcebf82522.
+Colab allocated Tesla T4; bootstrap installed source successfully (visible UI).
+Acquisition cell waits for user-entered HF read token via getpass; instructions
+provided using official HF docs. No inference started or GPU metrics claimed.
+Generator includes pinned validation-only downloads, environment export, source
+binding, bounded smoke and separately gated full83 with43group-holdout reporting.
+All4generated code cells compile; uploaded notebook final cell still needs the
+new reporting update before full83. See COLAB_CONTROLS_VALIDATION.md.
+
 ## 2026-11-07 — Controls acceptance and final runtime binding
 
 Added separate control candidate thresholds and shared-trajectory score arms.
