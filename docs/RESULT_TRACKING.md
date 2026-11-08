@@ -1,5 +1,24 @@
 # Experiment and result tracking
 
+## 2026-11-08 — Four-arm cached-score runner/resume acceptance
+
+Started CPU replay on43registered validation holdout slices/25groups from the
+verified T4 bundle699af4f3791b9f33688abcbdd9ffcd44e7d33169964ab672ecc03b607be4162a.
+Source checkout2aab5b4; driver/runner actual file hashes recorded in private
+runs/controls-resume-20261108/aggregate.json. Nine artifact pins verified first.
+For each of4arms, deliberately interrupt after1durable shard, resume remaining
+42, then replay completed receipt with a backend that rejects any new call.
+Compare all shard score bytes and image/pixel metrics to T4 aggregate receipt.
+Thresholds unchanged from40calibration; one existing sampling seed17. No model
+inference, no training or test access. Status: completed,37.3170231s driver wall
+time including artifact verification/shard I/O/metric replay; not model latency.
+Each arm resumed without recomputing its1durable shard; completed replay made
+0backend calls. All172score shards exactly equal their T4 inputs;60numeric
+metric fields match oracle receipt at1e-10. Four deliberate interrupted statuses
+and completed receipts remain private. Aggregate evidence:
+[cache/resume](evidence/2026-11-08-controls-cache-resume.json).
+No additional seed, training, U-Net or LPIPS execution in this acceptance.
+
 ## 2026-11-08 — Registered-partition Colab validation retry
 
 - Previous 07Nov inference/report completed, but its private ZIP was not

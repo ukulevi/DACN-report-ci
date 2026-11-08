@@ -1,5 +1,23 @@
 # Worklog
 
+## 2026-11-08 — Four-arm resume acceptance and freeze review decision
+
+Executed validation-only cached T4 score replay through frozen_runner for4arms
+and43registered holdout slices. Deliberately interrupted each after1durable shard,
+resumed42, then completed replay with backend calls forbidden.172score shards
+exactly match input;60numeric metric fields match T4 oracle at1e-10;37.317s total,
+0U-Net/LPIPS. Recorded actual attempts/provenance in RESULT_TRACKING/evidence.
+Full suite inside sandbox273pass/1BMAD CLI staging rename WinError5; isolated
+failure test1pass, outside sandbox full274pass38.57s. No root cause/code fix
+established; retained both outcomes, no speculative retry changes.
+Prepared freeze-review packet and runbook separating actual primary-model API,
+cached4arm validation acceptance and missing turnkey final wrapper/dataset factory.
+User decision: keep candidate and await CI or team review; no freeze exception,
+no test authorization. Preserve configuration statuses and thresholds unchanged.
+Independent read-only review found no material correctness issues in the new
+evidence/runbook/decision records. Aggregate schema/privacy/hash checks passed;
+all60fields/172shards and unchanged candidate statuses verified before commit.
+
 ## 2026-11-08 — Repin accepted T4 candidate and prepare freeze handoff
 
 Plan: repin from verified T4 evidence, run offline nine-artifact/source preflight,

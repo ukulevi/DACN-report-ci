@@ -3,6 +3,10 @@
 Trạng thái: **candidate, chưa frozen, chưa cho phép mở test**. Nhóm làm chung,
 thứ tự công việc dựa vào prerequisite thay vì chờ người mang role A/B/C.
 
+Quyết định08Nov: người dùng giữ candidate, chờ CI hoặc nhóm review. Hồ sơ cụ thể:
+[freeze review](FREEZE_REVIEW_2026-11-08.md), [runbook](FROZEN_EVALUATION_RUNBOOK.md).
+Cached4arm runner/resume validation đã đạt; chưa có turnkey final wrapper4arms.
+
 Update08Nov: T4 smoke2/full83 và private artifact handoff đã nghiệm thu;
 [evidence](COLAB_ACCEPTANCE_2026-11-08.md). Bốn controls khớp cache C. Candidate
 JSON đã repin đúng source/archive và môi trường T4 đã nghiệm thu, loại nhãn CPU

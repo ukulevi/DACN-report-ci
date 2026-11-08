@@ -87,6 +87,18 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   preflight95files đạt, final candidate rejection và CPU-runtime mismatch gate
   đều hoạt động. Thresholds không đổi. Còn review freeze/live final runtime,
   không còn thiếu checksum/export LPIPS hoặc artifact tải về.
+- **08Nov runner acceptance:**4arms×43cached validation slices đều ngắt/resume/
+  completed replay đạt;172score shards khớp byte,60numeric metric fields khớp
+  receipt tại1e-10. Đây không là fresh-model four-arm final wrapper. Wrapper/
+  verified dataset factory còn cần hoàn thiện và nghiệm thu validation trước final.
+- **08Nov software gate:** Full suite sandbox273pass/1BMAD CLI rename WinError5;
+  test riêng đạt và full ngoài sandbox274pass38.57s. Chưa biết root cause hoặc
+  sửa code. Không đánh đồng với CI account failure, không giấu lỗi bằng retry.
+- **Decision / exact next handoff:** Người dùng chọn giữ candidate, chờ CI hoặc
+  nhóm review; chưa chấp thuận freeze/ngoại lệ CI. Nhóm xem FREEZE_REVIEW_2026-11-08.md
+  và ghi quyết định protocol/CI; repo owner xử lý BLK-20261107-01. Gate đóng khi
+  có review freeze, live runtime binding và wrapper acceptance thực tế, không chỉ
+  có checksum hoặc local tests. Không mở test trước điều kiện này.
 - **Reported / updated:** 2026-11-06
 - **Owner / next handoff:** B tích hợp/evaluator; C cache/continuation; A review freeze.
 - **Affected work:** DAC-11/12/14/15/30 và final reproducibility.

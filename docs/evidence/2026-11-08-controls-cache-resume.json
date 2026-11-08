@@ -1,0 +1,133 @@
+{
+  "status": "completed",
+  "source_commit": "2aab5b4d9d2a39fb8cf0869a6549af3a7d992c5c",
+  "driver_sha256": "2350f7fa89864ff26017eda09340809a47116b8fe39d40de544c2c39fb75eb93",
+  "runner_sha256": "892e9ef88d4beb7144314a117bb6a85b80ef8a335da0fff0efe09ee0302f67ba",
+  "scope": "CPU cached T4 validation scores; no U-Net/LPIPS/training/test/tuning",
+  "bundle_sha256": "699af4f3791b9f33688abcbdd9ffcd44e7d33169964ab672ecc03b607be4162a",
+  "sampling_seed_count": 1,
+  "holdout_samples": 43,
+  "holdout_groups": 25,
+  "calibration_samples": 40,
+  "arms": {
+    "final_lpips": {
+      "status": "completed",
+      "planned_interruptions": 1,
+      "cached_score_adapter_calls": 43,
+      "completed_replay_calls": 0,
+      "shards_exactly_equal_to_input": 43,
+      "metric_fields_verified": 15,
+      "metrics": {
+        "pixel": {
+          "auroc": 0.9490360645313125,
+          "auprc": 0.3123301734628661,
+          "precision": 0.2974710255494595,
+          "recall": 0.4935720185298237,
+          "f1": 0.3712146276577787,
+          "threshold": 0.26617634296417236,
+          "dice_micro": 0.3712146276577787,
+          "macro_lesion_dice": 0.31357079206024785,
+          "normal_pixel_fpr": 0.005772112573099415
+        },
+        "image": {
+          "auroc": 0.9144736842105263,
+          "auprc": 0.9443859166057084,
+          "precision": 0.6875,
+          "recall": 0.9166666666666666,
+          "f1": 0.7857142857142857,
+          "threshold": 0.24719371760470998
+        }
+      }
+    },
+    "initial_lpips": {
+      "status": "completed",
+      "planned_interruptions": 1,
+      "cached_score_adapter_calls": 43,
+      "completed_replay_calls": 0,
+      "shards_exactly_equal_to_input": 43,
+      "metric_fields_verified": 15,
+      "metrics": {
+        "pixel": {
+          "auroc": 0.9261098571296197,
+          "auprc": 0.1578756979270777,
+          "precision": 0.19495828044695063,
+          "recall": 0.33646353287607283,
+          "f1": 0.24687113008194345,
+          "threshold": 0.2501829266548157,
+          "dice_micro": 0.24687113008194345,
+          "macro_lesion_dice": 0.23777684509577213,
+          "normal_pixel_fpr": 0.015722770467836256
+        },
+        "image": {
+          "auroc": 0.787280701754386,
+          "auprc": 0.8545009110761922,
+          "precision": 0.6111111111111112,
+          "recall": 0.9166666666666666,
+          "f1": 0.7333333333333333,
+          "threshold": 0.2262084392261588
+        }
+      }
+    },
+    "naive_stitch_lpips": {
+      "status": "completed",
+      "planned_interruptions": 1,
+      "cached_score_adapter_calls": 43,
+      "completed_replay_calls": 0,
+      "shards_exactly_equal_to_input": 43,
+      "metric_fields_verified": 15,
+      "metrics": {
+        "pixel": {
+          "auroc": 0.9362993247185885,
+          "auprc": 0.18059333785347384,
+          "precision": 0.21875292456120948,
+          "recall": 0.4616655295004848,
+          "f1": 0.2968487528357761,
+          "threshold": 0.21649277210235596,
+          "dice_micro": 0.2968487528357761,
+          "macro_lesion_dice": 0.28544525922297564,
+          "normal_pixel_fpr": 0.018309576023391814
+        },
+        "image": {
+          "auroc": 0.7850877192982457,
+          "auprc": 0.861002903908283,
+          "precision": 0.6176470588235294,
+          "recall": 0.875,
+          "f1": 0.7241379310344828,
+          "threshold": 0.20856854640361336
+        }
+      }
+    },
+    "brightness": {
+      "status": "completed",
+      "planned_interruptions": 1,
+      "cached_score_adapter_calls": 43,
+      "completed_replay_calls": 0,
+      "shards_exactly_equal_to_input": 43,
+      "metric_fields_verified": 15,
+      "metrics": {
+        "pixel": {
+          "auroc": 0.9501972521258396,
+          "auprc": 0.3895056557159782,
+          "precision": 0.16146869266940445,
+          "recall": 0.7885768664488095,
+          "f1": 0.2680513044300881,
+          "threshold": 0.48235294222831726,
+          "dice_micro": 0.2680513044300881,
+          "macro_lesion_dice": 0.5589781256327274,
+          "normal_pixel_fpr": 0.13493512426900584
+        },
+        "image": {
+          "auroc": 0.6798245614035088,
+          "auprc": 0.7703086888538122,
+          "precision": 0.5714285714285714,
+          "recall": 1.0,
+          "f1": 0.7272727272727273,
+          "threshold": 0.4997753345200585
+        }
+      }
+    }
+  },
+  "elapsed_seconds": 37.31702310000037,
+  "unet_calls": 0,
+  "lpips_calls": 0
+}
