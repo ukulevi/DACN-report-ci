@@ -3,6 +3,12 @@
 Trạng thái: **candidate, chưa frozen, chưa cho phép mở test**. Nhóm làm chung,
 thứ tự công việc dựa vào prerequisite thay vì chờ người mang role A/B/C.
 
+Update08Nov: T4 smoke2/full83 và private artifact handoff đã nghiệm thu;
+[evidence](COLAB_ACCEPTANCE_2026-11-08.md). Bốn controls khớp cache C. Candidate
+JSON hiện vẫn giữ CPU pins cũ; generator đã sửa metadata kế thừa với CPU regression.
+Cần repin runtime cuối và review freeze. Không tự dùng candidate cũ hoặc raw
+manifest nhãn CPU làm final.
+
 Manifest máy đọc: [final_evaluation_candidate.json](../configs/final_evaluation_candidate.json).
 Các pin hiện có provenance được điền trong JSON; không điền hash suy đoán. Gate
 `dacn.evaluation.frozen_inputs.capture_frozen_inputs(manifest, artifact_paths)`
@@ -13,7 +19,7 @@ acceptance. Validation-only candidate execution có scope riêng; final yêu c�
 frozen. Controls dùng contract riêng trong final_control_candidates.json.
 
 Gate yêu cầu source snapshot, config, checkpoint, LPIPS backbone/calibration,
-dependency lock, validation index và mask parameters. Các file private ở runtime;
+dependency lock, validation index, registered validation partition và mask parameters. Các file private ở runtime;
 manifest chỉ chứa hash và thông số tổng hợp. LPIPS đã export và xác minh output
 trên83cachedpairs tại local. Runtime final vẫn phải đối chiếu đúng các artifact
 đã pin, không tự suy rằng cùng tên package thì cùng môi trường.

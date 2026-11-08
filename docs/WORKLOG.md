@@ -1,5 +1,21 @@
 # Worklog
 
+## 2026-11-08 — Colab registered validation and durable private handoff
+
+Completed T4 smoke2/full83 using source d5889d5 and pinned40/43 membership;
+fixed UI code-transfer indentation by executing literals from pinned generator.
+Downloaded private ZIP via native Chrome and copied into ignored run directory;
+verified ZIP SHA and10member hashes. CPU replay matches every43holdout metric
+field at1e-10; all4maps match C at atol1e-6. Final AP.312330/Dice.371215;
+brightness AP.389506 remains stronger. No training/test/tuning.
+Documented inherited source/environment metadata erratum without altering raw
+bundle. Added acceptance/evidence and updated blocker progress; next steps are
+metadata preflight, final runtime repin and team freeze, then final evaluation.
+Fixed inherited CPU identity in future generated Colab manifests. Regression
+first failed on stale execution_source_commit, then24related checks passed;
+all5generated code cells compile. No GPU rerun for this metadata-only correction.
+Private verifier compiled. Runtime remains connected, no cell executing.
+
 ## 2026-11-07 — Verify native Chrome download before validation retry
 
 Checked Downloads, project C:/Users/Admin/Downloads/@ukulevi/DACN and current

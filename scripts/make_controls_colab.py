@@ -85,6 +85,11 @@ for key in ('lpips_backbone','lpips_calibration'):
 paths['dependency_lock'] = ENV/'lpips/requirements.freeze.txt'
 paths['source_snapshot'] = ENV/'source.zip'; paths['source_snapshot'].write_bytes(SOURCE)
 manifest = json.loads(json.dumps(candidate))
+manifest.pop('execution_source_commit', None)
+manifest.pop('pending', None)
+source_comment = zipfile.ZipFile(io.BytesIO(SOURCE)).comment.decode('ascii', errors='replace')
+manifest['source_archive_commit'] = source_comment if len(source_comment)==40 and all(c in '0123456789abcdef' for c in source_comment) else None
+manifest['environment_scope'] = 'Colab runtime with exported dependency version inventory; not historical runtime identity'
 for key in ('checkpoint','config','validation_index','validation_partition','mask_parameters'):
     assert sha(paths[key]) == manifest['artifacts'][key]
 for key in ('source_snapshot','lpips_backbone','lpips_calibration','dependency_lock'):

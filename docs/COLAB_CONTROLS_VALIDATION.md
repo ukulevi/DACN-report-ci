@@ -1,5 +1,10 @@
 # Colab GPU controls validation — 07/11/2026
 
+**Update08Nov:** Registered-partition retry completed; ZIP downloaded and locally
+verified, four-arm map/metric replay passed. See
+[acceptance08Nov](COLAB_ACCEPTANCE_2026-11-08.md) for actual results and metadata
+erratum. Earlier running/preparation text below describes07Nov history.
+
 Notebook riêng: https://colab.research.google.com/drive/1-EsZiZ1uHxWpPXVrzC8nVmLAxjQ3cbeR
 
 User đã chọn Colab GPU cá nhân. Notebook mới giữ nguyên notebook Gaussian20 cũ.

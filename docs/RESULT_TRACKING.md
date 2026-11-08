@@ -1,5 +1,35 @@
 # Experiment and result tracking
 
+## 2026-11-08 — Registered-partition Colab validation retry
+
+- Previous 07Nov inference/report completed, but its private ZIP was not
+  downloaded successfully before runtime expiry. Saved notebook aggregate output
+  remains evidence; the lost bundle has not been locally verified.
+- New private notebook: https://colab.research.google.com/drive/1QcyfCVbHxz4JKAlqWng_ZqD-Wh2oK48j.
+  Source snapshot d5889d5; same pinned G30 checkpoint, model/dataset revisions,
+  mask parameters, registered40/43 partition and fixed control thresholds.
+  User HF authentication, artifact checksums and LPIPS state export passed.
+- Preparation cell failed before inference after UI transfer altered indentation.
+  Restored the smoke/full cell bodies directly from literals in the pinned
+  generator via AST, avoiding multiline typing/autocomplete transformations.
+- T4 smoke completed2/2, peak allocated CUDA112928768bytes, as printed by the
+  produced report. Full83 validation started after smoke passed; completed83/83.
+  No training, threshold fitting, model reselection or test access.
+- Private ZIP53129178bytes downloaded and verified; SHA256
+  699af4f3791b9f33688abcbdd9ffcd44e7d33169964ab672ecc03b607be4162a.
+  Ten contained files pass manifest hashes. CPU replay of all43holdout metric
+  fields matches Colab at1e-10; four map arrays match C cache at atol1e-6.
+  Final pixel AP.3123301734628661, AUROC.9490360645313125, precision.2974710255,
+  recall.4935720185, F1/Dice.3712146276577787; image AUROC.9144736842,
+  P/R/F1 .6875/.9166666667/.7857142857. Brightness pixel AP remains.3895056557.
+  Full83 adapter time164.659411047s,4150U-Net/249LPIPS, peak112928768bytes.
+- Actual source ZIPd5889d5 hash a3c5345eb494b88cc75da95e7a7a588e58c0e864d7c039d77239f1f2affefd8b.
+  Raw manifest inherits old CPU source/environment labels; preserved unchanged,
+  corrected explicitly in evidence sidecar. Source/dependency/weights pins are
+  authoritative for this validation, not inherited execution_source_commit.
+  See [acceptance](COLAB_ACCEPTANCE_2026-11-08.md) and
+  [aggregate evidence](evidence/2026-11-08-colab-registered-acceptance.json).
+
 ## 2026-11-07 — Colab T4 controls preparation
 
 Preparation attempts (no U-Net inference yet): HF checkpoint/validation/mask

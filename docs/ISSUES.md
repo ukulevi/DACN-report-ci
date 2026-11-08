@@ -27,7 +27,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
 | `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
 | `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
-| `BLK-20261106-01` | Nghiệm thu resume/cache sau tích hợp | Open | B/C; A review freeze | DAC-11/12/14/15/30 | 2026-11-06 |
+| `BLK-20261106-01` | Nghiệm thu resume/cache sau tích hợp | Investigating | Nhóm review freeze; CI repo owner | DAC-11/12/14/15/30 | 2026-11-08 |
 
 ## Blocker details
 
@@ -72,7 +72,13 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 ### BLK-20261106-01 — Tích hợp và kiểm chứng branch C mới trước freeze
 
-- **Status:** Open
+- **Status:** Investigating
+- **08Nov evidence:** T4 smoke2/full83 hoàn tất, ZIP tải và10file checksum đạt;
+  toàn bộ43holdout metric replay khớp1e-10,4scoremaps khớp cache C tại1e-6.
+  Bounded trained CPU resume đã đạt trước đó. Xem COLAB_ACCEPTANCE_2026-11-08.md.
+  Sửa nhãn provenance CPU kế thừa cho generator mới,24related CPU checks đạt.
+  Chưa tự đóng gate: runtime cuối cần repin/review freeze và CI head còn bị
+  chặn tài khoản ở BLK-20261107-01; chưa chạy remote Modal continuation.
 - **Reported / updated:** 2026-11-06
 - **Owner / next handoff:** B tích hợp/evaluator; C cache/continuation; A review freeze.
 - **Affected work:** DAC-11/12/14/15/30 và final reproducibility.
