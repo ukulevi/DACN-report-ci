@@ -5,9 +5,11 @@ thứ tự công việc dựa vào prerequisite thay vì chờ người mang rol
 
 Update08Nov: T4 smoke2/full83 và private artifact handoff đã nghiệm thu;
 [evidence](COLAB_ACCEPTANCE_2026-11-08.md). Bốn controls khớp cache C. Candidate
-JSON hiện vẫn giữ CPU pins cũ; generator đã sửa metadata kế thừa với CPU regression.
-Cần repin runtime cuối và review freeze. Không tự dùng candidate cũ hoặc raw
-manifest nhãn CPU làm final.
+JSON đã repin đúng source/archive và môi trường T4 đã nghiệm thu, loại nhãn CPU
+cũ. [Static preflight](evidence/2026-11-08-final-candidate-preflight.json) xác minh
+9artifacts và95file Python trong archive. Đây là kiểm offline trên bytes đã tải,
+không chứng minh một runtime Colab mới có cùng packages. Còn review freeze và
+live runtime binding trước final; candidate vẫn bị gate từ chối chạy final.
 
 Manifest máy đọc: [final_evaluation_candidate.json](../configs/final_evaluation_candidate.json).
 Các pin hiện có provenance được điền trong JSON; không điền hash suy đoán. Gate
@@ -24,7 +26,17 @@ manifest chỉ chứa hash và thông số tổng hợp. LPIPS đã export và x
 trên83cachedpairs tại local. Runtime final vẫn phải đối chiếu đúng các artifact
 đã pin, không tự suy rằng cùng tên package thì cùng môi trường.
 
-## Cập nhật pins 07/11/2026
+## Pins hiện hành 08/11/2026
+
+Source archive d5889d51a1a19213c6e533412b4582d645354c88,
+SHA256a3c5345eb494b88cc75da95e7a7a588e58c0e864d7c039d77239f1f2affefd8b;
+LPIPS weights/dependency inventory lấy từ ZIP T4 đã tải và kiểm10file hashes.
+Source thực thi final phải được extract từ đúng archive này; checkout HEAD đã
+có thay đổi generator nên không tự coi là cùng source tree. Candidate/control
+JSON là hồ sơ bên ngoài archive, không sửa ngược ZIP lịch sử. Giữ nguyên4arms,
+thresholds40calibration và seed17; việc nâng lên frozen cần review riêng.
+
+## Lịch sử pins 07/11/2026 — đã thay bằng T4 pins ở trên
 
 Nghiệm thu trained DDIM/resume giới hạn hai mẫu CPU đã đạt; arrays khớp lượt
 liên tục tuyệt đối, tổng200 U-Net calls. Xem ACCEPTANCE_2026-11-07.md.
@@ -44,7 +56,8 @@ Replay pixel/image AUROC, AP, Precision, Recall, F1, threshold, macro lesion Dic
 và normal FPR của final LPIPS, initial LPIPS, naive-stitch LPIPS và brightness:
 đều khớp kết quả C. Threshold được refit đúng 40 calibration slices; 43 holdout
 không dùng chọn lại threshold. Bootstrap và limitations xem RESULT_TRACKING.
-Đây là tái tính từ cached scores, không phải chạy lại LPIPS/U-Net độc lập.
+Lượt08Nov đã tái chạy LPIPS/U-Net trên T4, tải private maps và tính lại metric CPU;
+map khớp C trong1e-6. Chi tiết/timing/limitations trong acceptance08Nov.
 
 ## Candidate chính và đối chứng
 
@@ -67,13 +80,24 @@ không dùng chọn lại threshold. Bootstrap và limitations xem RESULT_TRACKI
   ở private runtime, không xuất vào báo cáo. Những seed bổ sung cần đăng ký trước.
 
 Các thông số trên là snapshot candidate đã đo, không phải lựa chọn lại dựa trên
-test. LPIPS package/backbone/calibration weight checksums và source snapshot
-thực thi cuối vẫn cần pin. Khi sửa code guard, phải phân biệt source mới với
-source đã sinh kết quả lịch sử.
+test. LPIPS/package inventory/source đã pin từ lượt T4 nghiệm thu. Khi runtime
+mới khác bytes hoặc packages, phải nghiệm thu lại thay vì tự thay hash để qua gate.
 
-## Thứ tự thực hiện chung
+## Việc hiện còn cần thực hiện — 08/11/2026
 
-Tiến độ sau review: helper continuation đã có test CPU và prefix đã gắn checksum
+1. Review/freeze candidate và cả4control contracts: checkpoint/sampler, thresholds,
+   registered partition, seed17 và giới hạn một seed/validation đã quan sát.
+2. Xử lý CI account/billing hoặc ghi quyết định nghiệm thu local evidence của
+   nhóm. Không suy local checks là CI xanh.
+3. Trước khi mở test, xác minh live final runtime/source/import tree/dependencies
+   đúng pins. Dùng source archive đã nghiệm thu và manifests bên ngoài archive;
+   không chạy trực tiếp HEAD rồi thay hash cho qua gate.
+4. Sau freeze mới thực hiện final evaluation theo protocol, rồi hoàn thiện
+   figures, report/slides/demo. Chưa có final-test run trong hồ sơ này.
+
+## Thứ tự thực hiện chung trước nghiệm thu — lịch sử06–07/11
+
+Tiến độ tại thời điểm06–07Nov: helper continuation đã có test CPU và prefix đã gắn checksum
 NPZ/source/donor-index; checkpoint load dùng snapshot bytes. Còn nghiệm thu source
 tích hợp và kiểm manifest thực tế; chưa có remote continuation job mới.
 

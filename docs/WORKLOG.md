@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-11-08 — Repin accepted T4 candidate and prepare freeze handoff
+
+Plan: repin from verified T4 evidence, run offline nine-artifact/source preflight,
+check live CI and stale Linear status, update report/freeze handoff, verify/push.
+Decision: preserve accepted d5889d5 execution archive rather than silently pin
+new HEAD; newer source/runtime needs acceptance again. Candidate stays unfrozen.
+Pins/95source files pass static preflight; candidate final gate and mismatched
+local CPU environment both reject execution. All4threshold contracts unchanged.
+This is no inference/training run and does not replace live final-runtime binding.
+Added required pixel/image metrics and actual runtime evidence to report draft.
+GitHub edff8c8 still startup_failure,0jobs/0check-runs; billing blocker remains.
+Focused paired/DDPM-validation/frozen-input/partition/runtime checks:27passed
+in9.88s; Ruff on related changed Python files and git whitespace check pass.
+Reviewed paired absolute/SSIM code and real Gaussian20/Simplex20 evidence;
+Linear DAC-30 marked Done with acceptance rationale, DAC-15 moved In Progress
+in verified DACN-KHMT workspace. No scientific-quality/final-test gate closed.
+Independent read-only final review found no material pin/metric correctness
+issues; updated two current-state doc sections that still listed completed work.
+
 ## 2026-11-08 — Colab registered validation and durable private handoff
 
 Completed T4 smoke2/full83 using source d5889d5 and pinned40/43 membership;

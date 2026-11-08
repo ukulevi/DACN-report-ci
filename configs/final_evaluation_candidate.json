@@ -4,12 +4,12 @@
   "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
   "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
   "artifacts": {
-    "source_snapshot": "fa03087984a6bd6176f20b706e3068f9c6879821993f8d6bb133380de6c4066f",
+    "source_snapshot": "a3c5345eb494b88cc75da95e7a7a588e58c0e864d7c039d77239f1f2affefd8b",
     "config": "1d731fe0b773df643a5d03f19dd84a85ae2de3c0347783186a84c0f5c6e69c9f",
     "checkpoint": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
-    "lpips_backbone": "6c58a8848413ba974fb64345adea3f5cee7888fe894c436fda33a7d87686c672",
-    "lpips_calibration": "f6e69d87ad68e0e74712addc8e06f20ed111f744fffb97411d7d2da4ef953dbf",
-    "dependency_lock": "ab0fac04da0a3103407192c98b0073588bc8375d42ae00bd407cdfe577fda929",
+    "lpips_backbone": "21a3a6c2a87be2bb4cb4b40b5c3ba88486e38545750e0f36aa384204f7ae4e31",
+    "lpips_calibration": "1e72616f68a17ee8abe7ac456151a7af2003f8df17fb5b8a2936d5f289e49db4",
+    "dependency_lock": "37a370c91e2dccfe89be43a33810e6aab70e88bc7ee7c3655b549b30d1a22b9f",
     "validation_index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
     "validation_partition": "ceffbc9b60a9cd60147775bcbc76d8df03bf780cfe379400fb52ecbe632d5490",
     "mask_parameters": "39ee181e3c783fa516c3f2f1294de31aab8239eb09ce9bed3c287872aef8bd16"
@@ -19,11 +19,12 @@
     "image": 0.24719371760470998
   },
   "pending": [
-    "Bounded two-sample CPU trained DDIM/resume accepted; broader validation and controls acceptance remain",
-    "Verify actual runtime source, dependencies and dataset content against captured artifacts",
-    "Benchmark memory/latency and freeze separate control contracts before final acceptance"
+    "Review final protocol/shortlist, one-seed limitation and control contracts before freeze",
+    "Resolve CI account/billing blocker or explicitly record team acceptance of local-check evidence",
+    "Verify live final runtime against these captured artifacts before opening test; changed versions/source require new acceptance"
   ],
-  "execution_source_commit": "84382a8",
-  "environment_scope": "New Windows CPU environment; all83 cached LPIPS pairs match at atol1e-6; historical runtime identity not established",
-  "scope": "Candidate for final LPIPS scoring only; controls require their own frozen contracts; no test authorization from this file"
+  "environment_scope": "Accepted Tesla T4 Colab validation environment; Torch2.14.1+cu130, torchvision0.29.1+cu130, LPIPS0.1.4, numpy2.4.6. Exported version inventory, not complete binary lock.",
+  "scope": "Candidate for final LPIPS scoring only; controls require their own frozen contracts; no test authorization from this file",
+  "source_archive_commit": "d5889d51a1a19213c6e533412b4582d645354c88",
+  "acceptance_evidence": "docs/evidence/2026-11-08-colab-registered-acceptance.json"
 }

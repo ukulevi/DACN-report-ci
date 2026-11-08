@@ -75,8 +75,9 @@ artifact đã bền vững ở local, có thể đóng phiên khi người dùng
 
 1. Đã sửa nhãn provenance kế thừa và kiểm generated manifest preflight bằng CPU;
    áp dụng generator mới cho notebook final, không sửa raw artifact cũ.
-2. Repin candidate cho runtime cuối; nhóm review shortlist, seed, thresholds,
-   controls và hạn chế một seed trước freeze. Không dùng test để quyết định.
+2. Follow-up08Nov: candidate đã repin T4, static preflight9artifacts/95files đạt;
+   nhóm còn review shortlist, seed, thresholds, controls và hạn chế một seed
+   trước freeze, rồi kiểm live final runtime. Không dùng test để quyết định.
 3. Xử lý CI account/billing ở BLK-20261107-01; local verification không thay CI.
 4. Sau freeze mới chạy final evaluation theo protocol; hoàn thiện báo cáo/demo
    bằng evidence đã có. BLK-20261101-02 và gate chung chưa tự động đóng.

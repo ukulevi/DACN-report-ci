@@ -67,6 +67,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 - **Action needed:** Chủ repo mở Show more và Billing/Actions để xử lý thông báo
   payment/account hoặc hạn mức được nêu đầy đủ. Không đổi phương thức thanh toán,
   tăng budget hay retry hàng loạt từ agent. Sau khi xử lý, chạy lại CI trên head.
+- **08Nov live check:** Commit edff8c8 vẫn startup_failure tại
+  [run42451751296](https://github.com/tanh1c/DACN/actions/runs/42451751296),
+  jobs=0/check-runs=0 qua API. Không có test job bắt đầu; giữ Waiting,
+  không suy rằng lỗi mới nằm trong code và không retry tự động.
 - **Close when:** Nguyên nhân được ghi và một run trên source liên quan thực sự
   khởi động/kết thúc với bằng chứng; trạng thái test failure nếu có được tách riêng.
 
@@ -79,6 +83,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   Sửa nhãn provenance CPU kế thừa cho generator mới,24related CPU checks đạt.
   Chưa tự đóng gate: runtime cuối cần repin/review freeze và CI head còn bị
   chặn tài khoản ở BLK-20261107-01; chưa chạy remote Modal continuation.
+- **08Nov repin:** Candidate đã pin9artifacts từ T4 receipt; static archive
+  preflight95files đạt, final candidate rejection và CPU-runtime mismatch gate
+  đều hoạt động. Thresholds không đổi. Còn review freeze/live final runtime,
+  không còn thiếu checksum/export LPIPS hoặc artifact tải về.
 - **Reported / updated:** 2026-11-06
 - **Owner / next handoff:** B tích hợp/evaluator; C cache/continuation; A review freeze.
 - **Affected work:** DAC-11/12/14/15/30 và final reproducibility.

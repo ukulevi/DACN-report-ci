@@ -1,0 +1,35 @@
+{
+  "status": "preflight_passed_candidate_only",
+  "date": "2026-11-08",
+  "scope": "Static artifact/source/dependency-inventory preflight; no live Colab check, inference, training or test access",
+  "manifest_sha256": "835caa3dbb16984df6c709cc9d228771d7639741a0e7061e41a647371b2ea05f",
+  "controls_sha256": "60df40452c333538d76301b27cd42d3831062faaf508061e5cbf4783365a2b93",
+  "artifacts_verified": [
+    "checkpoint",
+    "config",
+    "dependency_lock",
+    "lpips_backbone",
+    "lpips_calibration",
+    "mask_parameters",
+    "source_snapshot",
+    "validation_index",
+    "validation_partition"
+  ],
+  "artifact_count": 9,
+  "archived_runtime_static_checks": {
+    "source_files_verified": 95,
+    "dependency_freeze_verified": true
+  },
+  "final_execution_rejected_while_candidate": true,
+  "current_local_runtime_rejected": true,
+  "local_rejection_reason": "Running dependencies differ from pinned environment",
+  "thresholds_unchanged": true,
+  "control_arms": [
+    "brightness",
+    "final_lpips",
+    "initial_lpips",
+    "naive_stitch_lpips"
+  ],
+  "source_archive_commit": "d5889d51a1a19213c6e533412b4582d645354c88",
+  "acceptance_evidence": "docs/evidence/2026-11-08-colab-registered-acceptance.json"
+}
