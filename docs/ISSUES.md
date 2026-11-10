@@ -315,3 +315,23 @@ HF review added:small AP gains, no demonstrated pretrained/self-conditioning
 benefit, image classification/FP remain weak. Keep Investigating; A/B/C need to
 review the aggregate evidence and choose the next bounded scoring/control
 experiment before final freeze. No new training requested or started.
+
+## 2026-11-10 — Authorization và evidence mới
+
+- BLK-20261107-01 vẫn Waiting cho chủ repo: API live run42455732782 trên
+  HEAD1c13e5f startup_failure, jobs0. Người dùng yêu cầu triển khai freeze/test
+  và xử lý hoặc ghi quyết định CI. Agent chọn ngoại lệ dùng local evidence cho
+  đợt inference này; không coi là CI success hoặc đóng lỗi account/billing.
+  Local suite282pass/1skip41.29s; Ruff check/format đạt. Không thay đổi billing,
+  không merge main. Đóng blocker khi chủ repo có CI thực chạy thành công.
+- BLK-20261106-01: launcher shared-trajectory4arms và verified split factory đã
+  triển khai, tests synthetic/resume/gate đạt. Còn smoke2/validation43 trên runtime
+  mới trước final seal. Nhóm không phải cung cấp bundle Colab cũ để chuẩn bị runtime
+  Modal mới, nhưng acceptance phải so với historical maps/metrics và threshold
+  giữ nguyên. Xem FINAL_EVALUATION_2026-11-10.md; chưa đóng blocker bằng local tests.
+- BLK-20261106-01 update10Nov: fresh-model shared4arm smoke2/validation43 passed,
+  finalmap maxabs2.98e-7 and metrics maxabs2.26e-8 versus historical evidence.
+  Runtime/source/9pins verified; new manifest sealed frozen and saved in configs.
+  The four-arm final-wrapper/acceptance prerequisite is resolved for this protocol.
+  Historical remote training-continuation checks remain outside this test task;
+  CI account blocker remains Waiting under the documented local-evidence exception.

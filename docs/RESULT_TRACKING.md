@@ -2954,3 +2954,49 @@ and the checkpoints have different optimizer budgets. Held-out test remains seal
 - Driver: `scripts/evaluate_budget_pair.py` (executed as private runs copy before
   import/format cleanup; executed hash retained in evidence). No additional
   inference/training or held-out-test access for this CPU analysis.
+
+## 2026-11-10 — Final four-arm launcher acceptance, protocol-b
+
+User authorized method freeze, validation then full test and report. Scientific
+checkpoint/config/thresholds unchanged from accepted08Nov candidate; one trained
+seed17 and one UUID-derived sampling seed policy. Dataset revision
+350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7. New source snapshot
+f4f037fe9fef6fefc4d41cb2dafd94512d8caef0650641671a194480d454c02c;
+actual Modal dependency inventory ac4bea0313a7f12f653762c052cb2cb8fbc8a0c93cdb29a57997de32952c18f8.
+Native LPIPS trunk/head hashes equal historical exports; runtime is newly accepted,
+not claimed identical to old Colab. Method/threshold table:FINAL_EVALUATION_2026-11-10.md.
+
+- `final4-smoke-20261110-b`: submitted03:35UTC, bounded2validation samples, T4,
+  four shared score arms. [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-ZcY4PKHPflkuV2DdK0EuZt).
+  Durable start/terminal manifest on private runs Volume at
+  final-evaluation/final-fourarm-20261110-b/attempts/final4-smoke-20261110-b/run_manifest.json.
+  Status pending collection; no metrics claimed here. Test not authorized by this
+  smoke receipt alone; full43validation comparison must pass before final seal.
+- CPU prepare-a previously rejected LF config before inference; prepare-b recovered
+  exact pinned CRLF bytes and completed. Neither preparation was training/model
+  evaluation; no anomaly metrics or test access in preparation.
+
+Smoke-b completed/uploaded: private Hub revision
+[9d076e0eb1a5127c845983f54111c84d55abc25e](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/9d076e0eb1a5127c845983f54111c84d55abc25e/evaluations/final4-smoke-20261110-b).
+Safe aggregate receipt collected locally;2outputs and4arms completed. This is
+engineering smoke, not the research holdout or final-test result. Runtime/import
+and all9artifact checks passed before validation dataset factory access.
+
+- `final4-val-20261110-b`: submitted03:36UTC after successful smoke;43registered
+  validation holdout slices, same40calibration thresholds,25patient groups,
+  one training/sampling seed17. [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-vuwGcyyNqay53kZGFnCEbB).
+  Durable manifest on private Volume under protocol-b/attempts/final4-val-20261110-b.
+  Status pending produced receipt; no test data or threshold refitting in this stage.
+
+Validation-b **completed/uploaded**, private Hub revision
+[334b75e6bbb9fce4dbb2998e3630c52452aee6fd](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/334b75e6bbb9fce4dbb2998e3630c52452aee6fd/evaluations/final4-val-20261110-b).
+43/43outputs,2150U-Net/129LPIPS calls; adapter time64.952658s, median1.425616s,
+p951.486003s; peak CUDA allocated112928768B. Timing excludes data/shard I/O and
+global metrics; first adapter call includes model load. Maxabs final map error
+2.980232238769531e-7 versus historical C maps; largest image/pixel metric error
+across4arms2.2600697424657312e-8. Both below registered1e-6 tolerance.
+Source/runtime and9artifact checks passed before sample factory; no threshold
+refit, new training seed or test use. Produced receipt seals manifest frozen;
+local copies configs/final_evaluation_frozen_20261110.json and
+configs/final_controls_frozen_20261110.json. Aggregate evidence:
+[evidence](evidence/2026-11-10-fourarm-validation.json).

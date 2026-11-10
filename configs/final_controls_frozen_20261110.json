@@ -1,0 +1,32 @@
+{
+  "acceptance_evidence": "docs/evidence/2026-11-08-colab-registered-acceptance.json",
+  "arms": {
+    "brightness": {
+      "image": 0.4997753345200585,
+      "pixel": 0.48235294222831726
+    },
+    "final_lpips": {
+      "image": 0.24719371760470998,
+      "pixel": 0.26617634296417236
+    },
+    "initial_lpips": {
+      "image": 0.2262084392261588,
+      "pixel": 0.2501829266548157
+    },
+    "naive_stitch_lpips": {
+      "image": 0.20856854640361336,
+      "pixel": 0.21649277210235596
+    }
+  },
+  "compute": "One shared50 U-Net trajectory per sample; 3 LPIPS calls for final+initial+naive; brightness no model call",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "freeze_authority": "User instruction 2026-11-10",
+  "image_aggregation": "mean top576 over full240crop",
+  "pending": [],
+  "provenance": "docs/RESULT_TRACKING.md full metric replay; runs/audit-2026-11-06/b-full-metrics-results.json",
+  "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
+  "schema_version": 1,
+  "scope": "Fixed four-arm thresholds; no retuning after validation or test",
+  "score_comparison": ">=",
+  "status": "frozen"
+}

@@ -1851,3 +1851,28 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   calibration winner verified; new evidence scanned for HF credentials/private
   UUIDs. Checkpoint/bundle ignored by Git. CPU driver help works. No new run was
   started merely to repeat an already completed experiment.
+
+## 2026-11-10 — Four-arm final launcher and method review
+
+- User authorized review/freeze, validation, full test and report artifacts.
+  Preserved scientific config/checkpoint/thresholds and all four registered arms;
+  documented CI local-evidence exception, leaving account blocker Waiting.
+- Added durable shared-trajectory four-arm orchestration, dataset/runtime gates,
+  reference-validation acceptance before final seal, remote Modal controller and
+  artifact-driven report/figure builder. Kept old candidate/provenance intact.
+- Checks actually run:282pytest passed/1LPIPS roundtrip skipped41.29s; focused
+  gates/adapter/resume25passed/1skipped9.60s; Ruff check/format and whitespace checks.
+  Prepared CPU Modal environment; no GPU/model/test result claimed in this entry.
+- Checkout moved under ignored runs/bc-evaluation-colab to permit isolated edits;
+  original working branch and its uncommitted changes remain intact.
+- Added primary LPIPS reference after checking author metadata/CVPR2018 status
+  on arXiv1801.03924v2; CVF HTML fetch returned403, arXiv primary page succeeded.
+- CPU prepare-a stopped before inference: config LF bytes differ from the pinned
+  Windows CRLF artifact. Verified CRLF reproduces exact historical checksum;
+  added strict text-byte recovery regression (no config-value change). Disabled
+  Modal automatic package mounting so runtime import comes from the explicit
+  source root. Prepared fresh protocol-b rather than overwriting attempt-a.
+- Smoke2 and fresh-model validation43 completed on T4; four-arm outputs reproduce
+  historical final maps within2.98e-7 and all required metrics within2.26e-8.
+  Collected aggregate receipts and frozen manifest/control JSON before test;
+  test remains unopened until the final stage's gates verify these exact inputs.

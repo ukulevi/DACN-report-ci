@@ -155,3 +155,12 @@ source or run when possible. Append new entries at the top.
 - Practice adopted: Record real run metrics only from produced artifacts in
   `RESULT_TRACKING.md`; label smoke tests and synthetic outputs explicitly.
 - Source/run: `README.md`, `docs/PROJECT_PLAN.md`, and `docs/RESEARCH.md`.
+
+## 2026-11-10 — Reproduce the bytes of cross-platform config artifacts
+
+Observed: candidate config pin1d731fe0… is the CRLF serialization from Windows;
+Git checkout on macOS contains LF bytes with hashf1eaf46f…. Converting only line
+endings reproduces the historical checksum exactly. Prepare correctly stopped
+before inference. Practice: retain exact artifact bytes, and only recover LF/CRLF
+variants when the historical hash matches; never repin a config merely to bypass
+an integrity error. Regression verifies other content changes remain rejected.

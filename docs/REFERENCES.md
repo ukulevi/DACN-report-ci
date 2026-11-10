@@ -13,6 +13,7 @@ nguồn sơ cấp và mục đích đọc; không hàm ý tất cả phương ph
 | Score matching — Song & Ermon, 2019 | [Paper](https://arxiv.org/abs/1907.05600) | Hiểu score-based modeling |
 | DDPM — Ho et al., 2020 | [Paper](https://arxiv.org/abs/2006.11239) | Noise schedule, objective, reverse process |
 | DDIM — Song et al., 2020/2021 | [Paper](https://arxiv.org/abs/2010.02502) | Phân biệt sampler/reverse steps và timestep bắt đầu tái tạo |
+| LPIPS — Zhang, Isola, Efros, Shechtman & Wang, CVPR 2018 | [The Unreasonable Effectiveness of Deep Features as a Perceptual Metric](https://arxiv.org/abs/1801.03924v2) | Spatial perceptual distance; input adaptation và SqueezeNet weights của đồ án phải mô tả riêng |
 | Score-based SDE — Song et al., 2020/2021 | [Paper](https://arxiv.org/abs/2011.13456) | Related work; đọc sau DDPM |
 | Diffusion Models for Medical Anomaly Detection — Wolleb et al., 2022 | [Paper](https://arxiv.org/abs/2203.04306) | Có classifier guidance; không mô tả như normal-only thuần túy |
 | AnoDDPM — Wyatt et al., 2022 | [Paper](https://openaccess.thecvf.com/content/CVPR2022W/NTIRE/papers/Wyatt_AnoDDPM_Anomaly_Detection_With_Denoising_Diffusion_Probabilistic_Models_Using_Simplex_CVPRW_2022_paper.pdf), [code](https://github.com/Julian-Wyatt/AnoDDPM) | Partial diffusion và ảnh hưởng của noise; không tuyên bố tái lập nguyên bản |

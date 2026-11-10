@@ -1,5 +1,9 @@
 # Hồ sơ ứng viên đánh giá cuối — 06/11/2026
 
+Update10Nov: người dùng yêu cầu thực hiện freeze/validation/test; xem
+[hồ sơ10Nov](FINAL_EVALUATION_2026-11-10.md). Candidate08Nov được bảo toàn;
+runtime/launcher mới phải được nghiệm thu rồi seal manifest riêng trước test.
+
 Trạng thái: **candidate, chưa frozen, chưa cho phép mở test**. Nhóm làm chung,
 thứ tự công việc dựa vào prerequisite thay vì chờ người mang role A/B/C.
 

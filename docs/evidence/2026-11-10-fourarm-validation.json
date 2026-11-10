@@ -1,0 +1,108 @@
+{
+  "arms": {
+    "final_lpips": {
+      "pixel": {
+        "auroc": 0.949036056113996,
+        "auprc": 0.31233019606356355,
+        "precision": 0.2974710255494595,
+        "recall": 0.4935720185298237,
+        "f1": 0.3712146276577787,
+        "threshold": 0.26617634296417236,
+        "dice_micro": 0.3712146276577787,
+        "macro_lesion_dice": 0.31357079206024785,
+        "normal_pixel_fpr": 0.005772112573099415
+      },
+      "image": {
+        "auroc": 0.9144736842105263,
+        "auprc": 0.9443859166057084,
+        "precision": 0.6875,
+        "recall": 0.9166666666666666,
+        "f1": 0.7857142857142857,
+        "threshold": 0.24719371760470998
+      }
+    },
+    "initial_lpips": {
+      "pixel": {
+        "auroc": 0.9261098551161382,
+        "auprc": 0.1578756895414783,
+        "precision": 0.19495828044695063,
+        "recall": 0.33646353287607283,
+        "f1": 0.24687113008194345,
+        "threshold": 0.2501829266548157,
+        "dice_micro": 0.24687113008194345,
+        "macro_lesion_dice": 0.23777684509577213,
+        "normal_pixel_fpr": 0.015722770467836256
+      },
+      "image": {
+        "auroc": 0.787280701754386,
+        "auprc": 0.8545009110761922,
+        "precision": 0.6111111111111112,
+        "recall": 0.9166666666666666,
+        "f1": 0.7333333333333333,
+        "threshold": 0.2262084392261588
+      }
+    },
+    "naive_stitch_lpips": {
+      "pixel": {
+        "auroc": 0.9362993206248804,
+        "auprc": 0.18059333017770865,
+        "precision": 0.21875292456120948,
+        "recall": 0.4616655295004848,
+        "f1": 0.2968487528357761,
+        "threshold": 0.21649277210235596,
+        "dice_micro": 0.2968487528357761,
+        "macro_lesion_dice": 0.28544525922297564,
+        "normal_pixel_fpr": 0.018309576023391814
+      },
+      "image": {
+        "auroc": 0.7850877192982457,
+        "auprc": 0.861002903908283,
+        "precision": 0.6176470588235294,
+        "recall": 0.875,
+        "f1": 0.7241379310344828,
+        "threshold": 0.20856854640361336
+      }
+    },
+    "brightness": {
+      "pixel": {
+        "auroc": 0.9501972521258396,
+        "auprc": 0.3895056557159782,
+        "precision": 0.16146869266940445,
+        "recall": 0.7885768664488095,
+        "f1": 0.2680513044300881,
+        "threshold": 0.48235294222831726,
+        "dice_micro": 0.2680513044300881,
+        "macro_lesion_dice": 0.5589781256327274,
+        "normal_pixel_fpr": 0.13493512426900584
+      },
+      "image": {
+        "auroc": 0.6798245614035088,
+        "auprc": 0.7703086888538122,
+        "precision": 0.5714285714285714,
+        "recall": 1.0,
+        "f1": 0.7272727272727273,
+        "threshold": 0.4997753345200585
+      }
+    }
+  },
+  "status": "completed",
+  "split": "validation",
+  "sample_count": 43,
+  "method_contract": "e02048405215f80cedcdc2b6119f9a9e63910afcd2f2efbb901950c9cdae6a2a",
+  "unet_calls": 2150,
+  "lpips_calls": 129,
+  "adapter_seconds_sum": 64.95265813300003,
+  "adapter_seconds_median": 1.4256159379999929,
+  "adapter_seconds_p95": 1.4860028037000064,
+  "timing_scope": "Adapter incl model load on first call, scores/transfers; excludes I/O/global metrics",
+  "training_seeds": 1,
+  "sampling_seeds": 1,
+  "pixel_aggregation": "global micro over 240x240 crop; Dice=F1",
+  "image_aggregation": "mean of top576 pixels; score>=fixed threshold",
+  "threshold_source": "original40 validation calibration; no refitting",
+  "gpu": "Tesla T4",
+  "cuda_peak_allocated_bytes": 112928768,
+  "max_abs_final_map_error": 2.980232238769531e-07,
+  "max_abs_reference_metric_error": 2.2600697424657312e-08,
+  "reference_maps_verified": true
+}

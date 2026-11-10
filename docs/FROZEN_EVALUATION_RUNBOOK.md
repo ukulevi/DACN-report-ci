@@ -1,5 +1,9 @@
 # Vận hành và review trước final evaluation
 
+Update10Nov: authorization mới và launcher bốn phương án nằm trong
+[hồ sơ final10Nov](FINAL_EVALUATION_2026-11-10.md). Nội dung08Nov dưới đây giữ
+cho lịch sử; không còn là quyết định authorization mới nhất.
+
 Quyết định người dùng08/11/2026: **giữ candidate, chờ CI hoặc nhóm review**.
 Không đổi status thành frozen để vượt gate, không tải/chạy test trong bước này.
 
