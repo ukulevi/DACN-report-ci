@@ -39,6 +39,14 @@ LF/CRLF portability regression; figure provenance explicitly normalizes CRLF to
 LF, while the main build manifest retains raw-byte input hashes. Real changed
 values still fail the stale-figure check. No experiment data or thresholds changed.
 
+Hosted acceptance for `1a9496e`: [report run42760339837](https://github.com/ukulevi/DACN-report-ci/actions/runs/42760339837)
+Success, build1m15s and release9s; [quality run42760339699](https://github.com/ukulevi/DACN-report-ci/actions/runs/42760339699)
+Success31s. [Private prerelease report-v2026.11.10-5](https://github.com/ukulevi/DACN-report-ci/releases/tag/report-v2026.11.10-5)
+visibly contains report.pdf (147KB) and build-manifest.json. Remote PDF SHA256
+`2e3a0a70ca7db31eba5f5297480c2de166da385d91d7f345bcf63d5ebdd57ca8`.
+Local committed build manifest is completed/clean, candidate unchanged, PDF hash
+verified. Eight focused checks and full Ruff/format pass; portability fix reviewed.
+
 ## 2026-11-10 — Independent private report CI host (DAC-26)
 
 User approved private `ukulevi/DACN-report-ci` after confirming the source

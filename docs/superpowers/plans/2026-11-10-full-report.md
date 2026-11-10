@@ -34,7 +34,8 @@ user-supplied prior reports. Current course/advisor come from the course record.
 - [x] Update report workflow artifact paths and add private draft prereleases.
 - [x] Compile, render/inspect pages, verify citations/math/figures/metrics; run
   focused tests and repository lint; obtain final read-only review.
-- [ ] Record worklog, dual-push, verify actual PDF/release run and update DAC-26.
+- [x] Record worklog, dual-push and verify actual PDF/release run. DAC-26 receives
+  the final handoff after these acceptance records are pushed.
 
 ## Ledger
 
@@ -48,3 +49,8 @@ user-supplied prior reports. Current course/advisor come from the course record.
   compiled to 16 pages, rendered and visually inspected. No overflow or missing
   glyph warnings; all ten references resolve. Read-only final reviewer found no
   material scientific, code or release issues. No ML experiment or test access.
+- Hosted acceptance: first two report runs failed on raw Windows/Linux EOL
+  hashes; portable CRLF-to-LF chart provenance fixed after regression RED/GREEN.
+  Eight focused tests now pass; raw build-input hashes remain unchanged in scope.
+  `1a9496e` report run42760339837 and quality42760339699 succeeded. Private
+  prerelease report-v2026.11.10-5 has direct PDF and manifest assets.
