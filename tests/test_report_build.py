@@ -15,10 +15,10 @@ def fixture(root):
     (root / "reports").mkdir()
     (root / "configs").mkdir()
     (root / "docs/REPORT_DRAFT.md").write_text(
-        "# Báo cáo\nNội dung tiếng Việt.\n## Dữ liệu\n```python\n## code comment\n```\n",
+        "# Report\nEnglish narrative.\n## Dataset\n```python\n## code comment\n```\n",
         encoding="utf-8",
     )
-    (root / "reports/metadata.json").write_text('{"title":"DACN"}')
+    (root / "reports/metadata.json").write_text('{"title":"DACN","lang":"en-US"}')
     (root / "reports/header.tex").write_text("% initial layout\n")
     (root / "configs/final_evaluation_candidate.json").write_text('{"status":"candidate"}')
     data = {"status": "verified", "arms": {}}
@@ -57,9 +57,11 @@ def test_prepare_uses_evidence_and_preserves_candidate(tmp_path):
     receipt = prepare(tmp_path, tmp_path / "reports/build")
     body = (tmp_path / "reports/build/report.md").read_text(encoding="utf-8")
     assert "0.312330" in body and "0.321148" in body
-    assert "BẢN NHÁP" in body and "chưa có kết quả test" in body
-    assert "tiếng Việt" in body
-    assert "\n# Dữ liệu\n" in body and "\n## code comment\n" in body
+    assert "DRAFT" in body and "no held-out test results" in body
+    assert "English narrative" in body
+    assert "Automatically generated evidence appendix" in body
+    assert "\n# Dataset\n" in body and "\n## code comment\n" in body
+    assert receipt["report_language"] == "en-US"
     assert receipt["status"] == "prepared"
     before = receipt["inputs"]["reports/header.tex"]
     (tmp_path / "reports/header.tex").write_text("% changed layout\n")
@@ -78,6 +80,15 @@ def test_invalid_evidence_fails_before_report_is_written(tmp_path):
     path.write_text(json.dumps(data))
     prepare = runpy.run_path(str(PROJECT / "scripts/build_report.py"))["prepare"]
     with pytest.raises(ValueError, match="metric"):
+        prepare(tmp_path, tmp_path / "reports/build")
+    assert not (tmp_path / "reports/build/report.md").exists()
+
+
+def test_non_english_metadata_fails_before_report_is_written(tmp_path):
+    fixture(tmp_path)
+    (tmp_path / "reports/metadata.json").write_text('{"title":"DACN","lang":"vi-VN"}')
+    prepare = runpy.run_path(str(PROJECT / "scripts/build_report.py"))["prepare"]
+    with pytest.raises(ValueError, match="English"):
         prepare(tmp_path, tmp_path / "reports/build")
     assert not (tmp_path / "reports/build/report.md").exists()
 

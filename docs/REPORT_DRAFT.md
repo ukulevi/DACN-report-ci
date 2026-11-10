@@ -1,89 +1,117 @@
-# Diffusion Models for Anomaly Detection — bản thảo nội dung
+# Diffusion Models for Anomaly Detection — Working Draft
 
-Trạng thái 10/11/2026: nội dung nghiên cứu đã có bằng chứng; chưa phải báo cáo
-hoàn chỉnh hoặc kết quả held-out test. References dùng danh mục REFERENCES.md.
+Status as of 10 November 2026: this document contains evidence-backed research
+material. It is not a completed submission or a held-out test report.
+Bibliographic sources are maintained in [References](REFERENCES.md).
 
-Người dùng đang nhờ Hải Tuấn review/freeze. Agent giữ candidate, không tự mở test.
-[Mức sẵn sàng và ablation mới09Nov](REPORT_READINESS_2026-11-10.md) tách việc đã
-hoàn thành, producer-audited results mới và các gate còn chờ. Có thể viết dữ liệu/
-phương pháp/validation ngay, chưa chốt final-test conclusion.
+Protocol review and freeze have been requested from Hai Tuan. The configuration
+remains a candidate, and the test split remains sealed. The
+[readiness assessment and new ablations](REPORT_READINESS_2026-11-10.md) distinguish
+completed work, producer-audited results and outstanding gates. Data, methods
+and validation sections can be drafted before the final evaluation is completed.
 
-## Mục tiêu và dữ liệu
+## Objective and dataset
 
-Nhóm nghiên cứu phát hiện bất thường trên ảnh BMAD Brain FLAIR 2D bằng diffusion
-normal-only. Normal ở đây là slice không có tumor annotation, không đồng nghĩa
-bệnh nhân khỏe mạnh. Dữ liệu PNG render từ BraTS khác intensity NIfTI gốc.
-Preprocessing bảo toàn ảnh, padding và chuẩn hóa theo DATA_PROTOCOL.md.
-Patient-disjoint nhằm ngăn các slice của cùng bệnh nhân rò giữa các split.
-Dataset revision: `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`.
+This project investigates diffusion-based anomaly detection on BMAD Brain FLAIR
+2D images using normal-only training. A normal slice has no annotated tumor;
+this does not imply that the patient is healthy. The PNG images rendered from
+BraTS differ from the original NIfTI intensities.
 
-## Phương pháp
+The [data protocol](DATA_PROTOCOL.md) defines decoding, symmetric padding and
+normalization. Patient-disjoint splitting prevents slices from the same patient
+appearing across splits. The immutable dataset revision is
+`350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`.
 
-DDPM học dự đoán epsilon trên normal slices. Epsilon-MSE đánh giá noise prediction;
-không trực tiếp đo tumor segmentation. Partial reconstruction thêm noise đến
-timestep đã chọn rồi denoise. Discrepancy giữa input và reconstruction tạo anomaly
-map: absolute difference, local SSIM và perceptual LPIPS là các hướng đã khảo sát.
+## Method
 
-Ứng viên hiện tại dùng Gaussian EMA30, phase 1 DDIM t=300 với 20 calls và phase 2
-DDIM t=50 với 30 calls, eta=0. Pseudo-mask, stitch và một lượt resampling được dùng
-để hạn chế vùng sửa đổi; LPIPS spatial SqueezeNet tạo score cuối. Chi tiết và hashes
-trong FINAL_EVALUATION_CANDIDATE.md. 50 U-Net calls/ảnh là bộ đếm compute;
-không thay thế đo latency hoặc peak VRAM.
+The DDPM learns to predict noise epsilon from normal slices. Epsilon-MSE measures
+noise prediction error; it does not directly measure tumor segmentation quality.
+Partial reconstruction adds noise up to a selected timestep and then denoises.
+Differences between the input and reconstruction define anomaly maps. The
+investigated scores include absolute pixel difference, local SSIM difference
+and spatial perceptual LPIPS distance.
 
-## Thiết kế đánh giá và kết quả có bằng chứng
+The current candidate uses a Gaussian EMA epoch-30 checkpoint. Phase 1 performs
+20 DDIM evaluations starting at t=300. Phase 2 performs 30 evaluations starting
+at t=50, with eta=0 and one resampling pass. Pseudo-masking, stitching and
+resampling restrict the reconstructed region. Spatial SqueezeNet LPIPS produces
+the final anomaly score. Parameters and hashes are documented in the
+[final-evaluation candidate](FINAL_EVALUATION_CANDIDATE.md).
+The 50 U-Net evaluations per image measure model-call count, not wall-clock
+latency or peak GPU memory.
 
-Validation gồm 40 calibration và 43 holdout slices; thresholds chỉ fit calibration.
-Holdout đã được xem qua nhiều thí nghiệm, nên vẫn có selection bias. B đã replay
-metrics từ cached scores và khớp C đến tolerance 1e-10. Lượt08Nov tái chạy U-Net/
-LPIPS trên Colab T4, map khớp C tại atol1e-6; ZIP private đã tải và kiểm checksum,
-metric CPU khớp receipt Colab. Tất cả số dưới đây là validation, một seed17.
+## Evaluation design and measured validation results
 
-| Phương án trên phép thử DDIM20+30 | Pixel AP | Pixel F1/Dice |
+Validation contains 40 calibration slices and 43 group-holdout slices. Thresholds
+are fitted on calibration only. The holdout has been examined across several
+experiments and remains subject to selection bias.
+
+Independent cached-score replay matched producer metrics within 1e-10. The
+8 November Colab T4 run independently executed the U-Net and LPIPS pipeline;
+its score maps matched the producer cache within an absolute tolerance of 1e-6.
+The private ZIP was downloaded and checksum-verified. CPU metric replay matched
+the Colab receipt. Every result below is validation-only, with one sampling seed
+(base seed 17).
+
+| DDIM20+30 method | Pixel AP | Pixel F1/Dice |
 |---|---:|---:|
 | Final LPIPS | 0.312330 | 0.371215 |
 | Initial LPIPS | 0.157876 | 0.246871 |
 | Naive-stitch LPIPS | 0.180593 | 0.296849 |
 | Brightness control | 0.389506 | 0.268051 |
 
-| Phương án | Pixel ROC-AUC | Pixel Precision | Pixel Recall |
+| Method | Pixel ROC-AUC | Pixel precision | Pixel recall |
 |---|---:|---:|---:|
-| Final LPIPS | .949036 | .297471 | .493572 |
-| Initial LPIPS | .926110 | .194958 | .336464 |
-| Naive-stitch LPIPS | .936299 | .218753 | .461666 |
-| Brightness | .950197 | .161469 | .788577 |
+| Final LPIPS | 0.949036 | 0.297471 | 0.493572 |
+| Initial LPIPS | 0.926110 | 0.194958 | 0.336464 |
+| Naive-stitch LPIPS | 0.936299 | 0.218753 | 0.461666 |
+| Brightness | 0.950197 | 0.161469 | 0.788577 |
 
-| Phương án | Image ROC-AUC | Image Precision | Image Recall | Image F1 |
+| Method | Image ROC-AUC | Image precision | Image recall | Image F1 |
 |---|---:|---:|---:|---:|
-| Final LPIPS | .914474 | .687500 | .916667 | .785714 |
-| Initial LPIPS | .787281 | .611111 | .916667 | .733333 |
-| Naive-stitch LPIPS | .785088 | .617647 | .875000 | .724138 |
-| Brightness | .679825 | .571429 | 1.000000 | .727273 |
+| Final LPIPS | 0.914474 | 0.687500 | 0.916667 | 0.785714 |
+| Initial LPIPS | 0.787281 | 0.611111 | 0.916667 | 0.733333 |
+| Naive-stitch LPIPS | 0.785088 | 0.617647 | 0.875000 | 0.724138 |
+| Brightness | 0.679825 | 0.571429 | 1.000000 | 0.727273 |
 
-Pixel aggregation là global micro trên crop240; pixel F1 nằm trong bảng Dice.
-Image score mean top576pixels. Thresholds riêng từng arm lấy từ40calibration và
-giữ nguyên trước43holdout. Full83 có4150U-Net/249LPIPS calls; tổng adapter time
-164.659411s, peak CUDA allocated112928768bytes (~107.7MiB), không phải thời gian
-toàn notebook hoặc reserved VRAM. [Nghiệm thu08Nov](COLAB_ACCEPTANCE_2026-11-08.md)
-ghi hashes, môi trường và đính chính nhãn metadata kế thừa.
+Pixel metrics are global micro aggregates over the 240x240 crop. Pixel F1 equals
+micro Dice. The image score is the mean of the top 576 pixel scores. Each method
+uses its own thresholds from the original 40 calibration slices, retained when
+scoring the 43 holdout slices.
 
-Paired bootstrap theo 25 patient groups trên 43 holdout slices: 999/1000 draws
-hợp lệ, seed bootstrap 17. Delta AP final trừ naive stitch có CI95
-[0.026164, 0.177945]; final trừ brightness có CI95 [-0.287385, 0.232914].
-Chưa có bằng chứng final vượt brightness về AP trên dữ liệu mới. Không dùng kết
-quả LPIPS-only của ancestral sampler như đối chứng compute-matched DDIM.
-Các image/pixel ROC-AUC, Precision, Recall, F1 và provenance đầy đủ phải lấy từ
-aggregate receipt đã replay, xem RESULT_TRACKING.md; không tự điền giá trị thiếu.
+The full 83-image run made 4,150 U-Net and 249 LPIPS calls. The sum of adapter
+execution times was 164.659411 seconds, with peak allocated CUDA memory of
+112,928,768 bytes (approximately 107.7 MiB). These are not end-to-end notebook
+latency or reserved GPU memory. The
+[8 November acceptance report](COLAB_ACCEPTANCE_2026-11-08.md) records artifact
+hashes, environment details and the correction of inherited provenance labels.
 
-## Giới hạn và việc cần hoàn thành trước nộp
+A paired bootstrap over 25 patient groups in the 43-slice holdout produced
+999 valid draws out of 1,000, using bootstrap seed 17. The 95% confidence interval
+for final-minus-naive-stitch pixel AP was [0.026164, 0.177945]. For final-minus-
+brightness AP, it was [-0.287385, 0.232914]. These conditional validation results
+do not establish that the final method outperforms brightness on new data.
+Ancestral-sampler LPIPS-only results must not be presented as compute-matched
+DDIM controls.
 
-Một model/sampling seed, một contrast MRI 2D, validation đã khảo sát lặp và thiếu
-scanner/site metadata giới hạn khả năng suy rộng. Brightness control mạnh gợi ý
-cần thảo luận bias của dữ liệu và chất lượng anomaly ranking. Không có kết luận
-hiệu quả chẩn đoán lâm sàng từ các thí nghiệm này.
+Complete image/pixel ROC-AUC, precision, recall, F1 and provenance must be traced
+to the replayed aggregate receipts in [Result tracking](RESULT_TRACKING.md).
+Missing measurements must not be inferred from planned experiments.
 
-Cần review freeze và kiểm live runtime trước final, rồi mới mở test. Adapter,
-bounded validation, runtime benchmark và bảng image/pixel hiện đã có evidence;
-static preflight không thay live GPU runtime binding. Báo cáo cuối cần
-thêm artifact-derived figures, kết quả test nếu được chạy theo freeze,
-trích dẫn BMAD/BraTS/AnoDDPM/LPIPS và các phương pháp thực sự dùng; cuối cùng
-định dạng theo mẫu trường, slides và demo có hướng dẫn tái chạy.
+## Limitations and remaining submission work
+
+Generalization is limited by one training/sampling seed, a single MRI contrast,
+2D slices, repeated examination of validation, and insufficient scanner/site
+metadata. The strong brightness control motivates discussion of dataset bias
+and anomaly-ranking quality. The experiments do not establish clinical utility.
+
+Final evaluation requires protocol freeze review and verification of the live
+runtime before test access. The adapter, bounded validation, runtime measurements
+and image/pixel tables have supporting evidence. Static preflight does not
+replace live GPU runtime binding.
+
+The final report still requires artifact-derived figures, final-test results if
+run under a frozen protocol, complete BMAD/BraTS/AnoDDPM/LPIPS attribution and
+citations for methods actually used. Formatting must follow the university's
+confirmed requirements. Slides and a documented reproducible demo remain part
+of the final submission work.

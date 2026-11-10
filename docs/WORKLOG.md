@@ -1,5 +1,20 @@
 # Worklog
 
+## 2026-11-10 — English-only report and rebuild on every repository push
+
+Translated the authored report, metadata, header, generated appendix and report
+guide to English. Builder now requires English language metadata and records
+language/UTC build time; default cover date resolves automatically with source
+commit. Workflow push/PR filters removed so every repository push/PR update with
+the workflow rebuilds the report; no new model/threshold/freeze decisions.
+Four focused tests pass after red→green checks for English output and rejecting
+non-English metadata. Local English PDF compiled, 6 pages; text checks found
+required metrics/draft labels and no Vietnamese text. Candidate configs unchanged.
+All six rendered pages inspected; no missing-glyph/overflow warnings. Repository
+Ruff checks and format checks pass (211 files); git diff whitespace check passes.
+CI rebuilds committed English narrative, registered evidence tables and build
+provenance; it does not invent new research results or rewrite interpretation.
+
 ## 2026-11-10 — Automated Vietnamese draft report PDF build
 
 Implemented Markdown→Pandoc3.13→Tectonic0.17.0 with portable official binary

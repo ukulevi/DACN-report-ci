@@ -7,6 +7,7 @@ import json
 import math
 import re
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 INPUTS = (
@@ -42,17 +43,20 @@ def prepare(root, output):
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise ValueError("Report input must stay inside the repository")
         payloads[name] = path.read_bytes()
+    metadata = json.loads(payloads["reports/metadata.json"])
+    if metadata.get("lang") not in {"en", "en-US", "en-GB"}:
+        raise ValueError("Report metadata must select English")
     evidence = json.loads(payloads[INPUTS[1]])
     if evidence.get("status") != "verified" or set(evidence["arms"]) != set(ARMS):
         raise ValueError("Require verified four-arm aggregate evidence")
     appendix = [
-        "# Phụ lục số liệu sinh tự động",
+        "# Automatically generated evidence appendix",
         "",
-        "**BẢN NHÁP — chỉ có validation, chưa có kết quả test trong bản build này.**",
+        "**DRAFT — validation only; no held-out test results are included in this build.**",
         "",
-        "Bảng dưới đọc trực tiếp từ evidence08Nov:43holdout, thresholds từ40calibration, một seed17.",
+        "Source: verified 8 November evidence; 43 holdout slices, thresholds from 40 calibration slices, one sampling seed (17).",
         "",
-        "|Phương án|Pixel AP|Pixel AUROC|Precision|Recall|F1/Dice|",
+        "|Method|Pixel AP|Pixel AUROC|Precision|Recall|F1/Dice|",
         "|---|---:|---:|---:|---:|---:|",
     ]
     for name, label in ARMS.items():
@@ -66,7 +70,7 @@ def prepare(root, output):
             )
             + "|"
         )
-    appendix += ["", "|Phương án|Image AUROC|Precision|Recall|F1|", "|---|---:|---:|---:|---:|"]
+    appendix += ["", "|Method|Image AUROC|Precision|Recall|F1|", "|---|---:|---:|---:|---:|"]
     for name, label in ARMS.items():
         p = evidence["arms"][name]["metrics"]["image"]
         appendix.append(
@@ -78,11 +82,11 @@ def prepare(root, output):
         )
     appendix += [
         "",
-        "## Ablation09Nov do producer cung cấp",
+        "## Producer ablations from 9 November",
         "",
-        "JSON/hash audited; chưa độc lập replay arrays của mọi run mới. Không tự chọn lại candidate theo holdout.",
+        "Aggregate JSON and hashes were audited; arrays from every new run have not been independently replayed. These holdout results do not automatically select a new candidate.",
         "",
-        "|Bước pha1+pha2|t*|AP calibration|AP holdout|Dice holdout|",
+        "|Phase 1+2 steps|t*|Calibration AP|Holdout AP|Holdout Dice|",
         "|---|---:|---:|---:|---:|",
     ]
     rows = list(csv.DictReader(payloads[INPUTS[2]].decode("utf-8").splitlines()))
@@ -133,11 +137,14 @@ def prepare(root, output):
             line = line[1:]
         lines.append(line)
     body = "\n".join(lines) + "\n"
-    body = "**BẢN NHÁP — validation; chưa có kết quả test trong bản build này.**\n\n" + body
+    body = (
+        "**DRAFT — validation only; no held-out test results are included in this build.**\n\n"
+        + body
+    )
     body += (
         "\n\n"
         + "\n".join(appendix)
-        + f"\n\nSource Git: `{revision[:12]}`. Hashes đầu vào nằm trong build-manifest.json.\n"
+        + f"\n\nSource commit: `{revision[:12]}`. Input hashes are recorded in build-manifest.json.\n"
     )
     # Reserve space for compact research tables so rows are not orphaned across pages.
     body = re.sub(
@@ -153,6 +160,8 @@ def prepare(root, output):
     receipt = {
         "status": "prepared",
         "report_status": "draft_validation_only",
+        "report_language": metadata["lang"],
+        "built_at_utc": datetime.now(timezone.utc).isoformat(),
         "research_manifest_status": json.loads(payloads[INPUTS[3]])["status"],
         "source_commit": revision,
         "tracked_tree_dirty": dirty,
@@ -160,6 +169,10 @@ def prepare(root, output):
         "builder_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
     output.mkdir(parents=True, exist_ok=True)
+    if metadata.get("date", "auto") == "auto":
+        date = datetime.fromisoformat(receipt["built_at_utc"]).strftime("%d %B %Y")
+        metadata["date"] = f"Build: {date} (UTC) — source {revision[:12]}"
+    (output / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (output / "report.md").write_text(body, encoding="utf-8")
     (output / "build-manifest.json").write_text(
         json.dumps(receipt, indent=2) + "\n", encoding="utf-8"
@@ -194,7 +207,7 @@ def main():
             "--toc",
             "--number-sections",
             "--top-level-division=section",
-            "--metadata-file=" + str(root / "reports/metadata.json"),
+            "--metadata-file=" + str(output / "metadata.json"),
             "--include-in-header=" + str(root / "reports/header.tex"),
             "--output=" + str(output / "report.tex"),
         ],

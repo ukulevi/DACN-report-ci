@@ -2,26 +2,7 @@ name: Build draft report PDF
 
 on:
   push:
-    branches: [main, codex/bc-evaluation-colab]
-    paths:
-      - "docs/REPORT_DRAFT.md"
-      - "docs/evidence/**"
-      - "configs/final_evaluation_candidate.json"
-      - "reports/**"
-      - "scripts/build_report.py"
-      - "scripts/report_tools.py"
-      - "tests/test_report_build.py"
-      - ".github/workflows/report.yml"
   pull_request:
-    paths:
-      - "docs/REPORT_DRAFT.md"
-      - "docs/evidence/**"
-      - "configs/final_evaluation_candidate.json"
-      - "reports/**"
-      - "scripts/build_report.py"
-      - "scripts/report_tools.py"
-      - "tests/test_report_build.py"
-      - ".github/workflows/report.yml"
   workflow_dispatch:
 
 permissions:

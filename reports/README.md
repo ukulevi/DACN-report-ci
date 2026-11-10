@@ -1,91 +1,106 @@
-# Build báo cáo PDF tự động
+# Automatic English report builds
 
-Nguồn nội dung là [`docs/REPORT_DRAFT.md`](../docs/REPORT_DRAFT.md). Nhóm sửa
-Markdown như bình thường; Pandoc tạo LaTeX và Tectonic biên dịch PDF tiếng Việt.
-Không cần sửa hai bản nội dung Markdown/LaTeX song song.
+Edit [`docs/REPORT_DRAFT.md`](../docs/REPORT_DRAFT.md) in English. The build uses
+Pandoc to convert Markdown to LaTeX and Tectonic to produce an English PDF.
+The authored narrative has one source; generated LaTeX is not edited separately.
 
-Đây là **bản nháp validation**, chưa là báo cáo nộp hoàn chỉnh hoặc kết quả test.
-Build báo cáo không freeze phương pháp, không chọn model/threshold, không truy
-cập HF/Modal/Colab và không dùng dữ liệu riêng tư trong runs/checkpoints.
+The report remains a **validation draft**, not a completed submission or a
+held-out test result. Building the report does not freeze the protocol, select
+models/thresholds, access HF/Modal/Colab or load private arrays/checkpoints.
 
-## Nơi chỉnh sửa
+## What is updated automatically
 
-- Nội dung: `docs/REPORT_DRAFT.md`; các heading `##` thành mục cấp1 trong PDF.
-- Tên đề tài/nhóm/ngày/margins/font: `reports/metadata.json`. Bổ sung thông tin
-  trường, giảng viên, MSSV theo mẫu thật trước bản nộp; chưa tự điền thông tin đó.
-- Header/footers: `reports/header.tex`.
-- Phụ lục sinh tự động: accepted aggregate evidence08Nov và ablation CSV10Nov,
-  đường dẫn trong INPUTS của `scripts/build_report.py`. Không sửa tay số trong
-  PDF. Khi có evidence cuối đã review, cập nhật nguồn theo commit rõ ràng.
+The report workflow runs on **every push to any branch or tag that contains the
+workflow**, on pull-request updates, and on manual dispatch. There are no branch
+or changed-path filters. Each build records the source commit, current UTC build
+date, input hashes and PDF hash. Tables are regenerated from the registered
+aggregate evidence and ablation CSV. New repository commits therefore produce
+new build provenance even when the authored narrative has not changed.
 
-PDF có bảng chính và phụ lục từ evidence, phân biệt validation đã nghiệm thu
-với producer-audited ablations09Nov. Các nguồn hiện hành vẫn giữ candidate.
+Research interpretation is maintained in the English source. CI does not invent
+new experiments or silently replace reviewed evidence with another run. When new
+results are accepted, update the registered input paths in the builder and commit
+the evidence and narrative together.
 
-## Chạy local — Windows/Linux x86_64
+## Files to edit
 
-Chỉ cần Python3.11+ và Git; không cài thêm package vào môi trường training.
-Hai compiler portable từ release chính thức được pin checksum:
-Pandoc3.13 và Tectonic0.17.0. Chúng được lưu trong ignored `runs/report-tools`.
+- Narrative: `docs/REPORT_DRAFT.md`; level-two headings become top-level PDF sections.
+- Cover, team, font and margins: `reports/metadata.json`. Language must be English.
+  The default `date: auto` prints the current UTC build date and source commit.
+  Add confirmed university, supervisor and student information before submission.
+- Header/footer: `reports/header.tex`.
+- Generated evidence appendix: accepted aggregate JSON and producer ablation CSV,
+  registered in INPUTS in `scripts/build_report.py`.
+
+## Build locally — Windows/Linux x86_64
+
+Python3.11+ and Git are sufficient. No training dependencies are installed.
+The official portable releases of Pandoc3.13 and Tectonic0.17.0 are SHA256-pinned
+and stored in the ignored `runs/report-tools` directory.
 
 ```powershell
 python scripts/report_tools.py --output runs/report-tools
 python scripts/build_report.py
 ```
 
-Hoặc dùng `.venv/Scripts/python.exe` thay `python` trên Windows. Lần đầu cần
-Internet để tải compiler và TeX bundle; các lần sau dùng cache tài nguyên TeX.
-Tectonic vẫn có thể cần kiểm bundle online. Không cần quyền admin/cài TeX toàn máy.
+On Windows, `.venv/Scripts/python.exe` can be used instead of `python`.
+The first build needs Internet access for the compilers and public TeX bundle;
+later builds reuse cached resources but may still check the bundle online.
+No system-wide TeX installation or administrator access is required.
 
-Nếu chỉ kiểm dữ liệu/nội dung, không cần compiler/network:
+To validate and prepare content without compilers or network access:
 
 ```powershell
 python scripts/build_report.py --prepare-only
 ```
 
-Kết quả trong ignored `reports/build/`:
+Generated files in ignored `reports/build/`:
 
-- `report.pdf`: PDF sau build thành công.
-- `report.md`, `report.tex`: nội dung đã ghép và source LaTeX sinh tự động.
-- `build-manifest.json`: status, research status, source Git/dirty flag, hash đầu
-  vào/layout/builder, tool versions và PDF SHA khi completed.
-- `build.log`, `report.log`: chẩn đoán compiler. Khi lỗi, kiểm manifest/status;
-  một PDF còn từ build khác không là bằng chứng thành công của build mới.
+- `report.pdf`: compiled English draft after a successful build.
+- `report.md`, `report.tex`: assembled content and generated LaTeX.
+- `metadata.json`: metadata with the resolved automatic build date.
+- `build-manifest.json`: build/research status, language, source commit, UTC build
+  time, dirty-tree flag, input/layout/builder hashes, compiler versions and PDF hash.
+- `build.log`, `report.log`: compiler diagnostics.
 
-Script dọn các file report.aux/toc/out/lof/lot/xdv/pdf cũ trước compile để không
-reuse TOC hoặc PDF stale khi thay document class. Không xóa source Markdown.
-Compiler chạy untrusted mode; không bật shell escape.
+Check the manifest's completed status before using an output. Before compilation,
+the builder removes only its stale report.aux/toc/out/lof/lot/xdv/pdf files, so an
+old PDF or incompatible TOC cannot masquerade as a successful new build.
+The Markdown source is preserved. Tectonic runs in untrusted mode, without shell escape.
 
-Phiên bản compiler được pin, TeX bundle và metadata PDF vẫn có thể tạo khác biệt
-byte giữa môi trường/lần build; không hứa byte-identical PDFs. Manifest giúp
-truy vết source/input/tool của từng build.
+Compiler releases are pinned; TeX resources and PDF metadata can still affect
+output bytes between environments/builds. Byte-identical PDFs are not promised.
+Version labels in the manifest come from the checksum-pinned release metadata.
 
 ## GitHub Actions
 
 Workflow: [`.github/workflows/report.yml`](../.github/workflows/report.yml).
 
-- Tự chạy khi push thay đổi report/evidence lên `main` hoặc
-  `codex/bc-evaluation-colab`, và PR có thay đổi liên quan.
-- Có `workflow_dispatch`. Nút **Run workflow** có sau khi workflow đã nằm trên
-  default branch; khi chỉ ở nhánh hiện tại, push có thay đổi paths đã khai báo
-  để kích hoạt build. Không cần tạo PR chỉ để build trên nhánh này.
-- Khi thành công, mở Actions → **Build draft report PDF** → run → Artifacts →
-  tải `dacn-report-<commit>`. Artifact có PDF và build-manifest, giữ14ngày.
-- Diagnostic artifact `dacn-report-logs-<commit>` giữ7ngày, kể cả compile lỗi.
-- `contents: read`, checkout không lưu credentials; không tạo Release/Pages.
-  Không cung cấp HF/Modal token hay quyền write repo cho bước biên dịch.
+Push any repository update to a branch containing this workflow. Once a build
+succeeds, open Actions → **Build draft report PDF** → run → Artifacts and download
+`dacn-report-<commit>`. It contains the PDF and provenance manifest, retained for
+14 days. Diagnostic logs are retained for 7 days, including failed compilations.
 
-**Blocker hiện có:** GitHub Actions tài khoản DACN đang startup_failure trước
-khi tạo job. Workflow mới không giải quyết billing/account. Chủ repo cần xử lý
-BLK-20261107-01 rồi mới xác minh run remote thực; local PDF build không là CI xanh.
-Không thay payment settings, tăng budget hoặc retry hàng loạt từ công cụ này.
+Manual **Run workflow** becomes available once the workflow is present on the
+default branch. While it exists only on the working branch, pushes still trigger
+it automatically; a new PR is not required merely to build the report.
 
-## Nguồn tham khảo thiết kế
+The workflow uses read-only repository permissions, disables persisted checkout
+credentials and requires no HF/Modal tokens. It uploads repository-scoped
+artifacts and does not publish Releases or GitHub Pages.
 
-- [EE5217 build workflow](https://github.com/HThanh-how/EE5217/blob/d7041f5da9a03db13c954463a836e757848b7b8e/.github/workflows/build.yml):
-  tham khảo compile PDF/upload artifacts/logs; không sao chép nội dung môn học,
-  mẫu có thông tin sinh viên, release hay Pages deployment.
-- [hw2_introAI](https://github.com/HatakekkSheeshh/hw2_introAI): kết nối hiện trả404,
-  chưa đọc/áp dụng workflow từ repo này; có thể đối chiếu thêm khi có quyền.
+**Existing external blocker:** GitHub Actions for DACN currently reports account-
+level startup failures before jobs are created. This workflow cannot resolve
+billing/account restrictions. The repository owner must address BLK-20261107-01
+before a remote build can be verified. A successful local PDF is not a green CI run.
+
+## References
+
+- [EE5217 workflow](https://github.com/HThanh-how/EE5217/blob/d7041f5da9a03db13c954463a836e757848b7b8e/.github/workflows/build.yml):
+  reference for PDF compilation and artifact/log uploads. Course content,
+  student-specific templates, releases and Pages deployment were not copied.
+- [hw2_introAI](https://github.com/HatakekkSheeshh/hw2_introAI): currently returns
+  404 through the connected account; its workflow has not been inspected.
 - [Pandoc manual](https://pandoc.org/MANUAL.html),
   [Tectonic](https://github.com/tectonic-typesetting/tectonic),
   [upload-artifact v4](https://github.com/actions/upload-artifact/tree/v4).
