@@ -1,5 +1,24 @@
 # Worklog
 
+## 2026-11-10 — Independent private report CI host (DAC-26)
+
+User approved private `ukulevi/DACN-report-ci` after confirming the source
+owner's card expired. Created repository private and pushed committed source
+`4accc9f`, excluding local untracked data/checkpoints. Hosted report run
+[42756144394](https://github.com/ukulevi/DACN-report-ci/actions/runs/42756144394)
+completed successfully in 1m17s with PDF/manifest and diagnostic artifacts.
+The same source's quality run42756144682 also succeeded (53s): dependency
+installation, Ruff, format, pytest and CLI demo completed on GitHub-hosted Linux.
+Hosted pytest reported **158 passed, 23 skipped in 14.69s**; skipped checks are
+not counted as passing and this does not replace GPU/model acceptance.
+User then chose Git push synchronization and declined a broad classic token.
+No scheduled upstream workflow, token or new permission is enabled. Added the
+local `report-ci` remote and documented forwarding the same commit after origin.
+The ordinary push-triggered workflow builds each satellite update. No model
+runs, test access or research freeze changes. Report tests and repository lint/
+format checks pass before commit (4 report tests). BLK-20261107-01 remains open for the
+original owner's billing; the report host workaround is independently verified.
+
 ## 2026-11-10 — English-only report and rebuild on every repository push
 
 Translated the authored report, metadata, header, generated appendix and report

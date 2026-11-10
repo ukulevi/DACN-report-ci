@@ -74,6 +74,42 @@ Version labels in the manifest come from the checksum-pinned release metadata.
 
 ## GitHub Actions
 
+### Independent private build host
+
+The private satellite [ukulevi/DACN-report-ci](https://github.com/ukulevi/DACN-report-ci)
+builds reports under the user's own Actions account. Its initial source is the
+committed DACN snapshot; untracked data/checkpoints are excluded. A successful
+satellite report build does not resolve the source owner's billing restriction.
+
+On 10 November the user chose **Git push synchronization**, without a broad
+cross-repository token. No upstream polling workflow or secret is enabled.
+Push the same committed report branch to both remotes:
+
+```powershell
+git push origin codex/bc-evaluation-colab
+git push report-ci HEAD:refs/heads/main
+```
+
+The local `report-ci` remote points to
+`https://github.com/ukulevi/DACN-report-ci.git`. To configure another checkout:
+
+```powershell
+git remote add report-ci https://github.com/ukulevi/DACN-report-ci.git
+```
+
+The second push automatically builds the PDF on the satellite. A push only to
+`tanh1c/DACN` does **not** update the satellite. Fetch/review teammates' upstream
+changes before forwarding the report branch; other research branches are not
+automatically merged. Never force-push a diverged satellite main.
+
+Fully hosted cross-repository synchronization remains optional future work, not
+an active feature. The default Actions token cannot read another private repo;
+GitHub also limits fine-grained PATs for other users' personal repositories.
+The user declined a broader classic PAT, and none was created or stored. See
+[PAT documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+
+### Build workflow and artifacts
+
 Workflow: [`.github/workflows/report.yml`](../.github/workflows/report.yml).
 
 Push any repository update to a branch containing this workflow. Once a build
@@ -89,10 +125,11 @@ The workflow uses read-only repository permissions, disables persisted checkout
 credentials and requires no HF/Modal tokens. It uploads repository-scoped
 artifacts and does not publish Releases or GitHub Pages.
 
-**Existing external blocker:** GitHub Actions for DACN currently reports account-
-level startup failures before jobs are created. This workflow cannot resolve
-billing/account restrictions. The repository owner must address BLK-20261107-01
-before a remote build can be verified. A successful local PDF is not a green CI run.
+**Original-repository blocker:** GitHub Actions in `tanh1c/DACN` still reports
+account-level startup failures before jobs are created. Its owner must address
+BLK-20261107-01 before a hosted build in that original repository can be verified.
+Hosted PDF and quality builds in the independent satellite have already succeeded;
+that evidence is separate from local PDF builds and the original account blocker.
 
 ## References
 

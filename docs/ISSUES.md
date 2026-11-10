@@ -49,6 +49,21 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 ### BLK-20261107-01 — CI không khởi động job
 
+- **10Nov satellite workaround:** Người dùng xác nhận thẻ chủ repo expired và
+  đồng ý tạo private `ukulevi/DACN-report-ci`. Source `4accc9f` được đẩy sang
+  satellite; [report run42756144394](https://github.com/ukulevi/DACN-report-ci/actions/runs/42756144394)
+  **Success**, 1m17s, có PDF/manifest artifact. Đây là CI báo cáo của satellite,
+  chưa phải CI quality xanh của repo gốc; không đóng blocker billing gốc.
+- **Satellite quality evidence:** Cùng SHA `4accc9f`,
+  [quality run42756144682](https://github.com/ukulevi/DACN-report-ci/actions/runs/42756144682)
+  Success, 53s; job quality gồm Ruff, format, pytest và CLI demo đều hoàn tất.
+  Pytest: 158 passed, 23 skipped trong14.69s; không tính skipped thành pass.
+  Đây là evidence kiểm thử source ở satellite, không phải freeze approval.
+- **10Nov sync decision:** User chọn Git push, không cấp token classic rộng.
+  Satellite tự build sau mỗi push sang `main`; chưa có hosted upstream sync.
+  Dùng remote `report-ci`, push cùng commit sau origin; không force-push.
+  Không còn yêu cầu user cung cấp secret trong phạm vi phương án đã chọn.
+
 - **Status:** Waiting; reported 07/11/2026, nguyên nhân cấp tài khoản xác nhận qua ảnh người dùng.
 - **Owner / next handoff:** Nhóm cùng kiểm; repo admin hỗ trợ nếu nguyên nhân cần quyền quản trị.
 - **Evidence:** ecad491 và b986080 có Actions conclusion startup_failure.
