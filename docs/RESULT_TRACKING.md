@@ -1,5 +1,22 @@
 # Experiment and result tracking
 
+## 2026-11-10 — Audit producer09Nov DDIM ablations (no new agent run)
+
+HF revision03ec5b35cc134277b0ce4e76a0a315490b46bd21 adds22completed producer
+records:11smoke and11full83 validation runs. Audited88JSON member hashes against
+their manifests; configs/root/comparison metrics agree, thresholds retained from
+40calibration to43holdout, producer flags held_out_test_used=False. No private
+array/source ZIP download or independent new-run inference in this audit.
+All11full runs share G30 checkpoint d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946,
+same pinned dataset/index, seed17,50U-Net calls/output. These are inference/sampler
+ablations, not11training runs. Source code_revision c02addb is dirty;4actual ZIP
+digests recorded, not independently reviewed this turn.
+See [producer aggregate evidence](evidence/2026-11-10-hf-producer-update.json),
+[metric table CSV](evidence/2026-11-10-ddim-ablation-table.csv) and
+[review handoff](REPORT_READINESS_2026-11-10.md). These holdout data have been
+examined repeatedly and do not establish final-test performance or a new winner.
+No candidate/threshold changes; Hải Tuấn is being asked by user to review/freeze.
+
 ## 2026-11-08 — Four-arm cached-score runner/resume acceptance
 
 Started CPU replay on43registered validation holdout slices/25groups from the

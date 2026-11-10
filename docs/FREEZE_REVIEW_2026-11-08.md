@@ -6,6 +6,11 @@ này. Review dựa vào artifact T4 đã kiểm và preflight, không chọn l�
 **Quyết định08Nov của người dùng:** giữ candidate, chờ CI hoặc nhóm review.
 Chưa chấp thuận ngoại lệ CI/local checks, chưa chấp thuận freeze hoặc mở test.
 
+Update10Nov: người dùng đang nhờ Hải Tuấn review/freeze. HF có thêm11full
+inference ablations09Nov; xem REPORT_READINESS_2026-11-10.md trước khi chốt,
+không tự thay candidate bằng hàng có holdout cao nhất. Cấu hình trong tài liệu
+này vẫn là đề xuất20+30/t300 đã nghiệm thu, chưa là quyết định freeze mới.
+
 ## Cấu hình đề nghị giữ nguyên
 
 - Gaussian EMA epoch30, checkpoint SHA trong final_evaluation_candidate.json.

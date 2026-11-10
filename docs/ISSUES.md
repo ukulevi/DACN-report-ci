@@ -71,6 +71,9 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   [run42451751296](https://github.com/tanh1c/DACN/actions/runs/42451751296),
   jobs=0/check-runs=0 qua API. Không có test job bắt đầu; giữ Waiting,
   không suy rằng lỗi mới nằm trong code và không retry tự động.
+- **10Nov live check:** Commit1c13e5f vẫn startup_failure tại
+  [run42455732782](https://github.com/tanh1c/DACN/actions/runs/42455732782).
+  Chưa xác nhận CI đã được gỡ chặn; không suy local274pass là Actions success.
 - **Close when:** Nguyên nhân được ghi và một run trên source liên quan thực sự
   khởi động/kết thúc với bằng chứng; trạng thái test failure nếu có được tách riêng.
 
@@ -99,6 +102,12 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
   và ghi quyết định protocol/CI; repo owner xử lý BLK-20261107-01. Gate đóng khi
   có review freeze, live runtime binding và wrapper acceptance thực tế, không chỉ
   có checksum hoặc local tests. Không mở test trước điều kiện này.
+- **10Nov handoff:** Người dùng đang nhờ Hải Tuấn review/freeze. HF09Nov thêm
+  11full83 inference ablations và11smoke đã được agent kiểm88JSON hashes; xem
+  REPORT_READINESS_2026-11-10.md để chốt đúng source/config/calibration rationale.
+  Agent giữ candidate và không thay bằng hàng có holdout cao nhất. Reviewer cần
+  ghi cấu hình chọn, source ZIP thực, protocol/CI decision và commit/ngày review;
+  launcher/live runtime validation vẫn là prerequisite riêng trước final test.
 - **Reported / updated:** 2026-11-06
 - **Owner / next handoff:** B tích hợp/evaluator; C cache/continuation; A review freeze.
 - **Affected work:** DAC-11/12/14/15/30 và final reproducibility.

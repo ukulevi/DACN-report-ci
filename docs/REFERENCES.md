@@ -13,6 +13,9 @@ nguồn sơ cấp và mục đích đọc; không hàm ý tất cả phương ph
 | Score matching — Song & Ermon, 2019 | [Paper](https://arxiv.org/abs/1907.05600) | Hiểu score-based modeling |
 | DDPM — Ho et al., 2020 | [Paper](https://arxiv.org/abs/2006.11239) | Noise schedule, objective, reverse process |
 | DDIM — Song et al., 2020/2021 | [Paper](https://arxiv.org/abs/2010.02502) | Phân biệt sampler/reverse steps và timestep bắt đầu tái tạo |
+| AutoDDPM — Bercea, Neumayr, Rueckert & Schnabel, 2023 | [Paper](https://arxiv.org/abs/2305.19643), [code tác giả](https://github.com/ci-ber/autoDDPM) | Nguồn ý tưởng mask/stitch/re-sample; DDIM20+30 của nhóm là adaptation, không tuyên bố tái lập nguyên bản hoặc thuật toán mới |
+| LPIPS — Zhang, Isola, Efros, Shechtman & Wang, 2018 | [Paper](https://arxiv.org/abs/1801.03924) | Nền tảng perceptual distance; pretrained features không tự chứng minh phù hợp MRI hoặc tumor segmentation |
+| SSIM — Wang, Bovik, Sheikh & Simoncelli, 2004 | [Trang tác giả](https://ece.uwaterloo.ca/~z70wang/publications/ssim.html) | Cơ sở structural similarity; dự án dùng local1−SSIM và phải mô tả window/data range/crop thực |
 | Score-based SDE — Song et al., 2020/2021 | [Paper](https://arxiv.org/abs/2011.13456) | Related work; đọc sau DDPM |
 | Diffusion Models for Medical Anomaly Detection — Wolleb et al., 2022 | [Paper](https://arxiv.org/abs/2203.04306) | Có classifier guidance; không mô tả như normal-only thuần túy |
 | AnoDDPM — Wyatt et al., 2022 | [Paper](https://openaccess.thecvf.com/content/CVPR2022W/NTIRE/papers/Wyatt_AnoDDPM_Anomaly_Detection_With_Denoising_Diffusion_Probabilistic_Models_Using_Simplex_CVPRW_2022_paper.pdf), [code](https://github.com/Julian-Wyatt/AnoDDPM) | Partial diffusion và ảnh hưởng của noise; không tuyên bố tái lập nguyên bản |

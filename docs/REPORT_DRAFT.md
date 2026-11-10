@@ -1,7 +1,12 @@
 # Diffusion Models for Anomaly Detection — bản thảo nội dung
 
-Trạng thái 08/11/2026: nội dung nghiên cứu đã có bằng chứng; chưa phải báo cáo
+Trạng thái 10/11/2026: nội dung nghiên cứu đã có bằng chứng; chưa phải báo cáo
 hoàn chỉnh hoặc kết quả held-out test. References dùng danh mục REFERENCES.md.
+
+Người dùng đang nhờ Hải Tuấn review/freeze. Agent giữ candidate, không tự mở test.
+[Mức sẵn sàng và ablation mới09Nov](REPORT_READINESS_2026-11-10.md) tách việc đã
+hoàn thành, producer-audited results mới và các gate còn chờ. Có thể viết dữ liệu/
+phương pháp/validation ngay, chưa chốt final-test conclusion.
 
 ## Mục tiêu và dữ liệu
 

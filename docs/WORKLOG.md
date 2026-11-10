@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-11-10 — Audit producer ablations and prepare report/freeze handoff
+
+Verified live GitHub working/C branches remain1c13e5f/c02addb. HF model updated
+09Nov to03ec5b35cc134277b0ce4e76a0a315490b46bd21; dataset revision unchanged.
+Downloaded aggregate JSON only for22new producer runs(11smoke/11full83),
+checked88JSON artifact hashes, root/comparison metrics/config consistency,
+calibration-to-holdout thresholds and reported50calls/output.11full runs share
+checkpoint/index/dataset hashes. Recorded dirty-source ZIP provenance limits;
+no private arrays/new source ZIPs/model inference/test downloads.
+Added safe audit evidence, CSV ablation table, report-readiness matrix and exact
+handoff for Hải Tuấn's review. Updated report draft/references using primary
+AutoDDPM/LPIPS/SSIM sources. Keep candidate and thresholds unchanged; user is
+coordinating C review/freeze, agent does not supply approval on their behalf.
+
 ## 2026-11-08 — Four-arm resume acceptance and freeze review decision
 
 Executed validation-only cached T4 score replay through frozen_runner for4arms
