@@ -40,7 +40,7 @@ def fixture(root):
                 **({"average_precision": 0.3123301734628661} if level == "pixel" else {}),
             }
     path = root / "docs/evidence/2026-11-08-colab-registered-acceptance.json"
-    path.write_text(json.dumps(data))
+    path.write_text(json.dumps(data, indent=2))
     table = root / "docs/evidence/2026-11-10-ddim-ablation-table.csv"
     with table.open("w", newline="") as stream:
         writer = csv.writer(stream)
@@ -61,7 +61,13 @@ def fixture(root):
     )
     (root / "report/figures/provenance.json").write_text(
         json.dumps(
-            {"inputs": {k: hashlib.sha256((root / k).read_bytes()).hexdigest() for k in inputs}}
+            {
+                "hash_normalization": "CRLF-to-LF",
+                "inputs": {
+                    k: hashlib.sha256((root / k).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+                    for k in inputs
+                },
+            }
         )
     )
     return path
@@ -152,3 +158,21 @@ def test_changed_evidence_rejects_stale_figures(tmp_path):
     prepare = runpy.run_path(str(PROJECT / "scripts/build_report.py"))["prepare"]
     with pytest.raises(ValueError, match="Stale report figures"):
         prepare(tmp_path, tmp_path / "report/build")
+
+
+def test_figure_provenance_portable_across_line_endings(tmp_path):
+    fixture(tmp_path)
+    prepare = runpy.run_path(str(PROJECT / "scripts/build_report.py"))["prepare"]
+    names = (
+        "docs/evidence/2026-11-08-colab-registered-acceptance.json",
+        "docs/evidence/2026-11-10-ddim-ablation-table.csv",
+    )
+    for name in names:
+        p = tmp_path / name
+        p.write_bytes(p.read_bytes().replace(b"\r\n", b"\n"))
+    first = prepare(tmp_path, tmp_path / "report/build")
+    for name in names:
+        p = tmp_path / name
+        p.write_bytes(p.read_bytes().replace(b"\n", b"\r\n"))
+    second = prepare(tmp_path, tmp_path / "report/build")
+    assert all(first["inputs"][n] != second["inputs"][n] for n in names)

@@ -1,6 +1,7 @@
 {
+  "hash_normalization": "CRLF-to-LF",
   "inputs": {
-    "docs/evidence/2026-11-08-colab-registered-acceptance.json": "f589d8379729bec023f0175db8fe488a4ff23c03f2c19c43f8f09180e13f5fff",
-    "docs/evidence/2026-11-10-ddim-ablation-table.csv": "60fcaff5c24eed173dd1da816ab921f100cc8063be30339b1675d777f8e8ab7a"
+    "docs/evidence/2026-11-08-colab-registered-acceptance.json": "c0a21c1ab2a669a3af9f3c8c8e60e9dbbecf62eee580dc3887dc82765b2c8683",
+    "docs/evidence/2026-11-10-ddim-ablation-table.csv": "dbee8790811b3432748b4f11e019d9bc73d1a8f3ce67a252ededc29a1c7aed15"
   }
 }

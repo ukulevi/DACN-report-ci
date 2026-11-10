@@ -122,7 +122,13 @@ if __name__ == "__main__":
     )
     (OUT / "provenance.json").write_text(
         json.dumps(
-            {"inputs": {k: hashlib.sha256((ROOT / k).read_bytes()).hexdigest() for k in sources}},
+            {
+                "hash_normalization": "CRLF-to-LF",
+                "inputs": {
+                    k: hashlib.sha256((ROOT / k).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+                    for k in sources
+                },
+            },
             indent=2,
         )
         + "\n",

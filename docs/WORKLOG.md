@@ -31,6 +31,14 @@ ASCII-encoded PDFs were detected as text (`i/lf w/lf`). Added binary attributes
 for PDF/PNG so Windows checkout cannot rewrite PDF byte offsets through CRLF
 conversion. `git check-attr` verifies text/diff/merge disabled for those assets.
 
+Hosted builds a19d404/4769187 failed before compilation because figure-source
+hashes captured Windows CRLF while Git blobs/Linux checkouts use LF. Confirmed
+both registered files matched the local raw hashes but not `git show HEAD:path`,
+and Actions log reported the stale-figure guard. Added an observed red-to-green
+LF/CRLF portability regression; figure provenance explicitly normalizes CRLF to
+LF, while the main build manifest retains raw-byte input hashes. Real changed
+values still fail the stale-figure check. No experiment data or thresholds changed.
+
 ## 2026-11-10 — Independent private report CI host (DAC-26)
 
 User approved private `ukulevi/DACN-report-ci` after confirming the source

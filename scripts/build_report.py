@@ -119,9 +119,15 @@ def prepare(root, output):
             )
             + "|"
         )
-    figure_inputs = json.loads(payloads["report/figures/provenance.json"])["inputs"]
+    figure_provenance = json.loads(payloads["report/figures/provenance.json"])
+    if figure_provenance.get("hash_normalization") != "CRLF-to-LF":
+        raise ValueError("Regenerate report figures with portable text-hash provenance")
+    figure_inputs = figure_provenance["inputs"]
     for name in INPUTS[1:3]:
-        if figure_inputs.get(name) != hashlib.sha256(payloads[name]).hexdigest():
+        if (
+            figure_inputs.get(name)
+            != hashlib.sha256(payloads[name].replace(b"\r\n", b"\n")).hexdigest()
+        ):
             raise ValueError("Stale report figures; regenerate from registered evidence")
     try:
         revision = subprocess.check_output(

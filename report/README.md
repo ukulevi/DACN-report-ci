@@ -42,7 +42,9 @@ the evidence and narrative together.
   `python scripts/report_figures.py` in an environment with reportlab. The logo
   in `report/assets/` was extracted from the user-supplied prior report; no
   research figures, text or experiment results were copied from that project.
-  `report/figures/provenance.json` pins the two aggregate input hashes. The build
+  `report/figures/provenance.json` pins the two aggregate input hashes after
+  CRLF-to-LF normalization, to survive Windows/Linux text checkout differences.
+  The build manifest separately preserves raw-byte hashes for exact provenance. The build
   rejects stale figures after either evidence file changes; regenerate figures
   and commit them with accepted evidence and manuscript updates.
 - Generated evidence appendix: accepted aggregate JSON and producer ablation CSV,
