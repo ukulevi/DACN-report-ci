@@ -1,0 +1,66 @@
+name: Build draft report PDF
+
+on:
+  push:
+    branches: [main, codex/bc-evaluation-colab]
+    paths:
+      - "docs/REPORT_DRAFT.md"
+      - "docs/evidence/**"
+      - "configs/final_evaluation_candidate.json"
+      - "reports/**"
+      - "scripts/build_report.py"
+      - "scripts/report_tools.py"
+      - "tests/test_report_build.py"
+      - ".github/workflows/report.yml"
+  pull_request:
+    paths:
+      - "docs/REPORT_DRAFT.md"
+      - "docs/evidence/**"
+      - "configs/final_evaluation_candidate.json"
+      - "reports/**"
+      - "scripts/build_report.py"
+      - "scripts/report_tools.py"
+      - "tests/test_report_build.py"
+      - ".github/workflows/report.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install checksum-pinned portable report tools
+        run: python3 scripts/report_tools.py --output runs/report-tools
+      - name: Build draft PDF and evidence appendix
+        run: python3 scripts/build_report.py
+      - name: Store PDF and source provenance
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dacn-report-${{ github.sha }}
+          path: |
+            reports/build/report.pdf
+            reports/build/build-manifest.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Store build diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dacn-report-logs-${{ github.sha }}
+          path: |
+            reports/build/build.log
+            reports/build/report.log
+            reports/build/build-manifest.json
+          if-no-files-found: ignore
+          retention-days: 7

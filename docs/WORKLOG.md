@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-11-10 — Automated Vietnamese draft report PDF build
+
+Implemented Markdown→Pandoc3.13→Tectonic0.17.0 with portable official binary
+archive SHA256 pins for Windows/Linux. No training dependency changes. Report
+appendix reads verified aggregate metrics/ablation CSV, rejects invalid metrics,
+preserves candidate and draft-validation labels; provenance hashes include body,
+evidence, metadata, layout and builder. Added path-filtered report.yml artifact/
+diagnostic workflow with pinned official checkout/upload actions and contents read.
+Reference EE5217 workflow reviewed; hw2_introAI returns404, not claimed reviewed.
+Three focused tests red→green, Ruff/YAML checks pass. Actual Windows PDF compiled
+and rendered: Vietnamese/metric text checks pass, no overfull/missing glyph
+warnings after splitting a wide table. Cleared stale TOC/aux after class change;
+earlier network-isolated compile failed before cached TeX bundle access, corrected
+with ordinary online local compile. Not a training/evaluation run.
+Remote Actions still requires account/billing resolution; no CI-success claim.
+Independent report-CI review found no material issues. Final validation:3tests
+pass, whole-repo Ruff check/format211files pass, YAML triggers/permissions parsed,
+six-page PDF text/metric checks pass and all rendered pages inspected. Compiler
+version labels come from pinned release metadata; no byte-identical PDF claim.
+
 ## 2026-11-10 — Audit producer ablations and prepare report/freeze handoff
 
 Verified live GitHub working/C branches remain1c13e5f/c02addb. HF model updated

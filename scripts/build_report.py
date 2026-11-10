@@ -1,0 +1,241 @@
+"""Build a draft report from authored Markdown and aggregate evidence, without ML access."""
+
+import argparse
+import csv
+import hashlib
+import json
+import math
+import re
+import subprocess
+from pathlib import Path
+
+INPUTS = (
+    "docs/REPORT_DRAFT.md",
+    "docs/evidence/2026-11-08-colab-registered-acceptance.json",
+    "docs/evidence/2026-11-10-ddim-ablation-table.csv",
+    "configs/final_evaluation_candidate.json",
+    "reports/metadata.json",
+    "reports/header.tex",
+)
+ARMS = {
+    "final_lpips": "Final LPIPS",
+    "initial_lpips": "Initial LPIPS",
+    "naive_stitch_lpips": "Naive-stitch LPIPS",
+    "brightness": "Brightness",
+}
+
+
+def metric(value):
+    value = float(value)
+    if not math.isfinite(value) or not 0 <= value <= 1:
+        raise ValueError("Report metric must be finite and in [0,1]")
+    return f"{value:.6f}"
+
+
+def prepare(root, output):
+    root, output = Path(root).resolve(), Path(output).resolve()
+    if output == root or not output.is_relative_to(root):
+        raise ValueError("Generated report output must be inside the repository")
+    payloads = {}
+    for name in INPUTS:
+        path = root / name
+        if path.is_symlink() or not path.resolve().is_relative_to(root):
+            raise ValueError("Report input must stay inside the repository")
+        payloads[name] = path.read_bytes()
+    evidence = json.loads(payloads[INPUTS[1]])
+    if evidence.get("status") != "verified" or set(evidence["arms"]) != set(ARMS):
+        raise ValueError("Require verified four-arm aggregate evidence")
+    appendix = [
+        "# Phụ lục số liệu sinh tự động",
+        "",
+        "**BẢN NHÁP — chỉ có validation, chưa có kết quả test trong bản build này.**",
+        "",
+        "Bảng dưới đọc trực tiếp từ evidence08Nov:43holdout, thresholds từ40calibration, một seed17.",
+        "",
+        "|Phương án|Pixel AP|Pixel AUROC|Precision|Recall|F1/Dice|",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+    for name, label in ARMS.items():
+        p = evidence["arms"][name]["metrics"]["pixel"]
+        appendix.append(
+            "|"
+            + label
+            + "|"
+            + "|".join(
+                metric(p[k]) for k in ("average_precision", "auroc", "precision", "recall", "f1")
+            )
+            + "|"
+        )
+    appendix += ["", "|Phương án|Image AUROC|Precision|Recall|F1|", "|---|---:|---:|---:|---:|"]
+    for name, label in ARMS.items():
+        p = evidence["arms"][name]["metrics"]["image"]
+        appendix.append(
+            "|"
+            + label
+            + "|"
+            + "|".join(metric(p[k]) for k in ("auroc", "precision", "recall", "f1"))
+            + "|"
+        )
+    appendix += [
+        "",
+        "## Ablation09Nov do producer cung cấp",
+        "",
+        "JSON/hash audited; chưa độc lập replay arrays của mọi run mới. Không tự chọn lại candidate theo holdout.",
+        "",
+        "|Bước pha1+pha2|t*|AP calibration|AP holdout|Dice holdout|",
+        "|---|---:|---:|---:|---:|",
+    ]
+    rows = list(csv.DictReader(payloads[INPUTS[2]].decode("utf-8").splitlines()))
+    if not rows:
+        raise ValueError("Report ablation table is empty")
+    for row in rows:
+        steps = [int(row[k]) for k in ("phase1_steps", "phase2_steps", "t_start")]
+        if steps[0] + steps[1] != 50 or not 0 < steps[2] <= 1000:
+            raise ValueError("Unexpected report ablation configuration")
+        appendix.append(
+            f"|{steps[0]}+{steps[1]}|{steps[2]}|"
+            + "|".join(
+                metric(row[k])
+                for k in ("calibration_pixel_ap", "holdout_pixel_ap", "holdout_pixel_f1_dice")
+            )
+            + "|"
+        )
+    try:
+        revision = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=root, stderr=subprocess.DEVNULL, text=True
+        ).strip()
+        dirty = bool(
+            subprocess.check_output(
+                ["git", "status", "--porcelain", "--untracked-files=no"], cwd=root
+            )
+        )
+    except (OSError, subprocess.CalledProcessError):
+        revision, dirty = "unavailable", True
+    body = payloads[INPUTS[0]].decode("utf-8")
+    if re.fullmatch(r"[0-9a-f]{40}", revision):
+        body = re.sub(
+            r"\]\((?!https?://|#)([^)]+\.md(?:#[^)]*)?)\)",
+            lambda m: f"](https://github.com/tanh1c/DACN/blob/{revision}/docs/{m[1]})",
+            body,
+        )
+    # The document title is supplied by Pandoc metadata, not duplicated as chapter1.
+    body = re.sub(r"\A# [^\n]*\n", "", body)
+    lines, fence = [], None
+    for line in body.splitlines():
+        match = re.match(r"^ {0,3}(`{3,}|~{3,})", line)
+        if match:
+            marker = match[1][0]
+            if fence is None:
+                fence = marker
+            elif fence == marker:
+                fence = None
+        elif fence is None and re.match(r"^#{2,6} ", line):
+            line = line[1:]
+        lines.append(line)
+    body = "\n".join(lines) + "\n"
+    body = "**BẢN NHÁP — validation; chưa có kết quả test trong bản build này.**\n\n" + body
+    body += (
+        "\n\n"
+        + "\n".join(appendix)
+        + f"\n\nSource Git: `{revision[:12]}`. Hashes đầu vào nằm trong build-manifest.json.\n"
+    )
+    # Reserve space for compact research tables so rows are not orphaned across pages.
+    body = re.sub(
+        r"(?m)(?:^\|[^\n]*\|\n){2,}",
+        lambda m: (
+            "\\Needspace{"
+            + str(min(28, len(m[0].splitlines()) * 1.5))
+            + "\\baselineskip}\n\n"
+            + m[0]
+        ),
+        body,
+    )
+    receipt = {
+        "status": "prepared",
+        "report_status": "draft_validation_only",
+        "research_manifest_status": json.loads(payloads[INPUTS[3]])["status"],
+        "source_commit": revision,
+        "tracked_tree_dirty": dirty,
+        "inputs": {k: hashlib.sha256(v).hexdigest() for k, v in payloads.items()},
+        "builder_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+    output.mkdir(parents=True, exist_ok=True)
+    (output / "report.md").write_text(body, encoding="utf-8")
+    (output / "build-manifest.json").write_text(
+        json.dumps(receipt, indent=2) + "\n", encoding="utf-8"
+    )
+    return receipt
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--output", type=Path, default=Path("reports/build"))
+    parser.add_argument("--tools", type=Path, default=Path("runs/report-tools/tools.json"))
+    parser.add_argument("--prepare-only", action="store_true")
+    args = parser.parse_args()
+    root = args.root.resolve()
+    output = (root / args.output).resolve()
+    receipt = prepare(root, output)
+    if args.prepare_only:
+        print("Draft Markdown and input provenance prepared; PDF not compiled.")
+        return
+    tools = json.loads((root / args.tools).read_text(encoding="utf-8"))
+    # A changed document class must not reuse an old TOC/aux or a stale successful PDF.
+    for suffix in ("aux", "toc", "out", "lof", "lot", "xdv", "pdf"):
+        (output / f"report.{suffix}").unlink(missing_ok=True)
+    commands = [
+        [
+            tools["pandoc"],
+            str(output / "report.md"),
+            "--from=markdown",
+            "--to=latex",
+            "--standalone",
+            "--toc",
+            "--number-sections",
+            "--top-level-division=section",
+            "--metadata-file=" + str(root / "reports/metadata.json"),
+            "--include-in-header=" + str(root / "reports/header.tex"),
+            "--output=" + str(output / "report.tex"),
+        ],
+        [
+            tools["tectonic"],
+            "--untrusted",
+            "--keep-logs",
+            "--keep-intermediates",
+            "--outdir",
+            str(output),
+            str(output / "report.tex"),
+        ],
+    ]
+    try:
+        with (output / "build.log").open("w", encoding="utf-8") as log:
+            for command in commands:
+                subprocess.run(
+                    command,
+                    cwd=output,
+                    stdout=log,
+                    stderr=subprocess.STDOUT,
+                    check=True,
+                    timeout=600,
+                )
+        pdf = output / "report.pdf"
+        if not pdf.is_file() or not pdf.read_bytes().startswith(b"%PDF-"):
+            raise ValueError("Compiler did not produce a PDF")
+        receipt.update(
+            status="completed",
+            pdf_sha256=hashlib.sha256(pdf.read_bytes()).hexdigest(),
+            tool_versions=tools["versions"],
+        )
+    except (OSError, ValueError, subprocess.SubprocessError) as exc:
+        receipt.update(status="failed", error_class=type(exc).__name__)
+        raise
+    finally:
+        (output / "build-manifest.json").write_text(
+            json.dumps(receipt, indent=2) + "\n", encoding="utf-8"
+        )
+    print("Draft PDF compiled; see report.pdf and build-manifest.json.")
+
+
+if __name__ == "__main__":
+    main()

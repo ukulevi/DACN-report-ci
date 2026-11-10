@@ -45,12 +45,19 @@ metric CPU khớp receipt Colab. Tất cả số dưới đây là validation, m
 | Naive-stitch LPIPS | 0.180593 | 0.296849 |
 | Brightness control | 0.389506 | 0.268051 |
 
-| Phương án | Pixel ROC-AUC | Pixel Precision | Pixel Recall | Image ROC-AUC | Image Precision | Image Recall | Image F1 |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Final LPIPS | .949036 | .297471 | .493572 | .914474 | .687500 | .916667 | .785714 |
-| Initial LPIPS | .926110 | .194958 | .336464 | .787281 | .611111 | .916667 | .733333 |
-| Naive-stitch LPIPS | .936299 | .218753 | .461666 | .785088 | .617647 | .875000 | .724138 |
-| Brightness | .950197 | .161469 | .788577 | .679825 | .571429 | 1.000000 | .727273 |
+| Phương án | Pixel ROC-AUC | Pixel Precision | Pixel Recall |
+|---|---:|---:|---:|
+| Final LPIPS | .949036 | .297471 | .493572 |
+| Initial LPIPS | .926110 | .194958 | .336464 |
+| Naive-stitch LPIPS | .936299 | .218753 | .461666 |
+| Brightness | .950197 | .161469 | .788577 |
+
+| Phương án | Image ROC-AUC | Image Precision | Image Recall | Image F1 |
+|---|---:|---:|---:|---:|
+| Final LPIPS | .914474 | .687500 | .916667 | .785714 |
+| Initial LPIPS | .787281 | .611111 | .916667 | .733333 |
+| Naive-stitch LPIPS | .785088 | .617647 | .875000 | .724138 |
+| Brightness | .679825 | .571429 | 1.000000 | .727273 |
 
 Pixel aggregation là global micro trên crop240; pixel F1 nằm trong bảng Dice.
 Image score mean top576pixels. Thresholds riêng từng arm lấy từ40calibration và

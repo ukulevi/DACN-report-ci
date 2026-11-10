@@ -1,0 +1,9 @@
+\usepackage{fancyhdr}
+\usepackage{needspace}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{DACN — BẢN NHÁP VALIDATION}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{16pt}
+\let\originaltableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{\originaltableofcontents\clearpage}
