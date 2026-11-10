@@ -11,12 +11,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 INPUTS = (
-    "docs/REPORT_DRAFT.md",
+    "report/thesis.md",
     "docs/evidence/2026-11-08-colab-registered-acceptance.json",
     "docs/evidence/2026-11-10-ddim-ablation-table.csv",
     "configs/final_evaluation_candidate.json",
-    "reports/metadata.json",
-    "reports/header.tex",
+    "report/metadata.json",
+    "report/header.tex",
+    "report/references.bib",
+    "report/cover.tex",
+    "report/assets/hcmut-logo.png",
+    "report/figures/pipeline.pdf",
+    "report/figures/validation.pdf",
+    "report/figures/ablations.pdf",
+    "report/figures/provenance.json",
 )
 ARMS = {
     "final_lpips": "Final LPIPS",
@@ -43,7 +50,13 @@ def prepare(root, output):
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise ValueError("Report input must stay inside the repository")
         payloads[name] = path.read_bytes()
-    metadata = json.loads(payloads["reports/metadata.json"])
+    citations = set(re.findall(r"(?<![\w])@([\w:-]+)", payloads[INPUTS[0]].decode("utf-8")))
+    references = set(
+        re.findall(r"@\w+\s*\{\s*([^,\s]+)", payloads["report/references.bib"].decode("utf-8"))
+    )
+    if citations - references:
+        raise ValueError("Unresolved report citation: " + ", ".join(sorted(citations - references)))
+    metadata = json.loads(payloads["report/metadata.json"])
     if metadata.get("lang") not in {"en", "en-US", "en-GB"}:
         raise ValueError("Report metadata must select English")
     evidence = json.loads(payloads[INPUTS[1]])
@@ -82,6 +95,8 @@ def prepare(root, output):
         )
     appendix += [
         "",
+        "\\Needspace{26\\baselineskip}",
+        "",
         "## Producer ablations from 9 November",
         "",
         "Aggregate JSON and hashes were audited; arrays from every new run have not been independently replayed. These holdout results do not automatically select a new candidate.",
@@ -104,6 +119,10 @@ def prepare(root, output):
             )
             + "|"
         )
+    figure_inputs = json.loads(payloads["report/figures/provenance.json"])["inputs"]
+    for name in INPUTS[1:3]:
+        if figure_inputs.get(name) != hashlib.sha256(payloads[name]).hexdigest():
+            raise ValueError("Stale report figures; regenerate from registered evidence")
     try:
         revision = subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=root, stderr=subprocess.DEVNULL, text=True
@@ -118,10 +137,11 @@ def prepare(root, output):
     body = payloads[INPUTS[0]].decode("utf-8")
     if re.fullmatch(r"[0-9a-f]{40}", revision):
         body = re.sub(
-            r"\]\((?!https?://|#)([^)]+\.md(?:#[^)]*)?)\)",
+            r"\]\(\.\./docs/([^)]+\.md(?:#[^)]*)?)\)",
             lambda m: f"](https://github.com/tanh1c/DACN/blob/{revision}/docs/{m[1]})",
             body,
         )
+    body = body.replace("](figures/", "](" + (root / "report/figures").as_posix() + "/")
     # The document title is supplied by Pandoc metadata, not duplicated as chapter1.
     body = re.sub(r"\A# [^\n]*\n", "", body)
     lines, fence = [], None
@@ -142,9 +162,9 @@ def prepare(root, output):
         + body
     )
     body += (
-        "\n\n"
+        "\n\n\\clearpage\n\n"
         + "\n".join(appendix)
-        + f"\n\nSource commit: `{revision[:12]}`. Input hashes are recorded in build-manifest.json.\n"
+        + f"\n\nSource commit: `{revision[:12]}`. Input hashes are recorded in build-manifest.json.\n\n\\clearpage\n"
     )
     # Reserve space for compact research tables so rows are not orphaned across pages.
     body = re.sub(
@@ -172,6 +192,18 @@ def prepare(root, output):
     if metadata.get("date", "auto") == "auto":
         date = datetime.fromisoformat(receipt["built_at_utc"]).strftime("%d %B %Y")
         metadata["date"] = f"Build: {date} (UTC) — source {revision[:12]}"
+    cover = (
+        payloads["report/cover.tex"]
+        .decode("utf-8")
+        .replace("@@LOGO@@", (root / "report/assets/hcmut-logo.png").as_posix())
+        .replace(
+            "@@MONTH@@", datetime.fromisoformat(receipt["built_at_utc"]).strftime("%B %Y").upper()
+        )
+    )
+    header = payloads["report/header.tex"].decode("utf-8")
+    (output / "header.tex").write_text(
+        header + "\n\\renewcommand{\\maketitle}{\n" + cover + "\n}\n", encoding="utf-8"
+    )
     (output / "metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (output / "report.md").write_text(body, encoding="utf-8")
     (output / "build-manifest.json").write_text(
@@ -183,7 +215,7 @@ def prepare(root, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
-    parser.add_argument("--output", type=Path, default=Path("reports/build"))
+    parser.add_argument("--output", type=Path, default=Path("report/build"))
     parser.add_argument("--tools", type=Path, default=Path("runs/report-tools/tools.json"))
     parser.add_argument("--prepare-only", action="store_true")
     args = parser.parse_args()
@@ -205,10 +237,12 @@ def main():
             "--to=latex",
             "--standalone",
             "--toc",
+            "--citeproc",
+            "--bibliography=" + str(root / "report/references.bib"),
             "--number-sections",
             "--top-level-division=section",
             "--metadata-file=" + str(output / "metadata.json"),
-            "--include-in-header=" + str(root / "reports/header.tex"),
+            "--include-in-header=" + str(output / "header.tex"),
             "--output=" + str(output / "report.tex"),
         ],
         [

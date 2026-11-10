@@ -1,8 +1,11 @@
 \usepackage{fancyhdr}
 \usepackage{needspace}
+\usepackage{etoolbox}
+\AtBeginEnvironment{CSLReferences}{\small}
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{DACN — VALIDATION DRAFT}
+\fancyhead[L]{\small Ho Chi Minh City University of Technology}
+\fancyhead[R]{\small CO4029 -- HK261}
 \fancyfoot[C]{\thepage}
 \setlength{\headheight}{16pt}
 \let\originaltableofcontents\tableofcontents

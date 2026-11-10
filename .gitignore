@@ -36,3 +36,5 @@ wandb/
 
 *.egg-info/
 reports/build/
+
+report/build/

@@ -1,5 +1,31 @@
 # Worklog
 
+## 2026-11-10 — Full English CO4029 report and private release pipeline (DAC-26)
+
+Moved canonical manuscript/layout into `report/`; legacy summary and `reports/`
+now point to it. Expanded the six-page summary into a 16-page validation-study
+report: abstract, theory/equations, audited data/preprocessing, model and score
+contracts, calibration/metrics, results/uncertainty, limitations, reproducibility,
+conclusion, aggregate evidence appendix and ten resolved bibliographic sources.
+Cover follows the two user-supplied report examples; current course/advisor and
+three names/IDs confirmed from supplied records, with prior-project research
+content/results excluded. Logo extracted from the user's prior cover.
+
+Added three aggregate-only vector figures and input-hash provenance; the builder
+rejects unresolved citations and stale figures. No patient arrays/images, training,
+test access or scientific freeze changes. Pandoc citeproc plus the existing pinned
+Tectonic compiler produces ignored `report/build/report.pdf` and generated LaTeX.
+Workflow retains every-push/PR triggers, read-only build permissions and pinned
+actions; a separate contents-write job publishes PDF/manifest as a clearly labeled
+validation-draft prerelease only on private satellite main push/manual.
+
+Checks: seven focused tests pass after observed red-to-green checks; repository
+Ruff and format pass. Real local PDF compiled and rendered for all-page visual
+review, including corrected long-SHA overflow and bibliography pagination; no
+remaining overflow/missing-glyph warnings. Final read-only review found no
+material issues. Hosted build/release still requires verification after push;
+local compilation is not claimed as remote publication.
+
 ## 2026-11-10 — Independent private report CI host (DAC-26)
 
 User approved private `ukulevi/DACN-report-ci` after confirming the source

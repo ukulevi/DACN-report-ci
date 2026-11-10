@@ -1,8 +1,10 @@
 {
   "title": "Diffusion Models for Anomaly Detection",
-  "subtitle": "Specialized Research Project — Working Draft",
+  "subtitle": "Specialized Project (CO4029) - Validation Study",
   "author": [
-    "DACN Team — three members"
+    "Chu Nguyễn Tuấn Anh - 2352022",
+    "Lê Hoàng Chí Vĩ - 2353336",
+    "Vũ Hải Tuấn - 2353280"
   ],
   "date": "auto",
   "lang": "en-US",
@@ -27,5 +29,10 @@
   "monofontoptions": [
     "BoldFont=texgyrecursor-bold.otf",
     "ItalicFont=texgyrecursor-italic.otf"
-  ]
+  ],
+  "reference-section-title": "References",
+  "link-citations": true,
+  "linkcolor": "black",
+  "citecolor": "blue",
+  "urlcolor": "blue"
 }
