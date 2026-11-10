@@ -26,6 +26,11 @@ remaining overflow/missing-glyph warnings. Final read-only review found no
 material issues. Hosted build/release still requires verification after push;
 local compilation is not claimed as remote publication.
 
+Follow-up before hosted acceptance: Git's add warning showed reportlab's
+ASCII-encoded PDFs were detected as text (`i/lf w/lf`). Added binary attributes
+for PDF/PNG so Windows checkout cannot rewrite PDF byte offsets through CRLF
+conversion. `git check-attr` verifies text/diff/merge disabled for those assets.
+
 ## 2026-11-10 — Independent private report CI host (DAC-26)
 
 User approved private `ukulevi/DACN-report-ci` after confirming the source
