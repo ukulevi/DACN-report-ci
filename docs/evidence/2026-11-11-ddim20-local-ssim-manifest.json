@@ -1,0 +1,23 @@
+{
+  "evaluation_id": "ddim20-ssim-val83-20261111T062304Z",
+  "status": "completed",
+  "started_at": "2026-11-11T06:24:18.405804+00:00",
+  "code_revision": "8838ec8b8ace2ddc13371087470ad2a04969ab20",
+  "working_tree_dirty": true,
+  "source_snapshot_sha256": "01904d9b13035e6c08f36638f3e120d34fa1e469e8d86541012eb004811cbe55",
+  "scope": "Cached validation only; CPU scoring; no model inference, no test access",
+  "gpu": null,
+  "cpu": 2,
+  "memory_mib": 8192,
+  "python": "3.11.12",
+  "versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.1",
+    "huggingface_hub": "2.4.0"
+  },
+  "completed_at": "2026-11-11T06:24:37.659845+00:00",
+  "total_seconds": 15.929608551000001,
+  "artifact_sync_status": "uploaded",
+  "model_revision": "263e6e79711e85958c0dbce5d729577a45a05255"
+}

@@ -1,0 +1,89 @@
+{
+  "adapter_seconds_median": 1.7549610530000024,
+  "adapter_seconds_p95": 2.0434276241,
+  "adapter_seconds_sum": 153.33726468899988,
+  "calibration": {
+    "empty_mask_pixel_false_positive_rate": 0.018159722222222223,
+    "image": {
+      "auprc": 0.7132160706113317,
+      "auroc": 0.6824999999999999,
+      "f1": 0.7142857142857143,
+      "precision": 0.5555555555555556,
+      "recall": 1.0,
+      "threshold": 0.22034396567485398
+    },
+    "image_aggregation": "mean of top 576 pixels",
+    "pixel": {
+      "auprc": 0.27044696157723436,
+      "auroc": 0.95446687475333,
+      "average_precision": 0.27044696157723436,
+      "dice_micro": 0.32224889917085453,
+      "f1": 0.32224889917085453,
+      "precision": 0.25574326930494484,
+      "recall": 0.4354999737270769,
+      "threshold": 0.23461146652698517
+    },
+    "pixel_aggregation": "global micro over 240x240 crop",
+    "pixel_dice_macro_lesion_slices": 0.28022650381242575,
+    "samples": 40,
+    "split": "validation",
+    "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie"
+  },
+  "calibration_samples": 40,
+  "config": {
+    "crop": 240,
+    "eta": 0,
+    "image_top_pixels": 576,
+    "inference_steps": 50,
+    "lpips_net": "squeeze",
+    "lpips_version": "0.1",
+    "seed": 17,
+    "starting_timestep": 300
+  },
+  "cuda_peak_allocated_bytes": 112601088,
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "gpu": "Tesla T4",
+  "group_holdout": {
+    "empty_mask_pixel_false_positive_rate": 0.012729349415204679,
+    "image": {
+      "auprc": 0.9014383294621989,
+      "auroc": 0.837719298245614,
+      "f1": 0.7457627118644068,
+      "precision": 0.6285714285714286,
+      "recall": 0.9166666666666666,
+      "threshold": 0.22034396567485398
+    },
+    "image_aggregation": "mean of top 576 pixels",
+    "pixel": {
+      "auprc": 0.18601991346055638,
+      "auroc": 0.9345199574305592,
+      "average_precision": 0.18601991346055638,
+      "dice_micro": 0.290416118431309,
+      "f1": 0.290416118431309,
+      "precision": 0.22247274742282816,
+      "recall": 0.4181060796495134,
+      "threshold": 0.23461146652698517
+    },
+    "pixel_aggregation": "global micro over 240x240 crop",
+    "pixel_dice_macro_lesion_slices": 0.2726092283696275,
+    "samples": 43,
+    "split": "validation",
+    "threshold_selection": "provided by caller; provenance must be recorded separately"
+  },
+  "holdout_samples": 43,
+  "lpips_calls_completed_trajectories": 83,
+  "method_contract": "4cbc55d9f77f91d0c15160d764427df44f56db7c5b163e942d81accb33965acf",
+  "sample_count": 83,
+  "sampling_seeds": 1,
+  "stage": "validation",
+  "status": "completed",
+  "test_accessed": false,
+  "thresholds": {
+    "image": 0.22034396567485398,
+    "pixel": 0.23461146652698517
+  },
+  "timing_scope": "Adapter incl cold model load per continuation; excludes data/checksum/shard/global-metric I/O",
+  "training_performed": false,
+  "training_seeds": 1,
+  "unet_calls_completed_trajectories": 4150
+}

@@ -3099,3 +3099,175 @@ Last-process CUDA allocated peak112928768B.
 These timings exclude dataset/commit/resume/global-metric overhead. No new model
 training. Earlier timeout/operator-cancellation records retained. Tracker remains
 stopped; this was a user-requested one-off completion check.
+
+## 2026-11-11 — Local SSIM on cached DDIM20 validation
+
+`ddim20-ssim-val83-20261111T062304Z` started as CPU-only scoring on shared
+Workspacephutungcogioihaitan,2CPU/8192MiB, no GPU/model loading. User authorized
+Local SSIM validation, no test rerun. [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-I9AUls8yBgrpJNgdXU3L1o).
+Callfc-01M74MEGBEWQKF22GDR2FF7G90; durable start manifest on private run Volume
+under evaluations/ddim20-ssim-val83-20261111T062304Z. Base code8838ec8 plus dirty
+scoring extension; actual Python source snapshot and package versions recorded.
+
+Inputs: original83DDIM20(t300) validation pairs, Gaussian EMA30/seed17,
+cache22656e1f63a0047d3dbe32f7833eea8e303988414e5942dec1ba5a1d9ed1ef19,
+immutable dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7; registered40calibration/
+43patient-group holdout reused by checksum. Existing local1-SSIM11x11Gaussian,
+sigma1.5, reflect, population moments, data_range2 signed[-1,1], full240crop;
+no clipping/ROI/window/timestep sweep. Separate image/pixel thresholds fit max-F1
+on40calibration, largest threshold on tie, saved before43holdout evaluation.
+Image mean top576pixels; pixel globalmicro/Dice=F1, macro lesion Dice/normalFPR.
+One original training/sampling seed; zero new U-Net/LPIPS calls. Status: running,
+pending produced aggregate/manifest; no numeric results claimed from progress logs.
+Exploratory extension after completed final test; final frozen method unchanged.
+
+Completed/uploaded: private HF revision
+[263e6e79711e85958c0dbce5d729577a45a05255](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/263e6e79711e85958c0dbce5d729577a45a05255/evaluations/ddim20-ssim-val83-20261111T062304Z).
+Actual start2026-11-11T06:24:18.405804Z, completion06:24:37.659845Z.
+Source snapshot01904d9b13035e6c08f36638f3e120d34fa1e469e8d86541012eb004811cbe55;
+Python3.11.12,NumPy2.4.6,SciPy1.17.1,scikit-learn1.9.1.83maps produced;
+40calibration/43holdout,25groups each, one original reconstruction seed17.
+
+Local SSIM **pixel global micro** on43validation holdout: ROC-AUC0.8805495167,
+AP0.0957718607,Precision0.1057501377,Recall0.1826408590,F1/Dice0.1339452078;
+macro lesion-slice Dice0.1723203699,normal-empty-mask pixel FPR0.0414665570.
+Image mean-top576:ROC-AUC0.3684210526,AP0.4938826315,Precision0.5581395349,
+Recall1.0,F10.7164179104. Image threshold predicts all43holdout images positive.
+Thresholds fit only on40calibration and written beforeholdout:pixel0.9038662186681857,
+image1.108771815639135. No threshold sweep or clipping, original signed-input
+SSIM contract. These are validation extension metrics, not a new held-out test.
+
+CPU paired-score component5.349924456s across83pairs,median0.064059484s,
+p950.066208280s. Evaluation duration15.929608551s after start commit/beforeupload;
+noGPU/VRAM N/A, zero new U-Net/LPIPS calls. Timing includes L1 computed by the
+existing paired-score routine, excludes cache/hash/I-O/global metrics for the
+component sum. Private maps remain on Volume/private Hub; local aggregate evidence
+in docs/evidence/2026-11-11-ddim20-local-ssim-{results,manifest}.json.
+
+Matched historical L1/InitialLPIPS rows retained, original results SHA
+verifieda8bae24bd7270b078d49f923461e43fb51aea3163ede5a2fe71c90a70b127730.
+Three-score comparison:DDIM20_LOCAL_SSIM_VALIDATION.md and aggregate JSON.
+SSIM pixel AP0.095772 is slightly above L10.090936, Dice0.133945 below L10.156053;
+Initial LPIPS AP0.157876/Dice0.246871 is higher on this inspected cohort.
+No new training, test rerun or change to the completed final-test protocol.
+
+## 2026-11-11 — Four fixed DDIM20 score sums, validation only
+
+User authorized LPIPS+Residual,LPIPS+LocalSSIM,Residual+LocalSSIM and allthree.
+`ddim20-fusion-val83-20261111T063345Z` started as CPU-only cached validation
+scoring,2CPU/8192MiB, no GPU. [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-BZEEZwwRU1daWsLogyA0Ng),
+callfc-01M74N7TFRS4P00Q7A1H9YV3WY. Base code8838ec8 plus dirty scoring extension;
+actual source snapshot and dependency versions in produced manifest.
+
+Immutable83validation DDIM20(t300) cache22656e1f63a0047d3dbe32f7833eea8e303988414e5942dec1ba5a1d9ed1ef19,
+dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7, GaussianEMA30/seed17;
+exact registered40calibration/43patient-group holdout. Reuse cached raw initial
+L1/LPIPS; compute existing signed-inputLocalSSIM with CPU. Fit each midrank CDF
+only on normal calibration pixels; equal-weight arithmetic means (1/2each for
+pairs,1/3each triple), no products or weight search. Save all fitted CDFs and
+pixel/image max-F1 thresholds before holdout metrics. Report all4arms and replay
+raw3score rows as integrity controls. Image mean top576pixels; pixel globalmicro
+on240crop; all ROC-AUC/AP/Precision/Recall/F1, macro lesion Dice/normalFPR.
+
+Status running pending aggregate/terminal artifact; no numeric results inferred
+from progress logs. No new model/U-Net/LPIPS calls, no training or test access.
+Exploratory after completed final test; does not replace frozen primary protocol.
+Definition registered before execution:DDIM20_SCORE_FUSION_VALIDATION.md.
+
+Completed/uploaded: private HF revision
+[78e025c24c4ce327e63200fb66679ab762d2ca79](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/78e025c24c4ce327e63200fb66679ab762d2ca79/evaluations/ddim20-fusion-val83-20261111T063345Z).
+Actual start2026-11-11T06:38:07.142292Z,completion06:38:48.743800Z;
+source snapshot9a315b6a4f67d15ef0a4c4a6cd8fa41dca2a4b16c15fc4b08b24a35e11fac35c.
+Python3.11.12,NumPy2.4.6,SciPy1.17.1,scikit-learn1.9.1. CDF fitted to20normal
+calibration images/1152000pixels per score; pixel/image thresholds for all7score
+rows persisted before holdout evaluation. Raw3baselines exactly reproduce36
+previous pixel/image AUROC/AP/P/R/F1/threshold fields within1e-12.
+
+43validation holdout pixel(globalmicro) metrics,ROC-AUC/AP/Precision/Recall/F1:
+- LPIPS+Residual:.917979641/.153122075/.177130504/.279527418/.216848674.
+- LPIPS+LocalSSIM:.915212990/.157357929/.176061806/.248375049/.206058259.
+- Residual+LocalSSIM:.886712163/.100392316/.108451262/.270388193/.154809328.
+- LPIPS+SSIM+Residual:.911881479/.142310469/.162471396/.247315689/.196110257.
+
+43validation holdout image(mean-top576) metrics,ROC-AUC/AP/Precision/Recall/F1:
+- LPIPS+Residual:.734649123/.804782815/.636363636/.875000000/.736842105.
+- LPIPS+LocalSSIM:.728070175/.792303635/.600000000/.875000000/.711864407.
+- Residual+LocalSSIM:.324561404/.455593602/.558139535/1.000000000/.716417910.
+- LPIPS+SSIM+Residual:.692982456/.750642641/.666666667/.750000000/.705882353.
+
+Full thresholds/macro lesion Dice/normal pixel FPR are in aggregate evidence and
+DDIM20_SCORE_FUSION_VALIDATION.md. Raw InitialLPIPS AP.157875671/Dice.246871130
+exceeds all four fixed fusions on these pixel metrics. Report all four; no new
+holdout-based reselection or weight/normalizer changes. One seed/inspected
+validation/post-final-test extension; no new final-test result.
+
+CPU SSIM3.944479504s; CDF/mean5.030068275s; evaluator39.880807316s after initial
+commit/before upload incl global metrics/I-O.2CPU/8192MiB, GPU/VRAM N/A, zero
+new U-Net/LPIPS calls, no training/test use. Private CDF/maps remain on Volume/
+private HF; only aggregate metrics/manifests copied into docs/evidence.
+
+## 2026-11-11 — Single-phase DDIM50+LPIPS, separate test extension
+
+User explicitly requests full test with DDIM50+LPIPS. Fixed protocol:
+DDIM50_LPIPS_TEST.md, one50call eta0 chain fromt300, GaussianEMA30,seed17/UUID
+sampling,raw spatialLPIPS0.1 squeeze,full240crop/top576image score, batch1.
+No mask/phase2/fusion/training. Earlier final-test outcomes already inspected;
+this is an exploratory repeated-cohort comparison, not an untouched new test.
+
+Initial CPU prepare invocation by file path failed before its body/inference
+with ModuleNotFoundError:modal_ddim50_lpips; automatic source mounting is disabled
+for explicit root binding. Appap-q2zF2pLgGrMBemWFXNhLrg stopped after confirmed
+startup error; no model/GPU/test work. Corrected to -m fully-qualified module,
+fresh actual protocolddim50-lpips-t300-20261111T064853Z-b.
+
+CPU prepare-b completed, actual runtime/import/source binding and9artifact pins
+verified. Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7; checkpointD3e06d…
+(exact full SHA in protocol), native LPIPS states unchanged. Config SHA
+ e1bfa4104529f47a58941f5b9ff45e2efdb5839718cb21ab21c6320da18a20f5;
+source snapshotbdc2cfcda87c266cf0092e1c7fdd676021af31245a72b65c9ec913b03086277c;
+dependency inventoryac4bea0313a7f12f653762c052cb2cb8fbc8a0c93cdb29a57997de32952c18f8.
+Base code8838ec8+dirty implementation; actual snapshot retains executed sources.
+Smoke2validation images submitted onT4; no metrics claimed until produced receipt.
+Validation83must fit thresholds on40calibration and seal acceptance before any
+of the3665test samples are opened. Private maps/reconstructions retained remote.
+
+DDIM50 smoke-b completed/uploaded,2validation samples,100verifiedU-Net/2LPIPS
+calls; aggregate SHA verified against producer manifest. Private Hub revision
+[494800a7d8ec76f10f2d43759d85d80ba946d0ac](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/494800a7d8ec76f10f2d43759d85d80ba946d0ac/evaluations/ddim50-lpips-t300-20261111T064853Z-b-smoke).
+[Modal smoke](https://modal.com/apps/phutungcogioihaitan/main/ap-hVdJYHmLpHBoaP0KwNEhBr),
+callfc-01M74PMQJT00XS2027VBWNTCZ1. Adapter sum6.803282068s incl cold load,
+last-process CUDA allocated peak112601088B. Engineering smoke only, no research
+quality/test result. Source/runtime/artifact gates passed before validation data.
+
+Full83DDIM50 validation stage submitted after smoke success; same pinned inputs,
+fixed method,40calibration threshold fit then43holdout metrics. No test access
+before produced validation acceptance and frozen thresholds. Status pending
+produced receipt; scalar metrics not inferred from logs/plans.
+
+DDIM50 validation-b app:
+https://modal.com/apps/phutungcogioihaitan/main/ap-3Kd87ce9N5BFnkxqKM2Gdx,
+callfc-01M74PR1XK021M106XW6EVKDZ0. Bounded smoke2receipt accepted, T4 active,
+83validation outputs requested; no test yet. Atomic private LPIPS/reconstruction
+shards commit every25samples and progress is logged without per-sample IDs.
+
+DDIM50 validation-b completed/uploaded83/83,4150verifiedU-Net/83LPIPS calls.
+Private Hub revision
+[d496f1c51103d47cf64e897a84308bee11091627](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/d496f1c51103d47cf64e897a84308bee11091627/evaluations/ddim50-lpips-t300-20261111T064853Z-b-validation).
+Aggregate SHA verified against producer manifest and frozen acceptance hash.
+All9artifact/source/import/runtime gates passed; exact40/43partition retained.
+Pixel/image thresholds fit only on40calibration and stored before43holdout:
+pixel0.23461146652698517,image0.22034396567485398.
+
+43validation holdout pixel globalmicro:ROC-AUC.9345199574,AP.1860199135,
+Precision.2224727474,Recall.4181060796,F1/Dice.2904161184,
+macro lesionDice.2726092284,normal pixelFPR.0127293494.
+Image mean-top576:ROC-AUC.8377192982,AP.9014383295,
+Precision.6285714286,Recall.9166666667,F1.7457627119. One original training/
+sampling seed17. Method was fixed before this validation; no holdout reselection.
+Adapter sum153.337264689s,median1.754961053s,p952.043427624s/image; excludes
+input/checksum/shard/aggregate overhead and includes first cold model load.
+
+Frozen config saved as configs/ddim50_lpips_frozen_20261111.json and acceptance
+in docs/evidence/2026-11-11-ddim50-lpips-validation{,-manifest}.json. New full-test
+stage will use this exact source/config/runtime/threshold receipt; no test result
+is claimed from validation. Earlier20+30test records and thresholds unchanged.

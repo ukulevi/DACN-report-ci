@@ -1,0 +1,495 @@
+{
+  "definition": {
+    "normalization": "midrank empirical CDF on normal calibration pixels only; not per-image",
+    "normalizer_fit_samples": 20,
+    "normalizer_fit_pixels_per_score": 1152000,
+    "normalizer_sha256": "4531da92ef34b2faae9a231969bf2ef42915b25556e434b009b16034b7aef4c2",
+    "fusions": {
+      "lpips_residual": {
+        "lpips": 0.5,
+        "residual": 0.5
+      },
+      "lpips_ssim": {
+        "lpips": 0.5,
+        "ssim": 0.5
+      },
+      "residual_ssim": {
+        "residual": 0.5,
+        "ssim": 0.5
+      },
+      "lpips_ssim_residual": {
+        "lpips": 0.3333333333333333,
+        "ssim": 0.3333333333333333,
+        "residual": 0.3333333333333333
+      }
+    },
+    "threshold_rule": "max F1 on original40 calibration; largest threshold on exact tie",
+    "calibration_samples": 40,
+    "holdout_samples": 43,
+    "candidate_selection": "none; all four prespecified fusions reported",
+    "score_comparison": ">=",
+    "image_score": "mean of top576 pixels",
+    "ssim_definition": {
+      "score": "1-local_SSIM(input, initial_DDIM20_reconstruction)",
+      "window": "11x11 Gaussian, sigma=1.5, reflect padding, population moments",
+      "data_range": 2,
+      "k1": 0.01,
+      "k2": 0.03,
+      "input_range": "[-1,1]; original signed-input contract, no [0,1] remapping",
+      "metric_region": "full240x240 crop; no foreground filtering",
+      "postprocessing": "none; no score clipping",
+      "threshold_rule": "max F1 on original40 calibration; largest threshold on exact tie",
+      "score_comparison": ">=",
+      "image_score": "mean of top576 pixels"
+    }
+  },
+  "calibration": {
+    "raw_residual": {
+      "thresholds": {
+        "pixel": 0.17744293808937073,
+        "image": 0.41501908594121534
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.8912591550942085,
+          "auprc": 0.0875499108026798,
+          "precision": 0.1016854177432711,
+          "recall": 0.4290893804844727,
+          "f1": 0.16440921102302755,
+          "threshold": 0.17744293808937073,
+          "average_precision": 0.0875499108026798,
+          "dice_micro": 0.16440921102302755
+        },
+        "image": {
+          "auroc": 0.255,
+          "auprc": 0.3771544262366431,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "threshold": 0.41501908594121534
+        },
+        "pixel_dice_macro_lesion_slices": 0.25547484468333587,
+        "empty_mask_pixel_false_positive_rate": 0.06601475694444445,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "raw_lpips": {
+      "thresholds": {
+        "pixel": 0.2501829266548157,
+        "image": 0.2262084392261588
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9475832634404638,
+          "auprc": 0.2380793629570621,
+          "precision": 0.24365352723561678,
+          "recall": 0.3512689821869581,
+          "f1": 0.2877279819228493,
+          "threshold": 0.2501829266548157,
+          "average_precision": 0.2380793629570621,
+          "dice_micro": 0.2877279819228493
+        },
+        "image": {
+          "auroc": 0.6649999999999999,
+          "auprc": 0.7113663919525157,
+          "precision": 0.5588235294117647,
+          "recall": 0.95,
+          "f1": 0.7037037037037037,
+          "threshold": 0.2262084392261588
+        },
+        "pixel_dice_macro_lesion_slices": 0.21548394512119576,
+        "empty_mask_pixel_false_positive_rate": 0.013323784722222223,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "raw_ssim": {
+      "thresholds": {
+        "pixel": 0.9038662186681857,
+        "image": 1.108771815639135
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.8968048281179548,
+          "auprc": 0.0991616384392796,
+          "precision": 0.12329266514363486,
+          "recall": 0.26656507803058166,
+          "f1": 0.16860262226432027,
+          "threshold": 0.9038662186681857,
+          "average_precision": 0.0991616384392796,
+          "dice_micro": 0.16860262226432027
+        },
+        "image": {
+          "auroc": 0.35000000000000003,
+          "auprc": 0.4795575188303737,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "threshold": 1.108771815639135
+        },
+        "pixel_dice_macro_lesion_slices": 0.24418241720196984,
+        "empty_mask_pixel_false_positive_rate": 0.03625086805555556,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "lpips_residual": {
+      "thresholds": {
+        "pixel": 0.9489557291666666,
+        "image": 0.9648003784933208
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9397163910017929,
+          "auprc": 0.20763938267200768,
+          "precision": 0.2203067911616308,
+          "recall": 0.3992170668908623,
+          "f1": 0.2839284713268681,
+          "threshold": 0.9489557291666666,
+          "average_precision": 0.20763938267200768,
+          "dice_micro": 0.2839284713268681
+        },
+        "image": {
+          "auroc": 0.7275,
+          "auprc": 0.7557497815481173,
+          "precision": 0.5555555555555556,
+          "recall": 1.0,
+          "f1": 0.7142857142857143,
+          "threshold": 0.9648003784933208
+        },
+        "pixel_dice_macro_lesion_slices": 0.33738107063803624,
+        "empty_mask_pixel_false_positive_rate": 0.021389756944444446,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "lpips_ssim": {
+      "thresholds": {
+        "pixel": 0.9556284722222222,
+        "image": 0.9662360877519774
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9382718802349257,
+          "auprc": 0.20356230733974204,
+          "precision": 0.22202005003761568,
+          "recall": 0.3334033944616678,
+          "f1": 0.266543441960113,
+          "threshold": 0.9556284722222222,
+          "average_precision": 0.20356230733974204,
+          "dice_micro": 0.266543441960113
+        },
+        "image": {
+          "auroc": 0.705,
+          "auprc": 0.7418137843704995,
+          "precision": 0.5555555555555556,
+          "recall": 1.0,
+          "f1": 0.7142857142857143,
+          "threshold": 0.9662360877519774
+        },
+        "pixel_dice_macro_lesion_slices": 0.31580769082290694,
+        "empty_mask_pixel_false_positive_rate": 0.01973697916666667,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "residual_ssim": {
+      "thresholds": {
+        "pixel": 0.9258485243055555,
+        "image": 0.9716181531364535
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9064400545533493,
+          "auprc": 0.10797008331950173,
+          "precision": 0.11693134620083069,
+          "recall": 0.37722663023487996,
+          "f1": 0.178524357794743,
+          "threshold": 0.9258485243055555,
+          "average_precision": 0.10797008331950173,
+          "dice_micro": 0.178524357794743
+        },
+        "image": {
+          "auroc": 0.4325,
+          "auprc": 0.49127513458767613,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "threshold": 0.9716181531364535
+        },
+        "pixel_dice_macro_lesion_slices": 0.2701243894074001,
+        "empty_mask_pixel_false_positive_rate": 0.05159027777777778,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "lpips_ssim_residual": {
+      "thresholds": {
+        "pixel": 0.9394710648148147,
+        "image": 0.9699652122214988
+      },
+      "metrics": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9353403872023721,
+          "auprc": 0.1913005728651297,
+          "precision": 0.20095119631228506,
+          "recall": 0.36077978035836267,
+          "f1": 0.2581275787851161,
+          "threshold": 0.9394710648148147,
+          "average_precision": 0.1913005728651297,
+          "dice_micro": 0.2581275787851161
+        },
+        "image": {
+          "auroc": 0.7500000000000001,
+          "auprc": 0.7459863928735742,
+          "precision": 0.7083333333333334,
+          "recall": 0.85,
+          "f1": 0.7727272727272727,
+          "threshold": 0.9699652122214988
+        },
+        "pixel_dice_macro_lesion_slices": 0.32422510020635253,
+        "empty_mask_pixel_false_positive_rate": 0.024006944444444445,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    }
+  },
+  "holdout_results": {
+    "raw_residual": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.8741356984117492,
+        "auprc": 0.09093554223610197,
+        "precision": 0.10183896456869815,
+        "recall": 0.3336984235285668,
+        "f1": 0.15605320167262834,
+        "threshold": 0.17744293808937073,
+        "average_precision": 0.09093554223610197,
+        "dice_micro": 0.15605320167262834
+      },
+      "image": {
+        "auroc": 0.25,
+        "auprc": 0.4318789312590723,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 0.41501908594121534
+      },
+      "pixel_dice_macro_lesion_slices": 0.21484553554247196,
+      "empty_mask_pixel_false_positive_rate": 0.07432474415204679,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "raw_lpips": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.9261098477667458,
+        "auprc": 0.15787567066566394,
+        "precision": 0.19495828044695063,
+        "recall": 0.33646353287607283,
+        "f1": 0.24687113008194345,
+        "threshold": 0.2501829266548157,
+        "average_precision": 0.15787567066566394,
+        "dice_micro": 0.24687113008194345
+      },
+      "image": {
+        "auroc": 0.787280701754386,
+        "auprc": 0.8545009110761922,
+        "precision": 0.6111111111111112,
+        "recall": 0.9166666666666666,
+        "f1": 0.7333333333333333,
+        "threshold": 0.2262084392261588
+      },
+      "pixel_dice_macro_lesion_slices": 0.23777684509577213,
+      "empty_mask_pixel_false_positive_rate": 0.015722770467836256,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "raw_ssim": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.8805495167423651,
+        "auprc": 0.09577186068111301,
+        "precision": 0.10575013774963873,
+        "recall": 0.18264085897942328,
+        "f1": 0.1339452078244438,
+        "threshold": 0.9038662186681857,
+        "average_precision": 0.09577186068111301,
+        "dice_micro": 0.1339452078244438
+      },
+      "image": {
+        "auroc": 0.368421052631579,
+        "auprc": 0.49388263148895706,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 1.108771815639135
+      },
+      "pixel_dice_macro_lesion_slices": 0.17232036992102526,
+      "empty_mask_pixel_false_positive_rate": 0.041466557017543856,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "lpips_residual": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.9179796409944092,
+        "auprc": 0.15312207486072427,
+        "precision": 0.17713050403913982,
+        "recall": 0.27952741767515354,
+        "f1": 0.21684867394695787,
+        "threshold": 0.9489557291666666,
+        "average_precision": 0.15312207486072427,
+        "dice_micro": 0.21684867394695787
+      },
+      "image": {
+        "auroc": 0.7346491228070174,
+        "auprc": 0.8047828151308957,
+        "precision": 0.6363636363636364,
+        "recall": 0.875,
+        "f1": 0.7368421052631579,
+        "threshold": 0.9648003784933208
+      },
+      "pixel_dice_macro_lesion_slices": 0.22606312642634432,
+      "empty_mask_pixel_false_positive_rate": 0.023980263157894737,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "lpips_ssim": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.9152129895908491,
+        "auprc": 0.15735792862910375,
+        "precision": 0.1760618055467169,
+        "recall": 0.24837504937695262,
+        "f1": 0.20605825879058265,
+        "threshold": 0.9556284722222222,
+        "average_precision": 0.15735792862910375,
+        "dice_micro": 0.20605825879058265
+      },
+      "image": {
+        "auroc": 0.7280701754385964,
+        "auprc": 0.7923036350861411,
+        "precision": 0.6,
+        "recall": 0.875,
+        "f1": 0.711864406779661,
+        "threshold": 0.9662360877519774
+      },
+      "pixel_dice_macro_lesion_slices": 0.20872098006238302,
+      "empty_mask_pixel_false_positive_rate": 0.021614583333333333,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "residual_ssim": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.8867121628626145,
+        "auprc": 0.10039231562811568,
+        "precision": 0.10845126210795435,
+        "recall": 0.27038819262398106,
+        "f1": 0.1548093282412143,
+        "threshold": 0.9258485243055555,
+        "average_precision": 0.10039231562811568,
+        "dice_micro": 0.1548093282412143
+      },
+      "image": {
+        "auroc": 0.32456140350877194,
+        "auprc": 0.4555936022709172,
+        "precision": 0.5581395348837209,
+        "recall": 1.0,
+        "f1": 0.7164179104477612,
+        "threshold": 0.9716181531364535
+      },
+      "pixel_dice_macro_lesion_slices": 0.20640506959472663,
+      "empty_mask_pixel_false_positive_rate": 0.057015716374269006,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    },
+    "lpips_ssim_residual": {
+      "split": "validation",
+      "samples": 43,
+      "pixel": {
+        "auroc": 0.9118814790814733,
+        "auprc": 0.14231046940363604,
+        "precision": 0.16247139588100687,
+        "recall": 0.24731568930225878,
+        "f1": 0.19611025684833988,
+        "threshold": 0.9394710648148147,
+        "average_precision": 0.14231046940363604,
+        "dice_micro": 0.19611025684833988
+      },
+      "image": {
+        "auroc": 0.6929824561403509,
+        "auprc": 0.750642640532767,
+        "precision": 0.6666666666666666,
+        "recall": 0.75,
+        "f1": 0.7058823529411765,
+        "threshold": 0.9699652122214988
+      },
+      "pixel_dice_macro_lesion_slices": 0.21216814111533408,
+      "empty_mask_pixel_false_positive_rate": 0.02653234649122807,
+      "threshold_selection": "provided by caller; provenance must be recorded separately",
+      "pixel_aggregation": "global micro over 240x240 crop",
+      "image_aggregation": "mean of top 576 pixels"
+    }
+  },
+  "normalization_seconds": 5.030068275000001,
+  "status": "completed",
+  "split": "validation",
+  "samples_scored": 83,
+  "calibration_groups": 25,
+  "holdout_groups": 25,
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "input_checksums": {
+    "cache": "22656e1f63a0047d3dbe32f7833eea8e303988414e5942dec1ba5a1d9ed1ef19",
+    "index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+    "partition": "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184"
+  },
+  "checkpoint_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+  "method": "Gaussian EMA30; initial DDIM20(t300), eta0; shared cached reconstruction",
+  "training_seeds": 1,
+  "sampling_seeds": 1,
+  "original_sampling_base_seed": 17,
+  "new_unet_calls": 0,
+  "new_lpips_calls": 0,
+  "test_accessed": false,
+  "training_performed": false,
+  "gpu": null,
+  "vram_bytes": null,
+  "cpu_ssim_seconds": 3.9444795040000002,
+  "limitations": "Post-final-test exploratory validation extension; repeatedly inspected validation; one seed, no test tuning or final-protocol replacement"
+}

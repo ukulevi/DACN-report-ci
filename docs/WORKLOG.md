@@ -2051,3 +2051,61 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   Ruff check passed,223files format check passed, git whitespace check passed.
   Existing automatic English PDF remains a validation-study draft; final test
   metrics are in the linked final-test record and the private report package.
+
+## 2026-11-11 — Complete Local SSIM on cached DDIM20 validation
+
+- User requested the missing Local SSIM validation score. Added CPU-only evaluator
+  and Modal entrypoint; reused checksum-pinned83initial DDIM20 pairs, exact40/43
+  registered patient-group membership and original signed-input11x11Gaussian SSIM.
+  Saved calibration-only thresholds before holdout evaluation; no test/GPU/model calls.
+- Actual run completed/uploaded to private HF revision263e6e79…;43holdout pixel
+  AP0.095772,F1/Dice0.133945,AUROC0.880550. Recorded full image/pixel P/R/F1,
+  macro Dice/FPR, thresholds, one seed, version/source/input provenance and timing.
+  Comparison retains measured historical L1/InitialLPIPS rows with verified SHA.
+- Checks actually run:16focused tests passed2.80s,6paired-evaluation tests passed
+  1.56s; Ruff check/format and whitespace check passed. New regressions verify
+  threshold independence from holdout and rejection before reading tampered caches.
+- Initial pytest invocation named a missing tests/test_scores.py and ran no tests;
+  corrected paths and completed the successful checks above. No results inferred
+  from synthetic tests. New maps stay on private Volume/Hub; only aggregates local.
+
+## 2026-11-11 — Four fixed score fusions on DDIM20 validation
+
+- User requested LPIPS+Residual,LPIPS+SSIM,Residual+SSIM,allthree. Registered
+  normal-calibration-only midrankCDF and fixed equal-weight arithmetic means
+  before execution; no weight sweep, products, new model inference or test access.
+- Added fusion evaluator and --score-family fusion to existing CPU Modal lifecycle.
+  Reused pinned83DDIM20 pairs and40/43partition; saved private CDF references and
+  all pixel/image calibration thresholds before holdout metrics. Raw3baselines
+  replayed as integrity controls,36numeric fields match earlier artifacts at1e-12.
+- Actual run completed/uploaded to HF78e025c2…; all four fusion metrics recorded.
+  None exceeded raw InitialLPIPS pixel AP/Dice on this inspected one-seed cohort;
+  no retrospective normalizer/weight changes. All required image/pixel AUROC,
+  Precision,Recall,F1 plus AP,macroDice,FPR/thresholds retained in safe evidence.
+- Checks run:12focused tests passed2.68s, testing CDF ties/holdout independence,
+  fixed weights and all thresholds-before-holdout; Ruff check passed,230files
+  format check passed, whitespace check passed. Private maps and fitted pixel
+  distributions remain remote; no new GPU, training, diffusion or LPIPS calls.
+
+## 2026-11-11 — Prepare DDIM50+LPIPS test extension
+
+- User explicitly requested full test for DDIM50+LPIPS. Fixed one50call eta0
+  chain fromt300, originalGaussianEMA30/base17 policy; raw spatialLPIPS on full240
+  crop/top576 image score. Separate experiment from20+30mask/stitch pipeline.
+- Added strict artifact/runtime gates, bounded smoke,83validation calibration/
+  freeze before test, exact global aggregate metrics and durable reconstruction
+  cache. Checkpoint every25outputs,8hour ceiling and explicit cached-shard
+  verification logs address prior slow commits/timeout/silent-resume experience.
+- Checks run:16focused tests passed4.33s (50U-Net/1LPIPS calls, deterministic
+  reconstruction, calibration-before-holdout, no dataset before gate, checksum/
+  resume rejection); Ruff/format and whitespace checks passed.233files formatted.
+- CPU prepare first failed CLI module import before function body/model/test;
+  stopped failed app and corrected to -m full module name, using fresh protocol-b.
+  Prepare-b verified all9pins/source/runtime. T4 smoke2 completed/uploaded,
+  verified100U-Net/2LPIPS calls and aggregate checksum;83validation now running.
+  No final-test results claimed before produced artifacts; no continuous tracker.
+- DDIM50 validation83 completed/uploaded;43holdout pixel AP.186020/Dice.290416,
+  full required image/pixel metrics and provenance recorded. Calibration-only
+  pixel/image thresholds.23461146652698517/.22034396567485398 sealed before test.
+  Verified producer aggregate SHA and acceptance SHA; saved frozen input JSON
+  and safe evidence. Test remains a separate user-requested exploratory stage.

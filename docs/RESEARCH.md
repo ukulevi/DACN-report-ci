@@ -511,3 +511,36 @@ See [implementation protocol](DDPM_MEMORY_FUSION.md). Bounded16train/2validation
 smoke is in scope; full GPU validation needs explicit separate authorization.
 The user supplied that authorization on2026-11-06 ("ok chạy full"); launched
 `memory-fusion-full83-t4-20261106T055134Z` with the same fixed protocol.
+
+## Authorized cached DDIM20 Local SSIM validation — 2026-11-11
+
+User requests the missing Local SSIM score on original DDIM20 validation outputs.
+Reuse immutable83cached pairs and registered40/43patient-group partition; run
+CPU scoring only. Existing11x11Gaussian/sigma1.5/data_range2 signed-input SSIM
+contract, calibration-only max-F1 pixel/image thresholds, fixed before holdout.
+No new model inference, test access, training or score/window/timestep sweep.
+This is explicitly exploratory work after the frozen final test, not a revised
+primary/test-selected method. Protocol:DDIM20_LOCAL_SSIM_VALIDATION.md.
+
+## Authorized DDIM20 score sums — 2026-11-11
+
+User requests four combinations of initial DDIM20 Residual, LocalSSIM and LPIPS.
+Fix equal-weight arithmetic means after normal-calibration-only midrank CDF:
+LPIPS+Residual,LPIPS+SSIM,Residual+SSIM,allthree. No weight/normalizer search;
+reuse cached83validation pairs and registered40/43partition. Fit separate pixel/
+image thresholds only on40calibration before43holdout metrics, report all4arms.
+CPU-only cached scoring; zero new U-Net/LPIPS calls, no training or test use.
+Raw3score rows are replayed as integrity controls. Exploratory after final test;
+not a new frozen primary method. Protocol:DDIM20_SCORE_FUSION_VALIDATION.md.
+
+## Authorized single-phase DDIM50+LPIPS test extension — 2026-11-11
+
+User explicitly requests full test with DDIM50+LPIPS after earlier DDIM20 scores.
+Fix one50call eta0 chain fromt300, GaussianEMA30 and originalseed17 policy;
+raw spatialLPIPS0.1 squeeze, full240crop/top576 image score, no mask/phase2/fusion.
+Prepare pinned source/runtime/weights, bounded smoke2 then full83validation;
+fit thresholds only on original40calibration and freeze before3665test samples.
+This is an exploratory repeated-test-cohort comparison after earlier finaltest,
+not a new untouched test or revised primary method. No tuning/sweep/training.
+Protocol:DDIM50_LPIPS_TEST.md. Private reconstruction caching and resume logs
+required; do not cancel based solely on idle GPU, missing logs or PENDING graph.

@@ -1,0 +1,61 @@
+{
+  "aggregate_sha256": "3c0b2f2cbe3684ea2c121bc7bbf80150c4282bbe024a58d9436d049a4fbaa9da",
+  "artifact_sync_status": "uploaded",
+  "batch_size": 1,
+  "completed_at": "2026-11-11T07:07:48.454597+00:00",
+  "cpu": 4,
+  "gpu": "Tesla T4",
+  "held_out_test_used": false,
+  "manifest": {
+    "artifacts": {
+      "checkpoint": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+      "config": "e1bfa4104529f47a58941f5b9ff45e2efdb5839718cb21ab21c6320da18a20f5",
+      "dataset_metadata": "9c60fac0ff2a2d6274e82db466e5e338303d0dc24986b3bab4b32b6e710af218",
+      "dependency_lock": "ac4bea0313a7f12f653762c052cb2cb8fbc8a0c93cdb29a57997de32952c18f8",
+      "lpips_backbone": "21a3a6c2a87be2bb4cb4b40b5c3ba88486e38545750e0f36aa384204f7ae4e31",
+      "lpips_calibration": "1e72616f68a17ee8abe7ac456151a7af2003f8df17fb5b8a2936d5f289e49db4",
+      "source_snapshot": "bdc2cfcda87c266cf0092e1c7fdd676021af31245a72b65c9ec913b03086277c",
+      "validation_index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+      "validation_partition": "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184"
+    },
+    "checkpoint_every_samples": 25,
+    "checkpoint_path_in_repo": "runs/ddpm-partial-t4-b8-e30-cont-20261102T034644Z/ddpm_epoch_030.pt",
+    "checkpoint_source": "Gaussian EMA30; same weights as DDIM20/20+30",
+    "code_revision": "8838ec8b8ace2ddc13371087470ad2a04969ab20",
+    "config": {
+      "crop": 240,
+      "eta": 0,
+      "image_top_pixels": 576,
+      "inference_steps": 50,
+      "lpips_net": "squeeze",
+      "lpips_version": "0.1",
+      "seed": 17,
+      "starting_timestep": 300
+    },
+    "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "frozen_at": "2026-11-11T07:07:48.445232+00:00",
+    "image_score": "mean top576pixels",
+    "method": "single_phase_DDIM50_LPIPS",
+    "metric_region": "full240crop",
+    "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
+    "resume_verification_log_interval": 100,
+    "schema_version": 1,
+    "scope": "User-requested exploratory extension after prior final test; no test tuning",
+    "score": "raw spatial LPIPS0.1 squeeze; grayscale repeatedRGB [-1,1],normalizeFalse",
+    "seed_policy": "base17+private UUID-derived sampling; batch1",
+    "status": "frozen",
+    "thresholds": {
+      "image": 0.22034396567485398,
+      "pixel": 0.23461146652698517
+    },
+    "validation_acceptance_sha256": "3c0b2f2cbe3684ea2c121bc7bbf80150c4282bbe024a58d9436d049a4fbaa9da",
+    "working_tree_dirty": true
+  },
+  "model_revision": "d496f1c51103d47cf64e897a84308bee11091627",
+  "protocol_id": "ddim50-lpips-t300-20261111T064853Z-b",
+  "stage": "validation",
+  "started_at": "2026-11-11T07:04:37.525495+00:00",
+  "status": "completed",
+  "timeout_seconds": 28800,
+  "total_seconds": 188.331672437
+}

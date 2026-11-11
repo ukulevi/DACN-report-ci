@@ -1,0 +1,10 @@
+{
+  "seed": 17,
+  "starting_timestep": 300,
+  "inference_steps": 50,
+  "eta": 0,
+  "lpips_net": "squeeze",
+  "lpips_version": "0.1",
+  "crop": 240,
+  "image_top_pixels": 576
+}
