@@ -1,0 +1,84 @@
+name: Build draft report PDF
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: report-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  report:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install checksum-pinned portable report tools
+        run: python3 scripts/report_tools.py --output runs/report-tools
+      - name: Build draft PDF and evidence appendix
+        run: python3 scripts/build_report.py
+      - name: Store PDF and source provenance
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dacn-report-${{ github.sha }}
+          path: |
+            report/build/report.pdf
+            report/build/build-manifest.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Store build diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dacn-report-logs-${{ github.sha }}
+          path: |
+            report/build/build.log
+            report/build/report.log
+            report/build/build-manifest.json
+          if-no-files-found: ignore
+          retention-days: 7
+
+  release:
+    name: Publish private report PDF
+    if: >-
+      github.repository == 'ukulevi/DACN-report-ci' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    needs: report
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - name: Download verified report artifact
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: dacn-report-${{ github.sha }}
+          path: artifact
+      - name: Publish clearly labeled validation-draft prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gh api "repos/$GH_REPO" --jq '.private')" = true
+          release_date="$(date -u +%Y.%m.%d)"
+          tag="report-v${release_date}-${GITHUB_RUN_NUMBER}"
+          title="DACN Validation Report ${release_date} (#${GITHUB_RUN_NUMBER})"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" artifact/report.pdf artifact/build-manifest.json --clobber
+          else
+            gh release create "$tag" artifact/report.pdf artifact/build-manifest.json \
+              --target "$GITHUB_SHA" --title "$title" --prerelease \
+              --notes "English CO4029 validation-study report built from ${GITHUB_SHA}. Candidate protocol: not yet frozen. No held-out test results. Source, input hashes and PDF checksum are recorded in the attached manifest."
+          fi

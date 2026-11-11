@@ -1,5 +1,10 @@
 # DACN — Phát hiện bất thường MRI bằng diffusion
 
+**Báo cáo CO4029:** [Nội dung và hướng dẫn trong `/report`](report/README.md) ·
+[Tải PDF từ private Releases](https://github.com/ukulevi/DACN-report-ci/releases).
+PDF được tạo tự động khi push sang repo CI; bản hiện tại trình bày nghiên cứu
+validation, chưa phải kết quả held-out test hoặc phê duyệt freeze.
+
 Đồ án chuyên ngành 3 người: **DDPM partial reconstruction cho BMAD FLAIR 2D**,
 khảo sát timestep bắt đầu tái tạo và score sai khác pixel/local SSIM; DAE là đối chứng khi khả thi.
 

@@ -1,5 +1,13 @@
 # Theo dõi dự án bằng Linear
 
+## Cập nhật10/11/2026
+
+Connector đã xác minh đúng DACN-KHMT. Live DAC-12/DAC-14/DAC-15 In Progress,
+DAC-30 Done. User đang nhờ Hải Tuấn review/freeze; chưa có phê duyệt freeze mới
+được ghi vào hồ sơ repo. [Report readiness/handoff](REPORT_READINESS_2026-11-10.md)
+đã cập nhật thêm11full83 và11smoke inference ablations09Nov từ HF; không đổi
+candidate đã nghiệm thu. Các audit/câu “chưa có kết quả model” bên dưới là lịch sử.
+
 ## Workspace mặc định — 07/11/2026
 
 **DACN-KHMT** (`https://linear.app/dacn-khmt`) là workspace duy nhất dùng cho

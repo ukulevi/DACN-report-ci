@@ -1,5 +1,120 @@
 # Worklog
 
+## 2026-11-10 — Full English CO4029 report and private release pipeline (DAC-26)
+
+Moved canonical manuscript/layout into `report/`; legacy summary and `reports/`
+now point to it. Expanded the six-page summary into a 16-page validation-study
+report: abstract, theory/equations, audited data/preprocessing, model and score
+contracts, calibration/metrics, results/uncertainty, limitations, reproducibility,
+conclusion, aggregate evidence appendix and ten resolved bibliographic sources.
+Cover follows the two user-supplied report examples; current course/advisor and
+three names/IDs confirmed from supplied records, with prior-project research
+content/results excluded. Logo extracted from the user's prior cover.
+
+Added three aggregate-only vector figures and input-hash provenance; the builder
+rejects unresolved citations and stale figures. No patient arrays/images, training,
+test access or scientific freeze changes. Pandoc citeproc plus the existing pinned
+Tectonic compiler produces ignored `report/build/report.pdf` and generated LaTeX.
+Workflow retains every-push/PR triggers, read-only build permissions and pinned
+actions; a separate contents-write job publishes PDF/manifest as a clearly labeled
+validation-draft prerelease only on private satellite main push/manual.
+
+Checks: seven focused tests pass after observed red-to-green checks; repository
+Ruff and format pass. Real local PDF compiled and rendered for all-page visual
+review, including corrected long-SHA overflow and bibliography pagination; no
+remaining overflow/missing-glyph warnings. Final read-only review found no
+material issues. Hosted build/release still requires verification after push;
+local compilation is not claimed as remote publication.
+
+Follow-up before hosted acceptance: Git's add warning showed reportlab's
+ASCII-encoded PDFs were detected as text (`i/lf w/lf`). Added binary attributes
+for PDF/PNG so Windows checkout cannot rewrite PDF byte offsets through CRLF
+conversion. `git check-attr` verifies text/diff/merge disabled for those assets.
+
+Hosted builds a19d404/4769187 failed before compilation because figure-source
+hashes captured Windows CRLF while Git blobs/Linux checkouts use LF. Confirmed
+both registered files matched the local raw hashes but not `git show HEAD:path`,
+and Actions log reported the stale-figure guard. Added an observed red-to-green
+LF/CRLF portability regression; figure provenance explicitly normalizes CRLF to
+LF, while the main build manifest retains raw-byte input hashes. Real changed
+values still fail the stale-figure check. No experiment data or thresholds changed.
+
+Hosted acceptance for `1a9496e`: [report run42760339837](https://github.com/ukulevi/DACN-report-ci/actions/runs/42760339837)
+Success, build1m15s and release9s; [quality run42760339699](https://github.com/ukulevi/DACN-report-ci/actions/runs/42760339699)
+Success31s. [Private prerelease report-v2026.11.10-5](https://github.com/ukulevi/DACN-report-ci/releases/tag/report-v2026.11.10-5)
+visibly contains report.pdf (147KB) and build-manifest.json. Remote PDF SHA256
+`2e3a0a70ca7db31eba5f5297480c2de166da385d91d7f345bcf63d5ebdd57ca8`.
+Local committed build manifest is completed/clean, candidate unchanged, PDF hash
+verified. Eight focused checks and full Ruff/format pass; portability fix reviewed.
+
+## 2026-11-10 — Independent private report CI host (DAC-26)
+
+User approved private `ukulevi/DACN-report-ci` after confirming the source
+owner's card expired. Created repository private and pushed committed source
+`4accc9f`, excluding local untracked data/checkpoints. Hosted report run
+[42756144394](https://github.com/ukulevi/DACN-report-ci/actions/runs/42756144394)
+completed successfully in 1m17s with PDF/manifest and diagnostic artifacts.
+The same source's quality run42756144682 also succeeded (53s): dependency
+installation, Ruff, format, pytest and CLI demo completed on GitHub-hosted Linux.
+Hosted pytest reported **158 passed, 23 skipped in 14.69s**; skipped checks are
+not counted as passing and this does not replace GPU/model acceptance.
+User then chose Git push synchronization and declined a broad classic token.
+No scheduled upstream workflow, token or new permission is enabled. Added the
+local `report-ci` remote and documented forwarding the same commit after origin.
+The ordinary push-triggered workflow builds each satellite update. No model
+runs, test access or research freeze changes. Report tests and repository lint/
+format checks pass before commit (4 report tests). BLK-20261107-01 remains open for the
+original owner's billing; the report host workaround is independently verified.
+
+## 2026-11-10 — English-only report and rebuild on every repository push
+
+Translated the authored report, metadata, header, generated appendix and report
+guide to English. Builder now requires English language metadata and records
+language/UTC build time; default cover date resolves automatically with source
+commit. Workflow push/PR filters removed so every repository push/PR update with
+the workflow rebuilds the report; no new model/threshold/freeze decisions.
+Four focused tests pass after red→green checks for English output and rejecting
+non-English metadata. Local English PDF compiled, 6 pages; text checks found
+required metrics/draft labels and no Vietnamese text. Candidate configs unchanged.
+All six rendered pages inspected; no missing-glyph/overflow warnings. Repository
+Ruff checks and format checks pass (211 files); git diff whitespace check passes.
+CI rebuilds committed English narrative, registered evidence tables and build
+provenance; it does not invent new research results or rewrite interpretation.
+
+## 2026-11-10 — Automated Vietnamese draft report PDF build
+
+Implemented Markdown→Pandoc3.13→Tectonic0.17.0 with portable official binary
+archive SHA256 pins for Windows/Linux. No training dependency changes. Report
+appendix reads verified aggregate metrics/ablation CSV, rejects invalid metrics,
+preserves candidate and draft-validation labels; provenance hashes include body,
+evidence, metadata, layout and builder. Added path-filtered report.yml artifact/
+diagnostic workflow with pinned official checkout/upload actions and contents read.
+Reference EE5217 workflow reviewed; hw2_introAI returns404, not claimed reviewed.
+Three focused tests red→green, Ruff/YAML checks pass. Actual Windows PDF compiled
+and rendered: Vietnamese/metric text checks pass, no overfull/missing glyph
+warnings after splitting a wide table. Cleared stale TOC/aux after class change;
+earlier network-isolated compile failed before cached TeX bundle access, corrected
+with ordinary online local compile. Not a training/evaluation run.
+Remote Actions still requires account/billing resolution; no CI-success claim.
+Independent report-CI review found no material issues. Final validation:3tests
+pass, whole-repo Ruff check/format211files pass, YAML triggers/permissions parsed,
+six-page PDF text/metric checks pass and all rendered pages inspected. Compiler
+version labels come from pinned release metadata; no byte-identical PDF claim.
+
+## 2026-11-10 — Audit producer ablations and prepare report/freeze handoff
+
+Verified live GitHub working/C branches remain1c13e5f/c02addb. HF model updated
+09Nov to03ec5b35cc134277b0ce4e76a0a315490b46bd21; dataset revision unchanged.
+Downloaded aggregate JSON only for22new producer runs(11smoke/11full83),
+checked88JSON artifact hashes, root/comparison metrics/config consistency,
+calibration-to-holdout thresholds and reported50calls/output.11full runs share
+checkpoint/index/dataset hashes. Recorded dirty-source ZIP provenance limits;
+no private arrays/new source ZIPs/model inference/test downloads.
+Added safe audit evidence, CSV ablation table, report-readiness matrix and exact
+handoff for Hải Tuấn's review. Updated report draft/references using primary
+AutoDDPM/LPIPS/SSIM sources. Keep candidate and thresholds unchanged; user is
+coordinating C review/freeze, agent does not supply approval on their behalf.
+
 ## 2026-11-08 — Four-arm resume acceptance and freeze review decision
 
 Executed validation-only cached T4 score replay through frozen_runner for4arms
@@ -1928,3 +2043,11 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   checks and measured run provenance remain recorded above.
 - Private MRI illustrations, per-sample shards/checkpoints and private DOCX/ZIP
   report artifacts remain ignored and are not included in the Git commit.
+- Remote advanced by8commits to107c231 during local evaluation/report work.
+  Merged those English-report/CI updates, retaining source and final-test records;
+  resolved reference duplication and kept the canonical manuscript pointer with
+  a separate current final-test-results link. No force push or main-branch edit.
+- Post-merge checks actually run:291passed/1LPIPSroundtrip skipped28.02s;
+  Ruff check passed,223files format check passed, git whitespace check passed.
+  Existing automatic English PDF remains a validation-study draft; final test
+  metrics are in the linked final-test record and the private report package.
