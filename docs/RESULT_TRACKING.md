@@ -3271,3 +3271,117 @@ Frozen config saved as configs/ddim50_lpips_frozen_20261111.json and acceptance
 in docs/evidence/2026-11-11-ddim50-lpips-validation{,-manifest}.json. New full-test
 stage will use this exact source/config/runtime/threshold receipt; no test result
 is claimed from validation. Earlier20+30test records and thresholds unchanged.
+
+DDIM50 full-test-b submitted after frozen validation acceptance and local commit
+147d1d4. [Modal test app](https://modal.com/apps/phutungcogioihaitan/main/ap-r68EAgfWIx8Ut4onVhjqpU),
+callfc-01M74QECD514X0PA6EN1WX0BNA. Protocol
+ddim50-lpips-t300-20261111T064853Z-b; stage test, all3665images requested.
+Same pinned method/config/checkpoint/runtime/dataset and thresholds above;
+T4,4CPU/32768MiB,8hour timeout. Private shard cache includes LPIPS/mask/
+reconstruction and commits every25outputs. Durable run manifest on shared Volume
+under ddim50-lpips/ddim50-lpips-t300-20261111T064853Z-b/test/run_manifest.json.
+Status submitted, awaiting produced terminal aggregate; no new test metrics
+claimed. No continuous tracker or collection loop re-enabled per user preference.
+
+## 2026-11-11 — DDIM50 single-phase test completed/uploaded
+
+Protocolddim50-lpips-t300-20261111T064853Z-b,test **completed/uploaded**,3665/3665.
+[Private immutable revisioncf288576d33ef49b8966a106d0473d4495950164](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/cf288576d33ef49b8966a106d0473d4495950164/evaluations/ddim50-lpips-t300-20261111T064853Z-b-test).
+Terminal2026-11-11T09:01:47.076599Z; callfc-01M74QECD514X0PA6EN1WX0BNA.
+Original183250U-Net/3665LPIPS completed-trajectory calls; no training, one seed17.
+Same source/config/checkpoint/dataset and calibration-only frozen thresholds
+pixel.23461146652698517,image.22034396567485398; no tuning or interruption.
+
+Pixel globalmicro240crop:ROC-AUC.9280859493,AP.2579503426,
+Precision.2941729365,Recall.3270075932,F1/Dice.3097224699.
+Macro lesion-slice Dice.2513814274,normal pixel FPR.0143470052.
+Image mean-top576:ROC-AUC.7561410124,AP.9284495626,
+Precision.8559928444,Recall.9490909091,F1.9001410879.
+Aggregate SHA verified against producer terminal manifest; safe copies:
+docs/evidence/2026-11-11-ddim50-lpips-test{,-manifest}.json.
+
+Adapter sum5294.248549917s,median1.436978620s,p951.487874896s/image,
+last-process CUDA allocated112601088B. Total stage6302.258080789s incl I/O/global
+metrics before upload, excludes original prepare/smoke/validation. T4,4CPU,
+32768MiB; no claim of controlled speedup over earlier different lifecycle.
+Private reconstruction/mask/score shards retained on Volume for replay.
+
+User requested a one-off LPIPS summary, not restarting tracking. All4LPIPS rows
+now have actual validation/test metrics in LPIPS_COMPARISON_2026-11-11.md and
+aggregate comparison JSON. DDIM50 improves pixel AP/F1 over20 Initial LPIPS;
+20+30Final remains higher among these LPIPS rows. This descriptive repeated-test
+comparison does not alter primary results or claim superiority over brightness.
+
+## 2026-11-11 — ConvAE/ConvVAE z256 smoke and authorized 30-epoch training
+
+User authorized both matched CNN baselines for30epochs. Protocol: CONV_AE_VAE_BASELINES.md. Shared T4,4CPU/8192MiB, seed17, latent256,width32, Adam1e-4, batch cap32, beta1, float32. Dataset revision350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7; code147d1d4db7cee4b0a603716659d3b205319d359e with dirty source snapshot9766dc01faced32f4bd70f9b05f2ad7ebd20c0d18128d49d0e1acd291f0b71ab. Source zip and durable manifests on shared dacn-bmad-runs/<run_id>/. No test inputs or anomaly thresholds; ROC-AUC, Precision, Recall, F1, AP and Dice N/A (training only).
+
+- **conv-ae-z256-smoke-20261111T104000Z**: completed, stage `upload_artifacts` at collection. [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-fwfh7SOg40o0PwJdE8Z2K4); call `fc-01M75FAH73XCD6BPZJHG1K11Q0`. Manifest: `dacn-bmad-runs/conv-ae-z256-smoke-20261111T104000Z/run_manifest.json`.
+  Produced epoch1, 64normal train/4normal val, 35updates; best normal-validation crop240MSE 0.06267871707677841, train time 4.8475293079999915s, peak allocated VRAM 199989248bytes. Best/last/epoch001 checkpoints are hashed in manifest.
+  [Private immutable artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/6ffbc62386a16f1c92a8e2750c8d693f452939b8/runs/conv-ae-z256-smoke-20261111T104000Z); uploaded.
+
+- **conv-vae-z256-smoke-20261111T104000Z**: completed, stage `upload_artifacts` at collection. [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-2QMjTE4UVDcB6WVjS85vJs); call `fc-01M75FAH7130JTRV7HKZYN7TZS`. Manifest: `dacn-bmad-runs/conv-vae-z256-smoke-20261111T104000Z/run_manifest.json`.
+  Produced epoch1, 64normal train/4normal val, 35updates; best normal-validation crop240MSE 0.0609237402677536, train time 6.028176942000002s, peak allocated VRAM 212599808bytes. Best/last/epoch001 checkpoints are hashed in manifest.
+  Training completed on durable Volume; Hub upload not yet confirmed at collection.
+
+- **conv-ae-z256-e30-20261111T141800Z**: started, stage `download_dataset` at collection. [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-7E4MnRovRvbnEchm6YWkiE); call `fc-01M75FFGYE1YC1HY0WZHR2J514`. Manifest: `dacn-bmad-runs/conv-ae-z256-e30-20261111T141800Z/run_manifest.json`.
+  Full30epochs requested from fresh initialization; 7500normal train/39normal validation, no early stopping. Durable start manifest exists; no completed epoch or final metrics claimed yet. Checkpoint Volume commit after each completed epoch.
+
+- **conv-vae-z256-e30-20261111T141800Z**: started, stage `validate_dataset` at collection. [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-t6Mzfda0hyXq1e0saCx4Fw); call `fc-01M75FFH4D2EACMP96FNWAW4X7`. Manifest: `dacn-bmad-runs/conv-vae-z256-e30-20261111T141800Z/run_manifest.json`.
+  Full30epochs requested from fresh initialization; 7500normal train/39normal validation, no early stopping. Durable start manifest exists; no completed epoch or final metrics claimed yet. Checkpoint Volume commit after each completed epoch.
+
+Smoke subsets span35shards; shard-local batches produced35updates, not2. Batch32 is an upper bound, with partial batches at shard boundaries; smoke therefore does not establish full-batch32 peak VRAM. Full runs retain the same sampler and configuration. No continuous tracker enabled. Safe aggregate evidence: docs/evidence/2026-11-11-conv-autoencoders-start.json.
+
+## 2026-11-11 — ConvAE and ConvVAE 30-epoch runs completed/uploaded
+
+One-off check of durable Modal manifests confirms both completed30/30epochs,7500normal training samples per epoch,39normal validation samples,7050optimizer steps,latent256,seed17. Same provenance/config as start record; no test used. Metrics below are normal-validation crop240 reconstruction MSE, selected minimum across epochs; not anomaly performance. ROC-AUC/Precision/Recall/F1/AP/Dice remain N/A (not evaluated).
+
+- ConvAE: completed/uploaded; best epoch13, normal-validation MSE0.012551643766271763; training792.0602241800001s, peak allocated VRAM955294720bytes. Terminal manifest updated2026-11-11T14:33:40.683356+00:00. [Private immutable artifacts and manifest](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/76100f136d0886b2a91b71d7ade65d9b92af8fcb/runs/conv-ae-z256-e30-20261111T141800Z). Volume manifest confirms best/last/epoch030 checkpoints and training_history.json hashes; Hub revision76100f136d0886b2a91b71d7ade65d9b92af8fcb.
+
+- ConvVAE: completed/uploaded; best epoch15, normal-validation MSE0.014492762609361073; training777.3185920589999s, peak allocated VRAM967028736bytes. Terminal manifest updated2026-11-11T14:34:01.370791+00:00. [Private immutable artifacts and manifest](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/2ca3277b2ff0899de29aca3c14fba0da78c1feb6/runs/conv-vae-z256-e30-20261111T141800Z). Volume manifest confirms best/last/epoch030 checkpoints and training_history.json hashes; Hub revision2ca3277b2ff0899de29aca3c14fba0da78c1feb6.
+
+Safe terminal evidence: docs/evidence/2026-11-11-conv-autoencoders-completed.json. No GPU work restarted and no continuous tracker enabled.
+
+## 2026-11-11 — ConvAE/ConvVAE validation smoke started
+
+Evaluation conv-val-smoke-20261111-a, [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-PoStDiPF3YxMAXrupljbbq), callfc-01M75H0VZNRMSBQPTCEB22PJV2. Fixed best AEepoch13/VAEepoch15 checkpoints as completed-training records, latent256, deterministic mean latent, seed17 training (one seed). Validation-only pinned83cache350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7, evaluate first2images per model only for bounded GPU/scoring smoke; no thresholds/anomaly performance from smoke. Residual and LocalSSIM, full240crop. T4,4CPU,8192MiB, one-hour timeout. Code147d1d4 dirty; exact source zip persisted remotely. Status submitted; no result yet. Protocol CONV_AE_VAE_BASELINES.md. Volume evaluations/conv-val-smoke-20261111-a/run_manifest.json; no test access.
+
+Smoke conv-val-smoke-20261111-a completed/uploaded,2/2images per model, source SHA188fdda91965e09f176fbe4e8764e941f9512767d74a49d7e689eaef2ef3676a; [private immutable artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/416b1d0858b3d4956d80896616ffb385c86885b0/evaluations/conv-val-smoke-20261111-a). No anomaly metrics fitted in smoke.
+
+Full validation evaluation **conv-val-full83-20261111-a** submitted after smoke acceptance. [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-2IWmnHdXEkhrjA5ks7WOfU); callfc-01M75H20FAT5ZD7R7KNDZPVNV9. Volume evaluations/conv-val-full83-20261111-a/run_manifest.json. Same checkpoint/dataset/score/source pins;83images per model,40calibration/43patient-disjoint internal holdout. T4,4CPU,8192MiB; deterministic reconstruction, no training, no test access. Thresholds fit on40only. Status submitted, awaiting produced aggregate. Checkpoint selection used normal validation including both partitions; do not claim independent model evaluation.
+
+Full evaluation **conv-val-full83-20261111-a completed/uploaded** at2026-11-11T14:45:29.169062+00:00;83images/model,40calibration/43group holdout, one training seed17, deterministic inference. Source188fdda91965e09f176fbe4e8764e941f9512767d74a49d7e689eaef2ef3676a, same immutable dataset/checkpoints as registered. [Private immutable artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/b3cbb757433195e32415ea178964cdb45ec66604/evaluations/conv-val-full83-20261111-a). All required pixel/image ROC-AUC, Precision, Recall, F1 plus AP/Dice/thresholds/latency/VRAM recorded in docs/evidence/2026-11-11-conv-validation.json and tables in CONV_AE_VAE_VALIDATION_2026-11-11.md. Aggregate SHA verified against producer manifest.
+
+- ConvAE Residual / L1,43validation pixel: AUROC0.8935760687229093,Precision0.141326226461409,Recall0.3618163536467124,F10.203259044074259,AP0.1173241033374779,calibration-only threshold0.2524328827857971.
+
+- ConvAE Residual / L1,43validation image: AUROC0.5087719298245614,Precision0.5581395348837209,Recall1.0,F10.7164179104477612,AP0.5944470927638054,calibration-only threshold0.45010001701302826.
+
+- ConvAE Local SSIM,43validation pixel: AUROC0.8799483760998817,Precision0.120914169245867,Recall0.23007864401910438,F10.15852044287746644,AP0.10254113456308703,calibration-only threshold0.9585380879082056.
+
+- ConvAE Local SSIM,43validation image: AUROC0.5328947368421053,Precision0.6,Recall1.0,F10.75,AP0.5961563505825809,calibration-only threshold1.1416252420140862.
+
+- ConvVAE Residual / L1,43validation pixel: AUROC0.9077512534220435,Precision0.18320089135553314,Recall0.3129421481667684,F10.23110786978717762,AP0.14855066650564988,calibration-only threshold0.3531322479248047.
+
+- ConvVAE Residual / L1,43validation image: AUROC0.5153508771929824,Precision0.5853658536585366,Recall1.0,F10.7384615384615385,AP0.6380612901978764,calibration-only threshold0.5696021176667677.
+
+- ConvVAE Local SSIM,43validation pixel: AUROC0.8995031367680358,Precision0.17183422429154452,Recall0.268377204007613,F10.20951927053035135,AP0.13287809137761725,calibration-only threshold0.9987573578611936.
+
+- ConvVAE Local SSIM,43validation image: AUROC0.5482456140350878,Precision0.5714285714285714,Recall1.0,F10.7272727272727273,AP0.6223457662586682,calibration-only threshold1.0349447467061381.
+
+Interpretation: low image AUROC (~0.51–0.55); image recall1 is accompanied by many false positives. Normal-validation checkpoint selection overlaps both partitions: exploratory development validation only. No model reselection, no test inference, no training or threshold sweep.
+
+## 2026-11-11 — ConvVAE raw spatial LPIPS validation
+
+User authorized LPIPS addition on ConvVAE validation only. Smoke **convvae-lpips-smoke-20261111-a** submitted: [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-NBEbhAtLupyYafoRjaIRKO), callfc-01M75HT0Y5A9QA4KKZ1D8A0H7Q. T4,4CPU/8192MiB,1hour; code147d1d4 dirty exact source zip remote. Fixed ConvVAEepoch15 SHA b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e, immutable cached reconstructions SHA fa3afc69d70a56bec23791c22c7f63ae31c3143c7707722c56bdd54252991df6 from prior full83validation. Dataset350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7, one training seed17. LPIPS0.1 spatial squeeze,state18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6; crop240,repeatRGB,signed[-1,1],normalizeFalse,clamp0,no residual fusion. Bounded2image smoke; no anomaly metrics from smoke. Volume evaluations/convvae-lpips-smoke-20261111-a/run_manifest.json. No test access, no new VAE inference/training. Full83stage will use registered40/43partition/calibration-only max-F1 thresholds if smoke passes. Checkpoint selection overlaps partitions: development validation only.
+
+LPIPS smoke completed/uploaded2/2, sourcec1643be2fac59d61d78fea4f0813f760470121f4e3fcca8fa6ae0e427ae74d59; [private immutable artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/9a8e8d26bd33f7654256712000a5a54fdb05576e/evaluations/convvae-lpips-smoke-20261111-a). Runtime torch2.13.0,torchvision0.28.0,lpips0.1.4,numpy2.4.6,scipy1.17.1,sklearn1.9.1. State SHA matched registered LPIPS weights.
+
+**convvae-lpips-val83-20261111-a** full83validation submitted after smoke acceptance; [Modal](https://modal.com/apps/phutungcogioihaitan/main/ap-4rJW8bMKp9yfo91i0D44M9), callfc-01M75HV6ZNXB68CM6D13W5NJA6; same source/runtime/cache/checkpoint/LPIPS pins as smoke. Volume evaluations/convvae-lpips-val83-20261111-a/run_manifest.json. 40calibration-only max-F1 pixel/image thresholds,43internal validation metrics; no test or training. Status submitted, no final metric claim yet.
+
+**convvae-lpips-val83-20261111-a completed/uploaded**,83/83 at2026-11-11T14:58:31.128239+00:00. [Private immutable artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/6232ff98127d92f09afa4d389366bcdaad9b61e9/evaluations/convvae-lpips-val83-20261111-a). Sourcec1643be2fac59d61d78fea4f0813f760470121f4e3fcca8fa6ae0e427ae74d59; same dataset/checkpoint/cache/LPIPS pins as accepted smoke. Verified aggregate SHA against producer manifest and unchanged calibration-only thresholds in43validation metrics.
+
+- 43validation pixel: ROC-AUC0.7844038285499325,Precision0.024984508454870095,Recall0.0702230042733508,F10.03685606720978556,AP0.046261121083496906,threshold0.4782870411872864.
+
+- 43validation image: ROC-AUC0.41885964912280704,Precision0.6111111111111112,Recall0.9166666666666666,F10.7333333333333333,AP0.4872400317682384,threshold0.5232977363694873.
+
+LPIPS scoring1.5147664410000132s (cached inputs, excludes metrics/I-O/upload), peak allocated VRAM45882880B. Full calibration/43validation tables and comparison to fixed Residual/SSIM in CONVVAE_LPIPS_VALIDATION_2026-11-11.md; safe producer evidence docs/evidence/2026-11-11-convvae-lpips-validation.json. LPIPS pixel AP/F1 lower than prior two ConvVAE scores; image AUROC below0.5. No inversion, score/threshold tuning, new training or test access; exploratory normal-validation checkpoint overlap caveat retained.

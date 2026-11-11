@@ -1,0 +1,388 @@
+{
+  "full": {
+    "manifest": {
+      "artifact_sync_status": "uploaded",
+      "artifacts": {
+        "conv_ae/local_ssim/private_maps.npz": "29568e52e2d72ca4a6019a8830d2b7d43b54e0b8f199605f9eeb0c0a584eacf4",
+        "conv_ae/local_ssim/thresholds.json": "e3a39aa2cd720b72bb5f99125eaa906a00c15e4f3b0969564dc16ef3ee87f761",
+        "conv_ae/pixel_difference/private_maps.npz": "e2e96eecacc6ac89c48889ee7d82d7aef2fcd81d346884838d66c66987b85ab1",
+        "conv_ae/pixel_difference/thresholds.json": "1993ad2b748a07d0a4ad3b12b1f304c2334fc91ad8c232e26aa97ca2df0601f9",
+        "conv_ae/private_reconstructions.npz": "3bc5b377a08d0f853d9e4191c3df1104a0ff2dc23c9d0dbf41ef7eb1d11f969e",
+        "conv_vae/local_ssim/private_maps.npz": "3601addec699d0d37a662e03186457ca58c631f092fa7c86ccf5fcb13726a43a",
+        "conv_vae/local_ssim/thresholds.json": "97c56598bfac45b4b32c95e5a260394b37069d7ede9553761b9f5232a25be208",
+        "conv_vae/pixel_difference/private_maps.npz": "567fe7275cb4c30eb09a21a2760f39957683d96215427f705993c0cf96b85e12",
+        "conv_vae/pixel_difference/thresholds.json": "5ad005a6cd1d4f43c270270f0c2ade71c29bca6e568870b1349dcd70a4ca90e6",
+        "conv_vae/private_reconstructions.npz": "fa3afc69d70a56bec23791c22c7f63ae31c3143c7707722c56bdd54252991df6",
+        "results.json": "519d557dcafdddfad4d1d315411cd83531c008d1c1481a0ac4cd0b7a3705d44c",
+        "source_snapshot.zip": "188fdda91965e09f176fbe4e8764e941f9512767d74a49d7e689eaef2ef3676a"
+      },
+      "code_revision": "147d1d4db7cee4b0a603716659d3b205319d359e",
+      "completed_at": "2026-11-11T14:45:29.169062+00:00",
+      "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+      "evaluation_id": "conv-val-full83-20261111-a",
+      "gpu": "T4",
+      "inference": "deterministic mean latent",
+      "model_revision": "b3cbb757433195e32415ea178964cdb45ec66604",
+      "scores": [
+        "pixel_difference",
+        "local_ssim"
+      ],
+      "smoke": false,
+      "source_snapshot_sha256": "188fdda91965e09f176fbe4e8764e941f9512767d74a49d7e689eaef2ef3676a",
+      "split": "validation",
+      "started_at": "2026-11-11T14:44:22.770200+00:00",
+      "status": "completed",
+      "test_accessed": false,
+      "total_seconds": 62.739140885999994,
+      "training_seeds": 1,
+      "working_tree_dirty": true
+    },
+    "results": {
+      "calibration_samples": 40,
+      "group_holdout_samples": 43,
+      "limitations": "Exploratory validation; normal-validation checkpoint selection overlaps both partitions. Internal holdout is NOT independent model evaluation. One training seed; no test access.",
+      "local_ssim": "11x11Gaussian sigma1.5, data_range2 on signed[-1,1], no clipping or foreground masking",
+      "metric_region": "full240crop; image top576mean",
+      "models": {
+        "conv_ae": {
+          "checkpoint_epoch": 13,
+          "checkpoint_sha256": "fc34f511e4910c688d9e7c5f4f075957f291cb801ced3f1d77850294f271bfbb",
+          "peak_vram_allocated_bytes": 35202560,
+          "reconstruction_seconds_median": 0.003859742000001276,
+          "reconstruction_seconds_sum": 1.0786768829999929,
+          "samples_scored": 83,
+          "scores": {
+            "local_ssim": {
+              "calibration": {
+                "empty_mask_pixel_false_positive_rate": 0.03568576388888889,
+                "image": {
+                  "auprc": 0.4654870911410509,
+                  "auroc": 0.45499999999999996,
+                  "f1": 0.6666666666666666,
+                  "precision": 0.5135135135135135,
+                  "recall": 0.95,
+                  "threshold": 1.1416252420140862
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.12595774171523344,
+                  "auroc": 0.9155498852652801,
+                  "average_precision": 0.12595774171523344,
+                  "dice_micro": 0.21069416062914112,
+                  "f1": 0.21069416062914112,
+                  "precision": 0.14934708657961154,
+                  "recall": 0.3575744837370606,
+                  "threshold": 0.9585380879082056
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.31374322926731774,
+                "samples": 40,
+                "split": "validation",
+                "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie"
+              },
+              "group_holdout": {
+                "empty_mask_pixel_false_positive_rate": 0.04313413742690059,
+                "image": {
+                  "auprc": 0.5961563505825809,
+                  "auroc": 0.5328947368421053,
+                  "f1": 0.75,
+                  "precision": 0.6,
+                  "recall": 1.0,
+                  "threshold": 1.1416252420140862
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.10254113456308703,
+                  "auroc": 0.8799483760998817,
+                  "average_precision": 0.10254113456308703,
+                  "dice_micro": 0.15852044287746644,
+                  "f1": 0.15852044287746644,
+                  "precision": 0.120914169245867,
+                  "recall": 0.23007864401910438,
+                  "threshold": 0.9585380879082056
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.20651419797403694,
+                "samples": 43,
+                "split": "validation",
+                "threshold_selection": "provided by caller; provenance must be recorded separately"
+              },
+              "thresholds": {
+                "image": 1.1416252420140862,
+                "pixel": 0.9585380879082056
+              }
+            },
+            "pixel_difference": {
+              "calibration": {
+                "empty_mask_pixel_false_positive_rate": 0.041368055555555554,
+                "image": {
+                  "auprc": 0.47458983563762974,
+                  "auroc": 0.41500000000000004,
+                  "f1": 0.6779661016949152,
+                  "precision": 0.5128205128205128,
+                  "recall": 1.0,
+                  "threshold": 0.45010001701302826
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.10760592745680138,
+                  "auroc": 0.9069855859565997,
+                  "average_precision": 0.10760592745680138,
+                  "dice_micro": 0.19981895151628104,
+                  "f1": 0.19981895151628104,
+                  "precision": 0.133809973790718,
+                  "recall": 0.3943565761126583,
+                  "threshold": 0.2524328827857971
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.2853212444707689,
+                "samples": 40,
+                "split": "validation",
+                "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie"
+              },
+              "group_holdout": {
+                "empty_mask_pixel_false_positive_rate": 0.04951937134502924,
+                "image": {
+                  "auprc": 0.5944470927638054,
+                  "auroc": 0.5087719298245614,
+                  "f1": 0.7164179104477612,
+                  "precision": 0.5581395348837209,
+                  "recall": 1.0,
+                  "threshold": 0.45010001701302826
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.1173241033374779,
+                  "auroc": 0.8935760687229093,
+                  "average_precision": 0.1173241033374779,
+                  "dice_micro": 0.203259044074259,
+                  "f1": 0.203259044074259,
+                  "precision": 0.141326226461409,
+                  "recall": 0.3618163536467124,
+                  "threshold": 0.2524328827857971
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.23661350188316424,
+                "samples": 43,
+                "split": "validation",
+                "threshold_selection": "provided by caller; provenance must be recorded separately"
+              },
+              "thresholds": {
+                "image": 0.45010001701302826,
+                "pixel": 0.2524328827857971
+              }
+            }
+          },
+          "timing_scope": "one image transfer/inference/output copy; excludes scoring, metric calculation and I/O; no warmup",
+          "training_run_id": "conv-ae-z256-e30-20261111T141800Z"
+        },
+        "conv_vae": {
+          "checkpoint_epoch": 15,
+          "checkpoint_sha256": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+          "peak_vram_allocated_bytes": 39397888,
+          "reconstruction_seconds_median": 0.003968170000000271,
+          "reconstruction_seconds_sum": 0.35145352299998933,
+          "samples_scored": 83,
+          "scores": {
+            "local_ssim": {
+              "calibration": {
+                "empty_mask_pixel_false_positive_rate": 0.028059027777777776,
+                "image": {
+                  "auprc": 0.55295407959122,
+                  "auroc": 0.51,
+                  "f1": 0.6666666666666666,
+                  "precision": 0.5,
+                  "recall": 1.0,
+                  "threshold": 1.0349447467061381
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.2061729010655187,
+                  "auroc": 0.9475053353603055,
+                  "average_precision": 0.2061729010655187,
+                  "dice_micro": 0.30833884726121713,
+                  "f1": 0.30833884726121713,
+                  "precision": 0.23370743873346345,
+                  "recall": 0.4529977405286112,
+                  "threshold": 0.9987573578611936
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.43057887851966203,
+                "samples": 40,
+                "split": "validation",
+                "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie"
+              },
+              "group_holdout": {
+                "empty_mask_pixel_false_positive_rate": 0.03343658625730994,
+                "image": {
+                  "auprc": 0.6223457662586682,
+                  "auroc": 0.5482456140350878,
+                  "f1": 0.7272727272727273,
+                  "precision": 0.5714285714285714,
+                  "recall": 1.0,
+                  "threshold": 1.0349447467061381
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.13287809137761725,
+                  "auroc": 0.8995031367680358,
+                  "average_precision": 0.13287809137761725,
+                  "dice_micro": 0.20951927053035135,
+                  "f1": 0.20951927053035135,
+                  "precision": 0.17183422429154452,
+                  "recall": 0.268377204007613,
+                  "threshold": 0.9987573578611936
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.2587291728878381,
+                "samples": 43,
+                "split": "validation",
+                "threshold_selection": "provided by caller; provenance must be recorded separately"
+              },
+              "thresholds": {
+                "image": 1.0349447467061381,
+                "pixel": 0.9987573578611936
+              }
+            },
+            "pixel_difference": {
+              "calibration": {
+                "empty_mask_pixel_false_positive_rate": 0.025813368055555556,
+                "image": {
+                  "auprc": 0.5024555802577951,
+                  "auroc": 0.515,
+                  "f1": 0.6785714285714286,
+                  "precision": 0.5277777777777778,
+                  "recall": 0.95,
+                  "threshold": 0.5696021176667677
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.2136041495989179,
+                  "auroc": 0.9436118638375175,
+                  "average_precision": 0.2136041495989179,
+                  "dice_micro": 0.33391144939387674,
+                  "f1": 0.33391144939387674,
+                  "precision": 0.2537456124776356,
+                  "recall": 0.48812463874730705,
+                  "threshold": 0.3531322479248047
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.4704588086271463,
+                "samples": 40,
+                "split": "validation",
+                "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie"
+              },
+              "group_holdout": {
+                "empty_mask_pixel_false_positive_rate": 0.031878654970760235,
+                "image": {
+                  "auprc": 0.6380612901978764,
+                  "auroc": 0.5153508771929824,
+                  "f1": 0.7384615384615385,
+                  "precision": 0.5853658536585366,
+                  "recall": 1.0,
+                  "threshold": 0.5696021176667677
+                },
+                "image_aggregation": "mean of top 576 pixels",
+                "pixel": {
+                  "auprc": 0.14855066650564988,
+                  "auroc": 0.9077512534220435,
+                  "average_precision": 0.14855066650564988,
+                  "dice_micro": 0.23110786978717762,
+                  "f1": 0.23110786978717762,
+                  "precision": 0.18320089135553314,
+                  "recall": 0.3129421481667684,
+                  "threshold": 0.3531322479248047
+                },
+                "pixel_aggregation": "global micro over 240x240 crop",
+                "pixel_dice_macro_lesion_slices": 0.2598321497927049,
+                "samples": 43,
+                "split": "validation",
+                "threshold_selection": "provided by caller; provenance must be recorded separately"
+              },
+              "thresholds": {
+                "image": 0.5696021176667677,
+                "pixel": 0.3531322479248047
+              }
+            }
+          },
+          "timing_scope": "one image transfer/inference/output copy; excludes scoring, metric calculation and I/O; no warmup",
+          "training_run_id": "conv-vae-z256-e30-20261111T141800Z"
+        }
+      },
+      "smoke": false,
+      "split": "validation",
+      "test_accessed": false,
+      "threshold_rule": "max F1 on40calibration; largest threshold on exact tie; score>=threshold"
+    }
+  },
+  "smoke": {
+    "manifest": {
+      "artifact_sync_status": "uploaded",
+      "artifacts": {
+        "conv_ae/local_ssim/private_maps.npz": "17bc66abdd175a7c415a9433a23c3c5b13cd204e01db549eaee756fde370eede",
+        "conv_ae/pixel_difference/private_maps.npz": "943203d2ea9c4d9dcbcc11d790fa439a251a9f981b3568361c8119166c5de296",
+        "conv_ae/private_reconstructions.npz": "0992ed52be62a559b441f31c3448011dfcd7add2ba3bf45b57bc0b5b2eb67a52",
+        "conv_vae/local_ssim/private_maps.npz": "b05f3ef76833e9ec6b12bd08976e15b6a3c1a626a3d1193e4de773037c3ddd91",
+        "conv_vae/pixel_difference/private_maps.npz": "cd195b8ef5c15f4a092cd579e83fac4536fb0a60f623f8f9bb66dd634a7529f4",
+        "conv_vae/private_reconstructions.npz": "e1928ab5dc14b2311a048294d87cb72f27d683b8a167caa060ec85a01bc2bab1",
+        "results.json": "b5feaf429f70fb207c008f771b6c061d56bd884cd08fcdb619faf9a8685de83b",
+        "source_snapshot.zip": "188fdda91965e09f176fbe4e8764e941f9512767d74a49d7e689eaef2ef3676a"
+      },
+      "code_revision": "147d1d4db7cee4b0a603716659d3b205319d359e",
+      "completed_at": "2026-11-11T14:43:52.442106+00:00",
+      "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+      "evaluation_id": "conv-val-smoke-20261111-a",
+      "gpu": "T4",
+      "inference": "deterministic mean latent",
+      "model_revision": "416b1d0858b3d4956d80896616ffb385c86885b0",
+      "scores": [
+        "pixel_difference",
+        "local_ssim"
+      ],
+      "smoke": true,
+      "source_snapshot_sha256": "188fdda91965e09f176fbe4e8764e941f9512767d74a49d7e689eaef2ef3676a",
+      "split": "validation",
+      "started_at": "2026-11-11T14:43:42.398377+00:00",
+      "status": "completed",
+      "test_accessed": false,
+      "total_seconds": 8.64583859,
+      "training_seeds": 1,
+      "working_tree_dirty": true
+    },
+    "results": {
+      "calibration_samples": 40,
+      "group_holdout_samples": 43,
+      "limitations": "Exploratory validation; normal-validation checkpoint selection overlaps both partitions. Internal holdout is NOT independent model evaluation. One training seed; no test access.",
+      "local_ssim": "11x11Gaussian sigma1.5, data_range2 on signed[-1,1], no clipping or foreground masking",
+      "metric_region": "full240crop; image top576mean",
+      "models": {
+        "conv_ae": {
+          "checkpoint_epoch": 13,
+          "checkpoint_sha256": "fc34f511e4910c688d9e7c5f4f075957f291cb801ced3f1d77850294f271bfbb",
+          "peak_vram_allocated_bytes": 35202560,
+          "reconstruction_seconds_median": 0.31293144600000034,
+          "reconstruction_seconds_sum": 0.6258628920000007,
+          "samples_scored": 2,
+          "scores": {},
+          "timing_scope": "one image transfer/inference/output copy; excludes scoring, metric calculation and I/O; no warmup",
+          "training_run_id": "conv-ae-z256-e30-20261111T141800Z"
+        },
+        "conv_vae": {
+          "checkpoint_epoch": 15,
+          "checkpoint_sha256": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+          "peak_vram_allocated_bytes": 39397888,
+          "reconstruction_seconds_median": 0.01617839349999972,
+          "reconstruction_seconds_sum": 0.03235678699999944,
+          "samples_scored": 2,
+          "scores": {},
+          "timing_scope": "one image transfer/inference/output copy; excludes scoring, metric calculation and I/O; no warmup",
+          "training_run_id": "conv-vae-z256-e30-20261111T141800Z"
+        }
+      },
+      "smoke": true,
+      "split": "validation",
+      "test_accessed": false,
+      "threshold_rule": "max F1 on40calibration; largest threshold on exact tie; score>=threshold"
+    }
+  }
+}

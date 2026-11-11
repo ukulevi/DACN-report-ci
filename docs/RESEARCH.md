@@ -544,3 +544,15 @@ This is an exploratory repeated-test-cohort comparison after earlier finaltest,
 not a new untouched test or revised primary method. No tuning/sweep/training.
 Protocol:DDIM50_LPIPS_TEST.md. Private reconstruction caching and resume logs
 required; do not cancel based solely on idle GPU, missing logs or PENDING graph.
+
+## Authorized ConvAE/ConvVAE baselines — 2026-11-11
+
+User requests ConvAE and ConvVAE with matched CNN encoder-decoder/global latent256,
+30epochs each. Fixed width32 six stride2levels, no skip connections; GroupNorm/
+SiLU,Tanh. Same seed17/batch32/Adam1e-4, normal7500training and39normal-validation
+checkpoint selection by crop240 reconstruction MSE; exact30epochs/no early stop.
+VAE adds mu/logvar/reparameterization with fixed beta1 KL-per-pixel objective;
+validation uses mean latent. Bounded64train/4normal-val smoke each before full;
+no test inputs, threshold selection or anomaly metrics during training. This
+explicitly expands optional baseline scope at user's request while preserving
+primary diffusion results. Protocol:CONV_AE_VAE_BASELINES.md.

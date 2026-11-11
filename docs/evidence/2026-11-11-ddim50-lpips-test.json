@@ -1,0 +1,56 @@
+{
+  "adapter_seconds_median": 1.436978619999536,
+  "adapter_seconds_p95": 1.487874895799996,
+  "adapter_seconds_sum": 5294.248549917,
+  "config": {
+    "crop": 240,
+    "eta": 0,
+    "image_top_pixels": 576,
+    "inference_steps": 50,
+    "lpips_net": "squeeze",
+    "lpips_version": "0.1",
+    "seed": 17,
+    "starting_timestep": 300
+  },
+  "cuda_peak_allocated_bytes": 112601088,
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "gpu": "Tesla T4",
+  "lpips_calls_completed_trajectories": 3665,
+  "method_contract": "4cbc55d9f77f91d0c15160d764427df44f56db7c5b163e942d81accb33965acf",
+  "metrics": {
+    "empty_mask_pixel_false_positive_rate": 0.014347005208333333,
+    "image": {
+      "auprc": 0.9284495626375369,
+      "auroc": 0.7561410123966941,
+      "f1": 0.900141087944819,
+      "precision": 0.8559928443649374,
+      "recall": 0.9490909090909091,
+      "threshold": 0.22034396567485398
+    },
+    "image_aggregation": "mean top576pixels",
+    "pixel": {
+      "auprc": 0.25795034263448224,
+      "auroc": 0.9280859493240116,
+      "dice_micro": 0.30972246989323127,
+      "f1": 0.30972246989323127,
+      "precision": 0.29417293654167376,
+      "recall": 0.32700759318219413,
+      "threshold": 0.23461146652698517
+    },
+    "pixel_aggregation": "global micro240crop",
+    "pixel_dice_macro_lesion_slices": 0.25138142740159797
+  },
+  "sample_count": 3665,
+  "sampling_seeds": 1,
+  "stage": "test",
+  "status": "completed",
+  "test_accessed": true,
+  "thresholds": {
+    "image": 0.22034396567485398,
+    "pixel": 0.23461146652698517
+  },
+  "timing_scope": "Adapter incl cold model load per continuation; excludes data/checksum/shard/global-metric I/O",
+  "training_performed": false,
+  "training_seeds": 1,
+  "unet_calls_completed_trajectories": 183250
+}

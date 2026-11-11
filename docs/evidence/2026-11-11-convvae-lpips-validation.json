@@ -1,0 +1,203 @@
+{
+  "smoke": {
+    "manifest": {
+      "artifact_sync_status": "uploaded",
+      "artifacts": {
+        "private_lpips_maps.npz": "be371321127adc832f9e89132e7ed2760440aef69886a63b3dcc71430e975dd5",
+        "results.json": "ee17abc15d6fe62cda75bff1a9f8ffdc9ac4ec7e2a84b029d16ddf6c430ef0f7",
+        "source_snapshot.zip": "c1643be2fac59d61d78fea4f0813f760470121f4e3fcca8fa6ae0e427ae74d59"
+      },
+      "checkpoint_epoch": 15,
+      "checkpoint_sha256": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+      "code_revision": "147d1d4db7cee4b0a603716659d3b205319d359e",
+      "completed_at": "2026-11-11T14:57:36.420113+00:00",
+      "cpu": 4,
+      "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+      "evaluation_id": "convvae-lpips-smoke-20261111-a",
+      "gpu": "T4",
+      "lpips": {
+        "input": "240crop grayscale repeatedRGB [-1,1]; normalize=False",
+        "network": "LPIPS0.1_squeeze_spatial",
+        "state_sha256": "18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6"
+      },
+      "memory_mib": 8192,
+      "model": "ConvVAE z256",
+      "model_revision": "9a8e8d26bd33f7654256712000a5a54fdb05576e",
+      "new_vae_calls": 0,
+      "reconstruction_sha256": "fa3afc69d70a56bec23791c22c7f63ae31c3143c7707722c56bdd54252991df6",
+      "smoke": true,
+      "source_snapshot_sha256": "c1643be2fac59d61d78fea4f0813f760470121f4e3fcca8fa6ae0e427ae74d59",
+      "split": "validation",
+      "started_at": "2026-11-11T14:57:30.680043+00:00",
+      "status": "completed",
+      "test_accessed": false,
+      "total_seconds": 4.217584458000001,
+      "training_performed": false,
+      "training_seed": 17,
+      "training_seeds": 1,
+      "versions": {
+        "lpips": "0.1.4",
+        "numpy": "2.4.6",
+        "scikit-learn": "1.9.1",
+        "scipy": "1.17.1",
+        "torch": "2.13.0",
+        "torchvision": "0.28.0"
+      },
+      "working_tree_dirty": true
+    },
+    "results": {
+      "calibration_samples": 40,
+      "checkpoint_epoch": 15,
+      "checkpoint_sha256": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+      "holdout_samples": 43,
+      "limitations": "Post-inspection exploratory validation; normal-validation checkpoint selection overlaps both partitions. Not independent model holdout; one training seed; no test access.",
+      "lpips": {
+        "input": "240crop grayscale repeatedRGB [-1,1]; normalize=False",
+        "network": "LPIPS0.1_squeeze_spatial",
+        "state_sha256": "18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6"
+      },
+      "metric_region": "full240crop; grayscale repeatRGB [-1,1]; normalize=False; no foreground or smoothing; image top576mean",
+      "new_vae_calls": 0,
+      "peak_vram_allocated_bytes": 45882880,
+      "samples_scored": 2,
+      "score": "raw spatial LPIPS0.1 squeeze; clamp minimum0",
+      "scoring_seconds_median": 0.3760589024999996,
+      "scoring_seconds_sum": 0.7521178049999993,
+      "smoke": true,
+      "split": "validation",
+      "test_accessed": false,
+      "timing_scope": "cached image-pair transfer + LPIPS layer contributions + map copy; no warmup; excludes input loading, metrics and upload",
+      "training_seeds": 1
+    }
+  },
+  "validation": {
+    "manifest": {
+      "artifact_sync_status": "uploaded",
+      "artifacts": {
+        "private_lpips_maps.npz": "c76e594e20b1aa079d8c58cc43680aaad28b9b55de31689456144059c0034816",
+        "results.json": "f37d93e0f0a9da81b95ddb9311cb7c88fa81ee410c4a8959585aa08c1dde6421",
+        "source_snapshot.zip": "c1643be2fac59d61d78fea4f0813f760470121f4e3fcca8fa6ae0e427ae74d59",
+        "thresholds.json": "62bc5363181ac4a214c30c6df82b3ab9b08bcd83c2b0235603c7c2cabf88f582"
+      },
+      "checkpoint_epoch": 15,
+      "checkpoint_sha256": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+      "code_revision": "147d1d4db7cee4b0a603716659d3b205319d359e",
+      "completed_at": "2026-11-11T14:58:31.128239+00:00",
+      "cpu": 4,
+      "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+      "evaluation_id": "convvae-lpips-val83-20261111-a",
+      "gpu": "T4",
+      "lpips": {
+        "input": "240crop grayscale repeatedRGB [-1,1]; normalize=False",
+        "network": "LPIPS0.1_squeeze_spatial",
+        "state_sha256": "18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6"
+      },
+      "memory_mib": 8192,
+      "model": "ConvVAE z256",
+      "model_revision": "6232ff98127d92f09afa4d389366bcdaad9b61e9",
+      "new_vae_calls": 0,
+      "reconstruction_sha256": "fa3afc69d70a56bec23791c22c7f63ae31c3143c7707722c56bdd54252991df6",
+      "smoke": false,
+      "source_snapshot_sha256": "c1643be2fac59d61d78fea4f0813f760470121f4e3fcca8fa6ae0e427ae74d59",
+      "split": "validation",
+      "started_at": "2026-11-11T14:58:14.929158+00:00",
+      "status": "completed",
+      "test_accessed": false,
+      "total_seconds": 13.442740701999998,
+      "training_performed": false,
+      "training_seed": 17,
+      "training_seeds": 1,
+      "versions": {
+        "lpips": "0.1.4",
+        "numpy": "2.4.6",
+        "scikit-learn": "1.9.1",
+        "scipy": "1.17.1",
+        "torch": "2.13.0",
+        "torchvision": "0.28.0"
+      },
+      "working_tree_dirty": true
+    },
+    "results": {
+      "calibration": {
+        "empty_mask_pixel_false_positive_rate": 0.058019097222222225,
+        "image": {
+          "auprc": 0.5793820066532694,
+          "auroc": 0.61,
+          "f1": 0.7037037037037037,
+          "precision": 0.5588235294117647,
+          "recall": 0.95,
+          "threshold": 0.5232977363694873
+        },
+        "image_aggregation": "mean of top 576 pixels",
+        "pixel": {
+          "auprc": 0.05783354581584411,
+          "auroc": 0.8544895593775687,
+          "average_precision": 0.05783354581584411,
+          "dice_micro": 0.11256222656268122,
+          "f1": 0.11256222656268122,
+          "precision": 0.06835097841459085,
+          "recall": 0.3187168304345541,
+          "threshold": 0.4782870411872864
+        },
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "pixel_dice_macro_lesion_slices": 0.1461232668170102,
+        "samples": 40,
+        "split": "validation",
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie"
+      },
+      "calibration_samples": 40,
+      "checkpoint_epoch": 15,
+      "checkpoint_sha256": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+      "group_holdout": {
+        "empty_mask_pixel_false_positive_rate": 0.08112116228070175,
+        "image": {
+          "auprc": 0.4872400317682384,
+          "auroc": 0.41885964912280704,
+          "f1": 0.7333333333333333,
+          "precision": 0.6111111111111112,
+          "recall": 0.9166666666666666,
+          "threshold": 0.5232977363694873
+        },
+        "image_aggregation": "mean of top 576 pixels",
+        "pixel": {
+          "auprc": 0.046261121083496906,
+          "auroc": 0.7844038285499325,
+          "average_precision": 0.046261121083496906,
+          "dice_micro": 0.03685606720978556,
+          "f1": 0.03685606720978556,
+          "precision": 0.024984508454870095,
+          "recall": 0.0702230042733508,
+          "threshold": 0.4782870411872864
+        },
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "pixel_dice_macro_lesion_slices": 0.0527173929973111,
+        "samples": 43,
+        "split": "validation",
+        "threshold_selection": "provided by caller; provenance must be recorded separately"
+      },
+      "holdout_samples": 43,
+      "limitations": "Post-inspection exploratory validation; normal-validation checkpoint selection overlaps both partitions. Not independent model holdout; one training seed; no test access.",
+      "lpips": {
+        "input": "240crop grayscale repeatedRGB [-1,1]; normalize=False",
+        "network": "LPIPS0.1_squeeze_spatial",
+        "state_sha256": "18fed4d1fc5c04f2918f64df3a2463344108576d1888f0d75538ca6d5c4dffe6"
+      },
+      "metric_region": "full240crop; grayscale repeatRGB [-1,1]; normalize=False; no foreground or smoothing; image top576mean",
+      "new_vae_calls": 0,
+      "peak_vram_allocated_bytes": 45882880,
+      "samples_scored": 83,
+      "score": "raw spatial LPIPS0.1 squeeze; clamp minimum0",
+      "scoring_seconds_median": 0.00945898799999867,
+      "scoring_seconds_sum": 1.5147664410000132,
+      "smoke": false,
+      "split": "validation",
+      "test_accessed": false,
+      "thresholds": {
+        "image": 0.5232977363694873,
+        "pixel": 0.4782870411872864
+      },
+      "timing_scope": "cached image-pair transfer + LPIPS layer contributions + map copy; no warmup; excludes input loading, metrics and upload",
+      "training_seeds": 1
+    }
+  }
+}

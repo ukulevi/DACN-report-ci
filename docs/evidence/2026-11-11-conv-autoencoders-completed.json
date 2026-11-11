@@ -1,0 +1,196 @@
+{
+  "ae": {
+    "artifact_sync_status": "uploaded",
+    "artifacts": {
+      "architecture.json": "cb23f8d597059be97aab56e617c7b611eafd1dd75200c30788e45588ee1be296",
+      "autoencoder_best.pt": "fc34f511e4910c688d9e7c5f4f075957f291cb801ced3f1d77850294f271bfbb",
+      "autoencoder_epoch_001.pt": "29d58d4b3ac3df6b0caa792189e5c0e46f4b87b034ff181c2b6feee685cabcdd",
+      "autoencoder_epoch_005.pt": "adfad3ff3aeecc5a8dd5f9780bf3e55541326599cd3f93a68d76678a47b03707",
+      "autoencoder_epoch_010.pt": "d80db5377f4763efd74ffdcb4d40d540b5ef1f280b54b0b3f112bb311288084a",
+      "autoencoder_epoch_020.pt": "6acc56f5d2f1c6bb404c2fc0fa232d4e128aaaa208c39206c941fd8b2cf5936d",
+      "autoencoder_epoch_030.pt": "64974f9cff277e6714e8b5fb8ee0b475f09f8b3588bc27153ea92447fd79aa95",
+      "autoencoder_last.pt": "ec5899f605bb187a2cbccad89ce9c6b72fde9e50af2cad1d2caf70693742d881",
+      "config.json": "2215707b8d7c87346761452b04b0eea8fb36effd6251bbe08b1461cd5f02613b",
+      "source_snapshot.zip": "9766dc01faced32f4bd70f9b05f2ad7ebd20c0d18128d49d0e1acd291f0b71ab",
+      "training_history.json": "7fa591923405bfb56c80d7cbdbe9c365d57fad7431249e48a49e634ecc6bbdb6",
+      "training_results.json": "eba6bbba0ef45eb181ef6cf541bc8e93db7829f89a7e699418638d90d1d72883"
+    },
+    "attempt": 1,
+    "attempt_history": [
+      {
+        "attempt": 1,
+        "recorded_at": "2026-11-11T14:33:27.634864+00:00",
+        "stage": "training",
+        "status": "training_completed"
+      }
+    ],
+    "code_revision": "147d1d4db7cee4b0a603716659d3b205319d359e",
+    "completed_at": "2026-11-11T14:33:27.634864+00:00",
+    "config": {
+      "batch_size": 32,
+      "beta": 1.0,
+      "epochs": 30,
+      "gradient_clip_norm": 1.0,
+      "latent_dim": 256,
+      "learning_rate": 0.0001,
+      "max_train_samples": null,
+      "max_validation_samples": null,
+      "model_type": "conv_ae",
+      "seed": 17,
+      "weight_decay": 0.0,
+      "width": 32
+    },
+    "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+    "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "dataset_version": "bmad-flair-patient-disjoint-v1",
+    "environment": {
+      "packages": {
+        "huggingface-hub": "2.3.0",
+        "modal": "1.6.3",
+        "numpy": "2.4.6",
+        "scikit-learn": "1.9.1",
+        "torch": "2.15.0"
+      },
+      "python": "3.11.12"
+    },
+    "gpu": "Tesla T4",
+    "model_repo_id": "dacn-bmad-team/dacn-runs",
+    "model_revision": "76100f136d0886b2a91b71d7ade65d9b92af8fcb",
+    "progress": {
+      "best_epoch": 13,
+      "checkpoint": "autoencoder_last.pt",
+      "epoch": 30,
+      "optimizer_steps": 7050
+    },
+    "requested_dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "requested_device": "cuda",
+    "run_id": "conv-ae-z256-e30-20261111T141800Z",
+    "schema_version": 2,
+    "source_archive_sha256": "eb7a5aae9ea1752b16d3a76b47595ffd956c0b210444da76853455d4d7be61c8",
+    "source_manifest_sha256": "36ceb0571637a634fad94f36b997e142302e4fac0f928cb99012e63c76aa978c",
+    "source_snapshot": "source_snapshot.zip",
+    "source_snapshot_sha256": "9766dc01faced32f4bd70f9b05f2ad7ebd20c0d18128d49d0e1acd291f0b71ab",
+    "stage": "upload_artifacts",
+    "started_at": "2026-11-11T14:16:44.299845+00:00",
+    "status": "completed",
+    "trainer": "dacn.training.conv_autoencoder:train",
+    "trainer_result": {
+      "anomaly_metrics_produced": false,
+      "best_epoch": 13,
+      "best_normal_validation_mse": 0.012551643766271763,
+      "checkpoint": "autoencoder_best.pt",
+      "early_stopping": false,
+      "epochs_completed": 30,
+      "last_checkpoint": "autoencoder_last.pt",
+      "latent_dim": 256,
+      "model_type": "conv_ae",
+      "normal_validation_samples": 39,
+      "optimizer_steps": 7050,
+      "peak_vram_allocated_bytes": 955294720,
+      "selection_metric": "normal_validation_reconstruction_mse",
+      "test_used": false,
+      "training_history": "training_history.json",
+      "training_samples_per_epoch": 7500,
+      "training_seconds": 792.0602241800001
+    },
+    "updated_at": "2026-11-11T14:33:40.683356+00:00",
+    "working_tree_dirty": true
+  },
+  "vae": {
+    "artifact_sync_status": "uploaded",
+    "artifacts": {
+      "architecture.json": "2d694c68696ac1d9136af16f2ccef644b2137a6804dad02a68f001163ad9b846",
+      "autoencoder_best.pt": "b85619af1f53f74f09136c26c92e5ac960f9ebdea7d84329cc582c1d56f0ab8e",
+      "autoencoder_epoch_001.pt": "c581b36fa1bda0ddb7d201a7570e6518b94a80ca5f04eacef094b350d3b00791",
+      "autoencoder_epoch_005.pt": "ecc9e8c1ebe5c4b6700f717a0df05d52eb7aa70a70db3dcb94ef9775e7d4bd6b",
+      "autoencoder_epoch_010.pt": "2aad1159aff310e4de45b4ba9cb616b8ae1de134b6a870af5b8e0472c083fee7",
+      "autoencoder_epoch_020.pt": "51c65ce6b7db46c5c76437e801adc841675574b3dfc7df2fac0963945938274d",
+      "autoencoder_epoch_030.pt": "5329c02c3c45d6f95598279d381937d86bc0cedc8c3d00a53034c9a52a080cb7",
+      "autoencoder_last.pt": "86cf5c26a378cc1a9219c9b94e952af56c24db6b6241e9c7018ccf0b56fb1175",
+      "config.json": "68725cf701acf9d52f157fad53330148842e8eb47618c68c58becaad9c2e652c",
+      "source_snapshot.zip": "9766dc01faced32f4bd70f9b05f2ad7ebd20c0d18128d49d0e1acd291f0b71ab",
+      "training_history.json": "2cdd89aa777be8f554e1e915ebf42d75e77b3676fb44653310f50d19fd77da61",
+      "training_results.json": "66d18cba957882919be3f0341e42fe8435434d29a97a134b36e1d16a3fe4c578"
+    },
+    "attempt": 1,
+    "attempt_history": [
+      {
+        "attempt": 1,
+        "recorded_at": "2026-11-11T14:33:46.803183+00:00",
+        "stage": "training",
+        "status": "training_completed"
+      }
+    ],
+    "code_revision": "147d1d4db7cee4b0a603716659d3b205319d359e",
+    "completed_at": "2026-11-11T14:33:46.803183+00:00",
+    "config": {
+      "batch_size": 32,
+      "beta": 1.0,
+      "epochs": 30,
+      "gradient_clip_norm": 1.0,
+      "latent_dim": 256,
+      "learning_rate": 0.0001,
+      "max_train_samples": null,
+      "max_validation_samples": null,
+      "model_type": "conv_vae",
+      "seed": 17,
+      "weight_decay": 0.0,
+      "width": 32
+    },
+    "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+    "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "dataset_version": "bmad-flair-patient-disjoint-v1",
+    "environment": {
+      "packages": {
+        "huggingface-hub": "2.3.0",
+        "modal": "1.6.3",
+        "numpy": "2.4.6",
+        "scikit-learn": "1.9.1",
+        "torch": "2.15.0"
+      },
+      "python": "3.11.12"
+    },
+    "gpu": "Tesla T4",
+    "model_repo_id": "dacn-bmad-team/dacn-runs",
+    "model_revision": "2ca3277b2ff0899de29aca3c14fba0da78c1feb6",
+    "progress": {
+      "best_epoch": 15,
+      "checkpoint": "autoencoder_last.pt",
+      "epoch": 30,
+      "optimizer_steps": 7050
+    },
+    "requested_dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "requested_device": "cuda",
+    "run_id": "conv-vae-z256-e30-20261111T141800Z",
+    "schema_version": 2,
+    "source_archive_sha256": "eb7a5aae9ea1752b16d3a76b47595ffd956c0b210444da76853455d4d7be61c8",
+    "source_manifest_sha256": "36ceb0571637a634fad94f36b997e142302e4fac0f928cb99012e63c76aa978c",
+    "source_snapshot": "source_snapshot.zip",
+    "source_snapshot_sha256": "9766dc01faced32f4bd70f9b05f2ad7ebd20c0d18128d49d0e1acd291f0b71ab",
+    "stage": "upload_artifacts",
+    "started_at": "2026-11-11T14:16:44.284709+00:00",
+    "status": "completed",
+    "trainer": "dacn.training.conv_autoencoder:train",
+    "trainer_result": {
+      "anomaly_metrics_produced": false,
+      "best_epoch": 15,
+      "best_normal_validation_mse": 0.014492762609361073,
+      "checkpoint": "autoencoder_best.pt",
+      "early_stopping": false,
+      "epochs_completed": 30,
+      "last_checkpoint": "autoencoder_last.pt",
+      "latent_dim": 256,
+      "model_type": "conv_vae",
+      "normal_validation_samples": 39,
+      "optimizer_steps": 7050,
+      "peak_vram_allocated_bytes": 967028736,
+      "selection_metric": "normal_validation_reconstruction_mse",
+      "test_used": false,
+      "training_history": "training_history.json",
+      "training_samples_per_epoch": 7500,
+      "training_seconds": 777.3185920589999
+    },
+    "updated_at": "2026-11-11T14:34:01.370791+00:00",
+    "working_tree_dirty": true
+  }
+}

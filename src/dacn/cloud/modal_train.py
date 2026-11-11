@@ -202,6 +202,7 @@ def _train_remote_impl(
         if resume and continue_from_run_id:
             raise ValueError("resume and continue_from_run_id are mutually exclusive")
         resumable_trainers = {
+            "dacn.training.conv_autoencoder:train": "autoencoder_last.pt",
             "dacn.training.ddpm_partial:train": "ddpm_last.pt",
             "dacn.training.feature_condition:train": "feature_condition_last.pt",
             "dacn.training.encoder_pretrain:train": "encoder_pretrain_last.pt",

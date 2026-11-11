@@ -98,3 +98,12 @@ producer manifest and frozen acceptance SHA; actual new source pin
 bdc2cfcda87c266cf0092e1c7fdd676021af31245a72b65c9ec913b03086277c.
 [Private validation artifacts](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/d496f1c51103d47cf64e897a84308bee11091627/evaluations/ddim50-lpips-t300-20261111T064853Z-b-validation).
 No test-based selection or new training. Actual test will use these fixed inputs.
+
+## Terminal test result
+
+Test completed3665/3665 and uploadedcf288576d33ef49b8966a106d0473d4495950164,
+terminal2026-11-11T09:01:47.076599Z. No resume/interruption or test-threshold change.
+Pixel ROC-AUC.928086,Precision.294173,Recall.327008,F1/Dice.309722,AP.257950.
+Image ROC-AUC.756141,Precision.855993,Recall.949091,F1.900141,AP.928450.
+Source/threshold provenance and full-precision metrics in terminal evidence;
+[LPIPS comparison](LPIPS_COMPARISON_2026-11-11.md) includes old20/20+30 controls.

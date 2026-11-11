@@ -1,0 +1,213 @@
+{
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "validation_holdout_samples": 43,
+  "calibration_samples": 40,
+  "test_samples": 3665,
+  "training_seeds": 1,
+  "sampling_seeds": 1,
+  "scope": "Descriptive comparison; all same fixed checkpoint/ROI, separate calibration thresholds. DDIM50 is a post-primary-test exploratory extension.",
+  "rows": {
+    "DDIM20 \u2014 Initial LPIPS": {
+      "validation": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9261098571296197,
+          "auprc": 0.1578756979270777,
+          "precision": 0.19495828044695063,
+          "recall": 0.33646353287607283,
+          "f1": 0.24687113008194345,
+          "threshold": 0.2501829266548157,
+          "average_precision": 0.1578756979270777,
+          "dice_micro": 0.24687113008194345
+        },
+        "image": {
+          "auroc": 0.787280701754386,
+          "auprc": 0.8545009110761922,
+          "precision": 0.6111111111111112,
+          "recall": 0.9166666666666666,
+          "f1": 0.7333333333333333,
+          "threshold": 0.2262084392261588
+        },
+        "pixel_dice_macro_lesion_slices": 0.23777684509577213,
+        "empty_mask_pixel_false_positive_rate": 0.015722770467836256,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "test": {
+        "image": {
+          "auprc": 0.9139425381206172,
+          "auroc": 0.7212561983471074,
+          "f1": 0.8975198876930276,
+          "precision": 0.8496751329001772,
+          "recall": 0.9510743801652892,
+          "threshold": 0.2262084392261588
+        },
+        "pixel": {
+          "auprc": 0.2246250531191261,
+          "auroc": 0.9200206226964647,
+          "dice_micro": 0.26502014735826396,
+          "f1": 0.26502014735826396,
+          "macro_lesion_dice": 0.21036301941567198,
+          "normal_pixel_fpr": 0.01474072265625,
+          "precision": 0.2677509294682365,
+          "recall": 0.2623445051754135,
+          "threshold": 0.2501829266548157
+        }
+      }
+    },
+    "DDIM50 \u2014 single-phase LPIPS": {
+      "validation": {
+        "empty_mask_pixel_false_positive_rate": 0.012729349415204679,
+        "image": {
+          "auprc": 0.9014383294621989,
+          "auroc": 0.837719298245614,
+          "f1": 0.7457627118644068,
+          "precision": 0.6285714285714286,
+          "recall": 0.9166666666666666,
+          "threshold": 0.22034396567485398
+        },
+        "image_aggregation": "mean of top 576 pixels",
+        "pixel": {
+          "auprc": 0.18601991346055638,
+          "auroc": 0.9345199574305592,
+          "average_precision": 0.18601991346055638,
+          "dice_micro": 0.290416118431309,
+          "f1": 0.290416118431309,
+          "precision": 0.22247274742282816,
+          "recall": 0.4181060796495134,
+          "threshold": 0.23461146652698517
+        },
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "pixel_dice_macro_lesion_slices": 0.2726092283696275,
+        "samples": 43,
+        "split": "validation",
+        "threshold_selection": "provided by caller; provenance must be recorded separately"
+      },
+      "test": {
+        "empty_mask_pixel_false_positive_rate": 0.014347005208333333,
+        "image": {
+          "auprc": 0.9284495626375369,
+          "auroc": 0.7561410123966941,
+          "f1": 0.900141087944819,
+          "precision": 0.8559928443649374,
+          "recall": 0.9490909090909091,
+          "threshold": 0.22034396567485398
+        },
+        "image_aggregation": "mean top576pixels",
+        "pixel": {
+          "auprc": 0.25795034263448224,
+          "auroc": 0.9280859493240116,
+          "dice_micro": 0.30972246989323127,
+          "f1": 0.30972246989323127,
+          "precision": 0.29417293654167376,
+          "recall": 0.32700759318219413,
+          "threshold": 0.23461146652698517
+        },
+        "pixel_aggregation": "global micro240crop",
+        "pixel_dice_macro_lesion_slices": 0.25138142740159797
+      }
+    },
+    "Naive-stitch from DDIM20 \u2014 LPIPS": {
+      "validation": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9362993247185885,
+          "auprc": 0.18059333785347384,
+          "precision": 0.21875292456120948,
+          "recall": 0.4616655295004848,
+          "f1": 0.2968487528357761,
+          "threshold": 0.21649277210235596,
+          "average_precision": 0.18059333785347384,
+          "dice_micro": 0.2968487528357761
+        },
+        "image": {
+          "auroc": 0.7850877192982457,
+          "auprc": 0.861002903908283,
+          "precision": 0.6176470588235294,
+          "recall": 0.875,
+          "f1": 0.7241379310344828,
+          "threshold": 0.20856854640361336
+        },
+        "pixel_dice_macro_lesion_slices": 0.28544525922297564,
+        "empty_mask_pixel_false_positive_rate": 0.018309576023391814,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "test": {
+        "image": {
+          "auprc": 0.9127594092693148,
+          "auroc": 0.7190816115702481,
+          "f1": 0.9007036747458952,
+          "precision": 0.8545994065281899,
+          "recall": 0.9520661157024793,
+          "threshold": 0.20856854640361336
+        },
+        "pixel": {
+          "auprc": 0.26951592581475736,
+          "auroc": 0.9314319016088011,
+          "dice_micro": 0.33301642283129074,
+          "f1": 0.33301642283129074,
+          "macro_lesion_dice": 0.280682436475115,
+          "normal_pixel_fpr": 0.019916883680555556,
+          "precision": 0.2987384794684106,
+          "recall": 0.37618020918981504,
+          "threshold": 0.21649277210235596
+        }
+      }
+    },
+    "DDIM20+30 \u2014 Final LPIPS": {
+      "validation": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9490360645313125,
+          "auprc": 0.3123301734628661,
+          "precision": 0.2974710255494595,
+          "recall": 0.4935720185298237,
+          "f1": 0.3712146276577787,
+          "threshold": 0.26617634296417236,
+          "average_precision": 0.3123301734628661,
+          "dice_micro": 0.3712146276577787
+        },
+        "image": {
+          "auroc": 0.9144736842105263,
+          "auprc": 0.9443859166057084,
+          "precision": 0.6875,
+          "recall": 0.9166666666666666,
+          "f1": 0.7857142857142857,
+          "threshold": 0.24719371760470998
+        },
+        "pixel_dice_macro_lesion_slices": 0.31357079206024785,
+        "empty_mask_pixel_false_positive_rate": 0.005772112573099415,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "test": {
+        "image": {
+          "auprc": 0.9458628748478963,
+          "auroc": 0.8059886363636364,
+          "f1": 0.9026378896882494,
+          "precision": 0.8739938080495356,
+          "recall": 0.9332231404958677,
+          "threshold": 0.24719371760470998
+        },
+        "pixel": {
+          "auprc": 0.3182260484737178,
+          "auroc": 0.938798976561719,
+          "dice_micro": 0.36429271671871877,
+          "f1": 0.36429271671871877,
+          "macro_lesion_dice": 0.2918483008748012,
+          "normal_pixel_fpr": 0.009782335069444445,
+          "precision": 0.3561074700596407,
+          "recall": 0.3728630969413566,
+          "threshold": 0.26617634296417236
+        }
+      }
+    }
+  }
+}

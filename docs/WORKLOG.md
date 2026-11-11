@@ -2109,3 +2109,43 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   pixel/image thresholds.23461146652698517/.22034396567485398 sealed before test.
   Verified producer aggregate SHA and acceptance SHA; saved frozen input JSON
   and safe evidence. Test remains a separate user-requested exploratory stage.
+- Saved source/freeze/validation evidence in local commit147d1d4 before test.
+  Submitted full3665image DDIM50+LPIPS test to detached T4 appap-r68EAg…,
+  callfc-01M74QECD514X0PA6EN1WX0BNA. No final metrics claimed; tracker remains off.
+
+## 2026-11-11 — Final DDIM50 receipt and LPIPS comparison
+
+- User requested a LPIPS summary. One-off log/call check confirmed3665DDIM50 test
+  outputs and completed/uploaded terminal state, HFcf288576…. Verified aggregate
+  SHA against producer manifest; collected only safe aggregate/terminal records.
+- Generated artifact-derived LPIPS comparison for20initial,50single-phase,
+  naive-stitch and20+30final, both validation43/test3665 and pixel/image levels.
+  DDIM50 test pixel AP.257950/Dice.309722; full ROC/P/R/F1/AP, timings and one-seed
+  limitations recorded without changing frozen thresholds or selecting new methods.
+- No new model runs/tests for this record-only task. Aggregate JSON/privacy and
+  whitespace checks performed; private maps/reconstructions remain remote. Did
+  not re-enable continuous tracking or silently replace the previous final test.
+
+## 2026-11-11 — Matched ConvAE/ConvVAE z256 training
+
+Implemented shared CNN encoder/decoder, AE and stochastic VAE heads, crop240MSE plus explicit per-pixel KL normalization, deterministic normal-validation selection, 30epoch configs and bounded smoke configs. Added full optimizer/RNG/sampler checkpoint resume to shared Modal lifecycle; no test input. Added protocol and authorized scope record. Checks: focused model/trainer/cloud tests12passed (including bit-identical CPU resume both models), Ruff check/format from implementation pass, git diff --check. Actual GPU smoke completed for both models; full30epoch jobs submitted and durable start manifests collected. Run IDs, checkpoint provenance and measured smoke losses recorded in RESULT_TRACKING and safe aggregate evidence. Full training still pending; no anomaly-performance claims.
+
+## 2026-11-11 — Verify ConvAE/ConvVAE completion
+
+Collected latest producer manifests from shared Modal Volume: both30/30epochs completed and uploaded, with best/last/epoch030 checkpoints and private immutable Hub revisions. Recorded measured normal-validation losses, timing, VRAM and safe terminal evidence in RESULT_TRACKING. Check: manifest status/epoch/upload/test-used assertions passed; git diff --check. No training or evaluation launched in this check; no additional tests run (records only).
+
+## 2026-11-11 — Validation evaluation for trained ConvAE/ConvVAE
+
+Added validation-only Modal launcher for immutable AEepoch13/VAEepoch15 best checkpoints, checksum-verified cached83inputs and registered40/43membership. Deterministic mean-latent inference, shared Residual/L1 and LocalSSIM scorers; reuse calibration-only threshold persistence and image/pixel metric evaluator. Saved remote private reconstructions/maps for audit, downloaded only safe aggregate records. Documented normal-validation checkpoint-selection overlap and resulting lack of independent model holdout. Checks:15model/partition/DDPM-validation tests and9paired-scoring/calibration tests passed; Ruff check/format and git diff --check passed. Two initial pytest invocations referenced nonexistent filenames and ran no tests; corrected to actual test modules. Actual2image/model GPU smoke completed/uploaded; full83/model evaluation submitted, provenance in RESULT_TRACKING. No test access or new model training.
+
+Validation full run completed/uploaded for both models,83images each. Collected required image/pixel metrics, wrote both calibration and43validation tables with checkpoint-selection-overlap caveat. Verified aggregate SHA and identical persisted calibration/holdout thresholds. Saved safe producer evidence and private immutable artifact links. No further GPU runs needed.
+
+## 2026-11-11 — ConvVAE LPIPS validation extension
+
+Added validation-only raw spatial LPIPS launcher reusing SHA-verified deterministic VAEepoch15 cached reconstructions. Verified fixed LPIPS state, runtime, source snapshot, original validation index/40–43partition; no VAE inference or training needed. Documented scope: LPIPS alone, no residual fusion, no test; normal-validation checkpoint selection overlap limits independence. Checks:14paired-score/partition/calibration tests and1LPIPS seven-layer/input-contract test passed, Ruff check/format and git diff --check passed. Actual2image smoke completed/uploaded; full83validation job submitted with provenance in RESULT_TRACKING.
+
+ConvVAE LPIPS full83evaluation completed/uploaded. Saved exact producer manifests/aggregates and calibration/43validation pixel/image metric tables with prior Residual/SSIM comparison. Verified producer aggregate SHA and identical fitted thresholds before/after internal holdout. LPIPS underperforms prior scores in pixel AP/F1 on this validation; no threshold/score tuning or test inference performed.
+
+## 2026-11-11 — Package completed experiments for GitHub
+
+User requested pushing all work from this evaluation branch. Prepared ConvAE/ConvVAE architecture/training/resume/configs/tests, completed training and validation aggregate evidence including VAE LPIPS, and completed DDIM50/LPIPS comparison records; preserve original source revisions in run manifests. Validation: Ruff check and format check passed (244files),41focused tests passed, git diff --check passed. Reviewed all26changed/new files for disallowed binary artifacts, credential patterns and private identifier JSON fields; none detected. Dataset/checkpoints/maps remain on private Modal/Hugging Face, outside Git. Fetch of origin/codex/bc-evaluation-colab completed before push. Separate original-checkout edits remain untouched.
