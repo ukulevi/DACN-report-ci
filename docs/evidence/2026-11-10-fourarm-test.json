@@ -1,0 +1,105 @@
+{
+  "adapter_seconds_median": 1.8469894800000475,
+  "adapter_seconds_p95": 2.0062745779996476,
+  "adapter_seconds_sum": 6439.784975820032,
+  "arms": {
+    "brightness": {
+      "image": {
+        "auprc": 0.9013407249766718,
+        "auroc": 0.6436497933884298,
+        "f1": 0.899118808872683,
+        "precision": 0.8318807984256396,
+        "recall": 0.9781818181818182,
+        "threshold": 0.4997753345200585
+      },
+      "pixel": {
+        "auprc": 0.5114340237017682,
+        "auroc": 0.9615363208861835,
+        "dice_micro": 0.416976905015636,
+        "f1": 0.416976905015636,
+        "macro_lesion_dice": 0.5447740081071409,
+        "normal_pixel_fpr": 0.107685302734375,
+        "precision": 0.2846990019601104,
+        "recall": 0.7788482667526317,
+        "threshold": 0.48235294222831726
+      }
+    },
+    "final_lpips": {
+      "image": {
+        "auprc": 0.9458628748478963,
+        "auroc": 0.8059886363636364,
+        "f1": 0.9026378896882494,
+        "precision": 0.8739938080495356,
+        "recall": 0.9332231404958677,
+        "threshold": 0.24719371760470998
+      },
+      "pixel": {
+        "auprc": 0.3182260484737178,
+        "auroc": 0.938798976561719,
+        "dice_micro": 0.36429271671871877,
+        "f1": 0.36429271671871877,
+        "macro_lesion_dice": 0.2918483008748012,
+        "normal_pixel_fpr": 0.009782335069444445,
+        "precision": 0.3561074700596407,
+        "recall": 0.3728630969413566,
+        "threshold": 0.26617634296417236
+      }
+    },
+    "initial_lpips": {
+      "image": {
+        "auprc": 0.9139425381206172,
+        "auroc": 0.7212561983471074,
+        "f1": 0.8975198876930276,
+        "precision": 0.8496751329001772,
+        "recall": 0.9510743801652892,
+        "threshold": 0.2262084392261588
+      },
+      "pixel": {
+        "auprc": 0.2246250531191261,
+        "auroc": 0.9200206226964647,
+        "dice_micro": 0.26502014735826396,
+        "f1": 0.26502014735826396,
+        "macro_lesion_dice": 0.21036301941567198,
+        "normal_pixel_fpr": 0.01474072265625,
+        "precision": 0.2677509294682365,
+        "recall": 0.2623445051754135,
+        "threshold": 0.2501829266548157
+      }
+    },
+    "naive_stitch_lpips": {
+      "image": {
+        "auprc": 0.9127594092693148,
+        "auroc": 0.7190816115702481,
+        "f1": 0.9007036747458952,
+        "precision": 0.8545994065281899,
+        "recall": 0.9520661157024793,
+        "threshold": 0.20856854640361336
+      },
+      "pixel": {
+        "auprc": 0.26951592581475736,
+        "auroc": 0.9314319016088011,
+        "dice_micro": 0.33301642283129074,
+        "f1": 0.33301642283129074,
+        "macro_lesion_dice": 0.280682436475115,
+        "normal_pixel_fpr": 0.019916883680555556,
+        "precision": 0.2987384794684106,
+        "recall": 0.37618020918981504,
+        "threshold": 0.21649277210235596
+      }
+    }
+  },
+  "cuda_peak_allocated_bytes": 112928768,
+  "gpu": "Tesla T4",
+  "image_aggregation": "mean of top576 pixels; score>=fixed threshold",
+  "lpips_calls": 10995,
+  "method_contract": "e02048405215f80cedcdc2b6119f9a9e63910afcd2f2efbb901950c9cdae6a2a",
+  "pixel_aggregation": "global micro over 240x240 crop; Dice=F1",
+  "sample_count": 3665,
+  "sampling_seeds": 1,
+  "split": "test",
+  "status": "completed",
+  "threshold_source": "original40 validation calibration; no refitting",
+  "timing_scope": "Adapter incl model load on first call, scores/transfers; excludes I/O/global metrics",
+  "training_seeds": 1,
+  "unet_calls": 183250
+}

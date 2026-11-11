@@ -164,3 +164,13 @@ endings reproduces the historical checksum exactly. Prepare correctly stopped
 before inference. Practice: retain exact artifact bytes, and only recover LF/CRLF
 variants when the historical hash matches; never repin a config merely to bypass
 an integrity error. Regression verifies other content changes remain rejected.
+
+## 2026-11-10 — Silent resume verification is not a hung inference job
+
+Observed: resume verifies all existing sample identities/content and shard hashes
+before its first new inference, but emits no progress for skipped shards. GPU
+idle, absent logs and a PENDING call-graph response did not establish a hang:
+the user subsequently supplied LPIPS initialization logs. An operator cancellation
+was sent too early. Practice: distinguish silent integrity verification from GPU
+inference; do not cancel solely from idle GPU or call-graph status. Check durable
+receipt changes and actual terminal errors; allow the known verification phase.

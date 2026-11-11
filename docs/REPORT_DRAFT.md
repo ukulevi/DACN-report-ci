@@ -1,5 +1,9 @@
 # Diffusion Models for Anomaly Detection — bản thảo nội dung
 
+Update10Nov: final test3665/3665 đã hoàn thành/uploaded. Bảng kết quả hiện hành
+và giới hạn xem [FINAL_TEST_RESULTS_2026-11-10.md](FINAL_TEST_RESULTS_2026-11-10.md).
+Bản thảo08Nov dưới đây giữ cho lịch sử, không phải trạng thái test mới nhất.
+
 Trạng thái 08/11/2026: nội dung nghiên cứu đã có bằng chứng; chưa phải báo cáo
 hoàn chỉnh hoặc kết quả held-out test. References dùng danh mục REFERENCES.md.
 

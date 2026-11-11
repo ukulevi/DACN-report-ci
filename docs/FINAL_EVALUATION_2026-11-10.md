@@ -1,5 +1,9 @@
 # Final evaluation — 10/11/2026
 
+Trạng thái cuối: **test3665/3665 completed/uploaded**. Xem
+[kết quả cuối](FINAL_TEST_RESULTS_2026-11-10.md), manifest và aggregate evidence.
+Các trạng thái chuẩn bị ở dưới là lịch sử của quá trình freeze/acceptance.
+
 Người dùng yêu cầu thực hiện review/freeze, launcher bốn phương án, validation,
 test và hình/báo cáo trong cuộc trao đổi10Nov. Đây là authorization mới, thay
 quyết định giữ candidate08Nov; không thay đổi phương pháp theo test.

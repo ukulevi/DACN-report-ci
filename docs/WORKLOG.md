@@ -1876,3 +1876,55 @@ Created codex/bc-evaluation-colab from C7134b10 in a managed worktree. Integrate
   historical final maps within2.98e-7 and all required metrics within2.26e-8.
   Collected aggregate receipts and frozen manifest/control JSON before test;
   test remains unopened until the final stage's gates verify these exact inputs.
+- Final frozen-input commit0d3a1aa saved before full-test submission. New full
+  local suite283passed/1skipped38.45s; Ruff/format/whitespace checks passed.
+  Submitted final4-test-20261110-b on T4 for all3665test images; awaiting produced
+  artifacts, no test metrics claimed. Historical08Nov candidate remains intact.
+
+## 2026-11-10 — Resume final test after configured timeout
+
+- User supplied cancellation logs. Verified original call terminal state is
+  FunctionTimeoutError at14400s; Volume has2631durable samples, no final metrics.
+- Recomputed source snapshot matches frozen checksum exactly. Preserved safe
+  timeout evidence; resume same run/protocol/attempt ID for remaining1034images,
+  checking/skipping existing shards. No source/scientific config changes or new
+  experiments; continuous tracking remains stopped per user instruction.
+
+## 2026-11-10 — Correct premature cancellation of test continuation
+
+- One-off diagnosis found no new logs, idle GPU and PENDING call graph; agent
+  canceled resume callfc-01M727Q69TTQD3TV04DB8MZ7AN. User then supplied LPIPS
+  initialization logs, showing that the hang inference was unsupported.
+- Acknowledged the premature cancellation. Confirmed old container absent before
+  resubmitting same run/source/config/thresholds. No model change or test tuning;
+  stored shards remain reusable. Silent old-shard verification is now treated as
+  expected work rather than sufficient reason to cancel. No continuous tracker.
+
+## 2026-11-10 — Verify final test and complete report artifacts
+
+- User requested a one-off status check. All3665test outputs completed and
+  uploaded to private HF revisionddc715a7…. Verified aggregate hash against
+  terminal manifest; recorded4arm image/pixel metrics, seed/threshold provenance,
+  timing scope and preserved interruption history. No new inference or training.
+- Created final results document and aggregate/manifest evidence. Rebuilt report
+  with actual test tables, ROC/PR, training curve and pipeline; added private
+  validation high/low-Dice examples. Formatted private DOCX(A4/Times New Roman),
+  reopened and verified4tables/8images plus every rounded test pixel metric.
+- Discussed brightness's higher pixel AP/Dice and high image-label prevalence;
+  do not claim diffusion beats all baselines or that high image F1 proves quality.
+- No new software tests needed for record/formatting changes; prior frozen-source
+  suite283pass/1skip and remote validation acceptance retained. School template
+  not supplied; generic Word formatting is not claimed to be the school's format.
+
+## 2026-11-11 — Publish frozen launcher and final-test evidence
+
+- User requested push to GitHub. Prepared the isolated evaluation branch for
+  origin/codex/bc-evaluation-colab, including frozen launcher/source commit and
+  final3665-image four-arm aggregate metrics, manifest and interruption history.
+- Verified test aggregate SHA against producer manifest; scanned all five new
+  10Nov evidence JSON files for forbidden identifier/credential keys, HF-token
+  patterns and UUIDs; scan passed. Git whitespace check passed. No new model run
+  or software tests for this documentation/evidence-only commit; earlier source
+  checks and measured run provenance remain recorded above.
+- Private MRI illustrations, per-sample shards/checkpoints and private DOCX/ZIP
+  report artifacts remain ignored and are not included in the Git commit.

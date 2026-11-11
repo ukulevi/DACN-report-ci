@@ -3000,3 +3000,85 @@ refit, new training seed or test use. Produced receipt seals manifest frozen;
 local copies configs/final_evaluation_frozen_20261110.json and
 configs/final_controls_frozen_20261110.json. Aggregate evidence:
 [evidence](evidence/2026-11-10-fourarm-validation.json).
+
+## 2026-11-10 — Frozen final test, four shared arms
+
+`final4-test-20261110-b`: submitted03:44UTC after real smoke2/validation43
+acceptance and frozen-input commit0d3a1aa. [Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-4ioFTp6OEN7ZKan7cnYwDe).
+Callfc-01M71RWNATHG60VCXAEYMSMKZK; protocolfinal-fourarm-20261110-b.
+Full3665test slices (640normal/3025abnormal by immutable dataset metadata),
+patient-disjoint-v1 dataset revision350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7;
+Gaussian EMA30 fixed checkpoint, DDIM20+30, base17/one sampling seed policy.
+Four arms finalLPIPS/initialLPIPS/naive-stitchLPIPS/brightness share each trajectory;
+all image/pixel thresholds fixed from original40calibration. No test tuning.
+Run start/terminal manifest and private durable shards on shared Volume:
+final-evaluation/final-fourarm-20261110-b/attempts/final4-test-20261110-b.
+Status: submitted/running pending receipt collection. No final metrics claimed
+before produced aggregate.json. Same accepted source/runtime9pins as validation;
+original candidate and earlier records preserved. Local full suite on frozen
+source283passed/1LPIPSroundtrip skipped38.45s; Ruff/format/whitespace passed.
+
+### 2026-11-10 — Test timeout and same-run continuation
+
+Original callfc-01M71RWNATHG60VCXAEYMSMKZK reached its configured14400-second
+limit. FunctionCall.get returned modal.exception.FunctionTimeoutError, confirming
+terminal cancellation before continuation. Volume inspection found2631committed
+sample shards of3665; private receipt statusfailed. No aggregate final metrics
+were produced. Evidence:docs/evidence/2026-11-10-test-timeout.json. Local source
+snapshot recomputed exactly matches frozenf4f037fe9fef6fefc4d41cb2dafd94512d8caef0650641671a194480d454c02c.
+Resume uses the SAME protocol/run/attempt IDfinal4-test-20261110-b, thresholds,
+config, checkpoint, runtime/source pins and dataset revision; checks existing
+identity/content/shard hashes and skips inference for accepted shards. Remaining
+1034images; no tuning or new sampling/training seed. Original cancellation and
+terminal-call evidence retained. Continuous tracking remains disabled per user.
+
+Continuation submitted as callfc-01M727Q69TTQD3TV04DB8MZ7AN on
+[Modal resume app](https://modal.com/apps/phutungcogioihaitan/main/ap-DH0IablIaCnGTaEtuba03h).
+Same attempt/run ID, original started_at retained; previous manifest exception
+InputCancellation and terminal14400s timeout preserved in the evidence file.
+Status submitted; no final metrics claimed and no continuous tracker restarted.
+
+### 2026-11-10 — Operator cancellation during first continuation
+
+Callfc-01M727Q69TTQD3TV04DB8MZ7AN was operator-canceled after missing logs,
+idle GPU and a PENDING call-graph response were incorrectly treated as a hang.
+User supplied15:32:02+07LPIPS initialization logs; those deprecation warnings are
+not an inference failure. This cancellation was agent-initiated, not another
+14400s timeout. Source runner silently checks existing2631shards before new
+inference, so these observations did not justify the hang diagnosis. Old
+container confirmed absent before second continuation; same attempt/protocol
+and frozen inputs retained. No final metrics produced or claimed by this call.
+
+Post-cancellation inspection found2649committed samples,18more than the original
+timeout, proving the first continuation made progress despite missing UI logs.
+Safe receipt evidence:docs/evidence/2026-11-10-resume-operator-cancellation.json.
+Second continuation submitted as callfc-01M729HBM4ZE1GW0MJN0K9Q986 on
+[Modal app](https://modal.com/apps/phutungcogioihaitan/main/ap-drpCxvqgdVqDiDQgO7yiwd).
+Same attemptfinal4-test-20261110-b; remaining1016samples after rechecking/skipping
+2649durable shards. No tracker restarted and no final metric claims.
+
+## 2026-11-10 — Final test completed and verified
+
+`final4-test-20261110-b` **completed/uploaded**,3665/3665test samples; terminal
+2026-11-10T09:53:27.113391Z. Private Hub revision
+[ddc715a7d17fbc00e176068c1d1ef91ae9e7835b](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/ddc715a7d17fbc00e176068c1d1ef91ae9e7835b/evaluations/final4-test-20261110-b).
+Collected aggregate/curves/terminal manifest, verified aggregate SHA against
+producer manifest. Safe copies in docs/evidence/2026-11-10-fourarm-test*.json;
+full4arm image/pixel table and interpretation:FINAL_TEST_RESULTS_2026-11-10.md.
+All metrics one seed; fixed original40calibration thresholds; no test tuning.
+
+Final LPIPS pixel global micro: ROC-AUC.9387989766,AP.3182260485,
+Precision.3561074701,Recall.3728630969,F1/Dice.3642927167;
+macro lesion-slice Dice.2918483009,normal pixel FPR.0097823351.
+Image mean-top576:ROC-AUC.8059886364,AP.9458628748,
+Precision.8739938080,Recall.9332231405,F1.9026378897.
+Brightness pixel AP.5114340237 and Dice.4169769050 exceed Final LPIPS;
+report this negative result. Image abnormal prevalence82.54%; all-positive
+algebraic F1.904335 exceeds model F1, so image F1 alone is not an efficacy claim.
+
+Completed trajectories183250U-Net/10995LPIPS calls; uncommitted interrupted
+work excluded. Adapter sum6439.784976s,median1.846989s,p952.006274578s.
+Last-process CUDA allocated peak112928768B.
+These timings exclude dataset/commit/resume/global-metric overhead. No new model
+training. Earlier timeout/operator-cancellation records retained. Tracker remains
+stopped; this was a user-requested one-off completion check.

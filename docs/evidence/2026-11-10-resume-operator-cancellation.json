@@ -1,0 +1,50 @@
+{
+  "status": "operator_cancelled",
+  "reason": "Premature hang diagnosis; no-code-change same-run recovery",
+  "progress": {
+    "status": "failed",
+    "committed_samples": 2649
+  },
+  "run_manifest": {
+    "attempt_id": "final4-test-20261110-b",
+    "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+    "exception_type": "KeyboardInterrupt",
+    "frozen_inputs": {
+      "acceptance_evidence": "docs/evidence/2026-11-08-colab-registered-acceptance.json",
+      "artifacts": {
+        "checkpoint": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+        "config": "1d731fe0b773df643a5d03f19dd84a85ae2de3c0347783186a84c0f5c6e69c9f",
+        "dependency_lock": "ac4bea0313a7f12f653762c052cb2cb8fbc8a0c93cdb29a57997de32952c18f8",
+        "lpips_backbone": "21a3a6c2a87be2bb4cb4b40b5c3ba88486e38545750e0f36aa384204f7ae4e31",
+        "lpips_calibration": "1e72616f68a17ee8abe7ac456151a7af2003f8df17fb5b8a2936d5f289e49db4",
+        "mask_parameters": "39ee181e3c783fa516c3f2f1294de31aab8239eb09ce9bed3c287872aef8bd16",
+        "source_snapshot": "f4f037fe9fef6fefc4d41cb2dafd94512d8caef0650641671a194480d454c02c",
+        "validation_index": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+        "validation_partition": "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184"
+      },
+      "controls_sha256": "6e430ee4415e4de6c9a8d548ba0a9c3c2bc14c88960cc75d6ada551eb7a4e2b6",
+      "dataset_metadata_sha256": "9c60fac0ff2a2d6274e82db466e5e338303d0dc24986b3bab4b32b6e710af218",
+      "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+      "environment_scope": "New Modal T4 acceptance; captured actual source/dependency inventory",
+      "freeze_authority": "User instruction 2026-11-10; CI local-evidence exception recorded",
+      "frozen_at": "2026-11-10T03:39:36.325366+00:00",
+      "pending": [],
+      "reference_artifact_revision": "fae9b50a4b78114fb51d87e803c77d019668f523",
+      "schema_version": 1,
+      "scope": "Final four-arm evaluation; fixed method accepted on validation",
+      "source_archive_commit": null,
+      "status": "frozen",
+      "thresholds": {
+        "image": 0.24719371760470998,
+        "pixel": 0.26617634296417236
+      },
+      "validation_acceptance_sha256": "8c8a1592286a206cf73a6b7ff7cf4eb7430aac1b5e9fdd2aa1d98a3f84e03cdb"
+    },
+    "gpu": "Tesla T4",
+    "held_out_test_used": true,
+    "protocol_id": "final-fourarm-20261110-b",
+    "stage": "test",
+    "started_at": "2026-11-10T03:44:19.985870+00:00",
+    "status": "interrupted"
+  }
+}
