@@ -103,9 +103,45 @@ Initial→Final and residual-in-score effects are the only sweep contrasts that
 clearly exclude zero. Intervals are conditional on one checkpoint, one sampling
 seed and the repeatedly inspected holdout; they are not test results.
 
+### Noise level → reconstruction quality → detection (added 13 Nov)
+
+Descriptive aggregates from the same producer arrays (all 83 validation slices,
+DDIM20+30; [evidence](evidence/2026-11-13-sweep-quality-results.json), run
+`sweep-quality-full-20261113T162803Z`). L1 is |input − reconstruction| on the
+`[-1,1]` scale over foreground (input > −0.95); "normal" is foreground of normal
+slices. Final AP and FPR are the producer's 43-holdout values.
+
+| t | Initial normal L1 | Initial lesion/normal L1 | Final lesion/normal LPIPS | Mask lesion recall | Normal foreground masked | Final holdout AP | Holdout normal FPR |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 100 | 0.084 | 0.96 | 2.08 | 0.828 | 0.506 | 0.2277 | 0.0065 |
+| 200 | 0.114 | 1.07 | 2.11 | 0.817 | 0.464 | 0.2914 | 0.0046 |
+| 300 | 0.137 | 1.20 | 2.07 | 0.814 | 0.448 | 0.3123 | 0.0058 |
+| 500 | 0.183 | 1.62 | 2.00 | 0.779 | 0.414 | 0.3211 | 0.0068 |
+| 800 | 0.329 | 1.48 | 1.73 | 0.621 | 0.291 | 0.1861 | 0.0490 |
+
+Reading, consistent with the under-/over-noising hypothesis:
+
+- **Too little noise (t100):** the initial reconstruction reproduces the lesion
+  (lesion error no larger than normal error, ratio 0.96), so the residual part of
+  the mask heatmap carries little lesion signal and detection is lowest among
+  t100–500.
+- **Plateau (t200–500):** lesion "healing" increases (ratio 1.07 → 1.62) while
+  normal-tissue error grows moderately; after phase 2 the lesion/normal LPIPS
+  contrast stays about 2.0–2.1 and AP is not separable by bootstrap.
+- **Too much noise (t800):** normal tissue is no longer reconstructed faithfully
+  (normal L1 0.329), lesion contrast drops (1.73), mask lesion recall falls to
+  0.62 and normal-pixel FPR rises about eightfold.
+- **Mask is coarse at every t:** 41–51% of normal-slice brain foreground is
+  masked (pixel precision about 0.10–0.12), so phase 2 re-samples a large share of
+  the brain. This makes the mask rule (percentile, dilation, heatmap) the next
+  candidate for a hypothesis-driven, validation-only ablation (AF-07).
+- The 30/20 split and the 43-holdout subset show the same ordering. Final-phase
+  L1 is zero outside the mask by construction, so LPIPS contrast rather than
+  final L1 is the detection-relevant quantity.
+
 **Not yet measured:** phase-2 start other than t50; total DDIM budget other
-than 50 calls; t400; more than one sampling seed; reconstruction-quality
-measures (e.g. normal-slice error) as a function of t.
+than 50 calls; t50 and t400 at phase 1; more than one sampling seed; mask
+percentile/dilation sensitivity.
 
 ## 3. Alternative scores on the same Final reconstruction — validation only
 
@@ -155,8 +191,8 @@ results. No ConvAE/ConvVAE test evaluation exists.
    controls on validation (13 Nov), and for Final/Initial/naive-stitch/
    brightness on 6 Nov. Still missing for the Section 3 alternative scores,
    the LPIPS-only mask and the test-set rows.
-2. Noise level → reconstruction quality → detection analysis from the cached
-   per-t arrays, if they contain reconstructions.
+2. Noise level → reconstruction quality → detection: done descriptively from
+   the cached per-t arrays (13 Nov, Section 2); no intervals for these aggregates.
 3. Validation-only completion of the sweep: phase-2 start, total DDIM budget,
    t400 and extra sampling seeds.
 4. No further test runs until a single configuration is frozen from

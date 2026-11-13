@@ -2215,3 +2215,27 @@ fitting or test access.
 Note: AGENTS.md and HUGGINGFACE_MODAL.md still describe a shared team Workspace
 and Secret `huggingface-secret-2`; they were not changed and need a team
 decision.
+
+## 2026-11-13 — Advisor tracker, Modal Workspace correction, noise-quality analysis
+
+- The user clarified that only the private Hugging Face repos are shared and
+  each member uses their own Modal Workspace and free credit. Updated the
+  Workspace/Secret guidance in AGENTS.md and HUGGINGFACE_MODAL.md accordingly
+  (Volume contents and Secret names can differ per Workspace; record the
+  Workspace per run). Historical records were not rewritten.
+- Added `docs/ADVISOR_FEEDBACK.md`: the advisor's 13 Nov email (Vietnamese, as
+  written) and tracker rows AF-01..AF-11 with status, evidence and next action;
+  AGENTS.md now asks agents to read and update it.
+- Added `dacn.evaluation.noise_quality` and `--analysis quality` to the sweep
+  launcher (verification shared with the bootstrap). Smoke and full runs
+  completed/uploaded in Workspace `tanh1c`; RESULT_TRACKING, ABLATION_SUMMARY §2
+  and tracker rows AF-05..AF-07 updated. Main finding: under-healing at t100,
+  plateau t200–500, normal-tissue breakdown at t800; the pseudo-mask covers
+  41–51% of normal brain foreground at t100–500.
+
+Checks: 4 new noise-quality unit tests passed (hand-computed aggregates,
+missing-class and misalignment cases); Ruff check/format clean; evidence copied
+byte-identically from the Hub and scanned for UUID-like identifiers (none); every
+table value and quoted range compared with the evidence JSON by script. The
+refactored bootstrap path was not re-run after the shared-verification change.
+No inference, training, threshold fitting or test access.

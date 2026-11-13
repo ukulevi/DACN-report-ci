@@ -3519,3 +3519,54 @@ reversed) the independent 2026-11-06 B bootstrap, which used the same seed and
 groups. Intervals are conditional on one checkpoint, one sampling seed, the
 repeatedly inspected 43-image holdout and fixed thresholds; they do not cover
 training-seed variability or selection bias and are not test results.
+
+## 2026-11-13 — Reconstruction quality versus noise level (sweep arrays)
+
+User-requested CPU analysis for advisor item AF-06 (noise level → reconstruction
+quality → detection). Workspace `tanh1c` (each member uses their own Modal
+Workspace; Hub is the shared store), Secret `huggingface` (value not inspected),
+code `e3469e4` clean (`--analysis quality` in `dacn.cloud.modal_sweep_bootstrap`).
+Same 12 producer runs, Hub revision, SHA checks, pinned-dataset equality and
+SHA-verified registered partition as the bootstrap entry above. No model calls,
+threshold fitting, selection or test access; ground-truth masks used only for
+post-hoc aggregates.
+
+| Evaluation ID | Status | Scope | Seconds | Artifacts |
+|---|---|---|---:|---|
+| `sweep-quality-smoke-20261113T162712Z` | completed/uploaded | reference run only | 10.28 | [Modal](https://modal.com/apps/tanh1c/main/ap-X3ROODMwZpgCOghxM4vDLn), [Hub bd634e9a](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/bd634e9a2cca3727ef7d94a58f4ade93fcab3c9d/evaluations/sweep-quality-smoke-20261113T162712Z) |
+| `sweep-quality-full-20261113T162803Z` | completed/uploaded | 12 runs, all 83 and 43-holdout | 51.31 | [Modal](https://modal.com/apps/tanh1c/main/ap-wdrFPAonVv2zsaWBgNH4tE), [Hub 8005b7c9](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/8005b7c9fe2f9d604853955356a521baeaa275c4/evaluations/sweep-quality-full-20261113T162803Z) |
+
+Full results SHA-256 `07b2a208e141bb2dbab74ba6b1795e2fe5d5a42ff81a3796561f918892746058`
+([evidence](evidence/2026-11-13-sweep-quality-results.json),
+[manifest](evidence/2026-11-13-sweep-quality-manifest.json)). Definitions:
+foreground is input > -0.95 in the 240 crop; "normal tissue" is foreground of the
+39 normal slices; lesion is annotated tumour of the 44 abnormal slices; values are
+pixel-micro means of |input - reconstruction| (inputs in [-1,1]) or of the
+spatial LPIPS map. DDIM20+30, all 83 validation slices:
+
+| Phase-1 t | Initial normal L1 | Initial lesion/normal L1 | Final lesion/normal LPIPS | Final normal LPIPS p99 | Mask lesion recall | Normal foreground masked |
+|---:|---:|---:|---:|---:|---:|---:|
+| 100 | 0.084 | 0.96 | 2.08 | 0.282 | 0.828 | 0.506 |
+| 200 | 0.114 | 1.07 | 2.11 | 0.318 | 0.817 | 0.464 |
+| 300 | 0.137 | 1.20 | 2.07 | 0.342 | 0.814 | 0.448 |
+| 500 | 0.183 | 1.62 | 2.00 | 0.394 | 0.779 | 0.414 |
+| 800 | 0.329 | 1.48 | 1.73 | 0.528 | 0.621 | 0.291 |
+
+Observations on this cohort (descriptive, one seed, no intervals):
+
+- Normal-tissue reconstruction error rises monotonically with t. At t100 the
+  initial lesion error is not above normal-tissue error (ratio 0.96): the lesion is
+  largely reproduced. Lesion "healing" grows to t500 (1.62), then the ratio falls
+  at t800 as normal tissue is no longer reconstructed faithfully.
+- Phase 2 raises the lesion/normal LPIPS contrast from about 1.5 (initial) to
+  about 2.0–2.1 for t100–500, then to 1.73 at t800, where producer holdout normal
+  pixel FPR rises to 0.049 (vs 0.0046–0.0068 for t100–500).
+- The pseudo-mask covers 78–83% of lesion pixels for t100–500 (62% at t800) but
+  also 41–51% of normal-slice foreground, with pixel precision about 0.10–0.12.
+  Phase 2 therefore re-samples a large part of the brain, not only lesions.
+- The 30/20 split and the 43-holdout subset show the same ordering
+  (e.g. holdout initial lesion/normal L1 0.87/0.97/1.09/1.48/1.50 for
+  t100/200/300/500/800).
+- Final-phase L1 outside the pseudo-mask is zero by construction, so final L1
+  ratios partly reflect mask coverage; the LPIPS contrast is the detection-relevant
+  quantity.
