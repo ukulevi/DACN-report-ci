@@ -71,10 +71,37 @@ Same total 50 U-Net calls at t300, split between phases:
 
 The 30/20 split was also run at t100/200/500/800 and follows the same shape
 (holdout AP 0.2308/0.2910/0.3288/0.1925). Pixel AP rises from t100 to a plateau
-at t300–500 and collapses at t800; image AUROC peaks at t300. Differences of
-about 0.01 AP inside the plateau are smaller than the calibration/holdout
-disagreement seen in Section 3 and should not select a configuration without
-patient-group confidence intervals.
+at t300–500 and collapses at t800; image AUROC peaks at t300.
+
+### Patient-group bootstrap of the sweep (added 13 Nov)
+
+Paired percentile bootstrap over the 25 holdout patient groups, 999 valid
+replicates, seed17, producer maps and thresholds fixed; reference Final LPIPS
+t300 DDIM20+30. "Delta" is candidate minus reference
+([evidence](evidence/2026-11-13-sweep-bootstrap-results.json), run
+`sweep-bootstrap-full-20261113T161403Z`).
+
+| Candidate | Pixel AP [95% CI] | Delta AP [95% CI] | Delta Dice [95% CI] |
+|---|---|---|---|
+| Final t300 20/30 (reference) | 0.3123 [0.0990, 0.4847] | – | – |
+| Final t100 20/30 | 0.2277 [0.0760, 0.3283] | [-0.1976, +0.0009] | [-0.1627, -0.0119] |
+| Final t200 20/30 | 0.2914 [0.0928, 0.4211] | [-0.0796, +0.0223] | [-0.0503, +0.0193] |
+| Final t500 20/30 | 0.3211 [0.1247, 0.4579] | [-0.1028, +0.0660] | [-0.0513, +0.0466] |
+| Final t800 20/30 | 0.1861 [0.0748, 0.3071] | [-0.2380, -0.0279] | [-0.2215, -0.0027] |
+| Final t300 10/40 | 0.2902 [0.0896, 0.4992] | [-0.0376, +0.0161] | [-0.0290, +0.0157] |
+| Final t300 25/25 | 0.3126 [0.0996, 0.4770] | [-0.0155, +0.0098] | [-0.0072, +0.0052] |
+| Final t300 30/20 | 0.3162 [0.1026, 0.4756] | [-0.0155, +0.0134] | [-0.0008, +0.0116] |
+| Initial LPIPS t300 | 0.1579 [0.0618, 0.3424] | [-0.2048, -0.0397] | [-0.1744, -0.0515] |
+| Final × final residual t300 | 0.1968 [0.0729, 0.2715] | [-0.2337, -0.0210] | [-0.1497, -0.0074] |
+| Brightness | 0.3895 [0.1038, 0.5833] | [-0.2329, +0.2874] | [-0.2980, +0.1131] |
+
+On this holdout, t800 is reliably worse and t100 is worse on Dice. t200, t300
+and t500 cannot be separated, and neither can the four DDIM step splits. The
+wide absolute AP intervals (about 0.10–0.48) show that the 43-image holdout
+cannot rank configurations whose AP differs by a few hundredths; the
+Initial→Final and residual-in-score effects are the only sweep contrasts that
+clearly exclude zero. Intervals are conditional on one checkpoint, one sampling
+seed and the repeatedly inspected holdout; they are not test results.
 
 **Not yet measured:** phase-2 start other than t50; total DDIM budget other
 than 50 calls; t400; more than one sampling seed; reconstruction-quality
@@ -124,8 +151,10 @@ results. No ConvAE/ConvVAE test evaluation exists.
 
 ## 5. Open items for the advisor's priorities
 
-1. Patient-group paired bootstrap intervals for Sections 1–3, using
-   `dacn.evaluation.group_bootstrap` on the fixed maps and thresholds.
+1. Patient-group paired bootstrap: done for the Section 2 sweep and its t300
+   controls on validation (13 Nov), and for Final/Initial/naive-stitch/
+   brightness on 6 Nov. Still missing for the Section 3 alternative scores,
+   the LPIPS-only mask and the test-set rows.
 2. Noise level → reconstruction quality → detection analysis from the cached
    per-t arrays, if they contain reconstructions.
 3. Validation-only completion of the sweep: phase-2 start, total DDIM budget,

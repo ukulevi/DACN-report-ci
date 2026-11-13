@@ -3463,3 +3463,59 @@ this is not an untouched confirmatory result.
 Compared with the frozen Final LPIPS test row (AP 0.318226, Dice 0.364293, image
 ROC-AUC 0.805989), the LPIPS-only mask is lower on these metrics for this cohort.
 This is descriptive; it does not reselect thresholds or replace the frozen protocol.
+
+## 2026-11-13 — Paired patient-group bootstrap of the DDIM noise/step sweep
+
+User-requested CPU job (Advisor priority: noise level/DDIM steps, ablation
+reliability). Validation only; no model calls, threshold fitting, selection or
+test access. The user stated that the team has no shared Modal Workspace, so both
+attempts ran in Workspace `tanh1c` using its existing Volumes and Secret
+`huggingface` (Secret value not inspected). Code `00698c4`
+(`dacn.cloud.modal_sweep_bootstrap`, clean working tree).
+
+Inputs: 12 producer runs (DDIM20+30 at t100/200/300/500/800, DDIM30+20 at the
+same t, DDIM10+40 and 25+25 at t300) from Hub revision
+`de97d764ef360742cb181346afbb9f0da59bc218`; each `results.json` and
+`private_ablation.npz` SHA-256 checked against its producer manifest. Pinned
+dataset `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`, index
+`57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3`; cached
+images/masks/labels equal across all runs and equal to the pinned validation
+shards. The registered 40/43 partition file is not on this Workspace's Volume;
+it was rebuilt with `StratifiedGroupKFold(2, shuffle=True, random_state=17)` and
+accepted only because its canonical bytes reproduce the registered SHA-256
+`5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184`.
+Producer calibration thresholds unchanged; job requires replay of every
+producer holdout pixel AP and micro Dice (max abs error 4.27e-15).
+
+| Evaluation ID | Status | Replicates | Seconds | Artifacts |
+|---|---|---:|---:|---|
+| `sweep-bootstrap-smoke-20261113T161050Z` | completed/uploaded | 20 | 116.07 | [Modal](https://modal.com/apps/tanh1c/main/ap-noUsttE7c0Pp8cmxDFSn85), [Hub 68de2169](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/68de2169b67293ecca26ee9812e60d4c8958bf4f/evaluations/sweep-bootstrap-smoke-20261113T161050Z) |
+| `sweep-bootstrap-full-20261113T161403Z` | completed/uploaded | 1000 (999 valid, 1 lacked a class) | 196.42 | [Modal](https://modal.com/apps/tanh1c/main/ap-YzY8f8D2LgQ38uVJSxx8va), [Hub 1e7be357](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/1e7be3573695b0eeabe033574046a17ff215f63f/evaluations/sweep-bootstrap-full-20261113T161403Z) |
+
+Full results SHA-256 `ea9e0ec1858465834df85bef87c421f0ddabaf01af22e34d26bf83db3df22a1d`
+(byte-identical copy in [evidence](evidence/2026-11-13-sweep-bootstrap-results.json),
+[manifest](evidence/2026-11-13-sweep-bootstrap-manifest.json)). Paired bootstrap
+seed17 resamples the 25 holdout patient groups; reference is Final LPIPS t300
+DDIM20+30. 95% percentile intervals, pixel-level global micro over the 240 crop:
+
+- Reference Final LPIPS t300 20/30: AP 0.3123 [0.0990, 0.4847], Dice 0.3712
+  [0.1496, 0.4793].
+- Final at t800 is lower than t300 (delta AP 20/30 [-0.2380, -0.0279]; 30/20
+  [-0.2281, -0.0266]). t100 has lower Dice (delta [-0.1627, -0.0119]) and an AP
+  delta interval touching zero ([-0.1976, +0.0009]). t200 and t500 are not
+  distinguishable from t300 (t500 20/30 delta AP [-0.1028, +0.0660]).
+- DDIM step splits at t300 are not distinguishable (10/40 delta AP
+  [-0.0376, +0.0161]; 25/25 [-0.0155, +0.0098]; 30/20 [-0.0155, +0.0134]).
+- All deltas are against the fixed t300 Final reference, not same-t pairs.
+  Initial LPIPS at t300 is lower (delta AP [-0.2048, -0.0397]); every other
+  Initial LPIPS row also has a negative interval except t500 30/20
+  ([-0.2431, +0.0007]). The LPIPS x final-residual score ([-0.2337, -0.0210]),
+  naive-stitch L1 and initial L1 are also lower than the reference.
+- Brightness minus Final AP [-0.2329, +0.2874], Dice [-0.2980, +0.1131]: not
+  distinguishable on this holdout.
+
+The t300 Final-vs-Initial and Final-vs-brightness intervals equal (with sign
+reversed) the independent 2026-11-06 B bootstrap, which used the same seed and
+groups. Intervals are conditional on one checkpoint, one sampling seed, the
+repeatedly inspected 43-image holdout and fixed thresholds; they do not cover
+training-seed variability or selection bias and are not test results.

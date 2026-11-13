@@ -2187,3 +2187,31 @@ lint, inference, training or test-split access were run.
 Next: patient-group bootstrap intervals for the summary tables and a
 validation-only completion of the sweep (phase-2 start, total DDIM budget, t400,
 extra sampling seeds); GPU work only when explicitly requested.
+
+## 2026-11-13 — Patient-group bootstrap for the DDIM noise/step sweep
+
+Added `dacn.evaluation.sweep_bootstrap` and the CPU-only Modal launcher
+`dacn.cloud.modal_sweep_bootstrap`. They reuse the twelve 06–09 Nov producer
+score maps and calibration thresholds, verify producer artifact SHA-256, sample
+alignment with the pinned validation shards and the registered 40/43 partition,
+and refuse to report unless every producer holdout AP/Dice replays exactly.
+Volumes are looked up without creation; the Hub Secret name is configurable
+(`DACN_HF_SECRET`) because the user stated the team has no shared Modal
+Workspace. The partition file is absent from Workspace `tanh1c`, so it is rebuilt
+and accepted only when its canonical bytes reproduce the registered SHA-256.
+
+Ran smoke (20 replicates) and full (1000 replicates, 999 valid) in `tanh1c`,
+both completed/uploaded; provenance and intervals in RESULT_TRACKING, evidence
+copied byte-identically from the Hub, summary table added to
+ABLATION_SUMMARY_2026-11-13. The t300 Final-vs-Initial and Final-vs-brightness
+intervals reproduce the independent 06 Nov bootstrap with sign reversed.
+
+Checks: 6 new unit tests plus 2 existing bootstrap tests passed; Ruff check and
+format clean on the new files; every interval quoted in RESULT_TRACKING and the
+summary table was compared by script with the evidence JSON (one wording error
+about same-t comparisons was corrected). No inference, training, threshold
+fitting or test access.
+
+Note: AGENTS.md and HUGGINGFACE_MODAL.md still describe a shared team Workspace
+and Secret `huggingface-secret-2`; they were not changed and need a team
+decision.

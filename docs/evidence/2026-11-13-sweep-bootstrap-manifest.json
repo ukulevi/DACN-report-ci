@@ -1,0 +1,26 @@
+{
+  "artifacts": {
+    "results.json": "ea9e0ec1858465834df85bef87c421f0ddabaf01af22e34d26bf83db3df22a1d",
+    "source_snapshot.zip": "f5f60e2922713e0728f65eda2d5e41b341f3d20d513cdba67b75eaacbdd589a5"
+  },
+  "code_revision": "00698c4c98047cc7b560c83df966cf6740d0ac5c",
+  "completed_at": "2026-11-13T16:17:36.315192+00:00",
+  "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "evaluation_id": "sweep-bootstrap-full-20261113T161403Z",
+  "gpu": null,
+  "held_out_test_used": false,
+  "index_sha256": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+  "method": "paired_patient_group_bootstrap_ddim_noise_step_sweep",
+  "mode": "full",
+  "model_repo_revision": "de97d764ef360742cb181346afbb9f0da59bc218",
+  "new_model_calls": 0,
+  "source_snapshot_sha256": "f5f60e2922713e0728f65eda2d5e41b341f3d20d513cdba67b75eaacbdd589a5",
+  "split": "validation",
+  "started_at": "2026-11-13T16:14:18.254618+00:00",
+  "status": "completed",
+  "threshold_fitting": false,
+  "total_seconds": 196.42130887099998,
+  "validation_partition_sha256": "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184",
+  "working_tree_dirty": false
+}
