@@ -53,11 +53,16 @@ Hub commit SHA. Pin that SHA for Modal runs instead of using moving `main`.
 
 ## Modal credentials and storage
 
-The project uses a shared Modal Workspace, which owns the Volumes and the
-`huggingface-secret-2` Secret used by jobs. Each teammate needs to be invited to
-that Workspace and authenticate their own Modal CLI. In the dashboard, confirm
-the active Workspace is the team one before running commands; a personal
-Workspace will not have the team's Secret or cached Volumes. See Modal's
+There is no shared Modal Workspace: each teammate runs jobs in their own
+Workspace so that each member's free credit can be used. The private Hugging Face
+dataset and model repos are the only shared storage. Volumes named
+`dacn-bmad-datasets` and `dacn-bmad-runs` exist separately in each Workspace and
+do not share contents; artifacts written only to one member's Volume (for
+example a registered partition file) are not visible to others, so inputs must be
+reproducible from pinned Hub revisions and outputs uploaded to the Hub. Record
+the Workspace in each run entry. The Hub Secret name below is the documented
+default; an older Workspace may use another name such as `huggingface`, and
+launchers that support it read the name from `DACN_HF_SECRET`. See Modal's
 [Workspace guide](https://modal.com/docs/guide/workspaces).
 
 ```powershell
@@ -66,9 +71,10 @@ modal setup
 modal secret list
 ```
 
-`modal secret list` should show a Secret named `huggingface-secret-2`; it does not
-reveal the token value. The Workspace owner provisions this shared Secret once
-from a private local `.env` file containing `HF_TOKEN`:
+`modal secret list` should show the Hub Secret (default name
+`huggingface-secret-2`); it does not reveal the token value. Each member
+provisions it once in their own Workspace from a private local `.env` file
+containing `HF_TOKEN`:
 
 ```powershell
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
@@ -76,8 +82,8 @@ if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 modal secret create huggingface-secret-2 --from-dotenv .env
 ```
 
-Run the create command only if the Secret is absent. Do not overwrite the shared
-Secret while onboarding; a Workspace owner should coordinate any rotation. The
+Run the create command only if the Secret is absent; do not overwrite an
+existing Secret without intending to rotate it. The
 token in this Secret must be able to read the private dataset repo and write to
 the organization's model repo. Modal's current CLI supports creating a Secret
 from dotenv and listing Secret names; see [Modal Secrets](https://modal.com/docs/guide/secrets)
@@ -86,12 +92,12 @@ and the [`modal secret` CLI](https://modal.com/docs/cli/latest/secret).
 For notebook artifact downloads, each member also needs a local Hugging Face
 token with read access. The notebook reads it from the ignored root `.env` or
 from `hf auth login`. This local token is not sent to Modal; the remote job uses
-the shared Modal Secret. A terminal run that only uploads artifacts does not
-need a local token once the shared Secret is configured.
+the Workspace's Modal Secret. A terminal run that only uploads artifacts does not
+need a local token once that Secret is configured.
 
 The app uses an A100 GPU, a six-hour job timeout, a persistent dataset Volume, and
 a persistent run Volume. Modal injects the Hub token from the
-`huggingface-secret-2` Secret. The token's account must have write access to the
+Workspace's Hub Secret (default `huggingface-secret-2`). The token's account must have write access to the
 organization's model repo for run uploads. Dataset shards are cached by repo and
 immutable commit SHA. The run Volume is committed before the output folder is
 uploaded to the private model repo `dacn-bmad-team/dacn-runs` at

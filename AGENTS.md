@@ -32,6 +32,9 @@ and the relevant protocol in `docs/`.
 
 ## Project records
 
+- Read `docs/ADVISOR_FEEDBACK.md` for the advisor's current priorities before
+  planning research work. When a task addresses one of its tracker rows,
+  update that row's status and evidence link; add a new section for new feedback.
 - For each completed task that changes repository files, append a concise,
   date-stamped entry to `docs/WORKLOG.md`. Include the issue/PR when known, the
   change, evidence or checks actually performed, and the next step when useful.
@@ -86,12 +89,15 @@ and the relevant protocol in `docs/`.
   the relevant requirements and data protocol. Treat Modal as remote compute:
   the local Jupyter notebook submits and displays a job; its local kernel does
   not train the model.
-- Use the shared team Modal Workspace so jobs can access the team's named
-  Volumes and `huggingface-secret-2` Secret. Check the active Workspace and
-  whether the Secret name is present; never inspect, print, log, or commit its
-  value. Do not replace a shared Secret. If it is missing or needs rotation,
-  explain that a Workspace owner must provision it from a private local `.env`
-  file.
+- There is no shared team Modal Workspace. Each member runs jobs in their own
+  Workspace (to use each member's free credit); the private Hugging Face repos
+  are the only shared storage. Volumes with the same names exist per Workspace
+  and do not share contents, so reproduce inputs from pinned Hub revisions and
+  upload aggregate outputs to the Hub. Record the Workspace that ran each job.
+  The Hub Secret name can differ per Workspace (for example `huggingface` or
+  `huggingface-secret-2`); check that the name is present, and never inspect,
+  print, log, or commit its value. If it is missing, the Workspace owner creates
+  it from a private local `.env` file.
 - Only start GPU work when the user explicitly asks. Start with the documented
   bounded smoke configuration unless the user specifically requests a larger
   run. Use a fresh run ID and immutable dataset revision for each attempt.
