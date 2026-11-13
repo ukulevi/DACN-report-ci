@@ -2239,3 +2239,28 @@ byte-identically from the Hub and scanned for UUID-like identifiers (none); ever
 table value and quoted range compared with the evidence JSON by script. The
 refactored bootstrap path was not re-run after the shared-verification change.
 No inference, training, threshold fitting or test access.
+
+## 2026-11-14 — Pseudo-mask rule ablation (AF-07), validation only
+
+Added `dacn.evaluation.mask_rule_ablation` and the T4 launcher
+`dacn.cloud.modal_mask_rule_ablation` (user-authorized GPU run). Hypothesis and
+eight arms (percentile 90/95/98/99 × dilation 1/3, control p95/d3) were fixed in
+code before any run. Only the mask rule changes; cached DDIM20 t300 initials and
+heatmaps, masked DDIM30 from t50, seeds and LPIPS weights are reused and checked.
+`_pinned_validation` now also returns calibration positions and in-memory sample
+IDs (never written) for per-sample seeds.
+
+Smoke (2 images) and full (83 images, 19920 U-Net calls, 714 s) completed and
+uploaded in Workspace `tanh1c`; the control replayed producer finals and LPIPS
+maps with max abs error 0.0. Result: tighter masks lower normal-tissue LPIPS and
+FPR as hypothesised but also lesion recall; no pixel AP or Dice difference beyond
+paired bootstrap uncertainty, control has the highest calibration AP and image
+ROC-AUC, no rule adopted. RESULT_TRACKING, ABLATION_SUMMARY §1/§5 and advisor
+rows AF-02/AF-07 updated.
+
+Checks: 5 new mask-rule tests (producer-equivalence at p95/d3, monotonic
+coverage, replay accept/reject, hand-computed statistics) plus 4 noise-quality
+tests passed locally with a numba import stub (numba is not installed in the
+local Python); Ruff check/format clean; evidence byte-identical to the Hub and
+free of UUID-like identifiers; summary tables generated from the evidence JSON
+and quoted claims checked by script. No training or test access.

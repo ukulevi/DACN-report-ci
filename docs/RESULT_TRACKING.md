@@ -3570,3 +3570,65 @@ Observations on this cohort (descriptive, one seed, no intervals):
 - Final-phase L1 outside the pseudo-mask is zero by construction, so final L1
   ratios partly reflect mask coverage; the LPIPS contrast is the detection-relevant
   quantity.
+
+## 2026-11-13 — Pseudo-mask rule ablation for Final LPIPS (AF-07, validation)
+
+User-authorized T4 GPU run in Workspace `tanh1c` (own Modal credit; Hub is the
+shared store), Secret `huggingface` (value not inspected), code `b833a0c` clean
+(`dacn.cloud.modal_mask_rule_ablation`). Hypothesis and arms fixed before any run
+(see [ABLATION_SUMMARY](ABLATION_SUMMARY_2026-11-13.md) and the module docstring):
+pooled normal-calibration percentile {90, 95, 98, 99} × dilation {1, 3}; control
+p95/d3. Fixed: Gaussian EMA30 checkpoint `d3e06d20…b946` (SHA-verified before
+load), cached DDIM20 t300 initials and LPIPS × clip(L1/P95) heatmaps from
+`autoddpm-ddim2030-full83-t4-20261106T074200Z` (NPZ/results SHA and pinned-dataset
+equality verified), masked DDIM30 from t50, eta0, one pass, base17/UUID seeds,
+LPIPS0.1 squeeze state `18fed4d1…dffe6`. Registered 40/43 partition rebuilt and
+SHA-verified. No retraining, no test access, no arm selection.
+
+- **`mask-rule-smoke-20261113T165555Z`** completed/uploaded; 2 images
+  (first normal, first abnormal), rules p95/d3 and p99/d1, 120 U-Net calls,
+  14.52 s, peak CUDA allocated 104409088 B. Control replay of producer finals and
+  final LPIPS maps: max abs error 0.0 and 0.0; mask threshold and masks exact.
+  No metrics from smoke. [Modal](https://modal.com/apps/tanh1c/main/ap-IHNoKUjmg2hbQWaue8xAOX),
+  [Hub 6874240f](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/6874240f57ded1466fb1e42d5a391d9475e9a1d2/evaluations/mask-rule-smoke-20261113T165555Z).
+- **`mask-rule-full-20261113T165856Z`** submitted detached after smoke acceptance;
+  completed/uploaded 2026-11-13T17:11:25Z, 714.31 s, 8 rules × 83 images,
+  19920 U-Net calls (30 per image per rule), peak CUDA allocated 104409088 B,
+  phase-2 median 0.81–0.89 s/image. Control replay over all 83 images: finals
+  and final LPIPS max abs error 0.0, threshold and masks exact.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-GvtZtX1vGrlZcojZ4llyJI),
+  [Hub 16819a8a](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/16819a8a9c10159e7cca76914231116f94c5af62/evaluations/mask-rule-full-20261113T165856Z)
+  (includes private score maps/masks, no images). Results SHA-256
+  `b8540cac677b263735cd4cb49db52a4f6bd1bb284a4ee9272cbe5abb83f6acae`,
+  [evidence](evidence/2026-11-13-mask-rule-results.json),
+  [manifest](evidence/2026-11-13-mask-rule-manifest.json).
+
+Score thresholds are max-F1 on the 40 calibration images per arm; metrics below
+are pixel-level global micro over the 240 crop on the 43-image holdout unless
+labelled; mask and final-quality columns use all 83 slices. Paired patient-group
+bootstrap vs control, 25 groups, 999 valid replicates, seed17.
+
+| Rule | Mask threshold | Mask lesion recall | Normal foreground masked | Final normal LPIPS | Lesion/normal LPIPS | Cal. AP | Holdout AP | Holdout AUROC | Holdout Dice | Normal FPR | Image AUROC | Delta AP vs p95/d3 [95% CI] |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| **p95/d3 (control)** | 0.1334 | 0.814 | 0.448 | 0.1313 | 2.07 | 0.3130 | 0.3123 | 0.9490 | 0.3712 | 0.0058 | 0.9145 | – |
+| p90/d3 | 0.0855 | 0.945 | 0.753 | 0.1567 | 1.79 | 0.3077 | 0.3119 | 0.9487 | 0.3807 | 0.0053 | 0.8925 | [-0.0217, +0.0180] |
+| p90/d1 | 0.0855 | 0.643 | 0.376 | 0.1532 | 1.77 | 0.2822 | 0.3133 | 0.9458 | 0.3710 | 0.0055 | 0.8904 | [-0.0170, +0.0250] |
+| p95/d1 | 0.1334 | 0.472 | 0.187 | 0.1190 | 2.16 | 0.2810 | 0.3322 | 0.9468 | 0.3819 | 0.0046 | 0.8991 | [-0.0147, +0.0433] |
+| p98/d3 | 0.1825 | 0.600 | 0.202 | 0.0888 | 2.76 | 0.2859 | 0.3148 | 0.9417 | 0.3768 | 0.0051 | 0.8838 | [-0.0226, +0.0165] |
+| p98/d1 | 0.1825 | 0.311 | 0.075 | 0.0722 | 3.12 | 0.2857 | 0.3286 | 0.9392 | 0.3904 | 0.0039 | 0.8860 | [-0.0323, +0.0544] |
+| p99/d3 | 0.2141 | 0.449 | 0.109 | 0.0606 | 3.53 | 0.2788 | 0.2912 | 0.9275 | 0.3561 | 0.0049 | 0.8706 | [-0.0610, +0.0069] |
+| p99/d1 | 0.2141 | 0.219 | 0.038 | 0.0459 | 4.24 | 0.2933 | 0.3291 | 0.9323 | 0.3852 | 0.0022 | 0.8838 | [-0.0503, +0.0758] |
+
+Observations (one seed, repeatedly inspected holdout, descriptive):
+
+- Tighter rules behave as hypothesised on normal tissue: normal-foreground
+  coverage falls from 0.448 to 0.038, final normal-tissue LPIPS from 0.1313 to
+  0.0459, lesion/normal LPIPS contrast rises from 2.07 to 4.24 and normal FPR
+  from 0.0058 to 0.0022.
+- The cost is lesion coverage (mask lesion recall 0.814 to 0.219) and lower
+  lesion LPIPS. Holdout pixel AP stays in 0.2912–0.3322 and every paired delta
+  AP and delta Dice interval includes zero; no rule is shown to beat the control.
+- Calibration-half AP is highest for the control (0.3130) and image ROC-AUC is
+  highest for the control (0.9145), while several tighter rules look better on
+  the holdout half; this disagreement is again within bootstrap uncertainty.
+- No rule is adopted. A calibration-AP selection rule would keep p95/d3.

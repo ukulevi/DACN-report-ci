@@ -48,6 +48,38 @@ Reading on this cohort (one seed, no confidence intervals yet):
 - Test rows after the original four-arm test (LPIPS-only mask, 12 Nov; DDIM50,
   11 Nov) are exploratory extensions on an already inspected test set.
 
+### Pseudo-mask rule ablation — validation only (added 13 Nov, AF-07)
+
+Hypothesis fixed before running: the p95/dilation3 mask re-samples about 45% of
+normal brain foreground; a tighter mask should lower normal-tissue LPIPS and FPR,
+retaining AP only while lesion recall stays high. Only the mask rule changes
+(pooled normal-calibration percentile × dilation); cached DDIM20 t300 initials
+and heatmaps, masked DDIM30 from t50, seeds and LPIPS are fixed. The control
+replays the producer exactly (max abs error 0.0). Run
+`mask-rule-full-20261113T165856Z`, [evidence](evidence/2026-11-13-mask-rule-results.json);
+mask and final-quality columns use all 83 slices, metrics the 43-image holdout,
+delta from a paired patient-group bootstrap (999 valid replicates).
+
+| Rule | Mask threshold | Mask lesion recall | Normal foreground masked | Final normal LPIPS | Lesion/normal LPIPS | Cal. AP | Holdout AP | Holdout AUROC | Holdout Dice | Normal FPR | Image AUROC | Delta AP vs p95/d3 [95% CI] |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| **p95/d3 (control)** | 0.1334 | 0.814 | 0.448 | 0.1313 | 2.07 | 0.3130 | 0.3123 | 0.9490 | 0.3712 | 0.0058 | 0.9145 | – |
+| p90/d3 | 0.0855 | 0.945 | 0.753 | 0.1567 | 1.79 | 0.3077 | 0.3119 | 0.9487 | 0.3807 | 0.0053 | 0.8925 | [-0.0217, +0.0180] |
+| p90/d1 | 0.0855 | 0.643 | 0.376 | 0.1532 | 1.77 | 0.2822 | 0.3133 | 0.9458 | 0.3710 | 0.0055 | 0.8904 | [-0.0170, +0.0250] |
+| p95/d1 | 0.1334 | 0.472 | 0.187 | 0.1190 | 2.16 | 0.2810 | 0.3322 | 0.9468 | 0.3819 | 0.0046 | 0.8991 | [-0.0147, +0.0433] |
+| p98/d3 | 0.1825 | 0.600 | 0.202 | 0.0888 | 2.76 | 0.2859 | 0.3148 | 0.9417 | 0.3768 | 0.0051 | 0.8838 | [-0.0226, +0.0165] |
+| p98/d1 | 0.1825 | 0.311 | 0.075 | 0.0722 | 3.12 | 0.2857 | 0.3286 | 0.9392 | 0.3904 | 0.0039 | 0.8860 | [-0.0323, +0.0544] |
+| p99/d3 | 0.2141 | 0.449 | 0.109 | 0.0606 | 3.53 | 0.2788 | 0.2912 | 0.9275 | 0.3561 | 0.0049 | 0.8706 | [-0.0610, +0.0069] |
+| p99/d1 | 0.2141 | 0.219 | 0.038 | 0.0459 | 4.24 | 0.2933 | 0.3291 | 0.9323 | 0.3852 | 0.0022 | 0.8838 | [-0.0503, +0.0758] |
+
+The normal-tissue part of the hypothesis holds: tighter masks cut normal
+coverage (0.448 → 0.038), normal-tissue LPIPS (0.131 → 0.046) and FPR
+(0.0058 → 0.0022), and raise lesion/normal contrast (2.07 → 4.24). Lesion
+recall falls with them (0.814 → 0.219), and pixel AP does not change reliably:
+all delta AP and delta Dice intervals include zero. The control has the highest
+calibration AP and image ROC-AUC, so the mask rule is a normal-FPR versus
+lesion-coverage trade-off rather than the AP bottleneck on this holdout. No rule
+is adopted.
+
 ## 2. Noise level (phase-1 start) and DDIM step split — validation only
 
 Final LPIPS arm, DDIM20 phase 1 + DDIM30 phase 2 from t50, unless stated.
@@ -140,8 +172,8 @@ Reading, consistent with the under-/over-noising hypothesis:
   final L1 is the detection-relevant quantity.
 
 **Not yet measured:** phase-2 start other than t50; total DDIM budget other
-than 50 calls; t50 and t400 at phase 1; more than one sampling seed; mask
-percentile/dilation sensitivity.
+than 50 calls; t50 and t400 at phase 1; more than one sampling seed. Mask
+percentile/dilation sensitivity is in Section 1.
 
 ## 3. Alternative scores on the same Final reconstruction — validation only
 
@@ -194,7 +226,9 @@ results. No ConvAE/ConvVAE test evaluation exists.
 2. Noise level → reconstruction quality → detection: done descriptively from
    the cached per-t arrays (13 Nov, Section 2); no intervals for these aggregates.
 3. Validation-only completion of the sweep: phase-2 start, total DDIM budget,
-   t400 and extra sampling seeds.
+   t50/t400 and extra sampling seeds. Mask-rule ablation done (13 Nov,
+   Section 1); weighted LPIPS+residual fusion on the Final reconstruction
+   (AF-03) not yet run.
 4. No further test runs until a single configuration is frozen from
    validation; report the three post-freeze test uses as exploratory.
 5. Source for the 11–12 November runs is only in private source snapshots;
