@@ -121,6 +121,32 @@ REFERENCE_CONTROLS = {
 SHARED_ARRAYS = ("images", "masks", "labels")
 
 
+def rebuild_registered_partition(index_bytes, labels, groups):
+    """Recreate the registered 40/43 partition bytes written by the four-arm protocol.
+
+    Callers must compare the SHA-256 with the recorded registration; a different
+    scikit-learn split then fails instead of silently changing membership.
+    """
+    import hashlib
+    import json
+
+    from sklearn.model_selection import StratifiedGroupKFold
+
+    labels, groups = np.asarray(labels), np.asarray(groups)
+    calibration, holdout = next(
+        StratifiedGroupKFold(2, shuffle=True, random_state=17).split(
+            np.zeros((len(labels), 1)), labels, groups
+        )
+    )
+    record = {
+        "schema_version": 1,
+        "index_sha256": hashlib.sha256(index_bytes).hexdigest(),
+        "calibration_positions": calibration.tolist(),
+        "holdout_positions": holdout.tolist(),
+    }
+    return (json.dumps(record, sort_keys=True, indent=2, allow_nan=False) + "\n").encode()
+
+
 def candidate_name(arm_label, start, steps1, steps2):
     return f"{arm_label}_t{start}_{steps1}_{steps2}"
 

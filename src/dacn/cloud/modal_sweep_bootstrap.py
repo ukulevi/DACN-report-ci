@@ -1,15 +1,18 @@
 """CPU-only paired patient-group bootstrap for the 09 Nov noise/DDIM sweep.
 
 Validation only. Reuses producer score maps and calibration thresholds; no model
-calls, threshold fitting, selection or test access. Requires the shared team
-Workspace: Volumes are looked up without creation and the Hub Secret must exist.
+calls, threshold fitting, selection or test access. Volumes are looked up without
+creation and must already hold the pinned dataset cache. The registered 40/43
+partition is rebuilt from the pinned index and must reproduce its recorded SHA-256.
+The Hub Secret name defaults to the team name; override with DACN_HF_SECRET.
 
-    modal run --detach -m dacn.cloud.modal_sweep_bootstrap \
+    DACN_HF_SECRET=huggingface modal run --detach -m dacn.cloud.modal_sweep_bootstrap \
         --evaluation-id sweep-bootstrap-smoke-UNIQUE --code-revision GIT_SHA --mode smoke
 """
 
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,6 +20,7 @@ from pathlib import Path
 import modal
 
 app = modal.App("dacn-sweep-bootstrap")
+HF_SECRET = os.environ.get("DACN_HF_SECRET", "huggingface-secret-2")
 data_volume = modal.Volume.from_name("dacn-bmad-datasets")
 run_volume = modal.Volume.from_name("dacn-bmad-runs")
 DATA_ROOT = Path("/mnt/datasets")
@@ -27,7 +31,6 @@ MODEL_REPO = "dacn-bmad-team/dacn-runs"
 # Immutable Hub revision containing all twelve producer sweep artifacts.
 MODEL_REVISION = "de97d764ef360742cb181346afbb9f0da59bc218"
 INDEX_SHA = "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3"
-PARTITION_PATH = "final-evaluation/final-fourarm-20261110-b/artifacts/validation_partition"
 PARTITION_SHA = "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184"
 REPLICATES = {"smoke": 20, "full": 1000}
 
@@ -51,7 +54,7 @@ def _sha_bytes(payload):
     memory=16384,
     timeout=60 * 60,
     volumes={str(DATA_ROOT): data_volume, str(RUN_ROOT): run_volume},
-    secrets=[modal.Secret.from_name("huggingface-secret-2")],
+    secrets=[modal.Secret.from_name(HF_SECRET)],
 )
 def run_sweep_bootstrap_remote(
     evaluation_id: str, code_revision: str, working_tree_dirty: bool, mode: str
@@ -73,7 +76,12 @@ def run_sweep_bootstrap_remote(
     )
     from dacn.data.shards import ShardDataset
     from dacn.evaluation.registered_partition import registered_partition
-    from dacn.evaluation.sweep_bootstrap import SWEEP_RUNS, bootstrap_sweep, collect_candidates
+    from dacn.evaluation.sweep_bootstrap import (
+        SWEEP_RUNS,
+        bootstrap_sweep,
+        collect_candidates,
+        rebuild_registered_partition,
+    )
 
     if mode not in REPLICATES or not re.fullmatch(
         r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", evaluation_id
@@ -115,13 +123,15 @@ def run_sweep_bootstrap_remote(
         key = hashlib.sha256(f"{DATASET}@{REVISION}".encode()).hexdigest()[:20]
         validation_dir = DATA_ROOT / key / "data" / "val"
         index_bytes = (validation_dir / "index.csv").read_bytes()
-        partition_bytes = (RUN_ROOT / PARTITION_PATH).read_bytes()
-        if _sha_bytes(index_bytes) != INDEX_SHA or _sha_bytes(partition_bytes) != PARTITION_SHA:
-            raise ValueError("Pinned validation index or registered partition differs")
+        if _sha_bytes(index_bytes) != INDEX_SHA:
+            raise ValueError("Pinned validation index differs")
         rows = list(csv.DictReader(io.StringIO(index_bytes.decode())))
         groups = np.array([row["patient_group_id"] for row in rows])
-        _, holdout = registered_partition(partition_bytes, index_bytes, groups)
         data = ShardDataset(validation_dir, "val", include_masks=True)
+        partition_bytes = rebuild_registered_partition(index_bytes, data.labels, groups)
+        if _sha_bytes(partition_bytes) != PARTITION_SHA:
+            raise ValueError("Rebuilt partition differs from the registered 40/43 membership")
+        _, holdout = registered_partition(partition_bytes, index_bytes, groups)
 
         runs, verified = {}, {}
         for start, steps1, steps2, run_id, npz_sha, results_sha in SWEEP_RUNS:
@@ -185,13 +195,16 @@ def run_sweep_bootstrap_remote(
             artifacts=_file_checksums(output),
         )
         persist()
-        HfApi(token=token).upload_folder(
-            folder_path=str(output),
-            path_in_repo=f"evaluations/{evaluation_id}",
-            repo_id=MODEL_REPO,
-            commit_message=f"Store sweep bootstrap {evaluation_id}",
-        )
-        manifest["artifact_sync_status"] = "uploaded"
+        try:
+            commit = HfApi(token=token).upload_folder(
+                folder_path=str(output),
+                path_in_repo=f"evaluations/{evaluation_id}",
+                repo_id=MODEL_REPO,
+                commit_message=f"Store sweep bootstrap {evaluation_id}",
+            )
+            manifest.update(artifact_sync_status="uploaded", hub_commit=commit.oid)
+        except Exception as exc:  # Results stay on the Volume and are returned.
+            manifest.update(artifact_sync_status="failed", artifact_sync_error=type(exc).__name__)
         persist()
         return {"manifest": manifest, "results": report}
     except BaseException as exc:

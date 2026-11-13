@@ -121,3 +121,21 @@ def test_sweep_registry_matches_reference_and_has_unique_runs():
     specs = [(run[0], run[1], run[2]) for run in sb.SWEEP_RUNS]
     assert len(specs) == len(set(specs))
     assert all(len(run[4]) == len(run[5]) == 64 for run in sb.SWEEP_RUNS)
+
+
+def test_rebuilt_partition_is_deterministic_group_disjoint_and_canonical():
+    import hashlib
+    import json
+
+    rng = np.random.default_rng(5)
+    groups = np.repeat([f"g{i}" for i in range(20)], 4)
+    labels = rng.integers(0, 2, size=len(groups))
+    index = b"sample_id,patient_group_id\n"
+    payload = sb.rebuild_registered_partition(index, labels, groups)
+    assert payload == sb.rebuild_registered_partition(index, labels, groups)
+    record = json.loads(payload)
+    assert list(record) == sorted(record) and payload.endswith(b"}\n")
+    assert record["index_sha256"] == hashlib.sha256(index).hexdigest()
+    cal, hold = record["calibration_positions"], record["holdout_positions"]
+    assert sorted(cal + hold) == list(range(len(groups)))
+    assert set(groups[cal]).isdisjoint(groups[hold])
