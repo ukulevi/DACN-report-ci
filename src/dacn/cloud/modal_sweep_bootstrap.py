@@ -86,13 +86,20 @@ def _pinned_validation():
     partition_bytes = rebuild_registered_partition(index_bytes, data.labels, groups)
     if _sha_bytes(partition_bytes) != PARTITION_SHA:
         raise ValueError("Rebuilt partition differs from the registered 40/43 membership")
-    _, holdout = registered_partition(partition_bytes, index_bytes, groups)
+    calibration, holdout = registered_partition(partition_bytes, index_bytes, groups)
     images, masks = [], []
     for i in range(len(data)):
         image_value, mask, _ = data[i]
         images.append(image_value[0].numpy())
         masks.append(mask.numpy())
-    dataset = {"images": np.stack(images), "masks": np.stack(masks), "labels": data.labels}
+    # Sample UUIDs stay in memory for per-sample seeds; never written to outputs.
+    dataset = {
+        "images": np.stack(images),
+        "masks": np.stack(masks),
+        "labels": data.labels,
+        "sample_ids": list(data.sample_ids),
+        "calibration": calibration,
+    }
     return groups, holdout, dataset
 
 
