@@ -22,6 +22,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 | ID | Blocker | Status | Owner / next handoff | Affects | Last updated |
 |---|---|---|---|---|---|
+| `BLK-20261113-01` | Source của run 11–12/11 chưa có trong Git | Open | Thành viên đã chạy SNC/Sobel/PraNet/CGFF/LPIPS-only-mask | Tái lập, review code, báo cáo ablation | 2026-11-13 |
 | `BLK-20261107-02` | Colab mới chờ HF read authentication | Resolved | Người dùng / agent tiếp tục smoke | GPU smoke/full validation | 2026-11-07 |
 | `BLK-20261107-01` | GitHub Actions bị chặn do tài khoản/billing | Waiting | Chủ repo kiểm Billing/Actions | CI head hiện tại | 2026-11-07 |
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
@@ -30,6 +31,31 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 | `BLK-20261106-01` | Nghiệm thu resume/cache sau tích hợp | Investigating | Nhóm review freeze; CI repo owner | DAC-11/12/14/15/30 | 2026-11-08 |
 
 ## Blocker details
+
+### BLK-20261113-01 — Source của các run 11–12/11 chỉ có trong snapshot private
+
+- **Status:** Open, 13/11/2026.
+- **Affects:** 11 run trên `dacn-bmad-team/dacn-runs`: `snc-lpips-*`, `sobel-*`,
+  `pranet-fusion-*`, `cgff-*` (smoke + full83 validation) và
+  `lpips-only-mask-20261112T154126Z-d-{smoke,validation,test}`. Kết quả đã được
+  ghi trong RESULT_TRACKING và ABLATION_SUMMARY_2026-11-13 nhưng code không
+  review/tái lập được từ Git.
+- **Evidence:** Mọi manifest ghi `code_revision=e3e309a` với
+  `working_tree_dirty=true`. Commit `e3e309a` (HEAD của
+  `origin/codex/bc-evaluation-colab`) không có launcher/evaluator, config hay
+  test cho các method `spatially_normal_calibrated_final_lpips`,
+  `final_reconstruction_sobel_vector_difference`,
+  `pranet_inspired_fixed_lpips_layer_fusion`, `context_guided_feature_fusion_lpips`
+  hoặc `DDIM20_DDIM30_LPIPS_only_pseudo_mask`. Source chỉ còn trong
+  `source_snapshot.zip`/`artifacts/source_snapshot` private trên Hub.
+- **Attempts:** Đã audit hash JSON aggregate so với manifest (khớp hết); không tải
+  source ZIP, mảng private hoặc ảnh. Chưa giải nén snapshot vào repo vì đó là
+  thay đổi code cần chính người chạy xác nhận.
+- **Next action:** Người đã chạy các run đẩy code/config/test tương ứng lên một
+  branch, hoặc xác nhận rằng có thể trích từ snapshot với SHA đã ghi trong
+  `docs/evidence/2026-11-13-hf-producer-sync.json`.
+- **Close when:** Một commit trong Git chứa source có hash/nội dung khớp snapshot
+  của từng run (hoặc được review là tương đương), kèm config và test liên quan.
 
 ### BLK-20261107-02 — Private Colab Hugging Face read access
 

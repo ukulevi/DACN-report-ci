@@ -1,0 +1,1337 @@
+{
+  "date": "2026-11-13",
+  "model_repo": "dacn-bmad-team/dacn-runs",
+  "scope": "Producer aggregate JSON/hash audit only; no private arrays, images, source ZIPs, model inference or new test access by this audit",
+  "runs": [
+    {
+      "evaluation_id": "snc-lpips-smoke-20261111-a",
+      "hf_revision": "951258eb0e887ccfaf87b080a5d6962892d4ef07",
+      "hf_commit_date": "2026-11-11T16:13:18+00:00",
+      "status": "completed",
+      "smoke": true,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "41b5cff8940b1cf520e0fc95360e9eff8134f4b2fb94d345384be3292e1fdee0",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T16:13:04.266013+00:00",
+      "started_at": "2026-11-11T16:12:51.357671+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/reference_summary.json": true,
+        "scores/results.json": true
+      },
+      "metrics": {}
+    },
+    {
+      "evaluation_id": "snc-lpips-full83-20261111-a",
+      "hf_revision": "ee758f06bee985acf5192328a4c4a2a68f117543",
+      "hf_commit_date": "2026-11-11T16:14:36+00:00",
+      "status": "completed",
+      "smoke": false,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "41b5cff8940b1cf520e0fc95360e9eff8134f4b2fb94d345384be3292e1fdee0",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T16:14:23.821685+00:00",
+      "started_at": "2026-11-11T16:13:57.553790+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/baseline_replay.json": true,
+        "scores/reference_summary.json": true,
+        "scores/results.json": true,
+        "scores/snc_lpips/thresholds.json": true
+      },
+      "metrics": {
+        "original_lpips": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9648678465775209,
+              "auprc": 0.3129524074804155,
+              "precision": 0.2941306144943511,
+              "recall": 0.5608743628816142,
+              "f1": 0.3858932412646192,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.745,
+              "auprc": 0.7062543587266294,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.37940871238808593,
+            "empty_mask_pixel_false_positive_rate": 0.0221484375
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.94903605783454,
+              "auprc": 0.3123301640701585,
+              "precision": 0.2974710255494595,
+              "recall": 0.4935720185298237,
+              "f1": 0.3712146276577787,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.9144736842105263,
+              "auprc": 0.9443859166057084,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.31357079206024785,
+            "empty_mask_pixel_false_positive_rate": 0.005772112573099415
+          }
+        },
+        "normal_calibrated_equal_mean": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9665639270549087,
+              "auprc": 0.3032925191816227,
+              "precision": 0.3081960706489383,
+              "recall": 0.5304240449792443,
+              "f1": 0.38986569340246596,
+              "threshold": 1.271402507821595
+            },
+            "image": {
+              "auroc": 0.7424999999999999,
+              "auprc": 0.6681893308407019,
+              "precision": 0.6451612903225806,
+              "recall": 1.0,
+              "f1": 0.7843137254901961,
+              "threshold": 1.1905352070140078
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.38898853128608063,
+            "empty_mask_pixel_false_positive_rate": 0.020680555555555556
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.947552281079604,
+              "auprc": 0.30715966197968675,
+              "precision": 0.31215745793131694,
+              "recall": 0.4653104463676518,
+              "f1": 0.37364918933337177,
+              "threshold": 1.271402507821595
+            },
+            "image": {
+              "auroc": 0.918859649122807,
+              "auprc": 0.9504314872516626,
+              "precision": 0.6470588235294118,
+              "recall": 0.9166666666666666,
+              "f1": 0.7586206896551724,
+              "threshold": 1.1905352070140078
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.3057663412657448,
+            "empty_mask_pixel_false_positive_rate": 0.005152595029239766
+          }
+        },
+        "snc_lpips": {
+          "thresholds": {},
+          "calibration": {
+            "pixel": {
+              "auroc": 0.8026390819160251,
+              "auprc": 0.043210665877080584,
+              "precision": 0.05385553137972007,
+              "recall": 0.4584625085387,
+              "f1": 0.09638833728737257,
+              "threshold": 1.7896568746674602
+            },
+            "image": {
+              "auroc": 0.765,
+              "auprc": 0.7610742894979949,
+              "precision": 0.7619047619047619,
+              "recall": 0.8,
+              "f1": 0.7804878048780488,
+              "threshold": 4.344022923146538
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.1021074618747978,
+            "empty_mask_pixel_false_positive_rate": 0.0861545138888889
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.8192036150524752,
+              "auprc": 0.06733375618929162,
+              "precision": 0.0828797555256691,
+              "recall": 0.4226846698028513,
+              "f1": 0.13858570873512063,
+              "threshold": 1.7896568746674602
+            },
+            "image": {
+              "auroc": 0.7916666666666666,
+              "auprc": 0.8195646972852855,
+              "precision": 0.7083333333333334,
+              "recall": 0.7083333333333334,
+              "f1": 0.7083333333333334,
+              "threshold": 4.344022923146538
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.15369163568705427,
+            "empty_mask_pixel_false_positive_rate": 0.04599415204678363
+          }
+        }
+      }
+    },
+    {
+      "evaluation_id": "sobel-smoke-20261111-a",
+      "hf_revision": "66d2a18f9d7095ba5031ca08dd638a1b7e9591dd",
+      "hf_commit_date": "2026-11-11T16:44:03+00:00",
+      "status": "completed",
+      "smoke": true,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "5b9be3818a4f65f5045d03832a7bba2d460c98151c68b38bcdb4579cb7352017",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T16:43:58.454879+00:00",
+      "started_at": "2026-11-11T16:43:53.804517+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/results.json": true
+      },
+      "metrics": {}
+    },
+    {
+      "evaluation_id": "sobel-full83-20261111-a",
+      "hf_revision": "1560d26eca692d588ef6e947d8d3efa5c0cef303",
+      "hf_commit_date": "2026-11-11T16:44:56+00:00",
+      "status": "completed",
+      "smoke": false,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "5b9be3818a4f65f5045d03832a7bba2d460c98151c68b38bcdb4579cb7352017",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T16:44:53.337612+00:00",
+      "started_at": "2026-11-11T16:44:25.361563+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/baseline_replay.json": true,
+        "scores/results.json": true,
+        "scores/thresholds.json": true
+      },
+      "metrics": {
+        "residual_l1": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.8911212593161291,
+              "auprc": 0.11375419884679291,
+              "precision": 0.12343573538974002,
+              "recall": 0.5685723293573643,
+              "f1": 0.202836201402167,
+              "threshold": 0.14408142864704132
+            },
+            "image": {
+              "auroc": 0.43749999999999994,
+              "auprc": 0.46537111893109506,
+              "precision": 0.5,
+              "recall": 1.0,
+              "f1": 0.6666666666666666,
+              "threshold": 0.5175398804971741
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.29573064190900195,
+            "empty_mask_pixel_false_positive_rate": 0.06609635416666666
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.8192763069367069,
+              "auprc": 0.09956937851452491,
+              "precision": 0.1288022715539494,
+              "recall": 0.4479656695514777,
+              "f1": 0.20007698661555612,
+              "threshold": 0.14408142864704132
+            },
+            "image": {
+              "auroc": 0.4407894736842105,
+              "auprc": 0.5012028800926649,
+              "precision": 0.5714285714285714,
+              "recall": 1.0,
+              "f1": 0.7272727272727273,
+              "threshold": 0.5175398804971741
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.2575162596813889,
+            "empty_mask_pixel_false_positive_rate": 0.06909082602339181
+          }
+        },
+        "final_lpips": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9648678465775209,
+              "auprc": 0.3129524074804155,
+              "precision": 0.2941306144943511,
+              "recall": 0.5608743628816142,
+              "f1": 0.3858932412646192,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.745,
+              "auprc": 0.7062543587266294,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.37940871238808593,
+            "empty_mask_pixel_false_positive_rate": 0.0221484375
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.94903605783454,
+              "auprc": 0.3123301640701585,
+              "precision": 0.2974710255494595,
+              "recall": 0.4935720185298237,
+              "f1": 0.3712146276577787,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.9144736842105263,
+              "auprc": 0.9443859166057084,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.31357079206024785,
+            "empty_mask_pixel_false_positive_rate": 0.005772112573099415
+          }
+        },
+        "sobel_gradient": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9133904877787573,
+              "auprc": 0.10028909550815597,
+              "precision": 0.10464409500698307,
+              "recall": 0.5925332352477537,
+              "f1": 0.17787469980243156,
+              "threshold": 0.09387984126806259
+            },
+            "image": {
+              "auroc": 0.3575,
+              "auprc": 0.4184257923735998,
+              "precision": 0.5128205128205128,
+              "recall": 1.0,
+              "f1": 0.6779661016949152,
+              "threshold": 0.33465225622057915
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.2757566295826726,
+            "empty_mask_pixel_false_positive_rate": 0.08509288194444445
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.858584135910295,
+              "auprc": 0.09597681523565907,
+              "precision": 0.11088906598009768,
+              "recall": 0.4871979028261572,
+              "f1": 0.18065907872791614,
+              "threshold": 0.09387984126806259
+            },
+            "image": {
+              "auroc": 0.37061403508771934,
+              "auprc": 0.4677666649931419,
+              "precision": 0.5714285714285714,
+              "recall": 1.0,
+              "f1": 0.7272727272727273,
+              "threshold": 0.33465225622057915
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.24611784457551542,
+            "empty_mask_pixel_false_positive_rate": 0.09356907894736842
+          }
+        }
+      }
+    },
+    {
+      "evaluation_id": "pranet-fusion-smoke-20261111-a",
+      "hf_revision": "98c116062ec211f4028b5a7f86bb319fa69602e6",
+      "hf_commit_date": "2026-11-11T16:53:06+00:00",
+      "status": "completed",
+      "smoke": true,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "458bc7a84d4195a4bf1dd8c66eee42fceb2de48bb398c5aca9b9eff3484532ef",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T16:53:02.107608+00:00",
+      "started_at": "2026-11-11T16:52:56.557915+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/results.json": true
+      },
+      "metrics": {}
+    },
+    {
+      "evaluation_id": "pranet-fusion-full83-20261111-a",
+      "hf_revision": "2c394d295f3673b765ee001f081bc46b194751f5",
+      "hf_commit_date": "2026-11-11T16:54:42+00:00",
+      "status": "completed",
+      "smoke": false,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "458bc7a84d4195a4bf1dd8c66eee42fceb2de48bb398c5aca9b9eff3484532ef",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T16:54:34.094355+00:00",
+      "started_at": "2026-11-11T16:53:27.539765+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/results.json": true,
+        "scores/thresholds.json": true
+      },
+      "metrics": {
+        "original_lpips": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9648678465775209,
+              "auprc": 0.3129524074804155,
+              "precision": 0.2941306144943511,
+              "recall": 0.5608743628816142,
+              "f1": 0.3858932412646192,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.745,
+              "auprc": 0.7062543587266294,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.37940871238808593,
+            "empty_mask_pixel_false_positive_rate": 0.0221484375
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.94903605783454,
+              "auprc": 0.3123301640701585,
+              "precision": 0.2974710255494595,
+              "recall": 0.4935720185298237,
+              "f1": 0.3712146276577787,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.9144736842105263,
+              "auprc": 0.9443859166057084,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.31357079206024785,
+            "empty_mask_pixel_false_positive_rate": 0.005772112573099415
+          }
+        },
+        "layer_1": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9279053416592266,
+              "auprc": 0.11880815142710777,
+              "precision": 0.1187548816656926,
+              "recall": 0.5712258945930324,
+              "f1": 0.19663116959460988,
+              "threshold": 0.013533798977732658
+            },
+            "image": {
+              "auroc": 0.5925,
+              "auprc": 0.5374824910542229,
+              "precision": 0.5806451612903226,
+              "recall": 0.9,
+              "f1": 0.7058823529411765,
+              "threshold": 0.05753806695833595
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.29169653275607954,
+            "empty_mask_pixel_false_positive_rate": 0.0696779513888889
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.8823204934974767,
+              "auprc": 0.11496727147305058,
+              "precision": 0.12079995060860645,
+              "recall": 0.4567098789815779,
+              "f1": 0.19106352133465035,
+              "threshold": 0.013533798977732658
+            },
+            "image": {
+              "auroc": 0.8135964912280702,
+              "auprc": 0.8829741244634598,
+              "precision": 0.6285714285714286,
+              "recall": 0.9166666666666666,
+              "f1": 0.7457627118644068,
+              "threshold": 0.05753806695833595
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.23946287034720412,
+            "empty_mask_pixel_false_positive_rate": 0.06984100877192982
+          }
+        },
+        "layer_2": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9219482432983321,
+              "auprc": 0.11105113247883276,
+              "precision": 0.1144645930508094,
+              "recall": 0.48226577689033684,
+              "f1": 0.18501607652222996,
+              "threshold": 0.003402623115107417
+            },
+            "image": {
+              "auroc": 0.6925,
+              "auprc": 0.6149708146728938,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.008586594464658346
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.27307859531082446,
+            "empty_mask_pixel_false_positive_rate": 0.06394878472222222
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9229346460349381,
+              "auprc": 0.22182743175050945,
+              "precision": 0.15738486299108617,
+              "recall": 0.5478148454052502,
+              "f1": 0.24452013624524144,
+              "threshold": 0.003402623115107417
+            },
+            "image": {
+              "auroc": 0.8706140350877193,
+              "auprc": 0.8979483984328457,
+              "precision": 0.6571428571428571,
+              "recall": 0.9583333333333334,
+              "f1": 0.7796610169491526,
+              "threshold": 0.008586594464658346
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.2661414072656911,
+            "empty_mask_pixel_false_positive_rate": 0.050104166666666665
+          }
+        },
+        "layer_3": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9379624416278501,
+              "auprc": 0.1636652763492732,
+              "precision": 0.1829368433764038,
+              "recall": 0.3980085124270926,
+              "f1": 0.25066185717122247,
+              "threshold": 0.056070759892463684
+            },
+            "image": {
+              "auroc": 0.6775,
+              "auprc": 0.624394065303006,
+              "precision": 0.5806451612903226,
+              "recall": 0.9,
+              "f1": 0.7058823529411765,
+              "threshold": 0.06400208727508369
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.2576284112798396,
+            "empty_mask_pixel_false_positive_rate": 0.027394965277777777
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.948152348658874,
+              "auprc": 0.3574070622379674,
+              "precision": 0.2928168795573253,
+              "recall": 0.5083312385535246,
+              "f1": 0.37158663595377317,
+              "threshold": 0.056070759892463684
+            },
+            "image": {
+              "auroc": 0.8662280701754387,
+              "auprc": 0.8972565162361904,
+              "precision": 0.71875,
+              "recall": 0.9583333333333334,
+              "f1": 0.8214285714285714,
+              "threshold": 0.06400208727508369
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.34151393275015157,
+            "empty_mask_pixel_false_positive_rate": 0.014328399122807018
+          }
+        },
+        "layer_4": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9553741045217151,
+              "auprc": 0.23154963850611499,
+              "precision": 0.23891433039204735,
+              "recall": 0.5619778256528821,
+              "f1": 0.33528747883879867,
+              "threshold": 0.07981035858392715
+            },
+            "image": {
+              "auroc": 0.685,
+              "auprc": 0.6692100832854695,
+              "precision": 0.6060606060606061,
+              "recall": 1.0,
+              "f1": 0.7547169811320755,
+              "threshold": 0.07373101877359052
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.340537842597887,
+            "empty_mask_pixel_false_positive_rate": 0.029013888888888888
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9448159769453918,
+              "auprc": 0.30217179868438593,
+              "precision": 0.25625119376832173,
+              "recall": 0.5540453190648903,
+              "f1": 0.3504267195121259,
+              "threshold": 0.07981035858392715
+            },
+            "image": {
+              "auroc": 0.861842105263158,
+              "auprc": 0.9210992182185173,
+              "precision": 0.6666666666666666,
+              "recall": 0.9166666666666666,
+              "f1": 0.7719298245614035,
+              "threshold": 0.07373101877359052
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.3088016504262711,
+            "empty_mask_pixel_false_positive_rate": 0.009485562865497076
+          }
+        },
+        "layer_5": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9595601086934383,
+              "auprc": 0.29414656949165824,
+              "precision": 0.2878749921713534,
+              "recall": 0.4830539645840996,
+              "f1": 0.3607573825174139,
+              "threshold": 0.049507830291986465
+            },
+            "image": {
+              "auroc": 0.81,
+              "auprc": 0.8132390586681757,
+              "precision": 0.6785714285714286,
+              "recall": 0.95,
+              "f1": 0.7916666666666666,
+              "threshold": 0.04986401889214499
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.3392362356309231,
+            "empty_mask_pixel_false_positive_rate": 0.014549479166666667
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9244690071045597,
+              "auprc": 0.15921428727487752,
+              "precision": 0.1967705547598829,
+              "recall": 0.27875534168851224,
+              "f1": 0.23069550422384522,
+              "threshold": 0.049507830291986465
+            },
+            "image": {
+              "auroc": 0.8464912280701755,
+              "auprc": 0.879238341757515,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.04986401889214499
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.20119206021287084,
+            "empty_mask_pixel_false_positive_rate": 0.006398026315789474
+          }
+        },
+        "layer_6": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9527000523267385,
+              "auprc": 0.2271896473069608,
+              "precision": 0.2768725753506416,
+              "recall": 0.4875203615154222,
+              "f1": 0.353171808682743,
+              "threshold": 0.03638828173279762
+            },
+            "image": {
+              "auroc": 0.6825,
+              "auprc": 0.6731809527196135,
+              "precision": 0.64,
+              "recall": 0.8,
+              "f1": 0.7111111111111111,
+              "threshold": 0.036859596885430314
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.3295465153526787,
+            "empty_mask_pixel_false_positive_rate": 0.022543402777777777
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9312561869538576,
+              "auprc": 0.16406316903383136,
+              "precision": 0.18016394795477678,
+              "recall": 0.23519589183754086,
+              "f1": 0.2040342679127726,
+              "threshold": 0.03638828173279762
+            },
+            "image": {
+              "auroc": 0.8464912280701755,
+              "auprc": 0.8775814927589224,
+              "precision": 0.7692307692307693,
+              "recall": 0.8333333333333334,
+              "f1": 0.8,
+              "threshold": 0.036859596885430314
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.18052179833755597,
+            "empty_mask_pixel_false_positive_rate": 0.007734831871345029
+          }
+        },
+        "layer_7": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9554201194721923,
+              "auprc": 0.2537556561743975,
+              "precision": 0.2809320956256358,
+              "recall": 0.46434764331879563,
+              "f1": 0.3500703151306277,
+              "threshold": 0.030996911227703094
+            },
+            "image": {
+              "auroc": 0.7625,
+              "auprc": 0.776542714029127,
+              "precision": 0.6428571428571429,
+              "recall": 0.9,
+              "f1": 0.75,
+              "threshold": 0.029806629767537944
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.2593808436526987,
+            "empty_mask_pixel_false_positive_rate": 0.01123263888888889
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9237553584765715,
+              "auprc": 0.17186959105972832,
+              "precision": 0.20552894857941473,
+              "recall": 0.21652242611412362,
+              "f1": 0.21088250981489415,
+              "threshold": 0.030996911227703094
+            },
+            "image": {
+              "auroc": 0.8508771929824562,
+              "auprc": 0.8861200750723718,
+              "precision": 0.7333333333333333,
+              "recall": 0.9166666666666666,
+              "f1": 0.8148148148148148,
+              "threshold": 0.029806629767537944
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.13370975759040135,
+            "empty_mask_pixel_false_positive_rate": 0.00637609649122807
+          }
+        },
+        "balanced": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.965924419512701,
+              "auprc": 0.31697267372021537,
+              "precision": 0.3084677116927923,
+              "recall": 0.5402763911512795,
+              "f1": 0.39271630047647693,
+              "threshold": 0.035002775490283966
+            },
+            "image": {
+              "auroc": 0.7425,
+              "auprc": 0.7086357273579982,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.032155098642558895
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.38256298263901584,
+            "empty_mask_pixel_false_positive_rate": 0.02056597222222222
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9485290928744925,
+              "auprc": 0.30227888342788056,
+              "precision": 0.30961206125975804,
+              "recall": 0.4664416274643588,
+              "f1": 0.3721803164779117,
+              "threshold": 0.035002775490283966
+            },
+            "image": {
+              "auroc": 0.9166666666666666,
+              "auprc": 0.9457727004295631,
+              "precision": 0.6666666666666666,
+              "recall": 0.9166666666666666,
+              "f1": 0.7719298245614035,
+              "threshold": 0.032155098642558895
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.30931110563492326,
+            "empty_mask_pixel_false_positive_rate": 0.004869334795321637
+          }
+        },
+        "shallow_focused": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9649639755434554,
+              "auprc": 0.2819653020016332,
+              "precision": 0.2982053296271678,
+              "recall": 0.5186275024959277,
+              "f1": 0.37867597690345106,
+              "threshold": 0.02945849858224392
+            },
+            "image": {
+              "auroc": 0.72,
+              "auprc": 0.6276267303996009,
+              "precision": 0.6666666666666666,
+              "recall": 1.0,
+              "f1": 0.8,
+              "threshold": 0.030638662826580305
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.389793774158516,
+            "empty_mask_pixel_false_positive_rate": 0.021141493055555554
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9459502168095564,
+              "auprc": 0.27227384815433486,
+              "precision": 0.2892839701402293,
+              "recall": 0.4467088016662477,
+              "f1": 0.35116023035230354,
+              "threshold": 0.02945849858224392
+            },
+            "image": {
+              "auroc": 0.9144736842105263,
+              "auprc": 0.9518108462187408,
+              "precision": 0.6111111111111112,
+              "recall": 0.9166666666666666,
+              "f1": 0.7333333333333333,
+              "threshold": 0.030638662826580305
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.29867401091804374,
+            "empty_mask_pixel_false_positive_rate": 0.00758406432748538
+          }
+        },
+        "middle_focused": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9639913607501533,
+              "auprc": 0.307792485433713,
+              "precision": 0.29219339256204185,
+              "recall": 0.5435079606957071,
+              "f1": 0.3800626486987994,
+              "threshold": 0.04115517437458038
+            },
+            "image": {
+              "auroc": 0.74,
+              "auprc": 0.7030975880779234,
+              "precision": 0.6451612903225806,
+              "recall": 1.0,
+              "f1": 0.7843137254901961,
+              "threshold": 0.03786686640362152
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.36624434498110225,
+            "empty_mask_pixel_false_positive_rate": 0.02138715277777778
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9491640048504767,
+              "auprc": 0.3163641597320567,
+              "precision": 0.2998365564977019,
+              "recall": 0.4907889539268144,
+              "f1": 0.3722532804020237,
+              "threshold": 0.04115517437458038
+            },
+            "image": {
+              "auroc": 0.9122807017543859,
+              "auprc": 0.9431733945598529,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.03786686640362152
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.3141912774745493,
+            "empty_mask_pixel_false_positive_rate": 0.005686220760233918
+          }
+        },
+        "deep_focused": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9669518917631634,
+              "auprc": 0.3376688941377299,
+              "precision": 0.32667613033759196,
+              "recall": 0.5260101938941727,
+              "f1": 0.4030438152371941,
+              "threshold": 0.03462307155132294
+            },
+            "image": {
+              "auroc": 0.755,
+              "auprc": 0.7427962322764954,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.03008000898343097
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.3650782273574257,
+            "empty_mask_pixel_false_positive_rate": 0.01822048611111111
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9482123952607425,
+              "auprc": 0.28843696803723534,
+              "precision": 0.31714095744680854,
+              "recall": 0.4282148884978633,
+              "f1": 0.36440172964383394,
+              "threshold": 0.03462307155132294
+            },
+            "image": {
+              "auroc": 0.9188596491228069,
+              "auprc": 0.9472870828187617,
+              "precision": 0.6764705882352942,
+              "recall": 0.9583333333333334,
+              "f1": 0.7931034482758621,
+              "threshold": 0.03008000898343097
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.29742376438556456,
+            "empty_mask_pixel_false_positive_rate": 0.003199013157894737
+          }
+        }
+      }
+    },
+    {
+      "evaluation_id": "cgff-smoke-20261112-a",
+      "hf_revision": "331e58c3f818b90b5d7924ab6ec53f435d84d3a7",
+      "hf_commit_date": "2026-11-11T17:51:11+00:00",
+      "status": "completed",
+      "smoke": true,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "54e5d42ee44d1298b565cc1e13fe86ff08a3ca8883494c3d8ba167915e556e39",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T17:51:07.632717+00:00",
+      "started_at": "2026-11-11T17:51:02.165507+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/gate_parameters.json": true,
+        "scores/results.json": true
+      },
+      "metrics": {}
+    },
+    {
+      "evaluation_id": "cgff-full83-20261112-a",
+      "hf_revision": "0f8768c6f987f8c45ac186e99dd83258d477a538",
+      "hf_commit_date": "2026-11-11T17:52:23+00:00",
+      "status": "completed",
+      "smoke": false,
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "working_tree_dirty": true,
+      "source_snapshot_sha256": "54e5d42ee44d1298b565cc1e13fe86ff08a3ca8883494c3d8ba167915e556e39",
+      "gpu": null,
+      "test_accessed": false,
+      "new_diffusion_calls": 0,
+      "new_lpips_calls": 0,
+      "completed_at": "2026-11-11T17:52:15.596377+00:00",
+      "started_at": "2026-11-11T17:51:37.037623+00:00",
+      "json_hash_checks": {
+        "config.json": true,
+        "results.json": true,
+        "scores/gate_parameters.json": true,
+        "scores/results.json": true,
+        "scores/thresholds.json": true
+      },
+      "metrics": {
+        "original_lpips": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9648678465775209,
+              "auprc": 0.3129524074804155,
+              "precision": 0.2941306144943511,
+              "recall": 0.5608743628816142,
+              "f1": 0.3858932412646192,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.745,
+              "auprc": 0.7062543587266294,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.37940871238808593,
+            "empty_mask_pixel_false_positive_rate": 0.0221484375
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.94903605783454,
+              "auprc": 0.3123301640701585,
+              "precision": 0.2974710255494595,
+              "recall": 0.4935720185298237,
+              "f1": 0.3712146276577787,
+              "threshold": 0.26617634296417236
+            },
+            "image": {
+              "auroc": 0.9144736842105263,
+              "auprc": 0.9443859166057084,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.24719371760470998
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.31357079206024785,
+            "empty_mask_pixel_false_positive_rate": 0.005772112573099415
+          }
+        },
+        "layer_3": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9379624416278501,
+              "auprc": 0.1636652763492732,
+              "precision": 0.1829368433764038,
+              "recall": 0.3980085124270926,
+              "f1": 0.25066185717122247,
+              "threshold": 0.056070759892463684
+            },
+            "image": {
+              "auroc": 0.6775,
+              "auprc": 0.624394065303006,
+              "precision": 0.5806451612903226,
+              "recall": 0.9,
+              "f1": 0.7058823529411765,
+              "threshold": 0.06400208727508369
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.2576284112798396,
+            "empty_mask_pixel_false_positive_rate": 0.027394965277777777
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.948152348658874,
+              "auprc": 0.3574070622379674,
+              "precision": 0.2928168795573253,
+              "recall": 0.5083312385535246,
+              "f1": 0.37158663595377317,
+              "threshold": 0.056070759892463684
+            },
+            "image": {
+              "auroc": 0.8662280701754387,
+              "auprc": 0.8972565162361904,
+              "precision": 0.71875,
+              "recall": 0.9583333333333334,
+              "f1": 0.8214285714285714,
+              "threshold": 0.06400208727508369
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.34151393275015157,
+            "empty_mask_pixel_false_positive_rate": 0.014328399122807018
+          }
+        },
+        "middle_focused": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9639913607501533,
+              "auprc": 0.307792485433713,
+              "precision": 0.29219339256204185,
+              "recall": 0.5435079606957071,
+              "f1": 0.3800626486987994,
+              "threshold": 0.04115517437458038
+            },
+            "image": {
+              "auroc": 0.74,
+              "auprc": 0.7030975880779234,
+              "precision": 0.6451612903225806,
+              "recall": 1.0,
+              "f1": 0.7843137254901961,
+              "threshold": 0.03786686640362152
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.36624434498110225,
+            "empty_mask_pixel_false_positive_rate": 0.02138715277777778
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9491640048504767,
+              "auprc": 0.3163641597320567,
+              "precision": 0.2998365564977019,
+              "recall": 0.4907889539268144,
+              "f1": 0.3722532804020237,
+              "threshold": 0.04115517437458038
+            },
+            "image": {
+              "auroc": 0.9122807017543859,
+              "auprc": 0.9431733945598529,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.03786686640362152
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.3141912774745493,
+            "empty_mask_pixel_false_positive_rate": 0.005686220760233918
+          }
+        },
+        "cgff_lpips": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9640006901946152,
+              "auprc": 0.3128777250167061,
+              "precision": 0.2943540064124616,
+              "recall": 0.5620040985760075,
+              "f1": 0.386352758436961,
+              "threshold": 0.2617657780647278
+            },
+            "image": {
+              "auroc": 0.7375,
+              "auprc": 0.7025453640176348,
+              "precision": 0.625,
+              "recall": 1.0,
+              "f1": 0.7692307692307693,
+              "threshold": 0.23787474414954582
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.37203942023960046,
+            "empty_mask_pixel_false_positive_rate": 0.021875868055555556
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.949252378443415,
+              "auprc": 0.31331819814693534,
+              "precision": 0.2965629831446704,
+              "recall": 0.4925126584551298,
+              "f1": 0.37020791297482236,
+              "threshold": 0.2617657780647278
+            },
+            "image": {
+              "auroc": 0.9122807017543859,
+              "auprc": 0.9428762547699595,
+              "precision": 0.6875,
+              "recall": 0.9166666666666666,
+              "f1": 0.7857142857142857,
+              "threshold": 0.23787474414954582
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.3130025098573605,
+            "empty_mask_pixel_false_positive_rate": 0.005593932748538011
+          }
+        }
+      }
+    },
+    {
+      "evaluation_id": "lpips-only-mask-20261112T154126Z-d-smoke",
+      "hf_revision": "6d30de730938979a8124eadd75acd2cf813034cf",
+      "hf_commit_date": "2026-11-12T15:47:20+00:00",
+      "status": "completed",
+      "stage": "smoke",
+      "gpu": "Tesla T4",
+      "held_out_test_used": false,
+      "completed_at": "2026-11-12T15:47:15.840585+00:00",
+      "started_at": "2026-11-12T15:47:00.286142+00:00",
+      "aggregate_sha256": "3b7d54ed3c9974470b3bd0bc86fee1dea07a2a38a73f3b7da20c749291c4461a",
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "scope": "User-requested exploratory extension after prior final test; no test tuning",
+      "method": "DDIM20_DDIM30_LPIPS_only_pseudo_mask",
+      "json_hash_checks": {
+        "aggregate.json": true
+      },
+      "mask_parameters": {
+        "mask_score": "raw_initial_lpips",
+        "mask_threshold": 0.1989728808403015,
+        "dilation": 3,
+        "fit": "pooled95percentile normal calibration; strict >; 3x3 maximum filter"
+      },
+      "adapter_seconds_median": 3.1552812285000007,
+      "adapter_seconds_p95": 4.765720323750002,
+      "cuda_peak_allocated_bytes": 112928768,
+      "unet_calls_completed_trajectories": 100,
+      "lpips_calls_completed_trajectories": 4,
+      "sample_count": 2,
+      "metrics": {}
+    },
+    {
+      "evaluation_id": "lpips-only-mask-20261112T154126Z-d-validation",
+      "hf_revision": "a118f7715a0d2f0136dae5aaf3debb2ae91b8407",
+      "hf_commit_date": "2026-11-12T15:49:52+00:00",
+      "status": "completed",
+      "stage": "validation",
+      "gpu": "Tesla T4",
+      "held_out_test_used": false,
+      "completed_at": "2026-11-12T15:49:48.461247+00:00",
+      "started_at": "2026-11-12T15:47:26.753557+00:00",
+      "aggregate_sha256": "d7cc51bb0c6ceafc2fc670d64e7b52356482df39b67ea62c4adfba19152bcdc5",
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "scope": "User-requested exploratory extension after prior final test; no test tuning",
+      "method": "DDIM20_DDIM30_LPIPS_only_pseudo_mask",
+      "frozen_at": "2026-11-12T15:49:48.458361+00:00",
+      "json_hash_checks": {
+        "aggregate.json": true
+      },
+      "thresholds": {
+        "image": 0.233926882656912,
+        "pixel": 0.2550427317619324
+      },
+      "mask_parameters": {
+        "mask_score": "raw_initial_lpips",
+        "mask_threshold": 0.1989728808403015,
+        "dilation": 3,
+        "fit": "pooled95percentile normal calibration; strict >; 3x3 maximum filter"
+      },
+      "adapter_seconds_median": 1.4174549220000046,
+      "adapter_seconds_p95": 1.6193292359999985,
+      "cuda_peak_allocated_bytes": 112928768,
+      "unet_calls_completed_trajectories": 4150,
+      "lpips_calls_completed_trajectories": 166,
+      "sample_count": 83,
+      "metrics": {
+        "lpips_only_mask": {
+          "calibration": {
+            "pixel": {
+              "auroc": 0.9549664208364178,
+              "auprc": 0.2698190657947477,
+              "precision": 0.27440968165361257,
+              "recall": 0.499816089538122,
+              "f1": 0.35430071981301625,
+              "threshold": 0.2550427317619324
+            },
+            "image": {
+              "auroc": 0.725,
+              "auprc": 0.680759462097058,
+              "precision": 0.6333333333333333,
+              "recall": 0.95,
+              "f1": 0.76,
+              "threshold": 0.233926882656912
+            },
+            "samples": 40,
+            "pixel_dice_macro_lesion_slices": 0.32368186905977336,
+            "empty_mask_pixel_false_positive_rate": 0.020426215277777778
+          },
+          "group_holdout": {
+            "pixel": {
+              "auroc": 0.9332131056856496,
+              "auprc": 0.2872849863588635,
+              "precision": 0.27765881513204854,
+              "recall": 0.4749524185729163,
+              "f1": 0.35044580755421895,
+              "threshold": 0.2550427317619324
+            },
+            "image": {
+              "auroc": 0.8662280701754386,
+              "auprc": 0.9242467450865283,
+              "precision": 0.7,
+              "recall": 0.875,
+              "f1": 0.7777777777777778,
+              "threshold": 0.233926882656912
+            },
+            "samples": 43,
+            "pixel_dice_macro_lesion_slices": 0.2782979029061636,
+            "empty_mask_pixel_false_positive_rate": 0.006203399122807017
+          }
+        }
+      }
+    },
+    {
+      "evaluation_id": "lpips-only-mask-20261112T154126Z-d-test",
+      "hf_revision": "de97d764ef360742cb181346afbb9f0da59bc218",
+      "hf_commit_date": "2026-11-12T17:28:48+00:00",
+      "status": "completed",
+      "stage": "test",
+      "gpu": "Tesla T4",
+      "held_out_test_used": true,
+      "completed_at": "2026-11-12T17:28:39.217692+00:00",
+      "started_at": "2026-11-12T15:49:58.198429+00:00",
+      "aggregate_sha256": "caa3f478c8db370c0eea365ec9765eb988bc5eb19e3602c31fcb5f808613971b",
+      "code_revision": "e3e309aec4129df2ae40207223dabe37203a3bfd",
+      "scope": "User-requested exploratory extension after prior final test; no test tuning",
+      "method": "DDIM20_DDIM30_LPIPS_only_pseudo_mask",
+      "frozen_at": "2026-11-12T15:49:48.458361+00:00",
+      "json_hash_checks": {
+        "aggregate.json": true
+      },
+      "thresholds": {
+        "image": 0.233926882656912,
+        "pixel": 0.2550427317619324
+      },
+      "mask_parameters": {
+        "mask_score": "raw_initial_lpips",
+        "mask_threshold": 0.1989728808403015,
+        "dilation": 3,
+        "fit": "pooled95percentile normal calibration; strict >; 3x3 maximum filter"
+      },
+      "adapter_seconds_median": 1.37350733400001,
+      "adapter_seconds_p95": 1.4903712216000258,
+      "cuda_peak_allocated_bytes": 112928768,
+      "unet_calls_completed_trajectories": 183250,
+      "lpips_calls_completed_trajectories": 7330,
+      "sample_count": 3665,
+      "metrics": {
+        "lpips_only_mask": {
+          "test": {
+            "pixel": {
+              "auroc": 0.9256941247955679,
+              "auprc": 0.2899989263472809,
+              "precision": 0.3350138553277074,
+              "recall": 0.360395439502658,
+              "f1": 0.3472414491087902,
+              "threshold": 0.2550427317619324
+            },
+            "image": {
+              "auroc": 0.7948982438016527,
+              "auprc": 0.9434372251157661,
+              "precision": 0.8793953335524154,
+              "recall": 0.8846280991735537,
+              "f1": 0.8820039551746869,
+              "threshold": 0.233926882656912
+            },
+            "pixel_dice_macro_lesion_slices": 0.2710074208680523,
+            "empty_mask_pixel_false_positive_rate": 0.00960354275173611
+          }
+        }
+      }
+    }
+  ]
+}

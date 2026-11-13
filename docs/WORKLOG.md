@@ -2149,3 +2149,41 @@ ConvVAE LPIPS full83evaluation completed/uploaded. Saved exact producer manifest
 ## 2026-11-11 — Package completed experiments for GitHub
 
 User requested pushing all work from this evaluation branch. Prepared ConvAE/ConvVAE architecture/training/resume/configs/tests, completed training and validation aggregate evidence including VAE LPIPS, and completed DDIM50/LPIPS comparison records; preserve original source revisions in run manifests. Validation: Ruff check and format check passed (244files),41focused tests passed, git diff --check passed. Reviewed all26changed/new files for disallowed binary artifacts, credential patterns and private identifier JSON fields; none detected. Dataset/checkpoints/maps remain on private Modal/Hugging Face, outside Git. Fetch of origin/codex/bc-evaluation-colab completed before push. Separate original-checkout edits remain untouched.
+
+## 2026-11-13 — Sync Hugging Face producer runs and consolidate Final LPIPS ablation
+
+Context: advisor email asked to (1) analyse Final LPIPS and the role of the
+residual mask, (2) study noise level and DDIM steps, (3) run ablations and compare
+baselines, choosing parameters on validation only. Switched the local checkout to
+`codex/bc-evaluation-colab` (`e3e309a`); the previous branch's uncommitted work
+is kept in a local stash, not modified.
+
+Audited private Hub `dacn-bmad-team/dacn-runs` (109 commits, last 2026-11-12).
+Found 11 runs absent from Git records: SNC-LPIPS, Sobel, PraNet-style fusion and
+CGFF (smoke + full83 validation, cached CPU re-scoring) and LPIPS-only pseudo-mask
+(smoke, validation, test). Downloaded aggregate JSON only into a temporary
+directory outside the repository; no `.npz`, private images or source ZIPs.
+Checked every downloaded JSON member against its producer manifest SHA-256 (all
+match) and scanned the new evidence for UUID-like identifiers and filesystem
+paths (none). Added:
+
+- `docs/evidence/2026-11-13-hf-producer-sync.json`: safe scalar metrics,
+  thresholds, status, HF revisions and source-snapshot hashes for the 11 runs.
+- RESULT_TRACKING entry for the 11 runs, including the exploratory post-freeze
+  LPIPS-only-mask test (pixel AP 0.289999 vs frozen Final 0.318226).
+- `docs/ABLATION_SUMMARY_2026-11-13.md`: one table set mapping existing results
+  to the advisor's three priorities (mask/re-sampling decomposition, phase-1
+  noise sweep t100–800 and DDIM splits, alternative scores, learned baselines)
+  and the open measurements.
+- `BLK-20261113-01`: all 11 manifests record dirty `e3e309a`, and that commit has
+  no source for these methods; the person who ran them must push the code.
+
+Checks: every figure in the new RESULT_TRACKING entry was re-compared by script
+against the evidence JSON (nine rounding errors from a 4-decimal printout were
+found and corrected); summary tables were cross-checked against the 09 Nov CSV,
+LPIPS_COMPARISON and FINAL_TEST_RESULTS. Documentation-only change: no tests,
+lint, inference, training or test-split access were run.
+
+Next: patient-group bootstrap intervals for the summary tables and a
+validation-only completion of the sweep (phase-2 start, total DDIM budget, t400,
+extra sampling seeds); GPU work only when explicitly requested.

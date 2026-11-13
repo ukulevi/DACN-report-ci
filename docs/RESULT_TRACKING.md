@@ -3385,3 +3385,81 @@ LPIPS smoke completed/uploaded2/2, sourcec1643be2fac59d61d78fea4f0813f760470121f
 - 43validation image: ROC-AUC0.41885964912280704,Precision0.6111111111111112,Recall0.9166666666666666,F10.7333333333333333,AP0.4872400317682384,threshold0.5232977363694873.
 
 LPIPS scoring1.5147664410000132s (cached inputs, excludes metrics/I-O/upload), peak allocated VRAM45882880B. Full calibration/43validation tables and comparison to fixed Residual/SSIM in CONVVAE_LPIPS_VALIDATION_2026-11-11.md; safe producer evidence docs/evidence/2026-11-11-convvae-lpips-validation.json. LPIPS pixel AP/F1 lower than prior two ConvVAE scores; image AUROC below0.5. No inversion, score/threshold tuning, new training or test access; exploratory normal-validation checkpoint overlap caveat retained.
+
+## 2026-11-13 — Audit producer 11–12 Nov runs (no new agent run)
+
+Audit only: these runs were started and uploaded by another team member and were
+missing from Git records. This entry records producer status/provenance from
+private Hub `dacn-bmad-team/dacn-runs`; this audit ran no inference, training,
+threshold fitting or test access. Producer aggregate JSON hashes match every
+producer manifest entry checked; private arrays, images and source ZIPs were not
+downloaded. Safe scalar evidence: [hf-producer-sync](evidence/2026-11-13-hf-producer-sync.json).
+Consolidated tables: [ABLATION_SUMMARY_2026-11-13](ABLATION_SUMMARY_2026-11-13.md).
+
+Shared provenance: dataset `350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7`, Gaussian
+EMA30 checkpoint `d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946`,
+registered 40 calibration/43 group-holdout validation partition, one training
+seed17 and one sampling seed policy. All manifests record `code_revision=e3e309a`
+with `working_tree_dirty=true`; the corresponding source is not in Git
+(`BLK-20261113-01`). Validation runs below are exploratory: the 43-image holdout
+has been inspected repeatedly.
+
+| Evaluation ID | Status | Split / stage | New model calls | Private artifacts |
+|---|---|---|---|---|
+| `snc-lpips-smoke-20261111-a` | completed | validation smoke | 0 | [951258eb](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/951258eb0e887ccfaf87b080a5d6962892d4ef07/evaluations/snc-lpips-smoke-20261111-a) |
+| `snc-lpips-full83-20261111-a` | completed | validation 83 | 0 | [ee758f06](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/ee758f06bee985acf5192328a4c4a2a68f117543/evaluations/snc-lpips-full83-20261111-a) |
+| `sobel-smoke-20261111-a` | completed | validation smoke | 0 | [66d2a18f](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/66d2a18f9d7095ba5031ca08dd638a1b7e9591dd/evaluations/sobel-smoke-20261111-a) |
+| `sobel-full83-20261111-a` | completed | validation 83 | 0 | [1560d26e](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/1560d26eca692d588ef6e947d8d3efa5c0cef303/evaluations/sobel-full83-20261111-a) |
+| `pranet-fusion-smoke-20261111-a` | completed | validation smoke | 0 | [98c11606](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/98c116062ec211f4028b5a7f86bb319fa69602e6/evaluations/pranet-fusion-smoke-20261111-a) |
+| `pranet-fusion-full83-20261111-a` | completed | validation 83 | 0 | [2c394d29](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/2c394d295f3673b765ee001f081bc46b194751f5/evaluations/pranet-fusion-full83-20261111-a) |
+| `cgff-smoke-20261112-a` | completed | validation smoke | 0 | [331e58c3](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/331e58c3f818b90b5d7924ab6ec53f435d84d3a7/evaluations/cgff-smoke-20261112-a) |
+| `cgff-full83-20261112-a` | completed | validation 83 | 0 | [0f8768c6](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/0f8768c6f987f8c45ac186e99dd83258d477a538/evaluations/cgff-full83-20261112-a) |
+| `lpips-only-mask-20261112T154126Z-d-smoke` | completed | validation smoke, T4 | DDIM20+30 | [6d30de73](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/6d30de730938979a8124eadd75acd2cf813034cf/evaluations/lpips-only-mask-20261112T154126Z-d-smoke) |
+| `lpips-only-mask-20261112T154126Z-d-validation` | completed | validation 83, T4 | 4150 U-Net/166 LPIPS | [a118f771](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/a118f7715a0d2f0136dae5aaf3debb2ae91b8407/evaluations/lpips-only-mask-20261112T154126Z-d-validation) |
+| `lpips-only-mask-20261112T154126Z-d-test` | completed | **test 3665**, T4 | 183250 U-Net/7330 LPIPS | [de97d764](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/de97d764ef360742cb181346afbb9f0da59bc218/evaluations/lpips-only-mask-20261112T154126Z-d-test) |
+
+Scope of the four cached-score families (SNC, Sobel, PraNet-style, CGFF): CPU
+re-scoring of cached Final LPIPS (DDIM20 t300 + masked DDIM30 t50) outputs or
+their LPIPS layer contributions; producer `test_accessed=false`, no new diffusion
+or LPIPS calls. Pixel global micro over full240 crop, image mean top576 pixels,
+max-F1 thresholds on 40 calibration images. 43-holdout pixel AP / Dice / image
+AUROC, with the shared reference Final LPIPS 0.312330 / 0.371215 / 0.914474:
+
+- SNC-LPIPS 0.067334 / 0.138586 / 0.791667; normal-calibrated equal-mean LPIPS
+  0.307160 / 0.373649 / 0.918860.
+- Sobel gradient difference 0.095977 / 0.180659 / 0.370614; Final L1 residual
+  0.099569 / 0.200077 / 0.440789.
+- PraNet-style fixed fusions: balanced 0.302279 / 0.372180 / 0.916667,
+  middle-focused 0.316364 / 0.372253 / 0.912281, deep-focused
+  0.288437 / 0.364402 / 0.918860, shallow-focused 0.272274 / 0.351160 / 0.914474.
+  Single layers disagree between halves (layer3 calibration 0.163665 vs holdout
+  0.357407; layer5 0.294147 vs 0.159214).
+- CGFF context-gated fusion (rho0.25, gate fitted on 20 normal calibration slices)
+  0.313318 / 0.370208 / 0.912281.
+
+LPIPS-only pseudo-mask: same DDIM20 t300 + masked DDIM30 t50 one-pass method as
+Final LPIPS, except the mask score is raw initial LPIPS without the normalized
+residual factor. Mask threshold 0.1989728808403015 (pooled 95th percentile on 20
+normal calibration slices, dilation3); score thresholds pixel 0.2550427317619324 /
+image 0.233926882656912 fitted on 40 calibration images and frozen at
+2026-11-12T15:49:48Z before the test stage. Producer scope: "User-requested
+exploratory extension after prior final test; no test tuning". The test split had
+already been inspected by the four-arm final test and the DDIM50 extension, so
+this is not an untouched confirmatory result.
+
+- 43 holdout: pixel ROC-AUC 0.933213, AP 0.287285, Precision 0.277659,
+  Recall 0.474952, F1/Dice 0.350446, macro lesion Dice 0.278298, normal pixel
+  FPR 0.006203; image ROC-AUC 0.866228, AP 0.924247, Precision 0.700000,
+  Recall 0.875000, F1 0.777778.
+- Test 3665 (pixel global micro): ROC-AUC 0.925694, AP 0.289999, Precision
+  0.335014, Recall 0.360395, F1/Dice 0.347241, macro lesion Dice 0.271007,
+  normal pixel FPR 0.009604. Image: ROC-AUC 0.794898, AP 0.943437, Precision
+  0.879395, Recall 0.884628, F1 0.882004.
+- Test adapter median 1.373507 s/image, p95 1.490371 s/image, sum 5090.11 s
+  (includes cold model loads; excludes data/checksum/shard/global-metric I/O);
+  last-process CUDA peak allocated 112928768 B. One training and sampling seed;
+  no confidence interval.
+
+Compared with the frozen Final LPIPS test row (AP 0.318226, Dice 0.364293, image
+ROC-AUC 0.805989), the LPIPS-only mask is lower on these metrics for this cohort.
+This is descriptive; it does not reselect thresholds or replace the frozen protocol.
