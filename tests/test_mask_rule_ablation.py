@@ -5,7 +5,7 @@ import types
 import numpy as np
 import pytest
 
-if importlib.util.find_spec("numba") is None:
+if "numba" not in sys.modules and importlib.util.find_spec("numba") is None:
     # The producer import chain loads the simplex noise module, which needs numba
     # at import time only; the mask functions under test never call it.
     stub = types.ModuleType("numba")
