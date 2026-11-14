@@ -372,6 +372,44 @@ Reading:
   brightness or L1 × brightness. That ablation is required before the gain can be
   credited to Final.
 
+### Which reconstruction error to gate by brightness (added 14 Nov, validation)
+
+`gate-full-20261114T105141Z` (code `37c1cbe6`, Modal CPU, 74 s) tested whether the
+hybrid gain needs the diffusion re-sampling. Each cached producer map was multiplied
+by the same brightness map, with no post-processing and no test access. Rule fixed
+before running (`GATE_*` in `dacn.evaluation.postprocess_hybrid`): the re-sampling is
+credited only if Initial LPIPS × brightness is below Final LPIPS × brightness, with
+the holdout Δ AP CI excluding 0 and calibration agreeing. Replays: producer
+references 0.0; Final LPIPS × brightness reproduces the hybrid run (0.0). 999/1000
+valid replicates. Evidence: [results](evidence/2026-11-14-gate-results.json),
+[manifest](evidence/2026-11-14-gate-manifest.json).
+
+| Map | Cal. AP | Holdout AP [95% CI] | Δ AP vs Final LPIPS × brightness | Holdout Dice | Δ Dice | Image AUROC | Δ image AUROC |
+|---|---:|---|---|---:|---|---:|---|
+| final_lpips__none | 0.313 | 0.312 [0.099, 0.485] | [-0.449, -0.153] | 0.371 | [-0.324, -0.059] | 0.914 | [-0.129, +0.060] |
+| brightness__none | 0.147 | 0.390 [0.104, 0.583] | [-0.426, -0.109] | 0.268 | [-0.411, -0.181] | 0.680 | [-0.537, -0.030] |
+| final_lpips_x_brightness | 0.496 | 0.656 [0.365, 0.783] | – | 0.588 | – | 0.932 | – |
+| initial_lpips_x_brightness | 0.421 | 0.530 [0.185, 0.681] | [-0.256, -0.014] | 0.486 | [-0.203, -0.025] | 0.818 | [-0.281, +0.015] |
+| final_l1_x_brightness | 0.189 | 0.181 [0.061, 0.286] | [-0.567, -0.250] | 0.280 | [-0.382, -0.192] | 0.592 | [-0.561, -0.136] |
+| initial_l1_x_brightness | 0.146 | 0.168 [0.059, 0.278] | [-0.589, -0.261] | 0.248 | [-0.420, -0.211] | 0.406 | [-0.776, -0.259] |
+| naive_stitch_l1_x_brightness | 0.193 | 0.184 [0.063, 0.291] | [-0.566, -0.247] | 0.285 | [-0.379, -0.188] | 0.583 | [-0.586, -0.136] |
+
+Reading:
+
+- **The rule credits the re-sampling,** but with a small margin. On holdout, Final
+  LPIPS × brightness beats Initial LPIPS × brightness by +0.126 AP (CI of
+  Initial − Final [−0.256, −0.014]). Calibration agrees (0.496 vs 0.421), and so do
+  Dice and image AUROC.
+- **The perceptual term is essential.** Every L1 residual gated by brightness stays
+  near AP 0.17–0.19, below brightness alone. Gating works on LPIPS maps, not on
+  intensity residuals.
+- Holdout AP builds up as follows: brightness 0.390 → Initial LPIPS × brightness
+  0.530 → Final LPIPS × brightness 0.656. Brightness, the perceptual error and the
+  masked re-sampling each contribute.
+- Same caveats as the hybrid subsection: the holdout has been inspected repeatedly,
+  there is one model and one sampling seed, and no test access. The
+  Initial-vs-Final interval ends close to 0.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |
@@ -399,9 +437,9 @@ results. No ConvAE/ConvVAE test evaluation exists.
    Section 1); weighted LPIPS+residual fusion on the Final reconstruction done
    (14 Nov, Section 3).
 4. Hybrid follow-up (14 Nov): LPIPS × brightness passes the pre-registered
-   rule on validation. Still needed: (a) the ablation of the reconstruction it
-   gates (Initial LPIPS, L1 and Naive-stitch, each × brightness; validation, CPU);
-   (b) if it still holds, freeze one configuration and run a single test
+   rule on validation, and the gate ablation credits the re-sampling: Initial
+   LPIPS × brightness is lower beyond uncertainty, and L1 gates are far lower
+   (Section 3). Remaining: freeze one configuration and run a single test
    evaluation, reported as the fifth test access after development.
 5. No further test runs until a single configuration is frozen from
    validation; report the three post-freeze test uses as exploratory. The

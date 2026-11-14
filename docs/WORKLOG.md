@@ -2349,3 +2349,17 @@ training and no threshold or method change.
 Checks: postprocess-hybrid (5), final-fusion and frozen-test-CI unit tests passed
 (12 total). Ruff clean. Evidence byte-identical to the Hub, LF, UUID-free. No
 training and no test access.
+
+## 2026-11-14 — Brightness-gated reconstruction ablation (validation)
+
+- Added the `gate` analysis (Final/Initial LPIPS and Final/Initial/Naive-stitch L1,
+  each × brightness). The resampling-credit rule and a hybrid replay gate were fixed
+  in code before running; per-arm evaluation is now shared with `hybrid`.
+- `gate-full-20261114T105141Z` (74 s CPU): Final LPIPS × brightness 0.656 vs Initial
+  LPIPS × brightness 0.530 (Δ [−0.256, −0.014], calibration agrees). L1 gates are
+  about 0.18. The rule credits the re-sampling.
+- RESULT_TRACKING, ABLATION_SUMMARY §3/§5 and AF-10 updated.
+
+Checks: 16 unit tests passed (postprocess-hybrid, final-fusion, sweep-bootstrap).
+Ruff clean. Replays exact. Evidence byte-identical to the Hub, LF, UUID-free. No
+test access.

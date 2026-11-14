@@ -3864,3 +3864,23 @@ both Final LPIPS and brightness.
   Not yet done: the ablation of the gated reconstruction, and no test access.
   Evidence: `docs/evidence/2026-11-14-hybrid-results.json` (sha256 `d5b5a167…c519`, matches
   manifest), `docs/evidence/2026-11-14-hybrid-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
+
+## 2026-11-14 — Brightness-gated reconstruction ablation (validation)
+
+Code `37c1cbe6` (`--analysis gate`), Modal CPU, Workspace `tanh1c`. The same cached producer
+maps as the hybrid run; no model calls; test unused. The rule was fixed in code before
+running: credit the re-sampling only if Initial LPIPS × brightness is below Final LPIPS ×
+brightness, with the holdout Δ AP CI excluding 0 and calibration agreeing.
+
+- **`gate-smoke-20261114T105032Z`** completed/uploaded, 20 replicates; replays 0.0.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-yrLnwPa89J6igWgfoZMhib),
+  [Hub 67a230d0](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/67a230d0515611deaea76f10854617313b299a28/evaluations/gate-smoke-20261114T105032Z).
+- **`gate-full-20261114T105141Z`** completed/uploaded, 1000 replicates (999 valid), 74 s.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-ccPlw2DU6GPPFIfhEGPj0u),
+  [Hub df582442](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/df582442cc21c578bfec5c9c97c93a5e858d5441/evaluations/gate-full-20261114T105141Z).
+  Producer replay 0.0; hybrid replay 0.0. Holdout pixel AP (calibration): Final LPIPS ×
+  brightness 0.656 (0.496); Initial LPIPS × brightness 0.530 (0.421), Δ [−0.256, −0.014];
+  Final L1 × brightness 0.181, Initial L1 × brightness 0.168, Naive-stitch L1 × brightness
+  0.184 (all Δ CI below −0.24). `credits_resampling: true`.
+  Evidence: `docs/evidence/2026-11-14-gate-results.json` (sha256 `d1374c90…84b0`, matches
+  manifest), `docs/evidence/2026-11-14-gate-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
