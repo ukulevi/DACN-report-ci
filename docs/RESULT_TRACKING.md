@@ -4005,3 +4005,19 @@ GPU: `dacn.cloud.modal_noise_extension --suite maskgate` (code `03265407`, T4). 
   `product_ensemble` (seed ensemble, producer mask; holdout AP 0.711).
   Evidence: `docs/evidence/2026-11-14-maskgate-results.json` (sha256 `03670ce5…fe7a`, matches
   manifest), `docs/evidence/2026-11-14-maskgate-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
+
+## 2026-11-14 — Single frozen test evaluation of the seed ensemble
+
+At the user's request, the R3 candidate (seed ensemble, producer mask) is evaluated once on
+test. This is the sixth test access. Code `df81f801` (`dacn.cloud.modal_seed_ensemble`,
+definition in `dacn.evaluation.seed_ensemble`). Frozen before any seed-18/19 test map
+existed: per-seed validation mask thresholds (0.13345 / 0.12588 / 0.12947) and the
+validation-calibration score thresholds (pixel 0.13543, image 0.15379). Workspace `tanh1c`.
+
+- **`ens-s18-smoke-20261114T141519Z`** (T4, 2 validation images, no test access)
+  completed/uploaded. The seed-18 adapter replays the validation variant maps exactly (0.0).
+  [Modal](https://modal.com/apps/tanh1c/main/ap-PZwUDXy0WjG7rA79ixvAP2),
+  [Hub fd0c40c7](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/fd0c40c703db34631f170b971be9101b0fdfbb2e/evaluations/ens-s18-smoke-20261114T141519Z).
+- **`ens-s18-full-20261114T141611Z`** and **`ens-s19-full-20261114T141617Z`** (T4, 3665 test slices each, resumable private chunks)
+  submitted detached in parallel. Status: running.
+
