@@ -119,6 +119,17 @@ GATE_KEY_CONTRAST = "initial_lpips_x_brightness"
 HYBRID_REPLAY = (0.6558091692470411, 0.5879735387280586, 0.9320175438596492)
 
 
+# Frozen 14 Nov for one test evaluation: Final LPIPS x brightness, no post-processing.
+# Thresholds are max-F1 on the 40-image validation calibration half
+# (hybrid-full-20261114T103245Z, arm lpips_x_brightness__none; score >= threshold).
+FROZEN_HYBRID_ARM = "final_lpips_x_brightness"
+FROZEN_HYBRID_THRESHOLDS = {"pixel": 0.1354231256334515, "image": 0.17669394359404414}
+
+
+def frozen_hybrid_map(final_lpips, brightness):
+    return np.asarray(final_lpips, dtype=np.float64) * np.asarray(brightness, dtype=np.float64)
+
+
 def gated_arms(arrays):
     """Each cached producer map x brightness, plus the two unprocessed references."""
     brightness = np.asarray(arrays["brightness"], dtype=np.float64)

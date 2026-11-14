@@ -89,3 +89,19 @@ def test_resampling_credit_requires_holdout_and_calibration_agreement():
     assert not ph.credits_resampling(summary, boot([-0.2, 0.01]))
     summary[ph.GATE_KEY_CONTRAST]["calibration_ap"] = 0.6
     assert not ph.credits_resampling(summary, boot([-0.2, -0.05]))
+
+
+def test_frozen_hybrid_thresholds_match_validation_evidence():
+    import json
+    from pathlib import Path
+
+    evidence = Path(__file__).parents[1] / "docs/evidence/2026-11-14-hybrid-results.json"
+    arm = json.loads(evidence.read_text(encoding="utf-8"))["arms"]["lpips_x_brightness__none"]
+    assert arm["score_thresholds"] == ph.FROZEN_HYBRID_THRESHOLDS
+    a, b = np.random.default_rng(2).random((2, 1, 240, 240)).astype(np.float32)
+    assert np.array_equal(
+        ph.frozen_hybrid_map(a, b),
+        ph.gated_arms({**{k: a for k in ph.GATE_SOURCES.values()}, "brightness": b})[
+            ph.FROZEN_HYBRID_ARM
+        ],
+    )
