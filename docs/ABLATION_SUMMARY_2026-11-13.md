@@ -625,6 +625,42 @@ Reading:
   mask** (`product_ensemble`: mean Final LPIPS over sampling seeds 17/18/19, ×
   brightness). Validation holdout AP 0.711, pooled 0.646.
 
+### Single frozen test evaluation of the seed ensemble (added 14 Nov)
+
+Rule R3 (fixed before the mask-gate run) chose the seed ensemble: the mean of Final
+LPIPS over sampling seeds 17/18/19, × brightness, with the producer mask. It was
+frozen in code `df81f801` (`dacn.evaluation.seed_ensemble`) before any seed-18/19 test
+map existed. Settings: per-seed validation mask thresholds, and pixel/image thresholds
+0.13543/0.15379 from validation calibration. Seed-18/19 test maps came from the
+unchanged frozen adapter (`ens-s18/s19-full-…`, T4; resumed once after a cancellation).
+The aggregation `ens-test-full-20261114T163509Z` (CPU, 45 min) passed its gates: seed-17
+maps reproduce the published test metrics (≤ 1.6e-14) and the frozen hybrid (0.0).
+767 groups, 1000/1000 valid replicates. **Sixth test access.** Evidence:
+[results](evidence/2026-11-14-ensemble-test-results.json),
+[manifest](evidence/2026-11-14-ensemble-test-manifest.json).
+
+| Arm | Pixel AP [95% CI] | Δ AP − ensemble | Pixel AUROC | Dice [95% CI] | Δ Dice − ensemble | Image AUROC [95% CI] | Δ AUROC − ensemble | Image AP | Δ image AP − ensemble |
+|---|---|---|---:|---|---|---|---|---:|---|
+| **Seed ensemble (frozen)** | 0.7009 [0.6769, 0.7242] | – | 0.9805 | 0.6290 [0.6141, 0.6435] | – | 0.8782 [0.8551, 0.8994] | – | 0.9698 | – |
+| Final LPIPS × brightness (1 seed) | 0.6505 [0.6263, 0.6731] | [-0.0551, -0.0454] | 0.9759 | 0.5943 [0.5797, 0.6089] | [-0.0382, -0.0310] | 0.8397 [0.8129, 0.8637] | [-0.0460, -0.0316] | 0.9594 | [-0.0136, -0.0077] |
+| Final LPIPS | 0.3182 [0.3031, 0.3333] | [-0.4015, -0.3627] | 0.9388 | 0.3643 [0.3515, 0.3764] | [-0.2773, -0.2509] | 0.8060 [0.7764, 0.8330] | [-0.0985, -0.0486] | 0.9459 | [-0.0345, -0.0145] |
+| Brightness control | 0.5114 [0.4830, 0.5431] | [-0.2180, -0.1613] | 0.9615 | 0.4170 [0.3972, 0.4379] | [-0.2297, -0.1932] | 0.6436 [0.6033, 0.6873] | [-0.2719, -0.1962] | 0.9013 | [-0.0856, -0.0514] |
+
+Seed-ensemble point metrics: precision 0.7260, recall 0.5549, macro lesion-slice Dice 0.5644, normal-slice pixel FPR 0.0072.
+
+Reading:
+
+- **The validation gain holds on test.** Pixel AP is 0.701 [0.677, 0.724] vs 0.651 for the
+  single-seed hybrid (Δ [−0.055, −0.045]). Dice 0.629, image AUROC 0.878 (+0.039) and
+  normal-slice FPR 0.0072 (vs 0.0101) all improve beyond uncertainty. Validation
+  predicted +0.055 holdout AP; test gives +0.050.
+- Against the original Final LPIPS (0.318) and brightness (0.511), pixel AP is now
+  about 2.2× and 1.4× higher, respectively.
+- Cost: three DDIM20+30 reconstructions per image (150 U-Net calls instead of 50).
+- Scope: one trained model, three sampling seeds, one cohort. The configuration was
+  chosen after many validation rounds, and this is the sixth access to an
+  already-inspected test set.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |

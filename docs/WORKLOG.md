@@ -2479,3 +2479,24 @@ Evidence byte-identical to the Hub, LF, UUID-free. No test access.
 Checks: ruff 0.17.5 check/format clean; mask-gate and noise-extension tests pass locally
 and in the CI-equivalent venv. Replays exact. Evidence byte-identical to the Hub, LF,
 UUID-free.
+
+## 2026-11-14 — Single frozen test evaluation of the seed ensemble
+
+- At the user's request, evaluated the R3 candidate once on test (sixth access). It was
+  frozen in `dacn.evaluation.seed_ensemble` (`df81f801`) before any seed-18/19 test map
+  existed. `dacn.cloud.modal_seed_ensemble`: GPU maps stage (seeds 18/19, unchanged frozen
+  adapter, validation smoke replay 0.0) and CPU aggregate stage (gates on the published
+  test metrics and the frozen hybrid).
+- The first detached runs were cancelled when Claude Code reaped the local clients for low
+  host memory. They resumed through `modal deploy` + `Function.spawn`, which does not depend
+  on a local client, and completed. The deployed app was stopped afterwards.
+- Result: test pixel AP 0.701 [0.677, 0.724] vs 0.651; Dice 0.629; image AUROC 0.878; all
+  beyond uncertainty.
+- RESULT_TRACKING, ABLATION_SUMMARY §3, FINAL_TEST_RESULTS addendum, ADVISOR AF-09/AF-11
+  and HANDOFF updated.
+
+Lesson: for multi-hour Modal jobs launched from this machine, use deploy + spawn rather
+than `modal run --detach` from a background shell.
+
+Checks: seed-ensemble tests (frozen values against evidence) pass in the CI-equivalent
+venv. Ruff 0.17.5 clean. Gates exact. Evidence byte-identical to the Hub, LF, UUID-free.

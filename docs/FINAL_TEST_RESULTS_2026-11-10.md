@@ -109,6 +109,14 @@ and must be reported with their access history. Details:
    (Initial LPIPS × brightness 0.530 vs 0.656 holdout AP) and LPIPS (L1 × brightness
    ≈ 0.18) contribute.
 
+3. **Seed ensemble of the hybrid** (`ens-test-full-20261114T163509Z`). The mean of
+   Final LPIPS over sampling seeds 17/18/19, × brightness. It was chosen on validation by
+   a rule fixed beforehand and frozen in code `df81f801`, then evaluated once on test (the
+   sixth test access). Pixel AP **0.7009** [0.6769, 0.7242], pixel AUROC 0.9805, Dice 0.6290,
+   image AUROC 0.8782, normal-slice FPR 0.0072. Every metric is better than the
+   single-seed hybrid beyond uncertainty (AP Δ [+0.045, +0.055]). It costs three
+   reconstructions per image.
+
 Scope: one trained model, one sampling seed, one cohort. The test set had been
 inspected before the hybrid was frozen, so the hybrid result is a post-freeze
 evaluation, not an untouched hold-out confirmation.

@@ -4025,5 +4025,20 @@ validation-calibration score thresholds (pixel 0.13543, image 0.15379). Workspac
   Resumable with the same IDs, code revision and `--resume`. No results yet.
   - Attempt 2, at user request: the app was deployed (`modal deploy`, app `dacn-seed-ensemble`)
     and both runs resumed through `Function.spawn` with the same IDs, revision `df81f801` and
-    resume=True. Spawned calls do not depend on a local client. Status: running.
+    resume=True. Spawned calls do not depend on a local client. Both **completed/uploaded**:
+    seed 18 (4268 s this attempt; [Hub 739add28](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/739add2881cd8796c852ca9d5c56ebe3d1c2371e/evaluations/ens-s18-full-20261114T141611Z)),
+    seed 19 (3861 s; [Hub ac934783](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/ac9347839264b04031ec32e01245849c2d9afb97/evaluations/ens-s19-full-20261114T141617Z)).
+    The manifests still carry `error: InputCancellation` from attempt 1; their status is
+    `completed`. Private chunks stay on the Volume.
+- **`ens-test-full-20261114T163509Z`** (CPU aggregation, spawned on the deployed app)
+  completed/uploaded, 2698 s.
+  [Hub af103578](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/af103578ac82dd6f32ca89afc79fff17f0f0a304/evaluations/ens-test-full-20261114T163509Z).
+  Gates: seed-17 Final LPIPS 1.6e-14, brightness 0.0, frozen hybrid AP 0.0. 3665 slices
+  (640 / 3025), 767 groups, 1000/1000 valid replicates. Test pixel AP **0.7009** [0.6769, 0.7242]
+  vs frozen hybrid 0.6505 (Δ [−0.0551, −0.0454]); Dice 0.6290; pixel AUROC 0.9805; image AUROC
+  0.8782 (hybrid Δ [−0.0460, −0.0316]); normal-slice FPR 0.0072. The deployed app
+  `dacn-seed-ensemble` was stopped afterwards.
+  Evidence: `docs/evidence/2026-11-14-ensemble-test-results.json` (sha256 `1927aa8a…b0ef`,
+  matches manifest), `docs/evidence/2026-11-14-ensemble-test-manifest.json`; byte-identical to
+  the Hub, LF, no UUIDs.
 
