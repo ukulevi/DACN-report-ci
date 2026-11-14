@@ -3835,3 +3835,32 @@ only aggregates are uploaded.
     Naive-stitch Δ [−0.1165, −0.0583]; Brightness 0.6436 (Δ [−0.2132, −0.1073]).
   - Evidence (byte-identical to Hub, LF, no UUIDs): `docs/evidence/2026-11-14-test-ci-results.json`
     (sha256 `6307f26e…f83d`, matches manifest), `docs/evidence/2026-11-14-test-ci-manifest.json`.
+
+## 2026-11-14 — Brain-mask post-processing and brightness hybrids on Final maps (validation)
+
+Code `2c76db10` (`dacn.evaluation.postprocess_hybrid`, `--analysis hybrid`), Modal CPU,
+Workspace `tanh1c`. Cached producer maps of `autoddpm-ddim2030-full83-t4-20261106T074200Z`;
+no model calls; test unused. The hypotheses, 18 arms (6 base maps × none/brain/brain_median5)
+and the candidate decision rule were fixed in the module docstring before running. Thresholds
+are max-F1 on calibration; paired patient-group bootstrap on the 43-image holdout against
+both Final LPIPS and brightness.
+
+- **`hybrid-smoke-20261114T103049Z`** completed/uploaded, 20 replicates, 82 s.
+  Replay error 0.0 for both unprocessed references. The eroded brain mask keeps 99.4% /
+  98.4% of lesion pixels (calibration/holdout).
+  [Modal](https://modal.com/apps/tanh1c/main/ap-KpQBc7NT2mFVYisfRUREea),
+  [Hub fa79bc1f](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/fa79bc1fe595ef8dffc243c9f5103072aaadb17e/evaluations/hybrid-smoke-20261114T103049Z).
+  Smoke point estimates (no intervals at 20 replicates): LPIPS × brightness holdout AP
+  0.656 (calibration 0.496) vs Final 0.312 and brightness 0.390.
+- **`hybrid-full-20261114T103245Z`** completed/uploaded, 1000 replicates (999 valid), 372 s.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-6lnTONKMP9NM4v09G1bl5h),
+  [Hub 9437977b](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/9437977b9fecfc872dd71f14c27549e90b2711e5/evaluations/hybrid-full-20261114T103245Z).
+  Replay error 0.0 for both references. Holdout pixel AP: Final 0.312, brightness 0.390,
+  **LPIPS × brightness 0.656** (Δ vs Final [+0.153, +0.449], Δ vs brightness
+  [+0.109, +0.426]; calibration AP 0.496 vs 0.313; Dice 0.588 vs 0.371; image AUROC 0.932
+  vs 0.914, Δ CI [−0.060, +0.129]). Brain mask + median5 on Final alone: Δ AP
+  [+0.002, +0.013]. Nine arms pass the pre-registered rule: LPIPS × brightness and CDF
+  fusion w0.25/w0.50, each under all three post-processings. Full table in ABLATION_SUMMARY §3.
+  Not yet done: the ablation of the gated reconstruction, and no test access.
+  Evidence: `docs/evidence/2026-11-14-hybrid-results.json` (sha256 `d5b5a167…c519`, matches
+  manifest), `docs/evidence/2026-11-14-hybrid-manifest.json`; byte-identical to the Hub, LF, no UUIDs.

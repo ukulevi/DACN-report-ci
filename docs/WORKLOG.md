@@ -2329,3 +2329,23 @@ clean, evidence byte-identical to the Hub and UUID-free. No training.
 Checks: evidence byte-identical to the Hub (results SHA matches the manifest),
 LF, no UUIDs or tokens. CI table generated from the evidence by script. No
 training and no threshold or method change.
+
+## 2026-11-14 — Brain-mask post-processing and brightness hybrids (validation)
+
+- At the user's request, explored the two cheap directions that need no GPU. Added
+  `dacn.evaluation.postprocess_hybrid` and `--analysis hybrid`. Hypotheses, 18 arms
+  and the candidate rule were fixed in the docstring before running. Code `2c76db10`
+  was committed before the runs.
+- Smoke (20 replicates) and full run (`hybrid-full-20261114T103245Z`, 1000 replicates,
+  6 min CPU). Both references replay the producer exactly. Post-processing: small
+  effect (median5 +0.002 to +0.013 AP on Final). LPIPS × brightness: holdout AP 0.656
+  vs 0.312 Final and 0.390 brightness, beyond uncertainty against both. Calibration
+  AP 0.496 vs 0.313. Image AUROC kept. Nine arms pass the rule.
+- RESULT_TRACKING, ABLATION_SUMMARY §3/§5 and advisor rows AF-03/AF-10 updated;
+  table generated from the evidence by script.
+- Next, pending user decision: ablate the gated reconstruction (Initial/L1/Naive-stitch
+  × brightness), then at most one frozen test run.
+
+Checks: postprocess-hybrid (5), final-fusion and frozen-test-CI unit tests passed
+(12 total). Ruff clean. Evidence byte-identical to the Hub, LF, UUID-free. No
+training and no test access.

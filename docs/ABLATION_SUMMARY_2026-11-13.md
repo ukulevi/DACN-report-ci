@@ -316,6 +316,62 @@ Not supported for pixel AP: no weight raises holdout AP, and w ≥ 0.5 lowers it
 beyond bootstrap uncertainty. A small residual weight slightly raises image
 ROC-AUC. Raw Final LPIPS remains the reference score.
 
+### Brain-mask post-processing and brightness hybrids (added 14 Nov, validation)
+
+`hybrid-full-20261114T103245Z` (code `2c76db10`, Modal CPU, 6 min) used the cached
+t300 Final LPIPS and brightness maps; there were no model calls and the test set was
+not used. The hypotheses, 18 arms and decision rule are fixed in
+`dacn.evaluation.postprocess_hybrid` and were not changed after the run. Brain mask:
+input > −0.95, holes filled, eroded 3 px; it keeps 99.4% / 98.4% of lesion pixels
+(calibration/holdout). Both unprocessed references replay the producer exactly
+(error 0.0). Paired patient-group bootstrap on the 43-image holdout, 999/1000 valid
+replicates. Evidence: [results](evidence/2026-11-14-hybrid-results.json),
+[manifest](evidence/2026-11-14-hybrid-manifest.json).
+
+| Arm | Cal. AP | Holdout AP [95% CI] | Δ AP vs Final | Δ AP vs brightness | Holdout Dice | Δ Dice vs Final | Image AUROC | Δ image AUROC vs Final | Rule |
+|---|---:|---|---|---|---:|---|---:|---|:---:|
+| final_lpips / none | 0.313 | 0.312 [0.099, 0.485] | – | [-0.287, +0.233] | 0.371 | – | 0.914 | – |  |
+| final_lpips / brain | 0.318 | 0.314 [0.102, 0.485] | [-0.002, +0.004] | [-0.287, +0.234] | 0.372 | [-0.000, +0.002] | 0.914 | [+0.000, +0.000] |  |
+| final_lpips / brain_median5 | 0.324 | 0.318 [0.103, 0.495] | [+0.002, +0.013] | [-0.283, +0.244] | 0.377 | [-0.002, +0.013] | 0.912 | [-0.012, +0.000] |  |
+| brightness / none | 0.147 | 0.390 [0.104, 0.583] | [-0.233, +0.287] | – | 0.268 | [-0.298, +0.113] | 0.680 | [-0.549, +0.036] |  |
+| brightness / brain | 0.155 | 0.397 [0.109, 0.591] | [-0.225, +0.293] | [-0.001, +0.015] | 0.276 | [-0.293, +0.117] | 0.680 | [-0.549, +0.040] |  |
+| brightness / brain_median5 | 0.174 | 0.429 [0.134, 0.615] | [-0.200, +0.332] | [+0.017, +0.076] | 0.278 | [-0.293, +0.126] | 0.724 | [-0.498, +0.058] |  |
+| lpips_x_brightness / none | 0.496 | 0.656 [0.365, 0.783] | [+0.153, +0.449] | [+0.109, +0.426] | 0.588 | [+0.059, +0.324] | 0.932 | [-0.060, +0.129] | ✓ |
+| lpips_x_brightness / brain | 0.497 | 0.653 [0.362, 0.777] | [+0.154, +0.445] | [+0.106, +0.426] | 0.589 | [+0.060, +0.323] | 0.930 | [-0.060, +0.122] | ✓ |
+| lpips_x_brightness / brain_median5 | 0.504 | 0.669 [0.379, 0.791] | [+0.175, +0.464] | [+0.120, +0.453] | 0.597 | [+0.062, +0.337] | 0.934 | [-0.049, +0.129] | ✓ |
+| lpips_bright_cdf_w025 / none | 0.501 | 0.624 [0.325, 0.751] | [+0.130, +0.392] | [+0.067, +0.400] | 0.584 | [+0.093, +0.295] | 0.901 | [-0.104, +0.092] | ✓ |
+| lpips_bright_cdf_w025 / brain | 0.501 | 0.622 [0.325, 0.748] | [+0.130, +0.389] | [+0.066, +0.398] | 0.584 | [+0.095, +0.295] | 0.901 | [-0.104, +0.092] | ✓ |
+| lpips_bright_cdf_w025 / brain_median5 | 0.507 | 0.635 [0.343, 0.758] | [+0.148, +0.403] | [+0.078, +0.422] | 0.592 | [+0.098, +0.307] | 0.904 | [-0.100, +0.098] | ✓ |
+| lpips_bright_cdf_w050 / none | 0.434 | 0.623 [0.315, 0.776] | [+0.017, +0.465] | [+0.131, +0.341] | 0.547 | [-0.046, +0.347] | 0.866 | [-0.220, +0.107] | ✓ |
+| lpips_bright_cdf_w050 / brain | 0.436 | 0.621 [0.315, 0.773] | [+0.019, +0.461] | [+0.127, +0.342] | 0.546 | [-0.049, +0.347] | 0.866 | [-0.220, +0.107] | ✓ |
+| lpips_bright_cdf_w050 / brain_median5 | 0.443 | 0.641 [0.352, 0.790] | [+0.045, +0.486] | [+0.142, +0.378] | 0.568 | [-0.030, +0.368] | 0.879 | [-0.196, +0.115] | ✓ |
+| lpips_bright_cdf_w075 / none | 0.310 | 0.548 [0.239, 0.721] | [-0.088, +0.433] | [+0.092, +0.230] | 0.406 | [-0.203, +0.259] | 0.796 | [-0.383, +0.075] |  |
+| lpips_bright_cdf_w075 / brain | 0.314 | 0.548 [0.236, 0.720] | [-0.085, +0.430] | [+0.090, +0.233] | 0.410 | [-0.200, +0.261] | 0.794 | [-0.391, +0.078] |  |
+| lpips_bright_cdf_w075 / brain_median5 | 0.317 | 0.570 [0.269, 0.745] | [-0.067, +0.457] | [+0.105, +0.274] | 0.438 | [-0.178, +0.293] | 0.820 | [-0.322, +0.095] |  |
+
+Reading:
+
+- **H1 (post-processing): small effect.** The brain mask alone changes nothing
+  reliable. Adding the median filter gives Final +0.002 to +0.013 AP and brightness
+  +0.017 to +0.076 AP. It removes edge false positives but does not change the
+  ranking between methods.
+- **H2 (hybrid): large effect.** LPIPS × brightness, with no extra parameters,
+  roughly doubles holdout pixel AP (0.656 vs 0.312 Final and 0.390 brightness). It
+  beats both beyond uncertainty, raises Dice by +0.06 to +0.32, keeps image AUROC
+  (0.932 vs 0.914; Δ CI includes 0), and also raises calibration AP from 0.313 to
+  0.496. The calibration gain matters because it shows the result is not a quirk of
+  the holdout. Rank fusion with w ≤ 0.5 gives similar gains; w = 0.75 drifts toward
+  brightness and fails the rule.
+- Interpretation: Final LPIPS localises "what the model cannot reconstruct", which
+  includes structures that are not lesions. Brightness keeps only the hyperintense
+  part, which matches FLAIR lesion appearance. This is the same idea as counting only
+  positive residuals on FLAIR.
+- Caveats: 18 arms were evaluated, so some intervals exclude 0 by chance, although
+  these deltas are far from 0. The holdout has been inspected repeatedly. This run
+  did not test whether the diffusion reconstruction is needed, i.e. Initial LPIPS ×
+  brightness or L1 × brightness. That ablation is required before the gain can be
+  credited to Final.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |
@@ -342,10 +398,15 @@ results. No ConvAE/ConvVAE test evaluation exists.
    sampling seeds 18/19 at t300 and t400. Mask-rule ablation done (13 Nov,
    Section 1); weighted LPIPS+residual fusion on the Final reconstruction done
    (14 Nov, Section 3).
-4. No further test runs until a single configuration is frozen from
+4. Hybrid follow-up (14 Nov): LPIPS × brightness passes the pre-registered
+   rule on validation. Still needed: (a) the ablation of the reconstruction it
+   gates (Initial LPIPS, L1 and Naive-stitch, each × brightness; validation, CPU);
+   (b) if it still holds, freeze one configuration and run a single test
+   evaluation, reported as the fifth test access after development.
+5. No further test runs until a single configuration is frozen from
    validation; report the three post-freeze test uses as exploratory. The
    14 Nov CI run reused the frozen four-arm protocol unchanged, to quantify
    uncertainty only. It is a fourth access to the test set, and no selection
    was made from it.
-5. Source for the 11–12 November runs is only in private source snapshots;
+6. Source for the 11–12 November runs is only in private source snapshots;
    see `BLK-20261113-01` in ISSUES.md.
