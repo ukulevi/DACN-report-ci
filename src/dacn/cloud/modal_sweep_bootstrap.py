@@ -14,6 +14,7 @@ Analyses:
   hybrid     brain-mask post-processing and brightness hybrids on Final maps
   gate       which reconstruction error to gate by brightness (Final vs Initial, L1)
   seeds      sampling-seed robustness of Final LPIPS x brightness (seeds 17/18/19)
+  diagnose   hybrid error analysis, pooled-83 contrasts, seed/noise ensembles
 
     DACN_HF_SECRET=huggingface modal run -m dacn.cloud.modal_sweep_bootstrap \
         --analysis quality --evaluation-id sweep-quality-smoke-UNIQUE \
@@ -50,6 +51,7 @@ METHODS = {
     "hybrid": "brain_mask_postprocess_and_brightness_hybrid_final_lpips_t300",
     "gate": "brightness_gated_reconstruction_ablation_t300",
     "seeds": "sampling_seed_robustness_final_lpips_x_brightness_t300",
+    "diagnose": "error_analysis_pooled83_and_reconstruction_ensembles_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -361,12 +363,37 @@ def _gate(token, mode, groups, holdout, dataset):
     }
 
 
-def _seeds(token, mode, groups, holdout, dataset):
-    """Sampling-seed robustness of Final LPIPS x brightness (seed bases 17/18/19)."""
+def _variant_maps(token, name, digest, shape):
+    """SHA-checked Final/Initial LPIPS maps saved by the variants run (all 83 slices)."""
     import io
 
     import numpy as np
     from huggingface_hub import hf_hub_download
+
+    from dacn.evaluation.postprocess_hybrid import SEED_SOURCE_REVISION, SEED_SOURCE_RUN
+
+    payload = Path(
+        hf_hub_download(
+            MODEL_REPO,
+            f"evaluations/{SEED_SOURCE_RUN}/{name}",
+            revision=SEED_SOURCE_REVISION,
+            token=token,
+            cache_dir="/tmp/hf-cache",
+        )
+    ).read_bytes()
+    if _sha_bytes(payload) != digest:
+        raise ValueError(f"Variant map checksum differs: {name}")
+    with np.load(io.BytesIO(payload), allow_pickle=False) as archive:
+        maps = {k: archive[k].copy() for k in ("autoddpm_lpips", "initial_lpips_only")}
+    if any(v.shape != shape for v in maps.values()):
+        raise ValueError("Variant maps must cover all 83 validation slices")
+    return maps
+
+
+def _seeds(token, mode, groups, holdout, dataset):
+    """Sampling-seed robustness of Final LPIPS x brightness (seed bases 17/18/19)."""
+
+    import numpy as np
 
     from dacn.evaluation.postprocess_hybrid import (
         HYBRID_REPLAY,
@@ -388,22 +415,8 @@ def _seeds(token, mode, groups, holdout, dataset):
         raise ValueError("Producer brightness differs from the pinned images")
     seed_maps, seed_checks = {}, {}
     for seed, (name, digest) in SEED_VARIANTS.items():
-        payload = Path(
-            hf_hub_download(
-                MODEL_REPO,
-                f"evaluations/{SEED_SOURCE_RUN}/{name}",
-                revision=SEED_SOURCE_REVISION,
-                token=token,
-                cache_dir="/tmp/hf-cache",
-            )
-        ).read_bytes()
-        if _sha_bytes(payload) != digest:
-            raise ValueError(f"Seed map checksum differs: {seed}")
-        with np.load(io.BytesIO(payload), allow_pickle=False) as archive:
-            maps = {k: archive[k].copy() for k in ("autoddpm_lpips", "initial_lpips_only")}
-        if any(v.shape != truth.shape for v in maps.values()):
-            raise ValueError("Seed maps must cover all 83 validation slices")
-        seed_maps[seed], seed_checks[seed] = maps, {"file": name, "sha256": digest}
+        seed_maps[seed] = _variant_maps(token, name, digest, truth.shape)
+        seed_checks[seed] = {"file": name, "sha256": digest}
     if not np.array_equal(seed_maps[17]["autoddpm_lpips"], arrays["autoddpm_lpips"]):
         raise ValueError("Seed-17 control maps differ from the producer reference")
     del arrays
@@ -448,6 +461,132 @@ def _seeds(token, mode, groups, holdout, dataset):
         "arms": arms,
         "pixel_bootstrap": pixel,
         "image_bootstrap": image,
+    }
+
+
+def _diagnose(token, mode, groups, holdout, dataset):
+    """Error analysis, pooled-83 contrasts and reconstruction ensembles (validation)."""
+    import numpy as np
+
+    from dacn.evaluation import diagnostics
+    from dacn.evaluation.diagnostics import (
+        ENSEMBLE_NOISE_LEVELS,
+        contrast_status,
+        ensemble_improves,
+        ensemble_mean,
+        false_positive_breakdown,
+        lesion_detection,
+    )
+    from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.postprocess_hybrid import HYBRID_REPLAY, SEED_VARIANTS
+    from dacn.evaluation.score_refinement import normal_cdf_gate, slice_rank_gate
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN, SWEEP_RUNS
+
+    wanted = {r[3] for r in SWEEP_RUNS if r[1:3] == (20, 30) and r[0] in ENSEMBLE_NOISE_LEVELS}
+    runs = {}
+    for spec, run_id, arrays, results, verified in _iter_verified_runs(token, dataset, wanted):
+        runs[spec[0]] = (run_id, arrays, results, verified)
+    if set(runs) != set(ENSEMBLE_NOISE_LEVELS) - {400}:
+        raise ValueError("Expected DDIM20+30 producer runs at t200/t300/t500")
+    _, arrays, results, verified = runs[300]
+    if runs[300][0] != REFERENCE_RUN:
+        raise ValueError("t300 run must be the producer reference")
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    images, brightness = arrays["images"], np.asarray(arrays["brightness"], np.float64)
+    shape = truth.shape
+    t400_name = "private_t400_20_30_maps.npz"
+    t400_sha = "0bcf42904c000ccb7e6ee48df9b33ec25db1cc6ae0f95c959c53d1c46c55fc4c"
+    final = {t: runs[t][1]["autoddpm_lpips"] for t in (200, 300, 500)}
+    final[400] = _variant_maps(token, t400_name, t400_sha, shape)["autoddpm_lpips"]
+    seeds = {17: final[300]}
+    for seed in (18, 19):
+        seeds[seed] = _variant_maps(token, *SEED_VARIANTS[seed], shape)["autoddpm_lpips"]
+    f300 = np.asarray(final[300], np.float64)
+    maps = {
+        "frozen_hybrid": f300 * brightness,
+        "brightness": brightness,
+        "final_t300": f300,
+        "final_t400": np.asarray(final[400], np.float64),
+        "hybrid_t400": np.asarray(final[400], np.float64) * brightness,
+        "slice_rank": f300 * slice_rank_gate(brightness, images),
+        "normal_cdf": f300 * normal_cdf_gate(brightness, images, labels, calibration),
+        "seed_ensemble": ensemble_mean(seeds.values()) * brightness,
+        "noise_ensemble": ensemble_mean(final[t] for t in ENSEMBLE_NOISE_LEVELS) * brightness,
+    }
+    arms, summary, replay, pixel, image = _evaluate_arms(
+        maps,
+        truth,
+        labels,
+        calibration,
+        holdout,
+        groups,
+        results,
+        mode,
+        ("frozen_hybrid",),
+        replay_arms={"final_t300": "autoddpm_lpips", "brightness": "brightness"},
+    )
+    held = arms["frozen_hybrid"]["group_holdout"]
+    hybrid_error = max(
+        abs(held["pixel"]["auprc"] - HYBRID_REPLAY[0]),
+        abs(held["pixel"]["f1"] - HYBRID_REPLAY[1]),
+        abs(held["image"]["auroc"] - HYBRID_REPLAY[2]),
+    )
+    if hybrid_error > 1e-9:
+        raise ValueError("Frozen hybrid does not replay the hybrid run")
+    thresholds = {name: arm["score_thresholds"]["pixel"] for name, arm in arms.items()}
+    pooled_pixel = {
+        ref: paired_group_bootstrap(
+            truth, maps, groups, thresholds, reference=ref, replicates=REPLICATES[mode], seed=17
+        )
+        for ref in ("frozen_hybrid", "final_t300")
+    }
+    pooled_image = image_group_bootstrap(
+        labels,
+        {name: image_scores(values) for name, values in maps.items()},
+        groups,
+        reference="frozen_hybrid",
+        replicates=REPLICATES[mode],
+        seed=17,
+    )
+    errors = {}
+    for name in ("frozen_hybrid", "final_t300", "brightness"):
+        predicted = maps[name] >= thresholds[name]
+        errors[name] = {
+            "threshold": thresholds[name],
+            **{
+                part: {
+                    "lesions": lesion_detection(truth[rows], predicted[rows]),
+                    "false_positives": false_positive_breakdown(
+                        truth[rows], predicted[rows], images[rows], brightness[rows], labels[rows]
+                    ),
+                }
+                for part, rows in (("calibration", calibration), ("holdout", holdout))
+            },
+        }
+    return {
+        "method": METHODS["diagnose"],
+        "hypotheses_and_rules": diagnostics.__doc__,
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {runs[t][0]: runs[t][3] for t in sorted(runs)},
+        "variant_artifacts": {"t400": t400_sha, **{s: SEED_VARIANTS[s][1] for s in (18, 19)}},
+        "producer_replay_abs_error": replay,
+        "hybrid_replay_abs_error": hybrid_error,
+        "ensemble_verdict": {
+            name: ensemble_improves(name, summary, pooled_pixel["frozen_hybrid"], pooled_image)
+            for name in ("seed_ensemble", "noise_ensemble")
+        },
+        "contrasts_pooled83": contrast_status(pooled_pixel),
+        "selection": "none; all arms reported; rules fixed before running",
+        "scope": SCOPE + " Pooled-83 AP reuses calibration slices; see caveat in rules.",
+        "summary": summary,
+        "arms": arms,
+        "error_analysis": errors,
+        "holdout_pixel_bootstrap": pixel["frozen_hybrid"],
+        "holdout_image_bootstrap": image["frozen_hybrid"],
+        "pooled83_pixel_bootstrap": pooled_pixel,
+        "pooled83_image_bootstrap": pooled_image,
     }
 
 
@@ -610,6 +749,8 @@ def run_sweep_analysis_remote(
             report = _gate(token, mode, groups, holdout, dataset)
         elif analysis == "seeds":
             report = _seeds(token, mode, groups, holdout, dataset)
+        elif analysis == "diagnose":
+            report = _diagnose(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)

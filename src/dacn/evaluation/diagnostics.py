@@ -1,182 +1,147 @@
-"""CPU-only validation diagnostics and one predeclared foreground candidate."""
+"""Error analysis, pooled-83 comparisons and reconstruction ensembles (validation).
 
-import argparse
-import hashlib
-import json
-from pathlib import Path
+Fixed before running (14 Nov). Uses cached producer maps only: no model calls, no
+test access, no threshold fitting beyond the usual calibration max-F1.
+
+A. Error analysis (descriptive, no selection). At the calibration-fitted pixel
+   thresholds of the frozen hybrid, Final LPIPS and brightness:
+   - lesion detection by connected ground-truth component (8-connectivity), binned
+     by size in pixels: [1, 50), [50, 200), [200, 1000), >= 1000; a lesion counts as
+     detected if any predicted pixel touches it; pixel recall per bin;
+   - false-positive pixels by region: background (input <= -0.95), brain rim (filled
+     foreground minus 3-pixel erosion), interior; by brightness quarter; on normal vs
+     abnormal slices; and the share in predicted components under 10 pixels.
+   Reported separately for calibration and holdout.
+
+B. Pooled-83 comparison. AP needs no threshold, so AP is also compared on all 83
+   validation slices with the paired patient-group bootstrap. Caveat: the 20 normal
+   calibration slices also fitted the phase-2 mask threshold and the CDF gate. A
+   contrast counts as resolved when its pooled CI excludes 0. Pre-specified
+   contrasts: Final t400 - t300; hybrid t400 - t300; slice-rank gate - frozen hybrid;
+   normal-CDF gate - frozen hybrid.
+
+C. Ensembles (H: averaging stochastic reconstructions removes sampling noise).
+   seed_ensemble   mean of t300 Final LPIPS over sampling seeds 17/18/19, x brightness
+   noise_ensemble  mean of Final LPIPS over t200/t300/t400/t500 (DDIM20+30, seed 17),
+                   x brightness
+   An ensemble improves on the frozen hybrid only if all of the following hold:
+   the pooled-83 AP delta CI is above 0; the holdout and calibration AP point
+   estimates are both higher; and the pooled image AUROC is not lower beyond
+   uncertainty (delta CI upper bound >= 0).
+"""
 
 import numpy as np
 from scipy import ndimage
 
-from dacn.evaluation.artifacts import _validation_data, load_validation_pairs
-from dacn.evaluation.scores import paired_score_maps
-from dacn.evaluation.validation import evaluate_maps
+from dacn.evaluation.postprocess_hybrid import ERODE_ITERATIONS, FOREGROUND_LEVEL
 
-POLICY = "FG-v1: crop8; input>-1; largest8-connected component; fill holes; no erosion"
-
-
-def foreground_v1(image):
-    image = np.asarray(image)
-    if image.shape != (256, 256) or not np.isfinite(image).all() or np.any(np.abs(image) > 1):
-        raise ValueError("expected finite normalized 256x256 input")
-    components, count = ndimage.label(image[8:-8, 8:-8] > -1, structure=np.ones((3, 3)))
-    if not count:
-        return np.zeros((240, 240), dtype=bool)
-    sizes = np.bincount(components.ravel())
-    sizes[0] = 0
-    return ndimage.binary_fill_holes(components == sizes.argmax())
+SIZE_BINS = ((1, 50), (50, 200), (200, 1000), (1000, None))
+SPECKLE_PIXELS = 10
+EIGHT = np.ones((3, 3), dtype=bool)
+ENSEMBLE_NOISE_LEVELS = (200, 300, 400, 500)
+ENSEMBLE_SEEDS = (17, 18, 19)
+CONTRASTS = (
+    ("final_t400", "final_t300"),
+    ("hybrid_t400", "frozen_hybrid"),
+    ("slice_rank", "frozen_hybrid"),
+    ("normal_cdf", "frozen_hybrid"),
+)
 
 
-def coverage(images, masks):
-    fg = np.stack([foreground_v1(image) for image in images])
-    lesions = masks[:, 8:-8, 8:-8].astype(bool)
-    removed = lesions & ~fg
-    total = int(lesions.sum())
-    return fg, {
-        "policy": POLICY,
-        "samples": len(images),
-        "lesion_pixels": total,
-        "excluded_lesion_pixels": int(removed.sum()),
-        "excluded_lesion_fraction": float(removed.sum() / total) if total else None,
-        "affected_lesion_slices": int(removed.any(axis=(1, 2)).sum()),
-        "fully_excluded_lesion_slices": int(
-            (lesions.any(axis=(1, 2)) & ~(lesions & fg).any(axis=(1, 2))).sum()
-        ),
-        "empty_foreground_slices": int((~fg.any(axis=(1, 2))).sum()),
-        "foreground_below_top576_slices": int((fg.sum(axis=(1, 2)) < 576).sum()),
-        "foreground_fraction": float(fg.mean()),
-    }
+def _bin_name(low, high):
+    return f"{low}-{high - 1}" if high else f">={low}"
 
 
-def confusion(predicted, truth):
-    truth = np.asarray(truth, dtype=bool)
-    return {
-        "tp": int((predicted & truth).sum()),
-        "fp": int((predicted & ~truth).sum()),
-        "fn": int((~predicted & truth).sum()),
-        "tn": int((~predicted & ~truth).sum()),
-    }
+def lesion_detection(truth, predicted):
+    """Per-size-bin lesion counts, detection rate and pixel recall."""
+    truth, predicted = np.asarray(truth, bool), np.asarray(predicted, bool)
+    stats = {_bin_name(*b): {"lesions": 0, "detected": 0, "pixels": 0, "hit": 0} for b in SIZE_BINS}
+    for t, p in zip(truth, predicted, strict=True):
+        labelled, count = ndimage.label(t, structure=EIGHT)
+        if not count:
+            continue
+        sizes = np.bincount(labelled.ravel())[1:]
+        hits = np.bincount(labelled[p].ravel(), minlength=count + 1)[1:]
+        for size, hit in zip(sizes, hits, strict=True):
+            for low, high in SIZE_BINS:
+                if size >= low and (high is None or size < high):
+                    row = stats[_bin_name(low, high)]
+                    row["lesions"] += 1
+                    row["detected"] += int(hit > 0)
+                    row["pixels"] += int(size)
+                    row["hit"] += int(hit)
+    for row in stats.values():
+        row["detection_rate"] = row["detected"] / row["lesions"] if row["lesions"] else None
+        row["pixel_recall"] = row["hit"] / row["pixels"] if row["pixels"] else None
+        del row["hit"]
+    return stats
 
 
-def summarize(scores, masks, labels, foreground, metrics):
-    predicted = scores >= metrics["pixel"]["threshold"]
-    truth = masks.astype(bool)
-    flat = scores.reshape(len(scores), -1)
-    top = np.argpartition(flat, -576, axis=1)[:, -576:]
-    top_values = np.take_along_axis(flat, top, axis=1)
-    cutoff = top_values.min(axis=1)
-    ties_total = (flat == cutoff[:, None]).sum(axis=1)
-    ties_selected = (top_values == cutoff[:, None]).sum(axis=1)
-    ambiguous = ties_total > ties_selected
-    image_scores = top_values.mean(axis=1)
-    image_predicted = image_scores >= metrics["image"]["threshold"]
-    normal = labels == 0
+def regions(images):
+    """Background, rim and interior masks of the 240 crop."""
+    crop = np.asarray(images)[:, 8:-8, 8:-8]
+    fg = np.stack([ndimage.binary_fill_holes(s > FOREGROUND_LEVEL) for s in crop])
+    interior = np.stack([ndimage.binary_erosion(s, iterations=ERODE_ITERATIONS) for s in fg])
+    return {"background": ~fg, "rim": fg & ~interior, "interior": interior}
+
+
+def false_positive_breakdown(truth, predicted, images, brightness, labels):
+    truth, predicted = np.asarray(truth, bool), np.asarray(predicted, bool)
     fp = predicted & ~truth
-    strata = {}
-    lesion_sizes = truth.sum(axis=(1, 2))
-    for name, lo, hi in [
-        ("1_to_100", 1, 100),
-        ("101_to_1000", 101, 1000),
-        ("over_1000", 1001, 57600),
-    ]:
-        selected = (lesion_sizes >= lo) & (lesion_sizes <= hi)
-        strata[name] = {
-            "slices": int(selected.sum()),
-            **confusion(predicted[selected], truth[selected]),
-        }
-    return {
-        "top576_boundary_tie_slices": int(ambiguous.sum()),
-        "top576_location_caveat": "location ambiguous on slices with a cutoff tie",
-        "pixel_confusion": confusion(predicted, truth),
-        "image_confusion": confusion(image_predicted, labels),
-        "image_all_positive": bool(image_predicted.all()),
-        "normal_image_false_positive_rate": float(image_predicted[normal].mean())
-        if normal.any()
-        else None,
-        "fp_outside_foreground": int((fp & ~foreground).sum()),
-        "fp_inside_foreground": int((fp & foreground).sum()),
-        "top576_outside_foreground_fraction": float(
-            (~np.take_along_axis(foreground.reshape(len(scores), -1), top, axis=1)).mean()
-        ),
-        "image_score_quantiles_q0_q25_q50_q75_q100": {
-            name: np.quantile(image_scores[labels == label], [0, 0.25, 0.5, 0.75, 1]).tolist()
-            for name, label in [("normal", 0), ("anomaly", 1)]
-            if (labels == label).any()
-        },
-        "lesion_size_strata": strata,
+    total = int(fp.sum())
+
+    def share(mask):
+        return float((fp & mask).sum() / total) if total else None
+
+    out = {"fp_pixels": total, "predicted_pixels": int(predicted.sum())}
+    out["by_region"] = {name: share(mask) for name, mask in regions(images).items()}
+    brightness = np.asarray(brightness)
+    out["by_brightness_quarter"] = {
+        f"{q / 4:.2f}-{(q + 1) / 4:.2f}": share(
+            (brightness >= q / 4) & ((brightness < (q + 1) / 4) if q < 3 else True)
+        )
+        for q in range(4)
     }
-
-
-def compare(artifact, dataset, provenance):
-    images, recons, masks, labels, provenance, digest = load_validation_pairs(
-        artifact, dataset, provenance
+    normal = np.asarray(labels) == 0
+    out["on_normal_slices"] = share(np.broadcast_to(normal[:, None, None], fp.shape))
+    speckle = 0
+    for p in predicted:
+        labelled, count = ndimage.label(p, structure=EIGHT)
+        if count:
+            sizes = np.bincount(labelled.ravel())
+            small = np.flatnonzero(sizes < SPECKLE_PIXELS)
+            small = small[small > 0]
+            speckle += int(np.isin(labelled, small).sum())
+    out["predicted_in_components_under_10px"] = (
+        speckle / out["predicted_pixels"] if out["predicted_pixels"] else None
     )
-    foreground, audit = coverage(images, masks)
-    cropped = masks[:, 8:-8, 8:-8]
-    maps = {name: [] for name in ("pixel_difference", "local_ssim")}
-    for image, reconstruction in zip(images, recons):
-        for name, scores in paired_score_maps(image, reconstruction).items():
-            maps[name].append(scores)
-    results = {}
-    for name, values in maps.items():
-        scores = np.stack(values).astype(np.float64)
-        floor = float(scores.min() - max(1.0, abs(scores.min()) * 0.1))
-        candidate = np.where(foreground, scores, floor)
-        results[name] = {}
-        for variant, values in [("baseline", scores), ("foreground_floor", candidate)]:
-            metrics = evaluate_maps(values, cropped, labels, split="validation")
-            results[name][variant] = {
-                "metrics": metrics,
-                "diagnostics": summarize(values, cropped, labels, foreground, metrics),
-            }
-        results[name]["floor"] = floor
-        results[name]["candidate_threshold_at_floor"] = bool(
-            results[name]["foreground_floor"]["metrics"]["pixel"]["threshold"] <= floor
-        )
-    return {
-        "split": "validation",
-        "scope": "exploratory CPU comparison; test not used",
-        "samples": len(images),
-        "thresholds_frozen": False,
-        "provenance_declared_by_producer": provenance,
-        "reconstruction_artifact_sha256": digest,
-        "coverage": audit,
-        "results": results,
-    }
+    return out
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dataset", type=Path, required=True)
-    parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--artifact", type=Path)
-    parser.add_argument("--provenance", type=Path)
-    parser.add_argument("--metadata-sha256")
-    args = parser.parse_args()
-    if args.output.exists():
-        raise FileExistsError("choose a fresh report path")
-    if args.artifact:
-        if not args.provenance:
-            parser.error("artifact requires provenance")
-        result = compare(
-            args.artifact, args.dataset, json.loads(args.provenance.read_text(encoding="utf-8"))
-        )
-    else:
-        if not args.metadata_sha256:
-            parser.error("coverage-only audit requires metadata-sha256")
-        _, images, masks, _ = _validation_data(args.dataset, args.metadata_sha256)
-        _, result = coverage(images, masks)
-        result.update(
-            split="validation",
-            scope="input-derived coverage audit; no reconstruction metrics",
-            dataset_metadata_sha256=args.metadata_sha256,
-        )
-    result["diagnostic_source_sha256"] = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    with args.output.open("x", encoding="utf-8") as stream:
-        json.dump(result, stream, indent=2, allow_nan=False)
-        stream.write("\n")
+def ensemble_mean(maps):
+    stacked = [np.asarray(m, dtype=np.float64) for m in maps]
+    if len({m.shape for m in stacked}) != 1:
+        raise ValueError("Ensemble members must share one shape")
+    return np.mean(stacked, axis=0)
 
 
-if __name__ == "__main__":
-    main()
+def ensemble_improves(name, summary, pooled_pixel, pooled_image):
+    """Rule C; ``pooled_*`` are bootstraps on all 83 slices against the frozen hybrid."""
+    return bool(
+        pooled_pixel["candidates"][name]["delta_ap_ci95"][0] > 0
+        and summary[name]["holdout_ap"] > summary["frozen_hybrid"]["holdout_ap"]
+        and summary[name]["calibration_ap"] > summary["frozen_hybrid"]["calibration_ap"]
+        and pooled_image["candidates"][name]["delta_auroc_ci95"][1] >= 0
+    )
+
+
+def contrast_status(pooled_by_reference, contrasts=CONTRASTS):
+    """Pooled-83 delta CI for each pre-specified contrast and whether it excludes 0."""
+    out = {}
+    for arm, reference in contrasts:
+        ci = pooled_by_reference[reference]["candidates"][arm]["delta_ap_ci95"]
+        out[f"{arm} - {reference}"] = {
+            "delta_ap_ci95": ci,
+            "resolved": bool(ci[0] > 0 or ci[1] < 0),
+        }
+    return out
