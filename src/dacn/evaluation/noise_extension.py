@@ -57,13 +57,21 @@ def run_point(
     selected,
     point,
     counter,
+    phase2_start=PHASE2_START,
+    seed_base=17,
+    mask_score="product",
 ):
-    """Producer-equivalent DDIM phase 1 + masked phase 2 for one sweep point."""
+    """Producer-equivalent DDIM phase 1 + masked phase 2 for one sweep point.
+
+    Defaults reproduce the producer. ``seed_base`` changes only the per-sample
+    sampling seeds; ``mask_score="lpips"`` builds the pseudo-mask heatmap from raw
+    initial LPIPS instead of LPIPS x normalized residual (same threshold rule).
+    """
     start, steps1, steps2 = point
-    if steps1 + steps2 != 50:
-        raise ValueError("Sweep points keep the 50-call budget")
+    if mask_score not in ("product", "lpips"):
+        raise ValueError("mask_score must be 'product' or 'lpips'")
     phase1 = ddim_indices(start, steps1)
-    phase2 = ddim_indices(PHASE2_START, steps2)
+    phase2 = ddim_indices(phase2_start, steps2)
     normal_calibration = [int(i) for i in calibration if labels[i] == 0]
     converted = sorted(set(normal_calibration) | set(selected))
     initials, initial_scores, heatmaps, phase1_seconds = {}, {}, {}, []
@@ -76,7 +84,7 @@ def run_point(
                 model,
                 diffusion,
                 image,
-                seed=derive_sampling_seed(17, sample_ids[index]),
+                seed=derive_sampling_seed(seed_base, sample_ids[index]),
                 indices=phase1,
             ),
             device,
@@ -87,7 +95,7 @@ def run_point(
         initial_scores[index], _ = ablation_pair_scores(
             perceptual, images[index], initials[index], device, 1e-8
         )
-        heatmaps[index] = initial_scores[index]["product"]
+        heatmaps[index] = initial_scores[index][mask_score]
         phase1_seconds.append(elapsed)
     stacked = np.zeros((len(images), 240, 240), dtype=np.float32)
     for index, value in heatmaps.items():
@@ -110,7 +118,7 @@ def run_point(
                 initial,
                 mask,
                 diffusion=diffusion,
-                seed=derive_sampling_seed(17, sample_ids[index]),
+                seed=derive_sampling_seed(seed_base, sample_ids[index]),
                 indices=phase2,
                 repeats=1,
             ),
@@ -164,3 +172,27 @@ def check_point_replay(result, cached, selected, *, atol=REPLAY_ATOL):
     if worst > atol:
         raise ValueError(f"Control replay exceeds tolerance: {worst}")
     return {"max_abs_errors": errors, "threshold_abs_error": threshold_error}
+
+
+# Validation-only variants for the advisor's remaining items; t300 control first.
+# name: (point, phase2_start, seed_base, mask_score)
+VARIANTS = {
+    "control_t300_20_30": ((300, 20, 30), 50, 17, "product"),
+    "t400_20_30": ((400, 20, 30), 50, 17, "product"),
+    "seed18_t300_20_30": ((300, 20, 30), 50, 18, "product"),
+    "seed19_t300_20_30": ((300, 20, 30), 50, 19, "product"),
+    "seed18_t400_20_30": ((400, 20, 30), 50, 18, "product"),
+    "seed19_t400_20_30": ((400, 20, 30), 50, 19, "product"),
+    "budget_t300_10_15": ((300, 10, 15), 50, 17, "product"),
+    "budget_t300_40_50": ((300, 40, 50), 50, 17, "product"),
+    "phase2_t30_t300_20_30": ((300, 20, 30), 30, 17, "product"),
+    "phase2_t100_t300_20_30": ((300, 20, 30), 100, 17, "product"),
+    "lpips_mask_t300_20_30": ((300, 20, 30), 50, 17, "lpips"),
+}
+SMOKE_VARIANTS = ("control_t300_20_30", "lpips_mask_t300_20_30", "budget_t300_40_50")
+# Published aggregates the matching variants must reproduce (43-holdout pixel AP).
+PUBLISHED_HOLDOUT_AP = {
+    "t400_20_30": ("noise-ext-full-20261114T034843Z", 0.34794637897971714),
+    "lpips_mask_t300_20_30": ("lpips-only-mask-20261112T154126Z-d-validation", 0.2872849863588635),
+}
+PUBLISHED_LPIPS_MASK_THRESHOLD = 0.1989728808403015

@@ -58,3 +58,36 @@ def test_point_replay_accepts_exact_subset_and_rejects_drift():
     moved["mask_threshold"] += 1e-6
     with pytest.raises(ValueError, match="threshold"):
         ne.check_point_replay(moved, cached, selected)
+
+
+def test_variants_are_valid_single_component_changes_with_control_first():
+    from dacn.evaluation.ddim_inpainting import ddim_indices
+
+    names = list(ne.VARIANTS)
+    assert names[0] == ne.SMOKE_VARIANTS[0] == "control_t300_20_30"
+    assert ne.VARIANTS["control_t300_20_30"] == (ne.CONTROL_POINT, 50, 17, "product")
+    control = ne.VARIANTS["control_t300_20_30"]
+    for name, (point, phase2_start, seed_base, mask_score) in ne.VARIANTS.items():
+        start, steps1, steps2 = point
+        assert len(ddim_indices(start, steps1)) == steps1
+        assert len(ddim_indices(phase2_start, steps2)) == steps2
+        assert mask_score in ("product", "lpips")
+        if name.startswith(("seed", "budget", "phase2", "lpips_mask")):
+            base = (point, phase2_start, seed_base, mask_score)
+            changed = sum(
+                a != b
+                for a, b in zip(
+                    (point[0], (steps1, steps2), phase2_start, seed_base, mask_score),
+                    (
+                        control[0][0] if not name.startswith("seed") or "t300" in name else 400,
+                        control[0][1:],
+                        control[1],
+                        control[2],
+                        control[3],
+                    ),
+                    strict=True,
+                )
+            )
+            assert changed == 1, (name, base)
+    assert set(ne.SMOKE_VARIANTS) <= set(names)
+    assert set(ne.PUBLISHED_HOLDOUT_AP) <= set(names)
