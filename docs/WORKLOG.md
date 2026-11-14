@@ -2380,3 +2380,24 @@ test access.
 Checks: 12 unit tests passed (postprocess-hybrid incl. a frozen-threshold check against
 the evidence, frozen-test-CI). Ruff clean. Evidence byte-identical to the Hub, LF,
 UUID-free. No training and no fitting on test.
+
+## 2026-11-14 — CI repair and report follow-ups
+
+- CI had failed on the two pushes of 14/11. The cause was `ruff check .`: CI resolves Ruff
+  0.17, while the local checks used 0.15.20, which has different default rules. There
+  were 11 findings, all in code from this session. Applied the safe fixes, added
+  documented `noqa: BLE001` to the intentional upload-failure handlers, and added the
+  repository's usual torch `importorskip` to two producer-pipeline tests, because CI does
+  not install torch. Verified with ruff 0.17.5 and a venv matching CI's `.[data,dev]`
+  install (204 passed, 27 skipped; demo OK). GitHub run 43592063874 succeeded.
+- AF-08: added Pixel AUROC to the hybrid, gate and hybrid-test tables in ABLATION_SUMMARY,
+  regenerated from the evidence. The test reference values are from the published 10/11
+  aggregate.
+- Added a 14/11 addendum to FINAL_TEST_RESULTS_2026-11-10 and REPORT_READINESS covering
+  the CIs and the post-freeze hybrid (fifth test access). `report/thesis.md` was left
+  unchanged; how to present the main method is a team decision.
+- AF-01 note for the advisor. ISSUES: BLK-20261107-01 resolved. BLK-20261113-01 is still
+  open; the LPIPS-only-mask validation result is now reproducible from Git.
+
+Lesson: run Ruff at CI's resolved version (`uvx ruff@<ci-version>`) before pushing. The
+local Ruff here is older and its defaults differ.

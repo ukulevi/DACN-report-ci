@@ -100,3 +100,15 @@ hoặc cải thiện chắc chắn từ một seed và một cohort đã khảo 
 Viết nội dung song song với review giúp giữ tiến độ; không cần đợi test để viết
 phương pháp. Mẫu trình bày của trường, hình minh họa an toàn, slides và demo vẫn
 cần hoàn thiện; không gọi REPORT_DRAFT hiện tại là bản nộp hoàn chỉnh.
+
+## Cập nhật 14/11/2026
+
+- Đã có CI theo nhóm bệnh nhân cho 4 nhánh frozen trên test, và một cấu hình mới là
+  **Final LPIPS × brightness**. Cấu hình này được cố định trên validation rồi chạy test
+  đúng một lần (lần dùng test thứ năm). Kết quả: pixel AP 0.651 [0.626, 0.673], vượt cả
+  Final LPIPS (0.318) và brightness (0.511) ngoài độ bất định. Xem phần addendum trong
+  [FINAL_TEST_RESULTS_2026-11-10.md](FINAL_TEST_RESULTS_2026-11-10.md) và
+  [ABLATION_SUMMARY §3](ABLATION_SUMMARY_2026-11-13.md).
+- `report/thesis.md` chưa cập nhật các kết quả này. Nhóm cần quyết định cách trình bày
+  phương pháp chính: Final LPIPS hay Final LPIPS × brightness. Khi viết phải ghi rõ lịch
+  sử dùng tập test.

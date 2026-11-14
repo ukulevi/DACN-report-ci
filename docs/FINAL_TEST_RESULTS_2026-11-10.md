@@ -77,3 +77,38 @@ shards and masks remain on shared Modal Volume. Report package in ignored
 runs/final-20261110/report includes PNG/PDF charts, training curve, report Markdown
 and private DOCX with validation high/low-Dice examples; no images committed.
 A4/Times New Roman is a general layout; school template has not been supplied.
+
+## Addendum 14/11/2026 — patient-group CIs and the post-freeze hybrid
+
+The 10/11 record above is unchanged. Two later test analyses use the same test split
+and must be reported with their access history. Details:
+[ABLATION_SUMMARY §1 and §3](ABLATION_SUMMARY_2026-11-13.md),
+[RESULT_TRACKING](RESULT_TRACKING.md).
+
+1. **Patient-group CIs for the four frozen arms** (`test-ci-full-20261114T042202Z`). The
+   frozen protocol was recomputed for uncertainty only, with no change, and reproduced
+   the table above within 5.2e-7. 767 groups, 1000 replicates. Final LPIPS pixel AP 0.3182
+   [0.3031, 0.3333]. Final beats Initial and Naive-stitch on every metric beyond
+   uncertainty. Brightness keeps higher pixel AP (Δ [+0.161, +0.228]); Final keeps higher
+   image AUROC.
+2. **Final LPIPS × brightness** (`hybrid-test-full-20261114T105717Z`). The configuration
+   and its thresholds were frozen on validation (code `a5911a35`) after several
+   development rounds on 14/11 (validation hybrid and gate ablations). It was evaluated
+   once on test, the fifth test access, with no fitting on test. Result:
+
+   | Arm | Pixel AP [95% CI] | Pixel AUROC | Dice | Image AUROC | Normal pixel FPR |
+   |---|---|---:|---:|---:|---:|
+   | **Final LPIPS × brightness** | **0.6505** [0.6263, 0.6731] | **0.9759** | **0.5943** | **0.8397** | 0.0101 |
+   | Final LPIPS | 0.3182 [0.3031, 0.3333] | 0.9388 | 0.3643 | 0.8060 | 0.0098 |
+   | Brightness | 0.5114 [0.4830, 0.5431] | 0.9615 | 0.4170 | 0.6436 | 0.1077 |
+
+   Pixel AP, Dice, image AUROC and image AP are higher than both Final LPIPS and
+   brightness beyond uncertainty. This replaces the statement above that diffusion does
+   not beat brightness, **for this hybrid only**. Final LPIPS alone still does not beat
+   brightness at pixel level. Validation shows that both the masked re-sampling
+   (Initial LPIPS × brightness 0.530 vs 0.656 holdout AP) and LPIPS (L1 × brightness
+   ≈ 0.18) contribute.
+
+Scope: one trained model, one sampling seed, one cohort. The test set had been
+inspected before the hybrid was frozen, so the hybrid result is a post-freeze
+evaluation, not an untouched hold-out confirmation.

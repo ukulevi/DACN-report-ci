@@ -24,7 +24,7 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 |---|---|---|---|---|---|
 | `BLK-20261113-01` | Source của run 11–12/11 chưa có trong Git | Open | Thành viên đã chạy SNC/Sobel/PraNet/CGFF/LPIPS-only-mask | Tái lập, review code, báo cáo ablation | 2026-11-13 |
 | `BLK-20261107-02` | Colab mới chờ HF read authentication | Resolved | Người dùng / agent tiếp tục smoke | GPU smoke/full validation | 2026-11-07 |
-| `BLK-20261107-01` | GitHub Actions bị chặn do tài khoản/billing | Waiting | Chủ repo kiểm Billing/Actions | CI head hiện tại | 2026-11-07 |
+| `BLK-20261107-01` | GitHub Actions bị chặn do tài khoản/billing | Resolved | Chủ repo kiểm Billing/Actions | CI head hiện tại | 2026-11-14 |
 | `BLK-20261101-01` | Chưa chốt terminal status của run batch-1 cũ | Open | C — Hai Tuan | Provenance run lịch sử; G30 run khác đã có | 2026-11-06 |
 | `BLK-20261101-02` | Xác nhận chất lượng score trước freeze | Investigating | B — Chí Vĩ; C — Hai Tuan | Score/model freeze trước held-out test | 2026-11-06 |
 | `BLK-20261102-03` | Modal client chưa deploy được T4 batch-8 pilot | Resolved | C — Hai Tuan | T4 one-epoch throughput pilot | 2026-11-02 |
@@ -35,6 +35,10 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 ### BLK-20261113-01 — Source của các run 11–12/11 chỉ có trong snapshot private
 
 - **Status:** Open, 13/11/2026.
+- **Update 14/11/2026:** The LPIPS-only-mask *validation* result can now be reproduced from
+  Git. `variants-full-20261114T041258Z` (code `f888e40`) reproduced its holdout AP 0.287285
+  and threshold 0.198973. The LPIPS-only-mask test run and the SNC/Sobel/PraNet/CGFF runs
+  still have no source in Git.
 - **Affects:** 11 run trên `dacn-bmad-team/dacn-runs`: `snc-lpips-*`, `sobel-*`,
   `pranet-fusion-*`, `cgff-*` (smoke + full83 validation) và
   `lpips-only-mask-20261112T154126Z-d-{smoke,validation,test}`. Kết quả đã được
@@ -75,6 +79,11 @@ cần quyết định chung. Linear vẫn là nguồn chính cho owner/status c�
 
 ### BLK-20261107-01 — CI không khởi động job
 
+- **Resolved 14/11/2026:** The original repository's Actions run again. The `CI`
+  quality workflow on `codex/bc-evaluation-colab` ran on 14/11. It first failed on new Ruff
+  0.17 rules in code from that day. After fix `a408e3d`, run
+  [43592063874](https://github.com/tanh1c/DACN/actions/runs/43592063874) **succeeded**:
+  ruff check, ruff format, pytest and the demo all passed.
 - **10Nov satellite workaround:** Người dùng xác nhận thẻ chủ repo expired và
   đồng ý tạo private `ukulevi/DACN-report-ci`. Source `4accc9f` được đẩy sang
   satellite; [report run42756144394](https://github.com/ukulevi/DACN-report-ci/actions/runs/42756144394)
