@@ -3980,3 +3980,28 @@ calls; test unused. Rules were fixed in code before running.
   recall is about 0.6; 99% of false positives are inside the brain.
   Evidence: `docs/evidence/2026-11-14-diagnose-results.json` (sha256 `6aea4476…d45d`, matches
   manifest), `docs/evidence/2026-11-14-diagnose-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
+
+## 2026-11-14 — Brightness-gated pseudo-mask for phase 2 (validation)
+
+GPU: `dacn.cloud.modal_noise_extension --suite maskgate` (code `03265407`, T4). CPU:
+`--analysis maskgate` (code `18bd774e`). Workspace `tanh1c`. Test unused. Rules fixed in
+`dacn.evaluation.mask_gate` before the GPU run.
+
+- **`maskgate-smoke-20261114T134128Z`** (GPU, 2 validation images) completed/uploaded, 36 s;
+  control replay 0.0. [Modal](https://modal.com/apps/tanh1c/main/ap-ZNv99Qe9ov9cqYlst3f4ZE),
+  [Hub f1a4a02d](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/f1a4a02d1ee6663fd5a0f739c2425bd55955ebf1/evaluations/maskgate-smoke-20261114T134128Z).
+- **`maskgate-full-20261114T134252Z`** (GPU, 4 configurations × 83) completed/uploaded, 742 s;
+  control replay 0.0. [Modal](https://modal.com/apps/tanh1c/main/ap-yoqLORjBkEE4cv2OMbxx6k),
+  [Hub d8441e8b](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/d8441e8ba602ec068b3f24566af91b79ce5bd193/evaluations/maskgate-full-20261114T134252Z).
+  Map files only (no images); SHA in that run's manifest.
+- **`maskgate-cpu-smoke-20261114T135616Z`** completed/uploaded, 87 s.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-OfQZfzsv6puGZuPVT9QMGZ),
+  [Hub 79f0a02c](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/79f0a02ceef47444b296e8ab94514823dbcf6376/evaluations/maskgate-cpu-smoke-20261114T135616Z).
+- **`maskgate-cpu-full-20261114T135821Z`** completed/uploaded, 1000 replicates, 345 s.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-7uj95hYIHRlqljZIPNFdQF),
+  [Hub 080772ec](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/080772ecf691a115d0866db1f072afb14cf2f764/evaluations/maskgate-cpu-full-20261114T135821Z).
+  Replays 0.0. R1 false (bmask beats the producer mask for 0/3 seeds; seed 17 pooled Δ
+  [−0.112, −0.037]). R2: large-lesion recall 0.627 vs 0.634. R3 test candidate:
+  `product_ensemble` (seed ensemble, producer mask; holdout AP 0.711).
+  Evidence: `docs/evidence/2026-11-14-maskgate-results.json` (sha256 `03670ce5…fe7a`, matches
+  manifest), `docs/evidence/2026-11-14-maskgate-manifest.json`; byte-identical to the Hub, LF, no UUIDs.

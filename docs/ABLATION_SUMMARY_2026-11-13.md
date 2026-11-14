@@ -583,6 +583,48 @@ in parentheses):
   takes 3× as long. It has not been evaluated on test. A test run would be the sixth
   test access and needs a team decision.
 
+### Brightness-gated pseudo-mask for phase 2 (added 14 Nov, validation)
+
+The error analysis showed large lesions under-segmented, so this tested building the
+phase-1 pseudo-mask from initial LPIPS × brightness instead of initial LPIPS ×
+normalised residual. The threshold rule (p95 on normal calibration, dilation 3) and
+the rest of the pipeline were unchanged. The GPU run `maskgate-full-20261114T134252Z`
+(code `03265407`, T4, 12 min) used seeds 17/18/19; its control replayed the producer
+exactly (0.0). The CPU analysis `maskgate-cpu-full-20261114T135821Z` (code `18bd774e`,
+6 min) SHA-checked every map against the GPU run's manifest and replayed the producer
+and the frozen hybrid (0.0). All scores are gated by brightness. Rules, including how
+the single test candidate is chosen (R3), were fixed in `dacn.evaluation.mask_gate`
+before the GPU run. 999–1000 valid replicates. No test access. Evidence:
+[results](evidence/2026-11-14-maskgate-results.json),
+[manifest](evidence/2026-11-14-maskgate-manifest.json).
+
+| Arm | Cal. AP | Holdout AP | Δ holdout − product s17 | Pooled-83 AP | Δ pooled − product s17 | Δ pooled − product ensemble | Holdout pixel AUROC | Holdout Dice | Pooled image AUROC | Large-lesion pixel recall (holdout) |
+|---|---:|---:|---|---:|---|---|---:|---:|---:|---:|
+| product_s17 | 0.496 | 0.656 | – | 0.588 | – | [-0.092, -0.033] | 0.979 | 0.588 | 0.830 | 0.634 |
+| bmask_s17 | 0.378 | 0.621 | [-0.073, +0.002] | 0.512 | [-0.112, -0.037] | [-0.183, -0.085] | 0.979 | 0.551 | 0.735 | 0.627 |
+| product_s18 | 0.531 | 0.610 | [-0.131, +0.003] | 0.576 | [-0.066, +0.033] | [-0.123, -0.034] | 0.976 | 0.550 | 0.813 | – |
+| bmask_s18 | 0.420 | 0.574 | [-0.199, +0.009] | 0.508 | [-0.153, -0.021] | [-0.209, -0.079] | 0.978 | 0.510 | 0.739 | – |
+| product_s19 | 0.519 | 0.659 | [-0.039, +0.050] | 0.599 | [-0.037, +0.054] | [-0.096, -0.011] | 0.976 | 0.599 | 0.809 | – |
+| bmask_s19 | 0.416 | 0.656 | [-0.057, +0.052] | 0.546 | [-0.108, +0.009] | [-0.170, -0.052] | 0.978 | 0.586 | 0.717 | – |
+| product_ensemble | 0.561 | 0.711 | [+0.027, +0.103] | 0.646 | [+0.033, +0.092] | – | 0.982 | 0.635 | 0.861 | 0.632 |
+| bmask_ensemble | 0.433 | 0.689 | [-0.021, +0.107] | 0.572 | [-0.069, +0.038] | [-0.124, -0.027] | 0.983 | 0.608 | 0.764 | 0.579 |
+| final_s17 | 0.313 | 0.312 | [-0.449, -0.153] | 0.312 | [-0.391, -0.110] | [-0.449, -0.171] | 0.949 | 0.371 | 0.833 | – |
+| brightness | 0.147 | 0.390 | [-0.426, -0.109] | 0.272 | [-0.429, -0.187] | [-0.500, -0.241] | 0.950 | 0.268 | 0.556 | – |
+
+Reading:
+
+- **The hypothesis is rejected.** The brightness-gated mask is worse than the producer
+  mask for all three seeds (seed wins 0/3). Pooled Δ AP for seed 17 is [−0.112,
+  −0.037]; calibration AP and image AUROC are lower; large-lesion pixel recall does not
+  rise (0.627 vs 0.634). The residual term in the mask is again shown to matter, which
+  agrees with AF-02 (an LPIPS-only mask was also worse).
+- Large-lesion under-segmentation is therefore not fixed by the mask heatmap. It
+  probably comes from the reconstruction itself, i.e. the partial DDPM re-sampling
+  only part of each lesion.
+- **R3 decision:** the single test candidate is the **seed ensemble with the producer
+  mask** (`product_ensemble`: mean Final LPIPS over sampling seeds 17/18/19, ×
+  brightness). Validation holdout AP 0.711, pooled 0.646.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |

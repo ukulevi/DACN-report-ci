@@ -1,0 +1,2136 @@
+{
+  "method": "brightness_gated_pseudo_mask_seeds_and_ensembles_t300",
+  "rules": "Brightness-gated pseudo-mask: decision rules for the CPU analysis (validation).\n\nFixed before the GPU ``maskgate`` run (14 Nov). The GPU run regenerates Final LPIPS\nwith the phase-1 pseudo-mask heatmap changed from initial LPIPS x normalised\nresidual (``product``, the producer rule) to initial LPIPS x brightness. Everything\nelse is unchanged: p95 threshold on normal calibration, dilation 3, masked DDIM30\nfrom t50. Seeds 17/18/19. Scores are always gated by brightness afterwards\n(Final LPIPS x brightness).\n\nArms\n  product_s{17,18,19}    frozen-hybrid pipeline; s17 is the producer, s18/s19 come\n                         from the variants run\n  bmask_s{17,18,19}      brightness-gated mask\n  product_ensemble, bmask_ensemble   mean of the three seeds' Final LPIPS, x brightness\n\nRules\n  R1 (single seed): bmask_s17 improves on product_s17 if the pooled-83 AP delta CI is\n     above 0, the holdout and calibration AP points are both higher, the pooled image\n     AUROC is not lower beyond uncertainty, and bmask beats product on holdout AP for\n     at least 2 of 3 seeds.\n  R2 (secondary): holdout pixel recall of lesions >= 1000 px rises under bmask_s17\n     (the failure the hypothesis targets). Reported; not a gate.\n  R3 (test candidate, decided before seeing the results): if bmask_ensemble passes R1's\n     first three conditions against product_ensemble, the single test candidate is\n     bmask_ensemble; otherwise it is product_ensemble. Running the test needs a separate\n     decision because it would be the sixth test access.\n",
+  "source_run": "maskgate-full-20261114T134252Z",
+  "source_revision": "d8441e8ba602ec068b3f24566af91b79ce5bd193",
+  "source_code_revision": "03265407c1f123b97bfdf7bdb73008a6c71e0508",
+  "source_artifacts": {
+    "private_bmask_s17_t300_20_30_maps.npz": "28281aa16562e40c162d6a6abfd8e4e48d855f13861524b2a4a33a7de603269d",
+    "private_bmask_s18_t300_20_30_maps.npz": "5c54f34a1f10289fd6c6657536434094427c6b49f8f297d3ac7578b399757070",
+    "private_bmask_s19_t300_20_30_maps.npz": "e099c9ad61c437f6c9a54b6414032f525aa1d8fab3a56b8c967cce4318190f72",
+    "private_control_t300_20_30_maps.npz": "eb9d56805fb4cadddc354dd700b803cfa4f69fae9ea361b7de1e96ff194cdae3",
+    "results.json": "ee65695055c698eecdaa9085c96a65aec518c34ec2e064a2856facf865d87295",
+    "source_snapshot.zip": "e85ac5c9b3554951c7a532e3de075b3573929069475d9b4a902106c1706beb57"
+  },
+  "reference_run": "autoddpm-ddim2030-full83-t4-20261106T074200Z",
+  "producer_artifacts": {
+    "autoddpm-ddim2030-full83-t4-20261106T074200Z": {
+      "results_sha256": "a8bae24bd7270b078d49f923461e43fb51aea3163ede5a2fe71c90a70b127730",
+      "private_ablation_sha256": "22656e1f63a0047d3dbe32f7833eea8e303988414e5942dec1ba5a1d9ed1ef19"
+    }
+  },
+  "producer_replay_abs_error": {
+    "final_s17": 0.0,
+    "brightness": 0.0
+  },
+  "hybrid_replay_abs_error": 0.0,
+  "verdict": {
+    "r1_bmask_single_seed": false,
+    "seed_wins": 0,
+    "r2_large_lesion_pixel_recall_holdout": {
+      "product_s17": 0.6343250486859611,
+      "bmask_s17": 0.626535294911594,
+      "product_ensemble": 0.6320498235736459,
+      "bmask_ensemble": 0.5792761699091838
+    },
+    "r3_test_candidate": "product_ensemble"
+  },
+  "selection": "none; all arms reported; rules fixed before the GPU run",
+  "scope": "Exploratory validation; producer arrays, maps and thresholds fixed; one training and sampling seed; test unused.",
+  "summary": {
+    "product_s17": {
+      "calibration_ap": 0.4962664440035765,
+      "holdout_ap": 0.6558091692470411,
+      "holdout_dice": 0.5879735387280586,
+      "holdout_image_auroc": 0.9320175438596492,
+      "holdout_empty_fpr": 0.011294773391812866
+    },
+    "bmask_s17": {
+      "calibration_ap": 0.3776721971612686,
+      "holdout_ap": 0.6207489968259875,
+      "holdout_dice": 0.5514352812053618,
+      "holdout_image_auroc": 0.8662280701754386,
+      "holdout_empty_fpr": 0.017834429824561404
+    },
+    "product_s18": {
+      "calibration_ap": 0.5306574993473985,
+      "holdout_ap": 0.610234252859329,
+      "holdout_dice": 0.5496098104793757,
+      "holdout_image_auroc": 0.8991228070175439,
+      "holdout_empty_fpr": 0.011967288011695906
+    },
+    "bmask_s18": {
+      "calibration_ap": 0.42049120061204304,
+      "holdout_ap": 0.5740659367939535,
+      "holdout_dice": 0.5095649295651242,
+      "holdout_image_auroc": 0.8640350877192983,
+      "holdout_empty_fpr": 0.01005391081871345
+    },
+    "product_s19": {
+      "calibration_ap": 0.5193874806762869,
+      "holdout_ap": 0.6594838130570392,
+      "holdout_dice": 0.5989389133136699,
+      "holdout_image_auroc": 0.9100877192982456,
+      "holdout_empty_fpr": 0.007491776315789474
+    },
+    "bmask_s19": {
+      "calibration_ap": 0.4161638334745106,
+      "holdout_ap": 0.6562783371476939,
+      "holdout_dice": 0.5855649969875137,
+      "holdout_image_auroc": 0.8421052631578947,
+      "holdout_empty_fpr": 0.0059859283625731
+    },
+    "product_ensemble": {
+      "calibration_ap": 0.5609737334976616,
+      "holdout_ap": 0.7107883108575528,
+      "holdout_dice": 0.6354411914060697,
+      "holdout_image_auroc": 0.9342105263157896,
+      "holdout_empty_fpr": 0.007256030701754386
+    },
+    "bmask_ensemble": {
+      "calibration_ap": 0.43309269937181066,
+      "holdout_ap": 0.6886992213781848,
+      "holdout_dice": 0.6084163000694606,
+      "holdout_image_auroc": 0.8903508771929824,
+      "holdout_empty_fpr": 0.008294042397660819
+    },
+    "final_s17": {
+      "calibration_ap": 0.3129524074804155,
+      "holdout_ap": 0.3123301640701585,
+      "holdout_dice": 0.3712146276577787,
+      "holdout_image_auroc": 0.9144736842105263,
+      "holdout_empty_fpr": 0.005772112573099415
+    },
+    "brightness": {
+      "calibration_ap": 0.14659484781762702,
+      "holdout_ap": 0.3895056557159782,
+      "holdout_dice": 0.2680513044300881,
+      "holdout_image_auroc": 0.6798245614035088,
+      "holdout_empty_fpr": 0.13493512426900584
+    }
+  },
+  "arms": {
+    "product_s17": {
+      "score_thresholds": {
+        "pixel": 0.1354231256334515,
+        "image": 0.17669394359404414
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9799100544547786,
+          "auprc": 0.4962664440035765,
+          "precision": 0.4439585492227979,
+          "recall": 0.5627922862697704,
+          "f1": 0.4963620354064325,
+          "threshold": 0.1354231256334515,
+          "average_precision": 0.4962664440035765,
+          "dice_micro": 0.4963620354064325
+        },
+        "image": {
+          "auroc": 0.71,
+          "auprc": 0.7365357753579702,
+          "precision": 0.7777777777777778,
+          "recall": 0.7,
+          "f1": 0.7368421052631579,
+          "threshold": 0.17669394359404414
+        },
+        "pixel_dice_macro_lesion_slices": 0.5926783592858659,
+        "empty_mask_pixel_false_positive_rate": 0.02215625,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9792961261513581,
+          "auprc": 0.6558091692470411,
+          "precision": 0.5578041667338027,
+          "recall": 0.6215929902682515,
+          "f1": 0.5879735387280586,
+          "threshold": 0.1354231256334515,
+          "average_precision": 0.6558091692470411,
+          "dice_micro": 0.5879735387280586
+        },
+        "image": {
+          "auroc": 0.9320175438596492,
+          "auprc": 0.9493753604626302,
+          "precision": 0.84,
+          "recall": 0.875,
+          "f1": 0.8571428571428571,
+          "threshold": 0.17669394359404414
+        },
+        "pixel_dice_macro_lesion_slices": 0.559729437285175,
+        "empty_mask_pixel_false_positive_rate": 0.011294773391812866,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "bmask_s17": {
+      "score_thresholds": {
+        "pixel": 0.11011846692424943,
+        "image": 0.07354520461136928
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.971497469068484,
+          "auprc": 0.3776721971612686,
+          "precision": 0.339371935471797,
+          "recall": 0.47643318795649203,
+          "f1": 0.3963889131765323,
+          "threshold": 0.11011846692424943,
+          "average_precision": 0.3776721971612686,
+          "dice_micro": 0.3963889131765323
+        },
+        "image": {
+          "auroc": 0.575,
+          "auprc": 0.6266555370107749,
+          "precision": 0.5277777777777778,
+          "recall": 0.95,
+          "f1": 0.6785714285714286,
+          "threshold": 0.07354520461136928
+        },
+        "pixel_dice_macro_lesion_slices": 0.4920829788603018,
+        "empty_mask_pixel_false_positive_rate": 0.029411458333333335,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9789781760706072,
+          "auprc": 0.6207489968259875,
+          "precision": 0.5008135563406089,
+          "recall": 0.6134413042697597,
+          "f1": 0.5514352812053618,
+          "threshold": 0.11011846692424943,
+          "average_precision": 0.6207489968259875,
+          "dice_micro": 0.5514352812053618
+        },
+        "image": {
+          "auroc": 0.8662280701754386,
+          "auprc": 0.9075937800122581,
+          "precision": 0.6486486486486487,
+          "recall": 1.0,
+          "f1": 0.7868852459016393,
+          "threshold": 0.07354520461136928
+        },
+        "pixel_dice_macro_lesion_slices": 0.5478237614995721,
+        "empty_mask_pixel_false_positive_rate": 0.017834429824561404,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "product_s18": {
+      "score_thresholds": {
+        "pixel": 0.1418647266682953,
+        "image": 0.12731827942375035
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9778209551120499,
+          "auprc": 0.5306574993473985,
+          "precision": 0.5146006677619376,
+          "recall": 0.5102201670957911,
+          "f1": 0.512401055408971,
+          "threshold": 0.1418647266682953,
+          "average_precision": 0.5306574993473985,
+          "dice_micro": 0.512401055408971
+        },
+        "image": {
+          "auroc": 0.7000000000000001,
+          "auprc": 0.7487272092398036,
+          "precision": 0.5625,
+          "recall": 0.9,
+          "f1": 0.6923076923076923,
+          "threshold": 0.12731827942375035
+        },
+        "pixel_dice_macro_lesion_slices": 0.5360189278227422,
+        "empty_mask_pixel_false_positive_rate": 0.014793402777777779,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9764327885433004,
+          "auprc": 0.610234252859329,
+          "precision": 0.5417771420597265,
+          "recall": 0.557672280676554,
+          "f1": 0.5496098104793757,
+          "threshold": 0.1418647266682953,
+          "average_precision": 0.610234252859329,
+          "dice_micro": 0.5496098104793757
+        },
+        "image": {
+          "auroc": 0.8991228070175439,
+          "auprc": 0.9267870022788315,
+          "precision": 0.6486486486486487,
+          "recall": 1.0,
+          "f1": 0.7868852459016393,
+          "threshold": 0.12731827942375035
+        },
+        "pixel_dice_macro_lesion_slices": 0.539718350418275,
+        "empty_mask_pixel_false_positive_rate": 0.011967288011695906,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "bmask_s18": {
+      "score_thresholds": {
+        "pixel": 0.1368680083190803,
+        "image": 0.061002725636256555
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9711016648260601,
+          "auprc": 0.42049120061204304,
+          "precision": 0.45462696125520335,
+          "recall": 0.3730229625348116,
+          "f1": 0.4098019973445708,
+          "threshold": 0.1368680083190803,
+          "average_precision": 0.42049120061204304,
+          "dice_micro": 0.4098019973445708
+        },
+        "image": {
+          "auroc": 0.5775000000000001,
+          "auprc": 0.6489511119141325,
+          "precision": 0.5405405405405406,
+          "recall": 1.0,
+          "f1": 0.7017543859649122,
+          "threshold": 0.061002725636256555
+        },
+        "pixel_dice_macro_lesion_slices": 0.34946153112843603,
+        "empty_mask_pixel_false_positive_rate": 0.013984375,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9778992831165594,
+          "auprc": 0.5740659367939535,
+          "precision": 0.5565337586390218,
+          "recall": 0.469906991776493,
+          "f1": 0.5095649295651242,
+          "threshold": 0.1368680083190803,
+          "average_precision": 0.5740659367939535,
+          "dice_micro": 0.5095649295651242
+        },
+        "image": {
+          "auroc": 0.8640350877192983,
+          "auprc": 0.9015143097140378,
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1": 0.75,
+          "threshold": 0.061002725636256555
+        },
+        "pixel_dice_macro_lesion_slices": 0.4886869562974532,
+        "empty_mask_pixel_false_positive_rate": 0.01005391081871345,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "product_s19": {
+      "score_thresholds": {
+        "pixel": 0.13992926565306352,
+        "image": 0.16302726373876875
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9763923236891692,
+          "auprc": 0.5193874806762869,
+          "precision": 0.47616457323706857,
+          "recall": 0.5059639535494719,
+          "f1": 0.4906121825083433,
+          "threshold": 0.13992926565306352,
+          "average_precision": 0.5193874806762869,
+          "dice_micro": 0.4906121825083433
+        },
+        "image": {
+          "auroc": 0.6775,
+          "auprc": 0.7237256211066196,
+          "precision": 0.6818181818181818,
+          "recall": 0.75,
+          "f1": 0.7142857142857143,
+          "threshold": 0.16302726373876875
+        },
+        "pixel_dice_macro_lesion_slices": 0.5357477475305021,
+        "empty_mask_pixel_false_positive_rate": 0.017114583333333332,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9762712992264441,
+          "auprc": 0.6594838130570392,
+          "precision": 0.6194742900997697,
+          "recall": 0.579721334434589,
+          "f1": 0.5989389133136699,
+          "threshold": 0.13992926565306352,
+          "average_precision": 0.6594838130570392,
+          "dice_micro": 0.5989389133136699
+        },
+        "image": {
+          "auroc": 0.9100877192982456,
+          "auprc": 0.9384721537447268,
+          "precision": 0.8,
+          "recall": 0.8333333333333334,
+          "f1": 0.8163265306122449,
+          "threshold": 0.16302726373876875
+        },
+        "pixel_dice_macro_lesion_slices": 0.5309216543315528,
+        "empty_mask_pixel_false_positive_rate": 0.007491776315789474,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "bmask_s19": {
+      "score_thresholds": {
+        "pixel": 0.13467646118852983,
+        "image": 0.027610368462685327
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9658482044832766,
+          "auprc": 0.4161638334745106,
+          "precision": 0.4195384219406869,
+          "recall": 0.3854237822500131,
+          "f1": 0.40175820564433307,
+          "threshold": 0.13467646118852983,
+          "average_precision": 0.4161638334745106,
+          "dice_micro": 0.40175820564433307
+        },
+        "image": {
+          "auroc": 0.5675,
+          "auprc": 0.6511530692308373,
+          "precision": 0.5128205128205128,
+          "recall": 1.0,
+          "f1": 0.6779661016949152,
+          "threshold": 0.027610368462685327
+        },
+        "pixel_dice_macro_lesion_slices": 0.3958656254235107,
+        "empty_mask_pixel_false_positive_rate": 0.016746527777777777,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9783567713324239,
+          "auprc": 0.6562783371476939,
+          "precision": 0.6946909198461994,
+          "recall": 0.5060688763601106,
+          "f1": 0.5855649969875137,
+          "threshold": 0.13467646118852983,
+          "average_precision": 0.6562783371476939,
+          "dice_micro": 0.5855649969875137
+        },
+        "image": {
+          "auroc": 0.8421052631578947,
+          "auprc": 0.9034930408357181,
+          "precision": 0.5714285714285714,
+          "recall": 1.0,
+          "f1": 0.7272727272727273,
+          "threshold": 0.027610368462685327
+        },
+        "pixel_dice_macro_lesion_slices": 0.48036390795115286,
+        "empty_mask_pixel_false_positive_rate": 0.0059859283625731,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "product_ensemble": {
+      "score_thresholds": {
+        "pixel": 0.13542788565883218,
+        "image": 0.15379337911124097
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9817470538255265,
+          "auprc": 0.5609737334976616,
+          "precision": 0.525576680594358,
+          "recall": 0.5585097998003258,
+          "f1": 0.541543007808022,
+          "threshold": 0.13542788565883218,
+          "average_precision": 0.5609737334976616,
+          "dice_micro": 0.541543007808022
+        },
+        "image": {
+          "auroc": 0.765,
+          "auprc": 0.7880619460385527,
+          "precision": 0.7272727272727273,
+          "recall": 0.8,
+          "f1": 0.7619047619047619,
+          "threshold": 0.15379337911124097
+        },
+        "pixel_dice_macro_lesion_slices": 0.5936769992278729,
+        "empty_mask_pixel_false_positive_rate": 0.01577690972222222,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9820968467353416,
+          "auprc": 0.7107883108575528,
+          "precision": 0.6540340207165257,
+          "recall": 0.6178762523790714,
+          "f1": 0.6354411914060697,
+          "threshold": 0.13542788565883218,
+          "average_precision": 0.7107883108575528,
+          "dice_micro": 0.6354411914060697
+        },
+        "image": {
+          "auroc": 0.9342105263157896,
+          "auprc": 0.9593894993894992,
+          "precision": 0.8333333333333334,
+          "recall": 0.8333333333333334,
+          "f1": 0.8333333333333334,
+          "threshold": 0.15379337911124097
+        },
+        "pixel_dice_macro_lesion_slices": 0.578064581028556,
+        "empty_mask_pixel_false_positive_rate": 0.007256030701754386,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "bmask_ensemble": {
+      "score_thresholds": {
+        "pixel": 0.12083139065813553,
+        "image": 0.09557113897584779
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9733621375988839,
+          "auprc": 0.43309269937181066,
+          "precision": 0.42001567807682255,
+          "recall": 0.42231096631811255,
+          "f1": 0.42116019493790285,
+          "threshold": 0.12083139065813553,
+          "average_precision": 0.43309269937181066,
+          "dice_micro": 0.42116019493790285
+        },
+        "image": {
+          "auroc": 0.605,
+          "auprc": 0.6582353158285554,
+          "precision": 0.5666666666666667,
+          "recall": 0.85,
+          "f1": 0.68,
+          "threshold": 0.09557113897584779
+        },
+        "pixel_dice_macro_lesion_slices": 0.42472615207097036,
+        "empty_mask_pixel_false_positive_rate": 0.018573784722222222,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9827597160895082,
+          "auprc": 0.6886992213781848,
+          "precision": 0.6574579875734957,
+          "recall": 0.5661830717851115,
+          "f1": 0.6084163000694606,
+          "threshold": 0.12083139065813553,
+          "average_precision": 0.6886992213781848,
+          "dice_micro": 0.6084163000694606
+        },
+        "image": {
+          "auroc": 0.8903508771929824,
+          "auprc": 0.9285495669816614,
+          "precision": 0.696969696969697,
+          "recall": 0.9583333333333334,
+          "f1": 0.8070175438596491,
+          "threshold": 0.09557113897584779
+        },
+        "pixel_dice_macro_lesion_slices": 0.545607535668381,
+        "empty_mask_pixel_false_positive_rate": 0.008294042397660819,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "final_s17": {
+      "score_thresholds": {
+        "pixel": 0.26617634296417236,
+        "image": 0.24719371760470998
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9648678465775209,
+          "auprc": 0.3129524074804155,
+          "precision": 0.2941306144943511,
+          "recall": 0.5608743628816142,
+          "f1": 0.3858932412646192,
+          "threshold": 0.26617634296417236,
+          "average_precision": 0.3129524074804155,
+          "dice_micro": 0.3858932412646192
+        },
+        "image": {
+          "auroc": 0.745,
+          "auprc": 0.7062543587266294,
+          "precision": 0.625,
+          "recall": 1.0,
+          "f1": 0.7692307692307693,
+          "threshold": 0.24719371760470998
+        },
+        "pixel_dice_macro_lesion_slices": 0.37940871238808593,
+        "empty_mask_pixel_false_positive_rate": 0.0221484375,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.94903605783454,
+          "auprc": 0.3123301640701585,
+          "precision": 0.2974710255494595,
+          "recall": 0.4935720185298237,
+          "f1": 0.3712146276577787,
+          "threshold": 0.26617634296417236,
+          "average_precision": 0.3123301640701585,
+          "dice_micro": 0.3712146276577787
+        },
+        "image": {
+          "auroc": 0.9144736842105263,
+          "auprc": 0.9443859166057084,
+          "precision": 0.6875,
+          "recall": 0.9166666666666666,
+          "f1": 0.7857142857142857,
+          "threshold": 0.24719371760470998
+        },
+        "pixel_dice_macro_lesion_slices": 0.31357079206024785,
+        "empty_mask_pixel_false_positive_rate": 0.005772112573099415,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    },
+    "brightness": {
+      "score_thresholds": {
+        "pixel": 0.48235294222831726,
+        "image": 0.4997753345200585
+      },
+      "calibration": {
+        "split": "validation",
+        "samples": 40,
+        "pixel": {
+          "auroc": 0.9354775305177223,
+          "auprc": 0.14659484781762702,
+          "precision": 0.12951104786750464,
+          "recall": 0.6886658609636909,
+          "f1": 0.21802091044440933,
+          "threshold": 0.48235294222831726,
+          "average_precision": 0.14659484781762702,
+          "dice_micro": 0.21802091044440933
+        },
+        "image": {
+          "auroc": 0.435,
+          "auprc": 0.495144108015777,
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6666666666666666,
+          "threshold": 0.4997753345200585
+        },
+        "pixel_dice_macro_lesion_slices": 0.5844861806212628,
+        "empty_mask_pixel_false_positive_rate": 0.13355381944444444,
+        "threshold_selection": "validation max F1, score >= threshold, largest threshold on tie",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      },
+      "group_holdout": {
+        "split": "validation",
+        "samples": 43,
+        "pixel": {
+          "auroc": 0.9501972521258396,
+          "auprc": 0.3895056557159782,
+          "precision": 0.16146869266940445,
+          "recall": 0.7885768664488095,
+          "f1": 0.2680513044300881,
+          "threshold": 0.48235294222831726,
+          "average_precision": 0.3895056557159782,
+          "dice_micro": 0.2680513044300881
+        },
+        "image": {
+          "auroc": 0.6798245614035088,
+          "auprc": 0.7703086888538122,
+          "precision": 0.5714285714285714,
+          "recall": 1.0,
+          "f1": 0.7272727272727273,
+          "threshold": 0.4997753345200585
+        },
+        "pixel_dice_macro_lesion_slices": 0.5589781256327274,
+        "empty_mask_pixel_false_positive_rate": 0.13493512426900584,
+        "threshold_selection": "provided by caller; provenance must be recorded separately",
+        "pixel_aggregation": "global micro over 240x240 crop",
+        "image_aggregation": "mean of top 576 pixels"
+      }
+    }
+  },
+  "lesion_detection_holdout": {
+    "product_s17": {
+      "1-49": {
+        "lesions": 32,
+        "detected": 7,
+        "pixels": 300,
+        "detection_rate": 0.21875,
+        "pixel_recall": 0.25666666666666665
+      },
+      "50-199": {
+        "lesions": 3,
+        "detected": 2,
+        "pixels": 183,
+        "detection_rate": 0.6666666666666666,
+        "pixel_recall": 0.39344262295081966
+      },
+      "200-999": {
+        "lesions": 7,
+        "detected": 6,
+        "pixels": 3348,
+        "detection_rate": 0.8571428571428571,
+        "pixel_recall": 0.46953405017921146
+      },
+      ">=1000": {
+        "lesions": 18,
+        "detected": 18,
+        "pixels": 51863,
+        "detection_rate": 1.0,
+        "pixel_recall": 0.6343250486859611
+      }
+    },
+    "bmask_s17": {
+      "1-49": {
+        "lesions": 32,
+        "detected": 5,
+        "pixels": 300,
+        "detection_rate": 0.15625,
+        "pixel_recall": 0.17
+      },
+      "50-199": {
+        "lesions": 3,
+        "detected": 2,
+        "pixels": 183,
+        "detection_rate": 0.6666666666666666,
+        "pixel_recall": 0.07650273224043716
+      },
+      "200-999": {
+        "lesions": 7,
+        "detected": 6,
+        "pixels": 3348,
+        "detection_rate": 0.8571428571428571,
+        "pixel_recall": 0.479689366786141
+      },
+      ">=1000": {
+        "lesions": 18,
+        "detected": 18,
+        "pixels": 51863,
+        "detection_rate": 1.0,
+        "pixel_recall": 0.626535294911594
+      }
+    },
+    "product_ensemble": {
+      "1-49": {
+        "lesions": 32,
+        "detected": 7,
+        "pixels": 300,
+        "detection_rate": 0.21875,
+        "pixel_recall": 0.13666666666666666
+      },
+      "50-199": {
+        "lesions": 3,
+        "detected": 2,
+        "pixels": 183,
+        "detection_rate": 0.6666666666666666,
+        "pixel_recall": 0.4371584699453552
+      },
+      "200-999": {
+        "lesions": 7,
+        "detected": 6,
+        "pixels": 3348,
+        "detection_rate": 0.8571428571428571,
+        "pixel_recall": 0.4513142174432497
+      },
+      ">=1000": {
+        "lesions": 18,
+        "detected": 18,
+        "pixels": 51863,
+        "detection_rate": 1.0,
+        "pixel_recall": 0.6320498235736459
+      }
+    },
+    "bmask_ensemble": {
+      "1-49": {
+        "lesions": 32,
+        "detected": 3,
+        "pixels": 300,
+        "detection_rate": 0.09375,
+        "pixel_recall": 0.05333333333333334
+      },
+      "50-199": {
+        "lesions": 3,
+        "detected": 0,
+        "pixels": 183,
+        "detection_rate": 0.0,
+        "pixel_recall": 0.0
+      },
+      "200-999": {
+        "lesions": 7,
+        "detected": 6,
+        "pixels": 3348,
+        "detection_rate": 0.8571428571428571,
+        "pixel_recall": 0.4402628434886499
+      },
+      ">=1000": {
+        "lesions": 18,
+        "detected": 18,
+        "pixels": 51863,
+        "detection_rate": 1.0,
+        "pixel_recall": 0.5792761699091838
+      }
+    }
+  },
+  "holdout_pixel_bootstrap": {
+    "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+    "reference": "product_s17",
+    "seed": 17,
+    "requested_replicates": 1000,
+    "valid_replicates": 999,
+    "skipped_missing_class": 1,
+    "groups": 25,
+    "samples": 43,
+    "candidates": {
+      "product_s17": {
+        "pixel_ap": 0.6558091692470398,
+        "pixel_dice_micro": 0.5879735387280586,
+        "threshold": 0.1354231256334515,
+        "ap_ci95": [
+          0.36490089230645273,
+          0.7827179860679779
+        ],
+        "dice_ci95": [
+          0.37772755740215436,
+          0.6980131857107026
+        ],
+        "delta_ap_ci95": [
+          0.0,
+          0.0
+        ],
+        "delta_dice_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "bmask_s17": {
+        "pixel_ap": 0.6207489968259846,
+        "pixel_dice_micro": 0.5514352812053618,
+        "threshold": 0.11011846692424943,
+        "ap_ci95": [
+          0.3263428033057737,
+          0.7693342407234486
+        ],
+        "dice_ci95": [
+          0.3298353690982635,
+          0.6795839169439384
+        ],
+        "delta_ap_ci95": [
+          -0.07261268432306138,
+          0.0015932017265369103
+        ],
+        "delta_dice_ci95": [
+          -0.07941469361752837,
+          -0.006734399661734038
+        ]
+      },
+      "product_s18": {
+        "pixel_ap": 0.6102342528593155,
+        "pixel_dice_micro": 0.5496098104793757,
+        "threshold": 0.1418647266682953,
+        "ap_ci95": [
+          0.28689842126950327,
+          0.763173079149642
+        ],
+        "dice_ci95": [
+          0.31539116877120266,
+          0.6775542626895164
+        ],
+        "delta_ap_ci95": [
+          -0.13075812784416013,
+          0.003076077708794405
+        ],
+        "delta_dice_ci95": [
+          -0.10165216012289366,
+          0.01531428658158682
+        ]
+      },
+      "bmask_s18": {
+        "pixel_ap": 0.5740659367939572,
+        "pixel_dice_micro": 0.5095649295651242,
+        "threshold": 0.1368680083190803,
+        "ap_ci95": [
+          0.25359629088751473,
+          0.7606994835452033
+        ],
+        "dice_ci95": [
+          0.27635741587012774,
+          0.6501872083108869
+        ],
+        "delta_ap_ci95": [
+          -0.19946428073550473,
+          0.009424793617396664
+        ],
+        "delta_dice_ci95": [
+          -0.16734283238332276,
+          0.016386453588185263
+        ]
+      },
+      "product_s19": {
+        "pixel_ap": 0.6594838130570391,
+        "pixel_dice_micro": 0.5989389133136699,
+        "threshold": 0.13992926565306352,
+        "ap_ci95": [
+          0.3867742772743505,
+          0.7774928665984321
+        ],
+        "dice_ci95": [
+          0.4087027064203127,
+          0.6908576497133883
+        ],
+        "delta_ap_ci95": [
+          -0.03931507387537554,
+          0.050107565766136404
+        ],
+        "delta_dice_ci95": [
+          -0.028782926614795288,
+          0.06125401307521089
+        ]
+      },
+      "bmask_s19": {
+        "pixel_ap": 0.6562783371476886,
+        "pixel_dice_micro": 0.5855649969875137,
+        "threshold": 0.13467646118852983,
+        "ap_ci95": [
+          0.37606287080221895,
+          0.7803024473040117
+        ],
+        "dice_ci95": [
+          0.38467005424553385,
+          0.6777309021077256
+        ],
+        "delta_ap_ci95": [
+          -0.05738044100282449,
+          0.05177405015911245
+        ],
+        "delta_dice_ci95": [
+          -0.05766352349685838,
+          0.060768933927817514
+        ]
+      },
+      "product_ensemble": {
+        "pixel_ap": 0.7107883108575425,
+        "pixel_dice_micro": 0.6354411914060697,
+        "threshold": 0.13542788565883218,
+        "ap_ci95": [
+          0.4598408543200076,
+          0.8163327664676814
+        ],
+        "dice_ci95": [
+          0.44523691053958986,
+          0.7321272028996754
+        ],
+        "delta_ap_ci95": [
+          0.026584976964870673,
+          0.10260159676727759
+        ],
+        "delta_dice_ci95": [
+          0.02182053378225689,
+          0.08173687071320128
+        ]
+      },
+      "bmask_ensemble": {
+        "pixel_ap": 0.6886992213781884,
+        "pixel_dice_micro": 0.6084163000694606,
+        "threshold": 0.12083139065813553,
+        "ap_ci95": [
+          0.42366070784434967,
+          0.8210178696505094
+        ],
+        "dice_ci95": [
+          0.406323524317172,
+          0.7150952308866241
+        ],
+        "delta_ap_ci95": [
+          -0.0210657677033276,
+          0.106716756334954
+        ],
+        "delta_dice_ci95": [
+          -0.021724591227367866,
+          0.07380625808311407
+        ]
+      },
+      "final_s17": {
+        "pixel_ap": 0.3123301640701599,
+        "pixel_dice_micro": 0.3712146276577787,
+        "threshold": 0.26617634296417236,
+        "ap_ci95": [
+          0.0989677994105857,
+          0.4846912219482891
+        ],
+        "dice_ci95": [
+          0.1495634442052259,
+          0.47926998537252463
+        ],
+        "delta_ap_ci95": [
+          -0.4486008603674149,
+          -0.15335862492067046
+        ],
+        "delta_dice_ci95": [
+          -0.32410869007271237,
+          -0.058631586417701775
+        ]
+      },
+      "brightness": {
+        "pixel_ap": 0.3895056557159785,
+        "pixel_dice_micro": 0.2680513044300881,
+        "threshold": 0.48235294222831726,
+        "ap_ci95": [
+          0.10377847643653142,
+          0.5832932564841332
+        ],
+        "dice_ci95": [
+          0.09845356122152453,
+          0.44401818975731744
+        ],
+        "delta_ap_ci95": [
+          -0.42578138936108745,
+          -0.10937537441645838
+        ],
+        "delta_dice_ci95": [
+          -0.41055685216648924,
+          -0.18084893509376743
+        ]
+      }
+    }
+  },
+  "holdout_image_bootstrap": {
+    "method": "paired patient-group percentile bootstrap; image level; fixed scores",
+    "reference": "product_s17",
+    "seed": 17,
+    "requested_replicates": 1000,
+    "valid_replicates": 999,
+    "groups": 25,
+    "candidates": {
+      "product_s17": {
+        "auroc": 0.9320175438596492,
+        "ap": 0.9493753604626302,
+        "auroc_ci95": [
+          0.8293725296442687,
+          0.989153079710145
+        ],
+        "ap_ci95": [
+          0.8203519506093037,
+          0.9924172794117647
+        ],
+        "delta_auroc_ci95": [
+          0.0,
+          0.0
+        ],
+        "delta_ap_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "bmask_s17": {
+        "auroc": 0.8662280701754386,
+        "ap": 0.9075937800122581,
+        "auroc_ci95": [
+          0.7083333333333334,
+          0.9696969696969697
+        ],
+        "ap_ci95": [
+          0.7033628795721187,
+          0.9765528844113402
+        ],
+        "delta_auroc_ci95": [
+          -0.15287698412698403,
+          -0.005952380952380931
+        ],
+        "delta_ap_ci95": [
+          -0.13976990242228232,
+          -0.00042854074618739495
+        ]
+      },
+      "product_s18": {
+        "auroc": 0.8991228070175439,
+        "ap": 0.9267870022788315,
+        "auroc_ci95": [
+          0.7762867647058824,
+          0.9801639515455305
+        ],
+        "ap_ci95": [
+          0.7493783164853937,
+          0.9857290207749767
+        ],
+        "delta_auroc_ci95": [
+          -0.11309523809523803,
+          0.02505208333333331
+        ],
+        "delta_ap_ci95": [
+          -0.12375231178579021,
+          0.028885515934929475
+        ]
+      },
+      "bmask_s18": {
+        "auroc": 0.8640350877192983,
+        "ap": 0.9015143097140378,
+        "auroc_ci95": [
+          0.7083333333333334,
+          0.9728260869565217
+        ],
+        "ap_ci95": [
+          0.6736419167469359,
+          0.9804894338208777
+        ],
+        "delta_auroc_ci95": [
+          -0.18754960317460317,
+          0.007503787878787829
+        ],
+        "delta_ap_ci95": [
+          -0.2062452478521053,
+          0.010831436779806356
+        ]
+      },
+      "product_s19": {
+        "auroc": 0.9100877192982456,
+        "ap": 0.9384721537447268,
+        "auroc_ci95": [
+          0.7836805555555556,
+          0.9910714285714286
+        ],
+        "ap_ci95": [
+          0.7825473876481941,
+          0.9912941527511464
+        ],
+        "delta_auroc_ci95": [
+          -0.09920926704014937,
+          0.035119047619047584
+        ],
+        "delta_ap_ci95": [
+          -0.0773946081579322,
+          0.03329928332537014
+        ]
+      },
+      "bmask_s19": {
+        "auroc": 0.8421052631578947,
+        "ap": 0.9034930408357181,
+        "auroc_ci95": [
+          0.6449469696969697,
+          0.984659090909091
+        ],
+        "ap_ci95": [
+          0.6835953126861726,
+          0.9872800925925925
+        ],
+        "delta_auroc_ci95": [
+          -0.2499999999999999,
+          0.01388888888888895
+        ],
+        "delta_ap_ci95": [
+          -0.17692670103679514,
+          0.0138999106390239
+        ]
+      },
+      "product_ensemble": {
+        "auroc": 0.9342105263157896,
+        "ap": 0.9593894993894992,
+        "auroc_ci95": [
+          0.8180297619047621,
+          1.0
+        ],
+        "ap_ci95": [
+          0.8208490135382925,
+          1.0
+        ],
+        "delta_auroc_ci95": [
+          -0.06459686147186151,
+          0.0576038748832866
+        ],
+        "delta_ap_ci95": [
+          -0.02876826670539189,
+          0.05867507566187243
+        ]
+      },
+      "bmask_ensemble": {
+        "auroc": 0.8903508771929824,
+        "ap": 0.9285495669816614,
+        "auroc_ci95": [
+          0.741765873015873,
+          0.9912280701754386
+        ],
+        "ap_ci95": [
+          0.7488489409141582,
+          0.9928944113700213
+        ],
+        "delta_auroc_ci95": [
+          -0.14160976890756308,
+          0.030322966507176988
+        ],
+        "delta_ap_ci95": [
+          -0.10510450048317688,
+          0.033915568075774095
+        ]
+      },
+      "final_s17": {
+        "auroc": 0.9144736842105263,
+        "ap": 0.9443859166057084,
+        "auroc_ci95": [
+          0.7707916666666667,
+          1.0
+        ],
+        "ap_ci95": [
+          0.7720138888888888,
+          0.9999999999999999
+        ],
+        "delta_auroc_ci95": [
+          -0.12876438618925828,
+          0.06007017543859648
+        ],
+        "delta_ap_ci95": [
+          -0.08790198717707474,
+          0.05525682079358537
+        ]
+      },
+      "brightness": {
+        "auroc": 0.6798245614035088,
+        "ap": 0.7703086888538122,
+        "auroc_ci95": [
+          0.41875,
+          0.9008432539682539
+        ],
+        "ap_ci95": [
+          0.4135130976967802,
+          0.9311073239886655
+        ],
+        "delta_auroc_ci95": [
+          -0.5366973684210525,
+          -0.030127164502164742
+        ],
+        "delta_ap_ci95": [
+          -0.48391234812476325,
+          -0.029564606798947204
+        ]
+      }
+    }
+  },
+  "pooled83_pixel_bootstrap": {
+    "product_s17": {
+      "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+      "reference": "product_s17",
+      "seed": 17,
+      "requested_replicates": 1000,
+      "valid_replicates": 1000,
+      "skipped_missing_class": 0,
+      "groups": 50,
+      "samples": 83,
+      "candidates": {
+        "product_s17": {
+          "pixel_ap": 0.5878205316786675,
+          "pixel_dice_micro": 0.5492259970892198,
+          "threshold": 0.1354231256334515,
+          "ap_ci95": [
+            0.34638669266399574,
+            0.7262153922414942
+          ],
+          "dice_ci95": [
+            0.3818394621619018,
+            0.6509586518770066
+          ],
+          "delta_ap_ci95": [
+            0.0,
+            0.0
+          ],
+          "delta_dice_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "bmask_s17": {
+          "pixel_ap": 0.5115418070483588,
+          "pixel_dice_micro": 0.4855785969945545,
+          "threshold": 0.11011846692424943,
+          "ap_ci95": [
+            0.2691095350774354,
+            0.6776558629570824
+          ],
+          "dice_ci95": [
+            0.300956993980562,
+            0.5997543288672471
+          ],
+          "delta_ap_ci95": [
+            -0.11241585179240547,
+            -0.037405805343214936
+          ],
+          "delta_dice_ci95": [
+            -0.10275278135980416,
+            -0.03332649960787902
+          ]
+        },
+        "product_s18": {
+          "pixel_ap": 0.5764956238937551,
+          "pixel_dice_micro": 0.5346728665091991,
+          "threshold": 0.1418647266682953,
+          "ap_ci95": [
+            0.3142599750739715,
+            0.7194359080217205
+          ],
+          "dice_ci95": [
+            0.3616599515065598,
+            0.6429779211764923
+          ],
+          "delta_ap_ci95": [
+            -0.06649571657201646,
+            0.0333895180226882
+          ],
+          "delta_dice_ci95": [
+            -0.06370827860540948,
+            0.02925710073427756
+          ]
+        },
+        "bmask_s18": {
+          "pixel_ap": 0.507673086993695,
+          "pixel_dice_micro": 0.46937695845033167,
+          "threshold": 0.1368680083190803,
+          "ap_ci95": [
+            0.24252028158605843,
+            0.6752664556359281
+          ],
+          "dice_ci95": [
+            0.2800524883056307,
+            0.5937333224171688
+          ],
+          "delta_ap_ci95": [
+            -0.15266014824750626,
+            -0.021262864787488102
+          ],
+          "delta_dice_ci95": [
+            -0.16636972929550228,
+            -0.00542024021563224
+          ]
+        },
+        "product_s19": {
+          "pixel_ap": 0.5991397022834689,
+          "pixel_dice_micro": 0.5532954057535423,
+          "threshold": 0.13992926565306352,
+          "ap_ci95": [
+            0.37544097650348635,
+            0.7217318716467782
+          ],
+          "dice_ci95": [
+            0.38995688380242205,
+            0.6466704494366824
+          ],
+          "delta_ap_ci95": [
+            -0.036828543168532096,
+            0.05423041946292527
+          ],
+          "delta_dice_ci95": [
+            -0.036255587579482704,
+            0.04439579154174218
+          ]
+        },
+        "bmask_s19": {
+          "pixel_ap": 0.5458452938432791,
+          "pixel_dice_micro": 0.5062760270533684,
+          "threshold": 0.13467646118852983,
+          "ap_ci95": [
+            0.29757715098220877,
+            0.6821322092076585
+          ],
+          "dice_ci95": [
+            0.3153693551547663,
+            0.6101330140197878
+          ],
+          "delta_ap_ci95": [
+            -0.10755407045966292,
+            0.009349448315999657
+          ],
+          "delta_dice_ci95": [
+            -0.11113696888714897,
+            0.019375390467132256
+          ]
+        },
+        "product_ensemble": {
+          "pixel_ap": 0.6460846544697918,
+          "pixel_dice_micro": 0.5959811153100879,
+          "threshold": 0.13542788565883218,
+          "ap_ci95": [
+            0.4065337493236683,
+            0.7714454658843406
+          ],
+          "dice_ci95": [
+            0.4355469677561686,
+            0.6908962910592393
+          ],
+          "delta_ap_ci95": [
+            0.03290894740709187,
+            0.0924997471291924
+          ],
+          "delta_dice_ci95": [
+            0.019618540133926658,
+            0.07721116797399359
+          ]
+        },
+        "bmask_ensemble": {
+          "pixel_ap": 0.5720242538988232,
+          "pixel_dice_micro": 0.5290019334622308,
+          "threshold": 0.12083139065813553,
+          "ap_ci95": [
+            0.31610630063725464,
+            0.7272614117775696
+          ],
+          "dice_ci95": [
+            0.3396253697988792,
+            0.6435383447344758
+          ],
+          "delta_ap_ci95": [
+            -0.0686678145228657,
+            0.03806622839266076
+          ],
+          "delta_dice_ci95": [
+            -0.08561936391275404,
+            0.032611304395205
+          ]
+        },
+        "final_s17": {
+          "pixel_ap": 0.31163208668631653,
+          "pixel_dice_micro": 0.3774913524899032,
+          "threshold": 0.26617634296417236,
+          "ap_ci95": [
+            0.1701309599626411,
+            0.4205019352429125
+          ],
+          "dice_ci95": [
+            0.24255434399493792,
+            0.45590701697490404
+          ],
+          "delta_ap_ci95": [
+            -0.39094517965929126,
+            -0.11012278558758669
+          ],
+          "delta_dice_ci95": [
+            -0.2595777388648197,
+            -0.06971170905257058
+          ]
+        },
+        "brightness": {
+          "pixel_ap": 0.2723252730193151,
+          "pixel_dice_micro": 0.2468771176372229,
+          "threshold": 0.48235294222831726,
+          "ap_ci95": [
+            0.09732036293087572,
+            0.42989016975949446
+          ],
+          "dice_ci95": [
+            0.12766309137277232,
+            0.3710376355044556
+          ],
+          "delta_ap_ci95": [
+            -0.42883159437198676,
+            -0.1870789701552889
+          ],
+          "delta_dice_ci95": [
+            -0.375063580718822,
+            -0.21418889581040293
+          ]
+        }
+      }
+    },
+    "product_ensemble": {
+      "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+      "reference": "product_ensemble",
+      "seed": 17,
+      "requested_replicates": 1000,
+      "valid_replicates": 1000,
+      "skipped_missing_class": 0,
+      "groups": 50,
+      "samples": 83,
+      "candidates": {
+        "product_s17": {
+          "pixel_ap": 0.5878205316786675,
+          "pixel_dice_micro": 0.5492259970892198,
+          "threshold": 0.1354231256334515,
+          "ap_ci95": [
+            0.34638669266399574,
+            0.7262153922414942
+          ],
+          "dice_ci95": [
+            0.3818394621619018,
+            0.6509586518770066
+          ],
+          "delta_ap_ci95": [
+            -0.0924997471291924,
+            -0.032908947407091875
+          ],
+          "delta_dice_ci95": [
+            -0.0772111679739936,
+            -0.01961854013392666
+          ]
+        },
+        "bmask_s17": {
+          "pixel_ap": 0.5115418070483588,
+          "pixel_dice_micro": 0.4855785969945545,
+          "threshold": 0.11011846692424943,
+          "ap_ci95": [
+            0.2691095350774354,
+            0.6776558629570824
+          ],
+          "dice_ci95": [
+            0.300956993980562,
+            0.5997543288672471
+          ],
+          "delta_ap_ci95": [
+            -0.18297315257832622,
+            -0.08480296838536712
+          ],
+          "delta_dice_ci95": [
+            -0.1626435399803511,
+            -0.06712388872761292
+          ]
+        },
+        "product_s18": {
+          "pixel_ap": 0.5764956238937551,
+          "pixel_dice_micro": 0.5346728665091991,
+          "threshold": 0.1418647266682953,
+          "ap_ci95": [
+            0.3142599750739715,
+            0.7194359080217205
+          ],
+          "dice_ci95": [
+            0.3616599515065598,
+            0.6429779211764923
+          ],
+          "delta_ap_ci95": [
+            -0.12277717640651913,
+            -0.03422330163727715
+          ],
+          "delta_dice_ci95": [
+            -0.09982117901339195,
+            -0.029868590650824044
+          ]
+        },
+        "bmask_s18": {
+          "pixel_ap": 0.507673086993695,
+          "pixel_dice_micro": 0.46937695845033167,
+          "threshold": 0.1368680083190803,
+          "ap_ci95": [
+            0.24252028158605843,
+            0.6752664556359281
+          ],
+          "dice_ci95": [
+            0.2800524883056307,
+            0.5937333224171688
+          ],
+          "delta_ap_ci95": [
+            -0.2085956563210897,
+            -0.07901757887929979
+          ],
+          "delta_dice_ci95": [
+            -0.2007329253248748,
+            -0.06897954127064965
+          ]
+        },
+        "product_s19": {
+          "pixel_ap": 0.5991397022834689,
+          "pixel_dice_micro": 0.5532954057535423,
+          "threshold": 0.13992926565306352,
+          "ap_ci95": [
+            0.37544097650348635,
+            0.7217318716467782
+          ],
+          "dice_ci95": [
+            0.38995688380242205,
+            0.6466704494366824
+          ],
+          "delta_ap_ci95": [
+            -0.09575025320806442,
+            -0.011014586648369606
+          ],
+          "delta_dice_ci95": [
+            -0.07537163233892871,
+            -0.014472485463961071
+          ]
+        },
+        "bmask_s19": {
+          "pixel_ap": 0.5458452938432791,
+          "pixel_dice_micro": 0.5062760270533684,
+          "threshold": 0.13467646118852983,
+          "ap_ci95": [
+            0.29757715098220877,
+            0.6821322092076585
+          ],
+          "dice_ci95": [
+            0.3153693551547663,
+            0.6101330140197878
+          ],
+          "delta_ap_ci95": [
+            -0.16975718870459172,
+            -0.052392660597535064
+          ],
+          "delta_dice_ci95": [
+            -0.15072794999428618,
+            -0.04249395123395694
+          ]
+        },
+        "product_ensemble": {
+          "pixel_ap": 0.6460846544697918,
+          "pixel_dice_micro": 0.5959811153100879,
+          "threshold": 0.13542788565883218,
+          "ap_ci95": [
+            0.4065337493236683,
+            0.7714454658843406
+          ],
+          "dice_ci95": [
+            0.4355469677561686,
+            0.6908962910592393
+          ],
+          "delta_ap_ci95": [
+            0.0,
+            0.0
+          ],
+          "delta_dice_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "bmask_ensemble": {
+          "pixel_ap": 0.5720242538988232,
+          "pixel_dice_micro": 0.5290019334622308,
+          "threshold": 0.12083139065813553,
+          "ap_ci95": [
+            0.31610630063725464,
+            0.7272614117775696
+          ],
+          "dice_ci95": [
+            0.3396253697988792,
+            0.6435383447344758
+          ],
+          "delta_ap_ci95": [
+            -0.12435011657399167,
+            -0.026966694164674048
+          ],
+          "delta_dice_ci95": [
+            -0.11889847756924199,
+            -0.027897769712082417
+          ]
+        },
+        "final_s17": {
+          "pixel_ap": 0.31163208668631653,
+          "pixel_dice_micro": 0.3774913524899032,
+          "threshold": 0.26617634296417236,
+          "ap_ci95": [
+            0.1701309599626411,
+            0.4205019352429125
+          ],
+          "dice_ci95": [
+            0.24255434399493792,
+            0.45590701697490404
+          ],
+          "delta_ap_ci95": [
+            -0.44920551073258336,
+            -0.17075177260424165
+          ],
+          "delta_dice_ci95": [
+            -0.3024654694742303,
+            -0.125551968464798
+          ]
+        },
+        "brightness": {
+          "pixel_ap": 0.2723252730193151,
+          "pixel_dice_micro": 0.2468771176372229,
+          "threshold": 0.48235294222831726,
+          "ap_ci95": [
+            0.09732036293087572,
+            0.42989016975949446
+          ],
+          "dice_ci95": [
+            0.12766309137277232,
+            0.3710376355044556
+          ],
+          "delta_ap_ci95": [
+            -0.500491373653062,
+            -0.24069406306219313
+          ],
+          "delta_dice_ci95": [
+            -0.43319040180508994,
+            -0.24979517755641345
+          ]
+        }
+      }
+    }
+  },
+  "pooled83_image_bootstrap": {
+    "product_s17": {
+      "method": "paired patient-group percentile bootstrap; image level; fixed scores",
+      "reference": "product_s17",
+      "seed": 17,
+      "requested_replicates": 1000,
+      "valid_replicates": 1000,
+      "groups": 50,
+      "candidates": {
+        "product_s17": {
+          "auroc": 0.8298368298368298,
+          "ap": 0.8569274577326808,
+          "auroc_ci95": [
+            0.7387977907509158,
+            0.9142898671096346
+          ],
+          "ap_ci95": [
+            0.7074080283390027,
+            0.9390597390349003
+          ],
+          "delta_auroc_ci95": [
+            0.0,
+            0.0
+          ],
+          "delta_ap_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "bmask_s17": {
+          "auroc": 0.7348484848484849,
+          "ap": 0.7899387710118295,
+          "auroc_ci95": [
+            0.6042953869047619,
+            0.8508385885885885
+          ],
+          "ap_ci95": [
+            0.572272845251893,
+            0.8987066323473655
+          ],
+          "delta_auroc_ci95": [
+            -0.17774178663713558,
+            -0.03311924342105271
+          ],
+          "delta_ap_ci95": [
+            -0.14641460669069048,
+            -0.020188263792402406
+          ]
+        },
+        "product_s18": {
+          "auroc": 0.8129370629370629,
+          "ap": 0.851374318039791,
+          "auroc_ci95": [
+            0.7196862730292963,
+            0.8970291620524179
+          ],
+          "ap_ci95": [
+            0.6793191534510435,
+            0.9331860242021348
+          ],
+          "delta_auroc_ci95": [
+            -0.076560231562137,
+            0.03399710213032577
+          ],
+          "delta_ap_ci95": [
+            -0.060125170912371566,
+            0.03725401117958111
+          ]
+        },
+        "bmask_s18": {
+          "auroc": 0.738927738927739,
+          "ap": 0.7968300521739546,
+          "auroc_ci95": [
+            0.5981297165247678,
+            0.8638257118725868
+          ],
+          "ap_ci95": [
+            0.5730398769481257,
+            0.9063800564864468
+          ],
+          "delta_auroc_ci95": [
+            -0.20614418476260568,
+            -1.0824674490095529e-16
+          ],
+          "delta_ap_ci95": [
+            -0.15827592804204652,
+            0.00044082765758604126
+          ]
+        },
+        "product_s19": {
+          "auroc": 0.8094405594405595,
+          "ap": 0.849555867043567,
+          "auroc_ci95": [
+            0.7083196271929824,
+            0.8944462901439646
+          ],
+          "ap_ci95": [
+            0.6765165563659699,
+            0.9324829803594381
+          ],
+          "delta_auroc_ci95": [
+            -0.08130791972255376,
+            0.03316666981274543
+          ],
+          "delta_ap_ci95": [
+            -0.05966736775408089,
+            0.0408801821986618
+          ]
+        },
+        "bmask_s19": {
+          "auroc": 0.7167832167832168,
+          "ap": 0.7862497548310222,
+          "auroc_ci95": [
+            0.5866577380952382,
+            0.8388965920942665
+          ],
+          "ap_ci95": [
+            0.572195648781046,
+            0.894949911523235
+          ],
+          "delta_auroc_ci95": [
+            -0.2055041651268786,
+            -0.03310937499999997
+          ],
+          "delta_ap_ci95": [
+            -0.16294631460871326,
+            -0.013775080824332691
+          ]
+        },
+        "product_ensemble": {
+          "auroc": 0.8607226107226107,
+          "ap": 0.8864940100797394,
+          "auroc_ci95": [
+            0.7663118975618975,
+            0.9400094850948509
+          ],
+          "ap_ci95": [
+            0.740242068216924,
+            0.9623643855566937
+          ],
+          "delta_auroc_ci95": [
+            -0.018375114468864404,
+            0.08617606351981363
+          ],
+          "delta_ap_ci95": [
+            -0.006843907283236774,
+            0.08791250729293003
+          ]
+        },
+        "bmask_ensemble": {
+          "auroc": 0.763986013986014,
+          "ap": 0.8170417553909346,
+          "auroc_ci95": [
+            0.6460444819819818,
+            0.8750194906444905
+          ],
+          "ap_ci95": [
+            0.6173758416428179,
+            0.9174747516999315
+          ],
+          "delta_auroc_ci95": [
+            -0.1483258928571428,
+            0.0025089285714286202
+          ],
+          "delta_ap_ci95": [
+            -0.10962021679847221,
+            0.0075919492551817635
+          ]
+        },
+        "final_s17": {
+          "auroc": 0.8327505827505828,
+          "ap": 0.8480887104474158,
+          "auroc_ci95": [
+            0.7150111607142857,
+            0.9377076411960132
+          ],
+          "ap_ci95": [
+            0.665482454307805,
+            0.9445472950673331
+          ],
+          "delta_auroc_ci95": [
+            -0.09003085609243694,
+            0.08553212878870793
+          ],
+          "delta_ap_ci95": [
+            -0.09492535511754588,
+            0.07627186475229504
+          ]
+        },
+        "brightness": {
+          "auroc": 0.5559440559440559,
+          "ap": 0.6250225188271088,
+          "auroc_ci95": [
+            0.3936863008580252,
+            0.7121381222943722
+          ],
+          "ap_ci95": [
+            0.3839898763894897,
+            0.791375192138417
+          ],
+          "delta_auroc_ci95": [
+            -0.42727280405405405,
+            -0.13862390350877196
+          ],
+          "delta_ap_ci95": [
+            -0.397922318713363,
+            -0.11705795615141572
+          ]
+        }
+      }
+    },
+    "product_ensemble": {
+      "method": "paired patient-group percentile bootstrap; image level; fixed scores",
+      "reference": "product_ensemble",
+      "seed": 17,
+      "requested_replicates": 1000,
+      "valid_replicates": 1000,
+      "groups": 50,
+      "candidates": {
+        "product_s17": {
+          "auroc": 0.8298368298368298,
+          "ap": 0.8569274577326808,
+          "auroc_ci95": [
+            0.7387977907509158,
+            0.9142898671096346
+          ],
+          "ap_ci95": [
+            0.7074080283390027,
+            0.9390597390349003
+          ],
+          "delta_auroc_ci95": [
+            -0.08617606351981363,
+            0.018375114468864383
+          ],
+          "delta_ap_ci95": [
+            -0.08791250729293003,
+            0.006843907283236762
+          ]
+        },
+        "bmask_s17": {
+          "auroc": 0.7348484848484849,
+          "ap": 0.7899387710118295,
+          "auroc_ci95": [
+            0.6042953869047619,
+            0.8508385885885885
+          ],
+          "ap_ci95": [
+            0.572272845251893,
+            0.8987066323473655
+          ],
+          "delta_auroc_ci95": [
+            -0.23836062834224583,
+            -0.044363095238095195
+          ],
+          "delta_ap_ci95": [
+            -0.1999467050561805,
+            -0.03579108017041872
+          ]
+        },
+        "product_s18": {
+          "auroc": 0.8129370629370629,
+          "ap": 0.851374318039791,
+          "auroc_ci95": [
+            0.7196862730292963,
+            0.8970291620524179
+          ],
+          "ap_ci95": [
+            0.6793191534510435,
+            0.9331860242021348
+          ],
+          "delta_auroc_ci95": [
+            -0.1190104166666666,
+            0.013770469114219024
+          ],
+          "delta_ap_ci95": [
+            -0.0990724284833521,
+            0.0072429210118749214
+          ]
+        },
+        "bmask_s18": {
+          "auroc": 0.738927738927739,
+          "ap": 0.7968300521739546,
+          "auroc_ci95": [
+            0.5981297165247678,
+            0.8638257118725868
+          ],
+          "ap_ci95": [
+            0.5730398769481257,
+            0.9063800564864468
+          ],
+          "delta_auroc_ci95": [
+            -0.25814062499999996,
+            -0.008910949248120179
+          ],
+          "delta_ap_ci95": [
+            -0.2090723641922898,
+            -0.018362618801219817
+          ]
+        },
+        "product_s19": {
+          "auroc": 0.8094405594405595,
+          "ap": 0.849555867043567,
+          "auroc_ci95": [
+            0.7083196271929824,
+            0.8944462901439646
+          ],
+          "ap_ci95": [
+            0.6765165563659699,
+            0.9324829803594381
+          ],
+          "delta_auroc_ci95": [
+            -0.10345943119380621,
+            -0.011068323568323614
+          ],
+          "delta_ap_ci95": [
+            -0.09928645404965088,
+            -0.00441669346128728
+          ]
+        },
+        "bmask_s19": {
+          "auroc": 0.7167832167832168,
+          "ap": 0.7862497548310222,
+          "auroc_ci95": [
+            0.5866577380952382,
+            0.8388965920942665
+          ],
+          "ap_ci95": [
+            0.572195648781046,
+            0.894949911523235
+          ],
+          "delta_auroc_ci95": [
+            -0.23809988839285717,
+            -0.07065081973133044
+          ],
+          "delta_ap_ci95": [
+            -0.21153033796045853,
+            -0.04239475983737221
+          ]
+        },
+        "product_ensemble": {
+          "auroc": 0.8607226107226107,
+          "ap": 0.8864940100797394,
+          "auroc_ci95": [
+            0.7663118975618975,
+            0.9400094850948509
+          ],
+          "ap_ci95": [
+            0.740242068216924,
+            0.9623643855566937
+          ],
+          "delta_auroc_ci95": [
+            0.0,
+            0.0
+          ],
+          "delta_ap_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "bmask_ensemble": {
+          "auroc": 0.763986013986014,
+          "ap": 0.8170417553909346,
+          "auroc_ci95": [
+            0.6460444819819818,
+            0.8750194906444905
+          ],
+          "ap_ci95": [
+            0.6173758416428179,
+            0.9174747516999315
+          ],
+          "delta_auroc_ci95": [
+            -0.18770234465737504,
+            -0.027411705618942468
+          ],
+          "delta_ap_ci95": [
+            -0.15658026679237919,
+            -0.019339492219319663
+          ]
+        },
+        "final_s17": {
+          "auroc": 0.8327505827505828,
+          "ap": 0.8480887104474158,
+          "auroc_ci95": [
+            0.7150111607142857,
+            0.9377076411960132
+          ],
+          "ap_ci95": [
+            0.665482454307805,
+            0.9445472950673331
+          ],
+          "delta_auroc_ci95": [
+            -0.11892248376623374,
+            0.043130208333333406
+          ],
+          "delta_ap_ci95": [
+            -0.14159012235410443,
+            0.036963039580507256
+          ]
+        },
+        "brightness": {
+          "auroc": 0.5559440559440559,
+          "ap": 0.6250225188271088,
+          "auroc_ci95": [
+            0.3936863008580252,
+            0.7121381222943722
+          ],
+          "ap_ci95": [
+            0.3839898763894897,
+            0.791375192138417
+          ],
+          "delta_auroc_ci95": [
+            -0.4808035714285716,
+            -0.13921911421911431
+          ],
+          "delta_ap_ci95": [
+            -0.4446318873785051,
+            -0.12741391309068859
+          ]
+        }
+      }
+    }
+  }
+}

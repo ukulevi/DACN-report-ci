@@ -2462,3 +2462,20 @@ the Write tool reporting "updated" rather than "created").
 
 Checks: ruff 0.17.5 check/format clean; full CI-equivalent pytest 214 passed / 28 skipped.
 Evidence byte-identical to the Hub, LF, UUID-free. No test access.
+
+## 2026-11-14 — Brightness-gated pseudo-mask for phase 2 (validation)
+
+- Added `mask_score="lpips_brightness"` to the producer-equivalent runner (default
+  unchanged), a GPU `maskgate` suite and a CPU `--analysis maskgate`. Rules, including the
+  test-candidate choice R3, were fixed in `dacn.evaluation.mask_gate` before the GPU run.
+  Checked that the new module names did not already exist.
+- GPU `maskgate-full-20261114T134252Z` (12 min T4) and CPU `maskgate-cpu-full-20261114T135821Z`:
+  the hypothesis is rejected. The brightness mask is worse for all 3 seeds and does not
+  fix large-lesion under-segmentation. R3 picks the seed ensemble with the producer mask
+  as the only test candidate. It has not been run on test; that needs a decision on a
+  sixth test access.
+- ABLATION_SUMMARY §3, RESULT_TRACKING and HANDOFF step 8 updated.
+
+Checks: ruff 0.17.5 check/format clean; mask-gate and noise-extension tests pass locally
+and in the CI-equivalent venv. Replays exact. Evidence byte-identical to the Hub, LF,
+UUID-free.
