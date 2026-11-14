@@ -519,6 +519,70 @@ Reading:
   LPIPS-side refinement without a reliable gain. The remaining headroom seems to lie
   less in the LPIPS network than in the gate and the reconstruction.
 
+### Error analysis, pooled-83 comparison and reconstruction ensembles (added 14 Nov, validation)
+
+`diagnose-full-20261114T132851Z` (code `4ffa2eab`, Modal CPU, 4.5 min) used only
+cached SHA-checked maps: producer t200/t300/t500, variants t400 and seeds 18/19. There
+were no model calls and no test access. Hypotheses and rules are fixed in
+`dacn.evaluation.hybrid_diagnostics`. Replays: producer references 0.0, frozen hybrid
+0.0. 999–1000 valid replicates. The pooled bootstrap covers 50 patient groups.
+Evidence: [results](evidence/2026-11-14-diagnose-results.json),
+[manifest](evidence/2026-11-14-diagnose-manifest.json).
+
+**A. Where the frozen hybrid fails** (holdout at calibration thresholds; calibration
+in parentheses):
+
+| Arm | Lesions 1-49 px: detected / pixel recall | Lesions 50-199 px: detected / pixel recall | Lesions 200-999 px: detected / pixel recall | Lesions >=1000 px: detected / pixel recall | FP inside brain | FP at brightness 0–0.50 / 0.50–1.00 | FP in components < 10 px |
+|---|---|---|---|---|---|---|---|
+| Frozen hybrid | 0.22 / 0.26 (n=32; cal. 0.08 / 0.08) | 0.67 / 0.39 (n=3; cal. 0.00 / 0.00) | 0.86 / 0.47 (n=7; cal. 1.00 / 0.35) | 1.00 / 0.63 (n=18; cal. 1.00 / 0.59) | 0.99 | 0.23 / 0.77 | 0.027 |
+| Final LPIPS | 0.44 / 0.28 (n=32; cal. 0.15 / 0.09) | 0.67 / 0.53 (n=3; cal. 0.00 / 0.00) | 0.57 / 0.30 (n=7; cal. 0.80 / 0.34) | 1.00 / 0.51 (n=18; cal. 1.00 / 0.59) | 0.99 | 0.90 / 0.10 | 0.011 |
+| Brightness | 0.34 / 0.47 (n=32; cal. 0.27 / 0.18) | 0.67 / 0.63 (n=3; cal. 1.00 / 0.68) | 1.00 / 0.96 (n=7; cal. 0.80 / 0.56) | 1.00 / 0.78 (n=18; cal. 1.00 / 0.70) | 0.94 | 0.08 / 0.92 | 0.016 |
+
+- **Small lesions are missed.** Only 22% of lesions under 50 px are detected on holdout
+  (8% on calibration). Final LPIPS alone detects more of them (44%) but with 3.6×
+  more false-positive pixels.
+- **Large lesions are found but under-segmented:** pixel recall is about 0.6. This
+  points to the reconstruction or the phase-2 mask, which may not cover the whole
+  lesion. It is not a detection problem.
+- **False positives:** 99% are inside the brain, mostly at mid-to-high brightness.
+  Speckle is only 2–3%. This explains why brain masking, median filtering and
+  small-component removal cannot help. The brightness gate removes most of Final
+  LPIPS's dark false positives (90% of them sit below brightness 0.5).
+
+**B and C. Pooled-83 contrasts and ensembles** (Δ = arm − frozen hybrid):
+
+| Arm | Cal. AP | Holdout AP | Δ holdout AP − frozen | Pooled-83 AP | Δ pooled AP − frozen | Holdout pixel AUROC | Holdout Dice | Pooled image AUROC | Δ pooled image AUROC |
+|---|---:|---:|---|---:|---|---:|---:|---:|---|
+| frozen_hybrid | 0.496 | 0.656 | – | 0.588 | – | 0.979 | 0.588 | 0.830 | – |
+| brightness | 0.147 | 0.390 | [-0.426, -0.109] | 0.272 | [-0.429, -0.187] | 0.950 | 0.268 | 0.556 | [-0.427, -0.139] |
+| final_t300 | 0.313 | 0.312 | [-0.449, -0.153] | 0.312 | [-0.391, -0.110] | 0.949 | 0.371 | 0.833 | [-0.090, +0.086] |
+| final_t400 | 0.306 | 0.348 | [-0.413, -0.131] | 0.332 | [-0.367, -0.097] | 0.953 | 0.392 | 0.827 | [-0.089, +0.083] |
+| hybrid_t400 | 0.491 | 0.668 | [-0.024, +0.045] | 0.597 | [-0.034, +0.046] | 0.981 | 0.587 | 0.834 | [-0.042, +0.050] |
+| slice_rank | 0.682 | 0.663 | [-0.090, +0.105] | 0.666 | [-0.035, +0.213] | 0.985 | 0.594 | 0.880 | [-0.046, +0.143] |
+| normal_cdf | 0.466 | 0.648 | [-0.057, +0.035] | 0.568 | [-0.052, +0.012] | 0.980 | 0.579 | 0.819 | [-0.036, +0.015] |
+| seed_ensemble | 0.561 | 0.711 | [+0.027, +0.103] | 0.646 | [+0.033, +0.092] | 0.982 | 0.635 | 0.861 | [-0.018, +0.086] |
+| noise_ensemble | 0.527 | 0.677 | [-0.007, +0.052] | 0.615 | [+0.006, +0.052] | 0.982 | 0.600 | 0.869 | [+0.006, +0.080] |
+
+| Pre-specified contrast | Pooled-83 Δ AP 95% CI | Resolved |
+|---|---|:---:|
+| final_t400 - final_t300 | [-0.011, +0.042] | no |
+| hybrid_t400 - frozen_hybrid | [-0.034, +0.046] | no |
+| slice_rank - frozen_hybrid | [-0.035, +0.213] | no |
+| normal_cdf - frozen_hybrid | [-0.052, +0.012] | no |
+
+- **Both ensembles pass the pre-registered rule.** The seed ensemble (mean of 3 sampling
+  seeds) is the stronger one: holdout AP 0.711 vs 0.656 (Δ CI [+0.027, +0.103]),
+  calibration 0.561 vs 0.496, pooled 0.646 vs 0.588 (Δ [+0.033, +0.092]), Dice 0.635. The
+  noise-level ensemble (t200–t500) passes more narrowly (pooled Δ [+0.006, +0.052]) and
+  also raises pooled image AUROC (Δ [+0.006, +0.080]). This supports the hypothesis
+  that sampling noise limits the hybrid.
+- **Pooling all 83 slices did not resolve the ambiguous contrasts.** t400 vs t300 and
+  the slice-rank gate (Δ [−0.035, +0.213]) remain undecided. More data, not a
+  different split, is needed to decide them.
+- Cost: the seed ensemble needs 3 full DDIM20+30 runs per image, so test inference
+  takes 3× as long. It has not been evaluated on test. A test run would be the sixth
+  test access and needs a team decision.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |

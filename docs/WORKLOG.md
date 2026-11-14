@@ -2439,3 +2439,26 @@ JSON. Relative links resolve. Docs only.
 Checks: ruff 0.17.5 check/format clean. score-refinement and postprocess-hybrid tests
 pass in the CI-equivalent venv (14 passed, 1 torch test skipped) and locally (15). Evidence
 byte-identical to the Hub, LF, UUID-free. No test access.
+
+## 2026-11-14 — Hybrid error analysis, pooled-83 contrasts and ensembles (validation)
+
+- Added `dacn.evaluation.hybrid_diagnostics` and `--analysis diagnose`. Rules were fixed
+  before running.
+- **Mistake and fix:** commit `a7174ff` created the new analysis as
+  `dacn.evaluation.diagnostics`. That path already held the team's FG-v1 foreground
+  diagnostics module, used by `test_foreground_diagnostics` and `test_validation_artifacts`,
+  and the write overwrote it. Caught from `git status` (M, not A) before any push. `4ffa2eab`
+  restores the original byte-identically (0-line diff) and moves the analysis to its own
+  module. The full CI-equivalent suite passed (214 passed, 28 skipped). The smoke run
+  made at `a7174ff` is recorded as superseded.
+- `diagnose-full-20261114T132851Z`: the seed ensemble beats the frozen hybrid (holdout AP
+  0.711, pooled Δ [+0.033, +0.092]); the noise ensemble passes narrowly; pooled-83 contrasts
+  are all unresolved. Error analysis: small lesions missed, large lesions under-segmented,
+  false positives inside the brain.
+- ABLATION_SUMMARY §3, RESULT_TRACKING, AF-11 note and HANDOFF step 7 updated.
+
+Lesson: before creating a module, check that the path does not exist (`git ls-files`, or
+the Write tool reporting "updated" rather than "created").
+
+Checks: ruff 0.17.5 check/format clean; full CI-equivalent pytest 214 passed / 28 skipped.
+Evidence byte-identical to the Hub, LF, UUID-free. No test access.

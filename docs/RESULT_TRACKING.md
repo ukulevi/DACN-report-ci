@@ -3955,3 +3955,28 @@ before running.
   Evidence: `docs/evidence/2026-11-14-refine-results.json` (sha256 `9622ca90…af5b`, matches
   manifest), `docs/evidence/2026-11-14-refine-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
 
+## 2026-11-14 — Hybrid error analysis, pooled-83 contrasts and ensembles (validation)
+
+`--analysis diagnose`, Modal CPU, Workspace `tanh1c`. Cached SHA-checked maps only; no model
+calls; test unused. Rules were fixed in code before running.
+
+- **`diagnose-smoke-20261114T132224Z`** completed/uploaded at code `a7174ff`, then
+  **superseded**. That commit had overwritten the team module `dacn.evaluation.diagnostics`
+  with the new analysis (the analysis itself was unaffected). Fixed in `4ffa2eab`, which
+  restores the original byte-identically and moves the analysis to
+  `dacn.evaluation.hybrid_diagnostics`. Not used for results.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-sNv4ldsqHK0IXTCglFxVIQ),
+  [Hub acb915a8](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/acb915a8beb1cf9623d1f7c08e9731e9bab22c24/evaluations/diagnose-smoke-20261114T132224Z).
+- **`diagnose-smoke-20261114T132709Z`** completed/uploaded at `4ffa2eab`, 20 replicates, 77 s;
+  replays 0.0. [Modal](https://modal.com/apps/tanh1c/main/ap-Q2W7RGcogerUWaQLNlCh8t),
+  [Hub 96492fb6](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/96492fb61a1701c8f96bb45c5006d88a3cf2fc8f/evaluations/diagnose-smoke-20261114T132709Z).
+- **`diagnose-full-20261114T132851Z`** completed/uploaded at `4ffa2eab`, 1000 replicates,
+  267 s. [Modal](https://modal.com/apps/tanh1c/main/ap-WfY7nBNJLaREkNiRcqkof5),
+  [Hub 7f5936fe](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/7f5936fef403bf2da2fd6ebc3842150d62f16357/evaluations/diagnose-full-20261114T132851Z).
+  Replays 0.0. Both ensembles pass the rule. Seed ensemble: holdout AP 0.711 (Δ [+0.027,
+  +0.103]), calibration 0.561, pooled-83 0.646 (Δ [+0.033, +0.092]). Noise ensemble: holdout
+  0.677, pooled 0.615 (Δ [+0.006, +0.052]). None of the four pooled contrasts is resolved.
+  Error analysis: hybrid detects 22% of lesions under 50 px on holdout; large-lesion pixel
+  recall is about 0.6; 99% of false positives are inside the brain.
+  Evidence: `docs/evidence/2026-11-14-diagnose-results.json` (sha256 `6aea4476…d45d`, matches
+  manifest), `docs/evidence/2026-11-14-diagnose-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
