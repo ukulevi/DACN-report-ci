@@ -10,6 +10,8 @@ DACN_HF_SECRET (each member uses their own Modal Workspace).
 Analyses:
   bootstrap  paired patient-group bootstrap of pixel AP/Dice (smoke: 20 replicates)
   quality    reconstruction-quality aggregates per noise level (smoke: reference run)
+  fusion     LPIPS + residual rank fusion on the Final reconstruction (AF-03)
+  hybrid     brain-mask post-processing and brightness hybrids on Final maps
 
     DACN_HF_SECRET=huggingface modal run -m dacn.cloud.modal_sweep_bootstrap \
         --analysis quality --evaluation-id sweep-quality-smoke-UNIQUE \
@@ -43,6 +45,7 @@ METHODS = {
     "bootstrap": "paired_patient_group_bootstrap_ddim_noise_step_sweep",
     "quality": "reconstruction_quality_ddim_noise_step_sweep",
     "fusion": "weighted_rank_fusion_final_lpips_residual_t300",
+    "hybrid": "brain_mask_postprocess_and_brightness_hybrid_final_lpips_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -235,6 +238,110 @@ def _fusion(token, mode, groups, holdout, dataset):
     }
 
 
+def _hybrid(token, mode, groups, holdout, dataset):
+    """Brain-mask post-processing and brightness hybrids on the Final maps."""
+    from dacn.evaluation import postprocess_hybrid
+    from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.postprocess_hybrid import (
+        BASELINE,
+        REFERENCE,
+        all_arms,
+        brain_mask_coverage,
+        passes_rule,
+    )
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+    from dacn.evaluation.validation import evaluate_maps
+
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    maps, brain = all_arms(
+        arrays["autoddpm_lpips"], arrays["brightness"], arrays["images"], labels, calibration
+    )
+    arms, holdout_maps, thresholds, summary = {}, {}, {}, {}
+    for name, values in maps.items():
+        fitted = evaluate_maps(
+            values[calibration], truth[calibration], labels[calibration], split="validation"
+        )
+        frozen = {level: fitted[level]["threshold"] for level in ("pixel", "image")}
+        held = evaluate_maps(
+            values[holdout], truth[holdout], labels[holdout], split="validation", thresholds=frozen
+        )
+        arms[name] = {"score_thresholds": frozen, "calibration": fitted, "group_holdout": held}
+        summary[name] = {
+            "calibration_ap": fitted["pixel"]["auprc"],
+            "holdout_ap": held["pixel"]["auprc"],
+            "holdout_dice": held["pixel"]["f1"],
+            "holdout_image_auroc": held["image"]["auroc"],
+            "holdout_empty_fpr": held["empty_mask_pixel_false_positive_rate"],
+        }
+        holdout_maps[name], thresholds[name] = values[holdout], frozen["pixel"]
+    replay = {}
+    for arm, producer_key in ((REFERENCE, "autoddpm_lpips"), (BASELINE, "brightness")):
+        producer = results["metrics"][producer_key]["group_holdout"]
+        ours = arms[arm]["group_holdout"]
+        replay[arm] = max(
+            abs(ours["pixel"]["auprc"] - producer["pixel"]["auprc"]),
+            abs(ours["pixel"]["f1"] - producer["pixel"]["f1"]),
+            abs(ours["image"]["auroc"] - producer["image"]["auroc"]),
+        )
+    if max(replay.values()) > 1e-9:
+        raise ValueError("Unprocessed references do not replay the producer holdout metrics")
+    del maps
+    pixel = {
+        ref: paired_group_bootstrap(
+            truth[holdout],
+            holdout_maps,
+            groups[holdout],
+            thresholds,
+            reference=ref,
+            replicates=REPLICATES[mode],
+            seed=17,
+        )
+        for ref in (REFERENCE, BASELINE)
+    }
+    image_values = {name: image_scores(values) for name, values in holdout_maps.items()}
+    image = {
+        ref: image_group_bootstrap(
+            labels[holdout],
+            image_values,
+            groups[holdout],
+            reference=ref,
+            replicates=REPLICATES[mode],
+            seed=17,
+        )
+        for ref in (REFERENCE, BASELINE)
+    }
+    candidates = [
+        name
+        for name in arms
+        if passes_rule(name, summary, pixel[REFERENCE], pixel[BASELINE], image[REFERENCE])
+    ]
+    return {
+        "method": METHODS["hybrid"],
+        "hypothesis_and_definition": postprocess_hybrid.__doc__,
+        "reference": REFERENCE,
+        "baseline": BASELINE,
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {REFERENCE_RUN: verified},
+        "producer_replay_abs_error": replay,
+        "brain_mask_lesion_coverage": {
+            "calibration": brain_mask_coverage(brain[calibration], truth[calibration]),
+            "holdout": brain_mask_coverage(brain[holdout], truth[holdout]),
+        },
+        "selection": "none; all arms reported; rule fixed before running",
+        "rule_candidates": candidates,
+        "scope": SCOPE,
+        "summary": summary,
+        "arms": arms,
+        "pixel_bootstrap": pixel,
+        "image_bootstrap": image,
+    }
+
+
 def _quality(token, mode, holdout, dataset):
     import numpy as np
 
@@ -338,6 +445,8 @@ def run_sweep_analysis_remote(
             report = _bootstrap(token, mode, groups, holdout, dataset)
         elif analysis == "fusion":
             report = _fusion(token, mode, groups, holdout, dataset)
+        elif analysis == "hybrid":
+            report = _hybrid(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)
