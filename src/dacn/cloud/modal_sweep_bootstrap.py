@@ -13,6 +13,7 @@ Analyses:
   fusion     LPIPS + residual rank fusion on the Final reconstruction (AF-03)
   hybrid     brain-mask post-processing and brightness hybrids on Final maps
   gate       which reconstruction error to gate by brightness (Final vs Initial, L1)
+  seeds      sampling-seed robustness of Final LPIPS x brightness (seeds 17/18/19)
 
     DACN_HF_SECRET=huggingface modal run -m dacn.cloud.modal_sweep_bootstrap \
         --analysis quality --evaluation-id sweep-quality-smoke-UNIQUE \
@@ -48,6 +49,7 @@ METHODS = {
     "fusion": "weighted_rank_fusion_final_lpips_residual_t300",
     "hybrid": "brain_mask_postprocess_and_brightness_hybrid_final_lpips_t300",
     "gate": "brightness_gated_reconstruction_ablation_t300",
+    "seeds": "sampling_seed_robustness_final_lpips_x_brightness_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -240,7 +242,9 @@ def _fusion(token, mode, groups, holdout, dataset):
     }
 
 
-def _evaluate_arms(maps, truth, labels, calibration, holdout, groups, results, mode, references):
+def _evaluate_arms(
+    maps, truth, labels, calibration, holdout, groups, results, mode, references, replay_arms=None
+):
     """Calibration-fitted thresholds, holdout metrics, producer replay and paired CIs."""
     from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
     from dacn.evaluation.group_bootstrap import paired_group_bootstrap
@@ -266,7 +270,9 @@ def _evaluate_arms(maps, truth, labels, calibration, holdout, groups, results, m
         }
         holdout_maps[name], thresholds[name] = values[holdout], frozen["pixel"]
     replay = {}
-    for arm, producer_key in ((REFERENCE, "autoddpm_lpips"), (BASELINE, "brightness")):
+    if replay_arms is None:
+        replay_arms = {REFERENCE: "autoddpm_lpips", BASELINE: "brightness"}
+    for arm, producer_key in replay_arms.items():
         producer = results["metrics"][producer_key]["group_holdout"]
         ours = arms[arm]["group_holdout"]
         replay[arm] = max(
@@ -348,6 +354,96 @@ def _gate(token, mode, groups, holdout, dataset):
         "credits_resampling": credits_resampling(summary, pixel[GATE_REFERENCE]),
         "selection": "none; all gates reported; rule fixed before running",
         "scope": SCOPE,
+        "summary": summary,
+        "arms": arms,
+        "pixel_bootstrap": pixel,
+        "image_bootstrap": image,
+    }
+
+
+def _seeds(token, mode, groups, holdout, dataset):
+    """Sampling-seed robustness of Final LPIPS x brightness (seed bases 17/18/19)."""
+    import io
+
+    import numpy as np
+    from huggingface_hub import hf_hub_download
+
+    from dacn.evaluation.postprocess_hybrid import (
+        HYBRID_REPLAY,
+        SEED_SOURCE_REVISION,
+        SEED_SOURCE_RUN,
+        SEED_VARIANTS,
+        seed_arms,
+        seed_verdict,
+    )
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    brightness = arrays["brightness"]
+    if not np.array_equal(brightness, (dataset["images"][:, 8:-8, 8:-8] + 1) / 2):
+        raise ValueError("Producer brightness differs from the pinned images")
+    seed_maps, seed_checks = {}, {}
+    for seed, (name, digest) in SEED_VARIANTS.items():
+        payload = Path(
+            hf_hub_download(
+                MODEL_REPO,
+                f"evaluations/{SEED_SOURCE_RUN}/{name}",
+                revision=SEED_SOURCE_REVISION,
+                token=token,
+                cache_dir="/tmp/hf-cache",
+            )
+        ).read_bytes()
+        if _sha_bytes(payload) != digest:
+            raise ValueError(f"Seed map checksum differs: {seed}")
+        with np.load(io.BytesIO(payload), allow_pickle=False) as archive:
+            maps = {k: archive[k].copy() for k in ("autoddpm_lpips", "initial_lpips_only")}
+        if any(v.shape != truth.shape for v in maps.values()):
+            raise ValueError("Seed maps must cover all 83 validation slices")
+        seed_maps[seed], seed_checks[seed] = maps, {"file": name, "sha256": digest}
+    if not np.array_equal(seed_maps[17]["autoddpm_lpips"], arrays["autoddpm_lpips"]):
+        raise ValueError("Seed-17 control maps differ from the producer reference")
+    del arrays
+    maps = seed_arms(seed_maps, brightness)
+    seeds = sorted(SEED_VARIANTS)
+    references = tuple(f"final_x_brightness_s{s}" for s in seeds)
+    arms, summary, replay, pixel, image = _evaluate_arms(
+        maps,
+        truth,
+        labels,
+        calibration,
+        holdout,
+        groups,
+        results,
+        mode,
+        references,
+        replay_arms={"final_lpips_s17": "autoddpm_lpips", "brightness": "brightness"},
+    )
+    held = arms["final_x_brightness_s17"]["group_holdout"]
+    hybrid_error = max(
+        abs(held["pixel"]["auprc"] - HYBRID_REPLAY[0]),
+        abs(held["pixel"]["f1"] - HYBRID_REPLAY[1]),
+        abs(held["image"]["auroc"] - HYBRID_REPLAY[2]),
+    )
+    if hybrid_error > 1e-9:
+        raise ValueError("Seed-17 hybrid does not replay the hybrid run")
+    by_seed = dict(zip(seeds, (pixel[r] for r in references), strict=True))
+    return {
+        "method": METHODS["seeds"],
+        "rules": "SEED_* comment in dacn.evaluation.postprocess_hybrid (fixed before running)",
+        "seed_source_run": SEED_SOURCE_RUN,
+        "seed_source_revision": SEED_SOURCE_REVISION,
+        "seed_artifacts": seed_checks,
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {REFERENCE_RUN: verified},
+        "producer_replay_abs_error": replay,
+        "hybrid_replay_abs_error": hybrid_error,
+        "verdict": seed_verdict(summary, by_seed, seeds),
+        "selection": "none; all seeds reported; rules fixed before running",
+        "scope": SCOPE + " Sampling seeds only; the trained model is unchanged.",
         "summary": summary,
         "arms": arms,
         "pixel_bootstrap": pixel,
@@ -512,6 +608,8 @@ def run_sweep_analysis_remote(
             report = _hybrid(token, mode, groups, holdout, dataset)
         elif analysis == "gate":
             report = _gate(token, mode, groups, holdout, dataset)
+        elif analysis == "seeds":
+            report = _seeds(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)

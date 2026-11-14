@@ -162,3 +162,66 @@ def passes_rule(name, holdout, pixel_vs_final, pixel_vs_brightness, image_vs_fin
         and image_vs_final["candidates"][name]["delta_auroc_ci95"][1] >= 0
         and holdout[name]["calibration_ap"] >= holdout[REFERENCE]["calibration_ap"]
     )
+
+
+# Sampling-seed robustness of the frozen hybrid (fixed before running, 14 Nov).
+# Maps: variants-full-20261114T041258Z, t300 DDIM20+30, sampling seed bases 17/18/19
+# (seed 17 is the producer control). Brightness has no seed. Thresholds are refit on
+# calibration per seed, as the protocol would for any rerun. Rules, per seed s:
+#   beats_brightness[s]: CI of (brightness - final_x_brightness_s) holdout AP below 0
+#   beats_final[s]:      CI of (final_lpips_s - final_x_brightness_s) holdout AP below 0
+#   resampling[s]:       CI of (initial_x_brightness_s - final_x_brightness_s) below 0
+#                        and calibration AP of final_x_brightness_s above initial's
+# The hybrid is called seed-robust if beats_brightness and beats_final hold for all
+# three seeds; the re-sampling credit is reported as a count out of three.
+SEED_VARIANTS = {
+    17: (
+        "private_control_t300_20_30_maps.npz",
+        "eb9d56805fb4cadddc354dd700b803cfa4f69fae9ea361b7de1e96ff194cdae3",
+    ),
+    18: (
+        "private_seed18_t300_20_30_maps.npz",
+        "c980d9c3b517f3e1dbab978c0e969b13e32ba2cabe84e3df703afbdfac96e133",
+    ),
+    19: (
+        "private_seed19_t300_20_30_maps.npz",
+        "ea40d38506f2ce4366ec56e15ca1406c76c11d96d3bee0384fda7d52c9f3e16c",
+    ),
+}
+SEED_SOURCE_RUN = "variants-full-20261114T041258Z"
+SEED_SOURCE_REVISION = "c699b85d3025fb559e5fb68e9a8669c6f94a0b86"
+
+
+def seed_arms(seed_maps, brightness):
+    """Brightness plus Final LPIPS, Final x brightness and Initial x brightness per seed."""
+    brightness = np.asarray(brightness, dtype=np.float64)
+    arms = {"brightness": brightness}
+    for seed, maps in sorted(seed_maps.items()):
+        final = np.asarray(maps["autoddpm_lpips"], dtype=np.float64)
+        arms[f"final_lpips_s{seed}"] = final
+        arms[f"final_x_brightness_s{seed}"] = final * brightness
+        arms[f"initial_x_brightness_s{seed}"] = (
+            np.asarray(maps["initial_lpips_only"], dtype=np.float64) * brightness
+        )
+    return arms
+
+
+def seed_verdict(summary, pixel_by_reference, seeds):
+    """Apply the SEED_* rules; ``pixel_by_reference[s]`` uses final_x_brightness_s."""
+    out = {"beats_brightness": {}, "beats_final": {}, "resampling": {}}
+    for seed in seeds:
+        hybrid = f"final_x_brightness_s{seed}"
+        deltas = pixel_by_reference[seed]["candidates"]
+        out["beats_brightness"][seed] = bool(deltas["brightness"]["delta_ap_ci95"][1] < 0)
+        out["beats_final"][seed] = bool(deltas[f"final_lpips_s{seed}"]["delta_ap_ci95"][1] < 0)
+        initial = f"initial_x_brightness_s{seed}"
+        out["resampling"][seed] = bool(
+            deltas[initial]["delta_ap_ci95"][1] < 0
+            and summary[hybrid]["calibration_ap"] > summary[initial]["calibration_ap"]
+        )
+    values = [summary[f"final_x_brightness_s{s}"]["holdout_ap"] for s in seeds]
+    out["seed_robust"] = all(out["beats_brightness"].values()) and all(out["beats_final"].values())
+    out["resampling_credit_count"] = sum(out["resampling"].values())
+    out["hybrid_holdout_ap_mean"] = float(np.mean(values))
+    out["hybrid_holdout_ap_sd"] = float(np.std(values, ddof=1))
+    return out

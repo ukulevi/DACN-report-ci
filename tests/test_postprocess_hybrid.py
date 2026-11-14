@@ -105,3 +105,48 @@ def test_frozen_hybrid_thresholds_match_validation_evidence():
             ph.FROZEN_HYBRID_ARM
         ],
     )
+
+
+def test_seed_arms_share_brightness_and_cover_each_seed():
+    rng = np.random.default_rng(3)
+    seed_maps = {
+        s: {
+            "autoddpm_lpips": rng.random((2, 240, 240)),
+            "initial_lpips_only": rng.random((2, 240, 240)),
+        }
+        for s in (17, 18)
+    }
+    bright = rng.random((2, 240, 240))
+    arms = ph.seed_arms(seed_maps, bright)
+    assert set(arms) == {"brightness"} | {
+        f"{kind}_s{s}"
+        for s in (17, 18)
+        for kind in ("final_lpips", "final_x_brightness", "initial_x_brightness")
+    }
+    assert np.array_equal(arms["final_x_brightness_s18"], seed_maps[18]["autoddpm_lpips"] * bright)
+
+
+def test_seed_verdict_applies_rules_per_seed():
+    def boot(seed, bright, final, initial):
+        return {
+            "candidates": {
+                "brightness": {"delta_ap_ci95": bright},
+                f"final_lpips_s{seed}": {"delta_ap_ci95": final},
+                f"initial_x_brightness_s{seed}": {"delta_ap_ci95": initial},
+            }
+        }
+
+    win, tie = [-0.3, -0.1], [-0.1, 0.02]
+    summary = {}
+    for seed, ap in ((17, 0.65), (18, 0.60)):
+        summary[f"final_x_brightness_s{seed}"] = {"holdout_ap": ap, "calibration_ap": 0.5}
+        summary[f"initial_x_brightness_s{seed}"] = {"calibration_ap": 0.4}
+    verdict = ph.seed_verdict(
+        summary, {17: boot(17, win, win, win), 18: boot(18, win, win, tie)}, (17, 18)
+    )
+    assert verdict["seed_robust"] and verdict["resampling_credit_count"] == 1
+    assert abs(verdict["hybrid_holdout_ap_mean"] - 0.625) < 1e-12
+    worse = ph.seed_verdict(
+        summary, {17: boot(17, win, win, win), 18: boot(18, tie, win, win)}, (17, 18)
+    )
+    assert not worse["seed_robust"] and worse["beats_brightness"] == {17: True, 18: False}
