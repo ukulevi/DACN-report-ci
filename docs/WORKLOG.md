@@ -2425,3 +2425,17 @@ to the Hub, LF, UUID-free. No test access.
 
 Checks: numbers checked against ABLATION_SUMMARY, RESULT_TRACKING and the evidence
 JSON. Relative links resolve. Docs only.
+
+## 2026-11-14 — LPIPS backbone and normalised brightness gate (validation)
+
+- Added `dacn.evaluation.score_refinement` and `dacn.cloud.modal_score_refinement` (CPU
+  image with LPIPS squeeze/alex/vgg). Hypotheses and rule were fixed before running. CPU
+  SqueezeNet must replay the producer maps (4.8e-7 achieved).
+- `refine-full-20261114T125015Z`: no arm passes. AlexNet/VGG16 are below SqueezeNet; the
+  normal-CDF gate shows no change; the slice-rank gate raises calibration AP (0.682) but
+  not holdout AP (0.663, CI includes 0). The frozen hybrid stands.
+- ABLATION_SUMMARY §3, RESULT_TRACKING, AF-01 note and HANDOFF updated.
+
+Checks: ruff 0.17.5 check/format clean. score-refinement and postprocess-hybrid tests
+pass in the CI-equivalent venv (14 passed, 1 torch test skipped) and locally (15). Evidence
+byte-identical to the Hub, LF, UUID-free. No test access.

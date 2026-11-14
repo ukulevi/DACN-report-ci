@@ -3934,3 +3934,24 @@ code before running.
   Evidence: `docs/evidence/2026-11-14-seeds-results.json` (sha256 `05f3ba56…82da`, matches
   manifest), `docs/evidence/2026-11-14-seeds-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
 
+## 2026-11-14 — LPIPS backbone and normalised brightness gate (validation)
+
+Code `436b03da` (`dacn.cloud.modal_score_refinement`, new CPU image with LPIPS
+squeeze/alex/vgg), Workspace `tanh1c`. Cached inputs and Final reconstructions of the
+t300 reference run. No DDPM calls; test unused. Hypotheses and rule were fixed in code
+before running.
+
+- **`refine-smoke-20261114T124652Z`** completed/uploaded, 20 replicates, 95 s. CPU
+  SqueezeNet maps vs producer 3.6e-7; hybrid replay 0.0.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-4wwmtbFT120d2VTEyd4Ew9),
+  [Hub 85a550dd](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/85a550dd03e11f2101132d34189ff15f1877f660/evaluations/refine-smoke-20261114T124652Z).
+- **`refine-full-20261114T125015Z`** completed/uploaded, 1000 replicates (999 valid), 163 s.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-qOn6GrDXA4YhfA9M67gk9E),
+  [Hub 82c8d176](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/82c8d17678f6585ace2101ab600e8bd997fb2c1e/evaluations/refine-full-20261114T125015Z).
+  Map replay 4.8e-7; hybrid replay 0.0. No arm passes the rule (`improving_arms: []`).
+  Holdout AP: AlexNet × brightness 0.594 (Δ [−0.154, −0.003]), VGG × brightness 0.595,
+  SqueezeNet × normal-CDF gate 0.648, SqueezeNet × slice-rank gate 0.663 (Δ [−0.090,
+  +0.105]; calibration AP 0.682 vs 0.496). Frozen hybrid unchanged.
+  Evidence: `docs/evidence/2026-11-14-refine-results.json` (sha256 `9622ca90…af5b`, matches
+  manifest), `docs/evidence/2026-11-14-refine-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
+

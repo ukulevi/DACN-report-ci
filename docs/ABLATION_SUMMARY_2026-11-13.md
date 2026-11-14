@@ -474,6 +474,51 @@ Reading:
 - This covers sampling-seed variability only. Variability from retraining the model
   (AF-11) has not been measured.
 
+### LPIPS backbone and normalised brightness gate (added 14 Nov, validation)
+
+`refine-full-20261114T125015Z` (code `436b03da`, Modal CPU, 3 min) recomputed
+spatial LPIPS with SqueezeNet, AlexNet and VGG16 (lpips 0.1, same input contract) on
+the cached Final reconstructions. Each map was crossed with four gates: none, raw
+brightness, brightness CDF fitted on normal-calibration brain pixels, and per-slice
+brightness rank. The reference is the frozen hybrid. There were no DDPM calls and no
+test access. Hypotheses and rule are fixed in `dacn.evaluation.score_refinement`.
+Replays: CPU SqueezeNet maps vs producer max error 4.8e-7; frozen hybrid exact (0.0).
+999/1000 valid replicates. Each Δ is arm − frozen hybrid. Evidence:
+[results](evidence/2026-11-14-refine-results.json),
+[manifest](evidence/2026-11-14-refine-manifest.json).
+
+| Arm (backbone / gate) | Cal. AP | Holdout AP [95% CI] | Δ AP − frozen hybrid | Holdout pixel AUROC | Holdout Dice | Δ Dice | Image AUROC | Δ image AUROC | Rule |
+|---|---:|---|---|---:|---:|---|---:|---|:---:|
+| frozen_hybrid | 0.496 | 0.656 [0.365, 0.783] | – | 0.979 | 0.588 | – | 0.932 | – |  |
+| squeeze / none | 0.313 | 0.312 [0.099, 0.485] | [-0.449, -0.153] | 0.949 | 0.371 | [-0.324, -0.059] | 0.914 | [-0.129, +0.060] |  |
+| squeeze / brightness | 0.496 | 0.656 [0.365, 0.783] | [-0.000, +0.000] | 0.979 | 0.588 | [+0.000, +0.000] | 0.932 | [+0.000, +0.000] |  |
+| squeeze / normal_cdf | 0.466 | 0.648 [0.351, 0.785] | [-0.057, +0.035] | 0.980 | 0.579 | [-0.051, +0.025] | 0.914 | [-0.058, +0.005] |  |
+| squeeze / slice_rank | 0.682 | 0.663 [0.346, 0.796] | [-0.090, +0.105] | 0.985 | 0.594 | [-0.101, +0.142] | 0.908 | [-0.164, +0.063] |  |
+| alex / none | 0.153 | 0.286 [0.064, 0.490] | [-0.512, -0.086] | 0.937 | 0.308 | [-0.415, -0.108] | 0.822 | [-0.266, +0.020] |  |
+| alex / brightness | 0.282 | 0.594 [0.253, 0.742] | [-0.154, -0.003] | 0.975 | 0.534 | [-0.108, -0.023] | 0.803 | [-0.281, -0.015] |  |
+| alex / normal_cdf | 0.270 | 0.579 [0.252, 0.738] | [-0.147, -0.027] | 0.976 | 0.522 | [-0.130, -0.019] | 0.789 | [-0.283, -0.037] |  |
+| alex / slice_rank | 0.479 | 0.629 [0.238, 0.763] | [-0.166, +0.108] | 0.983 | 0.585 | [-0.141, +0.118] | 0.811 | [-0.298, -0.002] |  |
+| vgg / none | 0.279 | 0.253 [0.090, 0.399] | [-0.536, -0.151] | 0.941 | 0.288 | [-0.424, -0.092] | 0.875 | [-0.244, +0.060] |  |
+| vgg / brightness | 0.456 | 0.595 [0.301, 0.726] | [-0.143, +0.019] | 0.974 | 0.551 | [-0.086, +0.008] | 0.862 | [-0.168, +0.005] |  |
+| vgg / normal_cdf | 0.426 | 0.575 [0.256, 0.729] | [-0.195, +0.023] | 0.975 | 0.534 | [-0.129, +0.012] | 0.840 | [-0.223, +0.004] |  |
+| vgg / slice_rank | 0.691 | 0.629 [0.358, 0.722] | [-0.133, +0.077] | 0.982 | 0.535 | [-0.130, +0.055] | 0.866 | [-0.255, +0.035] |  |
+
+Reading:
+
+- **No arm passes the rule; the frozen hybrid stands.**
+- **H1 (backbone): not supported.** AlexNet and VGG16 are below SqueezeNet both raw
+  (holdout AP 0.286 / 0.253 vs 0.312) and gated by brightness (0.594 / 0.595 vs
+  0.656). AlexNet × brightness is lower beyond uncertainty. SqueezeNet stays.
+- **H2 (normalised gate): not supported.** The normal-calibration CDF gate changes
+  nothing reliable (0.648). The per-slice rank gate is the one notable signal:
+  calibration AP rises from 0.496 to 0.682, but holdout AP barely moves (0.663,
+  Δ CI [−0.090, +0.105]) and image AUROC is slightly lower. Calibration and holdout
+  disagree, as with t400, so this is not adopted. It could be revisited with a
+  different partition or more data.
+- Together with AF-03 and the 6 Nov normal-calibrated LPIPS, this is the third
+  LPIPS-side refinement without a reliable gain. The remaining headroom seems to lie
+  less in the LPIPS network than in the gate and the reconstruction.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |
