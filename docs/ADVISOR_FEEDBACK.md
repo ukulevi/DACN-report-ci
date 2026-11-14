@@ -6,6 +6,8 @@ new email or meeting. Link evidence (RESULT_TRACKING entries, summary docs,
 evidence JSON) instead of copying metrics here. Status values: `Done`,
 `Partial`, `In progress`, `Not started`.
 
+Team handoff of the 13–14 Nov work: [HANDOFF_2026-11-14.md](HANDOFF_2026-11-14.md).
+
 ## 2026-11-13 — Email from the advisor (Trương Vĩnh Lân)
 
 Received by email and shared with the agent on 2026-11-13 (screenshot). The

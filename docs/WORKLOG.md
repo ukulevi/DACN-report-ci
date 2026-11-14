@@ -2415,3 +2415,13 @@ local Ruff here is older and its defaults differ.
 Checks: ruff 0.17.5 check/format clean. postprocess-hybrid tests pass in a CI-equivalent
 venv (10) and locally with the related suites (19). Replays exact. Evidence byte-identical
 to the Hub, LF, UUID-free. No test access.
+
+## 2026-11-14 — Team handoff
+
+- Wrote `docs/HANDOFF_2026-11-14.md` (Vietnamese) for teammates. It covers what was done
+  for each advisor item, the Final LPIPS × brightness result, the test-access history,
+  the file and module map, how to rerun in each member's own Modal Workspace, team rules,
+  and open items with owners. Linked from ADVISOR_FEEDBACK.
+
+Checks: numbers checked against ABLATION_SUMMARY, RESULT_TRACKING and the evidence
+JSON. Relative links resolve. Docs only.
