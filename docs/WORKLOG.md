@@ -2310,3 +2310,22 @@ test access.
 
 Checks: noise-extension (3) and frozen-test-CI (4) unit tests passed, Ruff
 clean, evidence byte-identical to the Hub and UUID-free. No training.
+
+## 2026-11-14 — Frozen four-arm test CIs completed (AF-09/AF-10/AF-11)
+
+- First full attempt of `test-ci-full-20261114T042202Z` was cancelled by Modal
+  (`InputCancellation`) after all 3665 chunks were saved. Cause: the host killed
+  the local client because it ran low on memory. Recorded as failed. At the user's
+  request it was resumed with the same ID and code revision `e1ff7118` using
+  `--resume`; the saved chunks were reused and only aggregation ran.
+- Gate passed: published test metrics reproduced within 5.2e-7. Patient-group
+  CIs (767 groups, 1000 replicates): Final beats Initial and Naive-stitch on
+  every metric beyond uncertainty. Brightness keeps higher pixel AP/Dice; Final
+  has higher image AUROC/AP beyond uncertainty.
+- RESULT_TRACKING, ABLATION_SUMMARY §1/§5 and advisor rows AF-02/AF-09/AF-10/AF-11
+  updated. Fixed the brightness image-AUROC rounding in §1 (0.6437 → 0.6436,
+  value 0.643650).
+
+Checks: evidence byte-identical to the Hub (results SHA matches the manifest),
+LF, no UUIDs or tokens. CI table generated from the evidence by script. No
+training and no threshold or method change.

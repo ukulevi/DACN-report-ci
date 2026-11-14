@@ -1,0 +1,224 @@
+{
+  "mode": "full",
+  "test_accessed": true,
+  "samples": 3665,
+  "normal_slices": 640,
+  "abnormal_slices": 3025,
+  "published_replay": {
+    "max_abs_error": 5.165289256314765e-07,
+    "per_arm": {
+      "final_lpips": {
+        "pixel_ap": 8.523276834315752e-08,
+        "pixel_dice": 2.143318243996717e-07,
+        "image_auroc": 5.165289256314765e-07,
+        "image_ap": 1.8133655599328335e-07
+      },
+      "initial_lpips": {
+        "pixel_ap": 1.397328616703497e-08,
+        "pixel_dice": 1.5246113821421048e-07,
+        "image_auroc": 0.0,
+        "image_ap": 0.0
+      },
+      "naive_stitch_lpips": {
+        "pixel_ap": 6.903702925997734e-08,
+        "pixel_dice": 2.449632555134862e-07,
+        "image_auroc": 5.165289255204542e-07,
+        "image_ap": 1.3230320250467997e-07
+      },
+      "brightness": {
+        "pixel_ap": 0.0,
+        "pixel_dice": 0.0,
+        "image_auroc": 0.0,
+        "image_ap": 0.0
+      }
+    }
+  },
+  "pixel_bootstrap": {
+    "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+    "reference": "final_lpips",
+    "seed": 17,
+    "requested_replicates": 1000,
+    "valid_replicates": 1000,
+    "skipped_missing_class": 0,
+    "groups": 767,
+    "samples": 3665,
+    "candidates": {
+      "final_lpips": {
+        "pixel_ap": 0.31822613370648617,
+        "pixel_dice_micro": 0.36429250238689437,
+        "threshold": 0.26617634296417236,
+        "ap_ci95": [
+          0.30305240257633903,
+          0.33329777722628323
+        ],
+        "dice_ci95": [
+          0.3514879475235084,
+          0.37640821993193146
+        ],
+        "delta_ap_ci95": [
+          0.0,
+          0.0
+        ],
+        "delta_dice_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "initial_lpips": {
+        "pixel_ap": 0.22462506709241226,
+        "pixel_dice_micro": 0.26502029981940217,
+        "threshold": 0.2501829266548157,
+        "ap_ci95": [
+          0.21084315246951812,
+          0.23830569093771672
+        ],
+        "dice_ci95": [
+          0.25236975460187644,
+          0.2770165533178736
+        ],
+        "delta_ap_ci95": [
+          -0.10292552196731693,
+          -0.08457230478237705
+        ],
+        "delta_dice_ci95": [
+          -0.10663002387247213,
+          -0.091495110150227
+        ]
+      },
+      "naive_stitch_lpips": {
+        "pixel_ap": 0.2695158567777281,
+        "pixel_dice_micro": 0.3330161778680352,
+        "threshold": 0.21649277210235596,
+        "ap_ci95": [
+          0.25459059232932135,
+          0.28421996518711196
+        ],
+        "dice_ci95": [
+          0.32066449580503836,
+          0.3447694102900497
+        ],
+        "delta_ap_ci95": [
+          -0.0575077220768786,
+          -0.04056479189361444
+        ],
+        "delta_dice_ci95": [
+          -0.03772441910714895,
+          -0.024774856933314916
+        ]
+      },
+      "brightness": {
+        "pixel_ap": 0.5114340237017682,
+        "pixel_dice_micro": 0.416976905015636,
+        "threshold": 0.48235294222831726,
+        "ap_ci95": [
+          0.4830024840280913,
+          0.5431395801723631
+        ],
+        "dice_ci95": [
+          0.39716144619682636,
+          0.43787201034108414
+        ],
+        "delta_ap_ci95": [
+          0.1612198942025361,
+          0.22786107177794435
+        ],
+        "delta_dice_ci95": [
+          0.031595648256349175,
+          0.07553441706679813
+        ]
+      }
+    }
+  },
+  "image_bootstrap": {
+    "method": "paired patient-group percentile bootstrap; image level; fixed scores",
+    "reference": "final_lpips",
+    "seed": 17,
+    "requested_replicates": 1000,
+    "valid_replicates": 1000,
+    "groups": 767,
+    "candidates": {
+      "final_lpips": {
+        "auroc": 0.805989152892562,
+        "ap": 0.9458630561844523,
+        "auroc_ci95": [
+          0.7764110824339449,
+          0.833035601002984
+        ],
+        "ap_ci95": [
+          0.9301991799822719,
+          0.9591428141880655
+        ],
+        "delta_auroc_ci95": [
+          0.0,
+          0.0
+        ],
+        "delta_ap_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "initial_lpips": {
+        "auroc": 0.7212561983471074,
+        "ap": 0.9139425381206172,
+        "auroc_ci95": [
+          0.6812460304683468,
+          0.7557785206955475
+        ],
+        "ap_ci95": [
+          0.8924427473786746,
+          0.9343325385579839
+        ],
+        "delta_auroc_ci95": [
+          -0.11708981711671505,
+          -0.05262847204622614
+        ],
+        "delta_ap_ci95": [
+          -0.046949701833990304,
+          -0.01710707542914654
+        ]
+      },
+      "naive_stitch_lpips": {
+        "auroc": 0.7190821280991736,
+        "ap": 0.9127595415725173,
+        "auroc_ci95": [
+          0.6811512229164766,
+          0.7540824792550755
+        ],
+        "ap_ci95": [
+          0.8909047691543269,
+          0.9333361339835735
+        ],
+        "delta_auroc_ci95": [
+          -0.11645138225740595,
+          -0.05831928706929944
+        ],
+        "delta_ap_ci95": [
+          -0.04837564499405665,
+          -0.019572958104799424
+        ]
+      },
+      "brightness": {
+        "auroc": 0.6436497933884298,
+        "ap": 0.9013407249766718,
+        "auroc_ci95": [
+          0.6033339438659708,
+          0.6873079763970845
+        ],
+        "ap_ci95": [
+          0.8804084088651903,
+          0.9224641226599335
+        ],
+        "delta_auroc_ci95": [
+          -0.21316937839151462,
+          -0.10728077453531712
+        ],
+        "delta_ap_ci95": [
+          -0.0650038955848478,
+          -0.024484625655830337
+        ]
+      }
+    }
+  },
+  "adapter_seconds_median_this_attempt": null,
+  "scope": "Frozen four-arm protocol recomputed on the already inspected test split for uncertainty only; thresholds and method unchanged; one training and sampling seed; intervals conditional on this model and cohort."
+}

@@ -1,0 +1,53 @@
+{
+  "artifacts": {
+    "results.json": "6307f26e54574c63d830ce18569a09c66ade16d2c1b8d3a2f830bac59968f83d",
+    "source_snapshot.zip": "6a18a22094024bb3aac74e89b10df13ffdefec10f8f426d6d937282dd40fd08b"
+  },
+  "attempts": [
+    "2026-11-14T04:22:23.762718+00:00",
+    "2026-11-14T06:43:32.172522+00:00"
+  ],
+  "checkpoint_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+  "code_revision": "e1ff7118a2440290872048c40f40a4c941946a08",
+  "completed_at": "2026-11-14T07:44:08.847913+00:00",
+  "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "error": "InputCancellation",
+  "error_message": "Input was cancelled by user",
+  "evaluation_id": "test-ci-full-20261114T042202Z",
+  "frozen_mask_threshold": 0.13344676792621613,
+  "frozen_score_thresholds": {
+    "brightness": {
+      "image": 0.4997753345200585,
+      "pixel": 0.48235294222831726
+    },
+    "final_lpips": {
+      "image": 0.24719371760470998,
+      "pixel": 0.26617634296417236
+    },
+    "initial_lpips": {
+      "image": 0.2262084392261588,
+      "pixel": 0.2501829266548157
+    },
+    "naive_stitch_lpips": {
+      "image": 0.20856854640361336,
+      "pixel": 0.21649277210235596
+    }
+  },
+  "gpu": "Tesla T4",
+  "held_out_test_used": true,
+  "method": "frozen_four_arm_test_recompute_patient_group_ci",
+  "mode": "full",
+  "progress": {
+    "stage": "pixel_bootstrap"
+  },
+  "selection": "none; frozen protocol recomputed for uncertainty only",
+  "source_snapshot_sha256": "6a18a22094024bb3aac74e89b10df13ffdefec10f8f426d6d937282dd40fd08b",
+  "split": "test",
+  "started_at": "2026-11-14T04:22:23.678126+00:00",
+  "status": "completed",
+  "test_index_sha256": "eb6b79086e16f2c5affa73495d2501f52267cb70f9bbb6ef4f6e49018d8cd613",
+  "threshold_fitting": false,
+  "total_seconds_last_attempt": 3634.084454898,
+  "working_tree_dirty": false
+}

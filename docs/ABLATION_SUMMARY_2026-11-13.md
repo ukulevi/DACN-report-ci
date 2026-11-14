@@ -3,7 +3,9 @@
 Purpose: one table set answering the advisor's three priorities (role of the
 residual mask, noise level/DDIM steps, ablation and baselines) from runs that
 already exist. **No new inference, training, threshold fitting or test access
-was performed for this summary.** All values are copied from producer aggregate
+was performed for the original 13 Nov summary**. Later subsections marked
+"added" record their own runs; only the 14 Nov test-CI subsection touched test.
+All values are copied from producer aggregate
 JSON on the private `dacn-bmad-team/dacn-runs` Hub repo; JSON member hashes were
 checked against the producer manifests (see
 [evidence](evidence/2026-11-13-hf-producer-sync.json) and
@@ -33,9 +35,10 @@ raw LPIPS(input, final) with no residual multiplier.
 | Mask from raw initial LPIPS only (no residual), then re-sample | 0.2698 | 0.2873 | 0.3504 | 0.2900 | 0.9257 | 0.3472 | 0.7949 |
 | **Final LPIPS (LPIPS×residual mask, re-sample)** | 0.3130 | 0.3123 | 0.3712 | **0.3182** | 0.9388 | 0.3643 | **0.8060** |
 | Final reconstruction, score LPIPS × final residual | 0.2477 | 0.1968 | 0.2725 | – | – | – | – |
-| Brightness control (no model) | 0.1466 | 0.3895 | 0.2681 | **0.5114** | **0.9615** | **0.4170** | 0.6437 |
+| Brightness control (no model) | 0.1466 | 0.3895 | 0.2681 | **0.5114** | **0.9615** | **0.4170** | 0.6436 |
 
-Reading on this cohort (one seed, no confidence intervals yet):
+Reading on this cohort (one seed; test CIs for the four frozen arms are in the
+subsection below):
 
 - Re-sampling inside the same mask adds about +0.05 test AP over naive stitching.
 - Including the normalized residual in the *mask* adds about +0.03 test AP over
@@ -47,6 +50,37 @@ Reading on this cohort (one seed, no confidence intervals yet):
   0.0098 vs 0.1077). Do not claim the diffusion method beats brightness overall.
 - Test rows after the original four-arm test (LPIPS-only mask, 12 Nov; DDIM50,
   11 Nov) are exploratory extensions on an already inspected test set.
+
+### Patient-group CIs for the frozen four arms on test (added 14 Nov, AF-09/AF-10)
+
+`test-ci-full-20261114T042202Z` (code `e1ff7118`, T4) recomputed the frozen
+four-arm protocol with the unchanged adapter and frozen thresholds, for
+uncertainty only. Gate: every published test metric reproduced within 1e-6
+(max abs error 5.2e-7). 3665 slices (640 normal / 3025 abnormal), 767 patient
+groups, paired percentile bootstrap, 1000/1000 valid replicates, seed 17. No
+threshold, method or configuration changed. Evidence:
+[results](evidence/2026-11-14-test-ci-results.json),
+[manifest](evidence/2026-11-14-test-ci-manifest.json).
+
+| Arm | Pixel AP [95% CI] | Δ AP vs Final | Dice [95% CI] | Δ Dice vs Final | Image AUROC [95% CI] | Δ AUROC vs Final | Image AP [95% CI] | Δ image AP vs Final |
+|---|---|---|---|---|---|---|---|---|
+| **Final LPIPS** | 0.3182 [0.3031, 0.3333] | – | 0.3643 [0.3515, 0.3764] | – | 0.8060 [0.7764, 0.8330] | – | 0.9459 [0.9302, 0.9591] | – |
+| Initial LPIPS | 0.2246 [0.2108, 0.2383] | [-0.1029, -0.0846] | 0.2650 [0.2524, 0.2770] | [-0.1066, -0.0915] | 0.7213 [0.6812, 0.7558] | [-0.1171, -0.0526] | 0.9139 [0.8924, 0.9343] | [-0.0469, -0.0171] |
+| Naive-stitch LPIPS | 0.2695 [0.2546, 0.2842] | [-0.0575, -0.0406] | 0.3330 [0.3207, 0.3448] | [-0.0377, -0.0248] | 0.7191 [0.6812, 0.7541] | [-0.1165, -0.0583] | 0.9128 [0.8909, 0.9333] | [-0.0484, -0.0196] |
+| Brightness control | 0.5114 [0.4830, 0.5431] | [0.1612, 0.2279] | 0.4170 [0.3972, 0.4379] | [0.0316, 0.0755] | 0.6436 [0.6033, 0.6873] | [-0.2132, -0.1073] | 0.9013 [0.8804, 0.9225] | [-0.0650, -0.0245] |
+
+Reading:
+
+- Final LPIPS beats Initial and Naive-stitch on every metric; all deltas exclude 0.
+  Re-sampling inside the mask, not the mask alone, is what makes the gain.
+- Brightness has higher pixel AP (+0.16 to +0.23) and Dice (+0.03 to +0.08)
+  beyond uncertainty. Final LPIPS has higher image AUROC (+0.11 to +0.21) and
+  image AP beyond uncertainty. The two methods win at different levels; neither
+  dominates.
+- The intervals cover patient resampling only. They are conditional on one
+  trained model, one sampling seed and this cohort. The test set had already
+  been inspected, so they quantify uncertainty and do not confirm the method
+  independently.
 
 ### Pseudo-mask rule ablation — validation only (added 13 Nov, AF-07)
 
@@ -299,8 +333,9 @@ results. No ConvAE/ConvVAE test evaluation exists.
 
 1. Patient-group paired bootstrap: done on validation for the sweep, its t300
    controls, mask rules, fusion, seeds/budget/phase-2 variants and the LPIPS-only
-   mask (6–14 Nov). Test-set intervals for the frozen four arms: run started
-   14 Nov. Not done for the Section 3 alternative scores (negative results).
+   mask (6–14 Nov). Test-set intervals for the frozen four arms: done 14 Nov
+   (Section 1). Not done for the Section 3 alternative scores (negative
+   results) or for the exploratory LPIPS-only mask/DDIM50 test rows.
 2. Noise level → reconstruction quality → detection: done descriptively from
    the cached per-t arrays (13 Nov, Section 2); no intervals for these aggregates.
 3. Sweep completion done 14 Nov: t50/t400, DDIM budget, phase-2 start and
@@ -308,6 +343,9 @@ results. No ConvAE/ConvVAE test evaluation exists.
    Section 1); weighted LPIPS+residual fusion on the Final reconstruction done
    (14 Nov, Section 3).
 4. No further test runs until a single configuration is frozen from
-   validation; report the three post-freeze test uses as exploratory.
+   validation; report the three post-freeze test uses as exploratory. The
+   14 Nov CI run reused the frozen four-arm protocol unchanged, to quantify
+   uncertainty only. It is a fourth access to the test set, and no selection
+   was made from it.
 5. Source for the 11–12 November runs is only in private source snapshots;
    see `BLK-20261113-01` in ISSUES.md.

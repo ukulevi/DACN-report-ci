@@ -3813,4 +3813,25 @@ only aggregates are uploaded.
   max abs error 0.0. [Modal](https://modal.com/apps/tanh1c/main/ap-PfeXoU0PsIqYoRaREQoAhT),
   [Hub 1ea8b6f8](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/1ea8b6f8eae07efea172e12b7ec07007acdeb789/evaluations/test-ci-smoke-20261114T041938Z).
 - **`test-ci-full-20261114T042202Z`** submitted detached on the 3665-slice test split after smoke
-  acceptance. Status: running.
+  acceptance. Status: **failed** (`InputCancellation`, "Input was cancelled by user") after all
+  3665/3665 map chunks were persisted on the Workspace Volume and before the pixel/image
+  bootstrap, published-replay check, or Hub upload; no results exist. Cause: the local Modal
+  client process was killed by the host (low memory), cancelling the detached input.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-a5N5MZUygJG3jCJ0qwKSgV). Resumable with the
+  same ID, code revision `e1ff7118` and `--resume` (chunks are reused; only aggregation runs).
+  - Resume attempt 2 (same ID, `--resume`, revision `e1ff7118`) submitted 2026-11-14 at user
+    request. Status: **completed/uploaded** (aggregation 3634 s on a T4; chunks reused).
+    [Modal](https://modal.com/apps/tanh1c/main/ap-oxuDE5qZ9hEarpGjS6LZOT),
+    [Hub 9a022536](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/9a02253698a917afdd59cd0061c815bea217f0b4/evaluations/test-ci-full-20261114T042202Z).
+    The manifest still has `error: InputCancellation` from attempt 1, because resume
+    does not clear old fields. Its `status` is `completed`.
+  - Gate: published four-arm test metrics reproduced, max abs error 5.2e-7 (≤ 1e-6).
+    3665 slices (640 normal / 3025 abnormal), 767 patient groups, 1000/1000 valid
+    replicates, seed 17. Frozen thresholds and method unchanged; uncertainty only.
+  - Pixel AP [95% CI]: Final 0.3182 [0.3031, 0.3333]; Initial 0.2246 (Δ [−0.1029, −0.0846]);
+    Naive-stitch 0.2695 (Δ [−0.0575, −0.0406]); Brightness 0.5114 (Δ [+0.1612, +0.2279]).
+    Dice: Final 0.3643 [0.3515, 0.3764]; Brightness Δ [+0.0316, +0.0755].
+    Image AUROC: Final 0.8060 [0.7764, 0.8330]; Initial Δ [−0.1171, −0.0526];
+    Naive-stitch Δ [−0.1165, −0.0583]; Brightness 0.6436 (Δ [−0.2132, −0.1073]).
+  - Evidence (byte-identical to Hub, LF, no UUIDs): `docs/evidence/2026-11-14-test-ci-results.json`
+    (sha256 `6307f26e…f83d`, matches manifest), `docs/evidence/2026-11-14-test-ci-manifest.json`.
