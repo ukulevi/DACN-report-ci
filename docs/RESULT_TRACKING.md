@@ -3884,3 +3884,31 @@ brightness, with the holdout Δ AP CI excluding 0 and calibration agreeing.
   0.184 (all Δ CI below −0.24). `credits_resampling: true`.
   Evidence: `docs/evidence/2026-11-14-gate-results.json` (sha256 `d1374c90…84b0`, matches
   manifest), `docs/evidence/2026-11-14-gate-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
+
+## 2026-11-14 — Single frozen test evaluation of Final LPIPS × brightness
+
+User approved one test run after the validation gate ablation. Code `a5911a35`
+(`dacn.cloud.modal_hybrid_test`), Modal CPU, Workspace `tanh1c`. The configuration
+(Final LPIPS × brightness, no post-processing) and its thresholds (pixel 0.13542, image
+0.17669; max-F1 on validation calibration) were frozen in code before this run. The test
+maps are the identity-checked private chunks of `test-ci-full-20261114T042202Z`. There
+are no model calls and no fitting on test. This is the fifth test access, after several
+development rounds on validation.
+
+- **`hybrid-test-smoke-20261114T105624Z`** completed/uploaded; validation only, no test
+  access. The frozen thresholds reproduce the hybrid holdout metrics (error 0.0).
+  [Modal](https://modal.com/apps/tanh1c/main/ap-Q0o9y5ZfcYHPMOvbutzRVe),
+  [Hub bf97afeb](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/bf97afeb82b5cad4acf85ea5307dd9d9b0fe8c66/evaluations/hybrid-test-smoke-20261114T105624Z).
+- **`hybrid-test-full-20261114T105717Z`** completed/uploaded, 2053 s CPU.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-V7hNgEghnVt6h4wLwO8hLo),
+  [Hub 8b61cb21](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/8b61cb21cec001bd75fd5fcde2ad19807ef3294d/evaluations/hybrid-test-full-20261114T105717Z).
+  Gate: the unprocessed source maps reproduce the published test metrics (Final 1.6e-14,
+  brightness 0.0). 3665 slices (640 normal / 3025 abnormal), 767 groups, 1000/1000 valid
+  replicates.
+  Test: pixel AP **0.6505** [0.6263, 0.6731] vs Final 0.3182 (Δ [−0.3504, −0.3142]) and
+  brightness 0.5114 (Δ [−0.1676, −0.1119]). Dice 0.5943 [0.5797, 0.6089]. Image AUROC
+  0.8397 [0.8129, 0.8637] vs Final 0.8060 (Δ [−0.0596, −0.0086]) and brightness 0.6436.
+  Normal-slice pixel FPR 0.0101. Validation holdout AP was 0.656; test agrees.
+  Evidence: `docs/evidence/2026-11-14-hybrid-test-results.json` (sha256 `5bcfdde3…d174`,
+  matches manifest), `docs/evidence/2026-11-14-hybrid-test-manifest.json`; byte-identical
+  to the Hub, LF, no UUIDs.

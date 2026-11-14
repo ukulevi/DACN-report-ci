@@ -1,0 +1,184 @@
+{
+  "mode": "full",
+  "test_accessed": true,
+  "samples": 3665,
+  "normal_slices": 640,
+  "abnormal_slices": 3025,
+  "source_replay_max_abs_error": {
+    "final_lpips": 1.5765166949677223e-14,
+    "brightness": 0.0
+  },
+  "frozen_hybrid_test": {
+    "split": "test",
+    "samples": 3665,
+    "pixel": {
+      "auroc": 0.9759423375105564,
+      "auprc": 0.6505047984912514,
+      "precision": 0.6641453444834496,
+      "recall": 0.5376805176741608,
+      "f1": 0.5942591582971183,
+      "threshold": 0.1354231256334515,
+      "average_precision": 0.6505047984912514,
+      "dice_micro": 0.5942591582971183
+    },
+    "image": {
+      "auroc": 0.8397004132231405,
+      "auprc": 0.9593948138208848,
+      "precision": 0.9595959595959596,
+      "recall": 0.6595041322314049,
+      "f1": 0.7817398119122257,
+      "threshold": 0.17669394359404414
+    },
+    "pixel_dice_macro_lesion_slices": 0.5356068805805239,
+    "empty_mask_pixel_false_positive_rate": 0.010092800564236112,
+    "threshold_selection": "provided by caller; provenance must be recorded separately",
+    "pixel_aggregation": "global micro over 240x240 crop",
+    "image_aggregation": "mean of top 576 pixels"
+  },
+  "image_bootstrap": {
+    "method": "paired patient-group percentile bootstrap; image level; fixed scores",
+    "reference": "final_lpips_x_brightness",
+    "seed": 17,
+    "requested_replicates": 1000,
+    "valid_replicates": 1000,
+    "groups": 767,
+    "candidates": {
+      "final_lpips_x_brightness": {
+        "auroc": 0.8397004132231405,
+        "ap": 0.9593948138208848,
+        "auroc_ci95": [
+          0.8128725590897522,
+          0.8637425198599608
+        ],
+        "ap_ci95": [
+          0.9474917003888849,
+          0.9697224682150601
+        ],
+        "delta_auroc_ci95": [
+          0.0,
+          0.0
+        ],
+        "delta_ap_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "final_lpips": {
+        "auroc": 0.805989152892562,
+        "ap": 0.9458630561844523,
+        "auroc_ci95": [
+          0.7764110824339449,
+          0.833035601002984
+        ],
+        "ap_ci95": [
+          0.9301991799822719,
+          0.9591428141880655
+        ],
+        "delta_auroc_ci95": [
+          -0.05964346023362541,
+          -0.008566147127976308
+        ],
+        "delta_ap_ci95": [
+          -0.02387766538620733,
+          -0.0042683780216501935
+        ]
+      },
+      "brightness": {
+        "auroc": 0.6436497933884298,
+        "ap": 0.9013407249766718,
+        "auroc_ci95": [
+          0.6033339438659708,
+          0.6873079763970845
+        ],
+        "ap_ci95": [
+          0.8804084088651903,
+          0.9224641226599335
+        ],
+        "delta_auroc_ci95": [
+          -0.2315417340867311,
+          -0.16003697921686066
+        ],
+        "delta_ap_ci95": [
+          -0.0740099366016436,
+          -0.0425922105810933
+        ]
+      }
+    }
+  },
+  "pixel_bootstrap": {
+    "method": "paired patient-group percentile bootstrap; fixed scores and thresholds",
+    "reference": "final_lpips_x_brightness",
+    "seed": 17,
+    "requested_replicates": 1000,
+    "valid_replicates": 1000,
+    "skipped_missing_class": 0,
+    "groups": 767,
+    "samples": 3665,
+    "candidates": {
+      "final_lpips_x_brightness": {
+        "pixel_ap": 0.6505047984912042,
+        "pixel_dice_micro": 0.5942591582971183,
+        "threshold": 0.1354231256334515,
+        "ap_ci95": [
+          0.6262550186104292,
+          0.6731107928561226
+        ],
+        "dice_ci95": [
+          0.5796918068539849,
+          0.6088908874430361
+        ],
+        "delta_ap_ci95": [
+          0.0,
+          0.0
+        ],
+        "delta_dice_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "final_lpips": {
+        "pixel_ap": 0.31822613370648617,
+        "pixel_dice_micro": 0.36429250238689437,
+        "threshold": 0.26617634296417236,
+        "ap_ci95": [
+          0.30305240257633903,
+          0.33329777722628323
+        ],
+        "dice_ci95": [
+          0.3514879475235084,
+          0.37640821993193146
+        ],
+        "delta_ap_ci95": [
+          -0.35035255279529615,
+          -0.31415925687919233
+        ],
+        "delta_dice_ci95": [
+          -0.2412624254441948,
+          -0.2179988822392937
+        ]
+      },
+      "brightness": {
+        "pixel_ap": 0.5114340237017682,
+        "pixel_dice_micro": 0.416976905015636,
+        "threshold": 0.48235294222831726,
+        "ap_ci95": [
+          0.4830024840280913,
+          0.5431395801723631
+        ],
+        "dice_ci95": [
+          0.39716144619682636,
+          0.43787201034108414
+        ],
+        "delta_ap_ci95": [
+          -0.1676270655940308,
+          -0.11191153124097714
+        ],
+        "delta_dice_ci95": [
+          -0.19371100883644382,
+          -0.15996681512961214
+        ]
+      }
+    }
+  },
+  "scope": "Single test evaluation of a configuration frozen on validation after several development rounds; fifth test access; one training and sampling seed; intervals conditional on this model and cohort."
+}

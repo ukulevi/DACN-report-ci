@@ -410,6 +410,39 @@ Reading:
   there is one model and one sampling seed, and no test access. The
   Initial-vs-Final interval ends close to 0.
 
+### Single frozen test evaluation of Final LPIPS × brightness (added 14 Nov)
+
+After the gate ablation, the configuration (Final LPIPS × brightness, no
+post-processing) and its validation-calibration thresholds (pixel 0.13542, image
+0.17669) were frozen in code `a5911a35`. Then one test evaluation was run:
+`hybrid-test-full-20261114T105717Z`, CPU, using the identity-checked test-CI map
+chunks, with no model calls and no fitting on test. Gate: the unprocessed maps
+reproduce the published test metrics (≤ 1.6e-14). 767 patient groups, 1000/1000
+valid replicates. This is the **fifth test access**; the configuration was chosen
+after several validation development rounds in this session. Evidence:
+[results](evidence/2026-11-14-hybrid-test-results.json),
+[manifest](evidence/2026-11-14-hybrid-test-manifest.json).
+
+| Arm | Pixel AP [95% CI] | Δ AP vs frozen hybrid | Dice [95% CI] | Δ Dice | Image AUROC [95% CI] | Δ AUROC | Image AP [95% CI] | Δ image AP |
+|---|---|---|---|---|---|---|---|---|
+| **Final LPIPS × brightness (frozen)** | 0.6505 [0.6263, 0.6731] | – | 0.5943 [0.5797, 0.6089] | – | 0.8397 [0.8129, 0.8637] | – | 0.9594 [0.9475, 0.9697] | – |
+| Final LPIPS | 0.3182 [0.3031, 0.3333] | [-0.3504, -0.3142] | 0.3643 [0.3515, 0.3764] | [-0.2413, -0.2180] | 0.8060 [0.7764, 0.8330] | [-0.0596, -0.0086] | 0.9459 [0.9302, 0.9591] | [-0.0239, -0.0043] |
+| Brightness control | 0.5114 [0.4830, 0.5431] | [-0.1676, -0.1119] | 0.4170 [0.3972, 0.4379] | [-0.1937, -0.1600] | 0.6436 [0.6033, 0.6873] | [-0.2315, -0.1600] | 0.9013 [0.8804, 0.9225] | [-0.0740, -0.0426] |
+
+Frozen hybrid point metrics: pixel AUROC 0.9759, precision 0.6641, recall 0.5377, macro lesion-slice Dice 0.5356, normal-slice pixel FPR 0.0101.
+
+Reading:
+
+- The validation gain carries over to test: pixel AP 0.651 (validation holdout
+  0.656). The hybrid beats Final LPIPS and brightness on every pixel and image
+  metric, with all deltas beyond uncertainty. It is the first configuration in this
+  project that beats the brightness control at pixel level.
+- The image-level gain over Final is small (AUROC +0.009 to +0.060); the pixel-level
+  gains are large.
+- Scope: one trained model, one sampling seed, one cohort; the test set has been
+  inspected before. The gate ablation for the re-sampling contribution
+  (Initial vs Final LPIPS × brightness) exists on validation only.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |
@@ -439,8 +472,8 @@ results. No ConvAE/ConvVAE test evaluation exists.
 4. Hybrid follow-up (14 Nov): LPIPS × brightness passes the pre-registered
    rule on validation, and the gate ablation credits the re-sampling: Initial
    LPIPS × brightness is lower beyond uncertainty, and L1 gates are far lower
-   (Section 3). Remaining: freeze one configuration and run a single test
-   evaluation, reported as the fifth test access after development.
+   (Section 3). Frozen and evaluated once on test (fifth access, 14 Nov): pixel
+   AP 0.651, beating Final and brightness beyond uncertainty (Section 3).
 5. No further test runs until a single configuration is frozen from
    validation; report the three post-freeze test uses as exploratory. The
    14 Nov CI run reused the frozen four-arm protocol unchanged, to quantify

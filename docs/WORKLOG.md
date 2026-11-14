@@ -2363,3 +2363,20 @@ training and no test access.
 Checks: 16 unit tests passed (postprocess-hybrid, final-fusion, sweep-bootstrap).
 Ruff clean. Replays exact. Evidence byte-identical to the Hub, LF, UUID-free. No
 test access.
+
+## 2026-11-14 — Single frozen test evaluation of Final LPIPS × brightness
+
+- With the user's approval, froze Final LPIPS × brightness (no post-processing) and its
+  validation-calibration thresholds in code (`a5911a35`). Added
+  `dacn.cloud.modal_hybrid_test` (CPU; reuses the identity-checked test-CI chunks; gate on
+  the published test metrics; smoke replays the validation holdout without test access).
+- Smoke: replay 0.0. Full (`hybrid-test-full-20261114T105717Z`, 34 min CPU): gate 1.6e-14.
+  Test pixel AP 0.651 [0.626, 0.673] vs brightness 0.511 and Final 0.318; Dice 0.594;
+  image AUROC 0.840. All deltas beyond uncertainty. This is the fifth test access,
+  recorded as such.
+- RESULT_TRACKING, ABLATION_SUMMARY §3/§5 and advisor rows AF-09/AF-10 updated; table
+  generated from the evidence by script.
+
+Checks: 12 unit tests passed (postprocess-hybrid incl. a frozen-threshold check against
+the evidence, frozen-test-CI). Ruff clean. Evidence byte-identical to the Hub, LF,
+UUID-free. No training and no fitting on test.
