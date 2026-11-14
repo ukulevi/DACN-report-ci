@@ -4023,4 +4023,7 @@ validation-calibration score thresholds (pixel 0.13543, image 0.15379). Workspac
   Claude Code stopped the local Modal clients because the host ran low on memory, and Modal
   cancelled the detached inputs. Saved chunks: seed 18 1500/3665, seed 19 1750/3665.
   Resumable with the same IDs, code revision and `--resume`. No results yet.
+  - Attempt 2, at user request: the app was deployed (`modal deploy`, app `dacn-seed-ensemble`)
+    and both runs resumed through `Function.spawn` with the same IDs, revision `df81f801` and
+    resume=True. Spawned calls do not depend on a local client. Status: running.
 
