@@ -280,7 +280,7 @@ def _evaluate_arms(
             abs(ours["pixel"]["f1"] - producer["pixel"]["f1"]),
             abs(ours["image"]["auroc"] - producer["image"]["auroc"]),
         )
-    if max(replay.values()) > 1e-9:
+    if replay and max(replay.values()) > 1e-9:
         raise ValueError("Unprocessed references do not replay the producer holdout metrics")
     pixel = {
         ref: paired_group_bootstrap(
