@@ -27,6 +27,10 @@ Rules
 """
 
 SEEDS = (17, 18, 19)
+# GPU source run; filled in after it completes. The CPU analysis checks its maps
+# against that run's own manifest checksums.
+MASKGATE_SOURCE_RUN = "maskgate-full-20261114T134252Z"
+MASKGATE_SOURCE_REVISION = "d8441e8ba602ec068b3f24566af91b79ce5bd193"
 LARGE_LESION_BIN = ">=1000"
 
 

@@ -15,6 +15,7 @@ Analyses:
   gate       which reconstruction error to gate by brightness (Final vs Initial, L1)
   seeds      sampling-seed robustness of Final LPIPS x brightness (seeds 17/18/19)
   diagnose   hybrid error analysis, pooled-83 contrasts, seed/noise ensembles
+  maskgate   brightness-gated pseudo-mask vs producer mask (needs the GPU maskgate run)
 
     DACN_HF_SECRET=huggingface modal run -m dacn.cloud.modal_sweep_bootstrap \
         --analysis quality --evaluation-id sweep-quality-smoke-UNIQUE \
@@ -52,6 +53,7 @@ METHODS = {
     "gate": "brightness_gated_reconstruction_ablation_t300",
     "seeds": "sampling_seed_robustness_final_lpips_x_brightness_t300",
     "diagnose": "error_analysis_pooled83_and_reconstruction_ensembles_t300",
+    "maskgate": "brightness_gated_pseudo_mask_seeds_and_ensembles_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -590,6 +592,143 @@ def _diagnose(token, mode, groups, holdout, dataset):
     }
 
 
+def _maskgate(token, mode, groups, holdout, dataset):
+    """Brightness-gated pseudo-mask vs producer mask, seeds and ensembles (rules: mask_gate)."""
+    import io
+
+    import numpy as np
+    from huggingface_hub import hf_hub_download
+
+    from dacn.evaluation import mask_gate
+    from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.hybrid_diagnostics import ensemble_mean, lesion_detection
+    from dacn.evaluation.mask_gate import (
+        LARGE_LESION_BIN,
+        MASKGATE_SOURCE_REVISION,
+        MASKGATE_SOURCE_RUN,
+        SEEDS,
+        choose_test_candidate,
+        r1,
+        seed_wins,
+    )
+    from dacn.evaluation.postprocess_hybrid import HYBRID_REPLAY, SEED_VARIANTS
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+
+    if not MASKGATE_SOURCE_RUN or not MASKGATE_SOURCE_REVISION:
+        raise ValueError("Mask-gate source run is not recorded yet")
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    brightness = np.asarray(arrays["brightness"], np.float64)
+
+    def hub(name):
+        path = hf_hub_download(
+            MODEL_REPO,
+            f"evaluations/{MASKGATE_SOURCE_RUN}/{name}",
+            revision=MASKGATE_SOURCE_REVISION,
+            token=token,
+            cache_dir="/tmp/hf-cache",
+        )
+        return Path(path).read_bytes()
+
+    source = json.loads(hub("run_manifest.json"))
+    if source.get("status") != "completed" or source.get("mode") != "full":
+        raise ValueError("Mask-gate source run is not a completed full run")
+    final = {}
+    for name in ("control", *(f"bmask_s{s}" for s in SEEDS)):
+        file = f"private_{name}_t300_20_30_maps.npz"
+        payload = hub(file)
+        if _sha_bytes(payload) != source["artifacts"][file]:
+            raise ValueError(f"Mask-gate map checksum differs: {file}")
+        with np.load(io.BytesIO(payload), allow_pickle=False) as archive:
+            final[name] = archive["autoddpm_lpips"].copy()
+        if final[name].shape != truth.shape:
+            raise ValueError("Mask-gate maps must cover all 83 validation slices")
+    if not np.array_equal(final["control"], arrays["autoddpm_lpips"]):
+        raise ValueError("Mask-gate control differs from the producer reference")
+    product = {17: arrays["autoddpm_lpips"]}
+    for seed in (18, 19):
+        product[seed] = _variant_maps(token, *SEED_VARIANTS[seed], truth.shape)["autoddpm_lpips"]
+    maps = {}
+    for seed in SEEDS:
+        maps[f"product_s{seed}"] = np.asarray(product[seed], np.float64) * brightness
+        maps[f"bmask_s{seed}"] = np.asarray(final[f"bmask_s{seed}"], np.float64) * brightness
+    maps["product_ensemble"] = ensemble_mean(product.values()) * brightness
+    maps["bmask_ensemble"] = ensemble_mean(final[f"bmask_s{s}"] for s in SEEDS) * brightness
+    maps["final_s17"] = np.asarray(arrays["autoddpm_lpips"], np.float64)
+    maps["brightness"] = brightness
+    arms, summary, replay, pixel, image = _evaluate_arms(
+        maps,
+        truth,
+        labels,
+        calibration,
+        holdout,
+        groups,
+        results,
+        mode,
+        ("product_s17",),
+        replay_arms={"final_s17": "autoddpm_lpips", "brightness": "brightness"},
+    )
+    held = arms["product_s17"]["group_holdout"]
+    hybrid_error = max(
+        abs(held["pixel"]["auprc"] - HYBRID_REPLAY[0]),
+        abs(held["pixel"]["f1"] - HYBRID_REPLAY[1]),
+        abs(held["image"]["auroc"] - HYBRID_REPLAY[2]),
+    )
+    if hybrid_error > 1e-9:
+        raise ValueError("product_s17 does not replay the frozen hybrid")
+    thresholds = {name: arm["score_thresholds"]["pixel"] for name, arm in arms.items()}
+    scores = {name: image_scores(values) for name, values in maps.items()}
+    pooled_pixel, pooled_image = {}, {}
+    for ref in ("product_s17", "product_ensemble"):
+        pooled_pixel[ref] = paired_group_bootstrap(
+            truth, maps, groups, thresholds, reference=ref, replicates=REPLICATES[mode], seed=17
+        )
+        pooled_image[ref] = image_group_bootstrap(
+            labels, scores, groups, reference=ref, replicates=REPLICATES[mode], seed=17
+        )
+    large = {}
+    for name in ("product_s17", "bmask_s17", "product_ensemble", "bmask_ensemble"):
+        predicted = maps[name][holdout] >= thresholds[name]
+        large[name] = lesion_detection(truth[holdout], predicted)
+    return {
+        "method": METHODS["maskgate"],
+        "rules": mask_gate.__doc__,
+        "source_run": MASKGATE_SOURCE_RUN,
+        "source_revision": MASKGATE_SOURCE_REVISION,
+        "source_code_revision": source.get("code_revision"),
+        "source_artifacts": source["artifacts"],
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {REFERENCE_RUN: verified},
+        "producer_replay_abs_error": replay,
+        "hybrid_replay_abs_error": hybrid_error,
+        "verdict": {
+            "r1_bmask_single_seed": r1(
+                summary, pooled_pixel["product_s17"], pooled_image["product_s17"]
+            ),
+            "seed_wins": seed_wins(summary),
+            "r2_large_lesion_pixel_recall_holdout": {
+                name: stats[LARGE_LESION_BIN]["pixel_recall"] for name, stats in large.items()
+            },
+            "r3_test_candidate": choose_test_candidate(
+                summary, pooled_pixel["product_ensemble"], pooled_image["product_ensemble"]
+            ),
+        },
+        "selection": "none; all arms reported; rules fixed before the GPU run",
+        "scope": SCOPE,
+        "summary": summary,
+        "arms": arms,
+        "lesion_detection_holdout": large,
+        "holdout_pixel_bootstrap": pixel["product_s17"],
+        "holdout_image_bootstrap": image["product_s17"],
+        "pooled83_pixel_bootstrap": pooled_pixel,
+        "pooled83_image_bootstrap": pooled_image,
+    }
+
+
 def _hybrid(token, mode, groups, holdout, dataset):
     """Brain-mask post-processing and brightness hybrids on the Final maps."""
     from dacn.evaluation import postprocess_hybrid
@@ -751,6 +890,8 @@ def run_sweep_analysis_remote(
             report = _seeds(token, mode, groups, holdout, dataset)
         elif analysis == "diagnose":
             report = _diagnose(token, mode, groups, holdout, dataset)
+        elif analysis == "maskgate":
+            report = _maskgate(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)
