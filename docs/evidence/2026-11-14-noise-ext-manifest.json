@@ -1,0 +1,63 @@
+{
+  "artifacts": {
+    "private_t300_20_30.npz": "22656e1f63a0047d3dbe32f7833eea8e303988414e5942dec1ba5a1d9ed1ef19",
+    "private_t400_20_30.npz": "fc181285e4051c22654e54a83ba80cfcf525572131b8f307e96b5a70422559e6",
+    "private_t400_30_20.npz": "0527fde834414677f8a241d7ecaaa604a0767ce8a1c761e146b2fe48d118dee4",
+    "private_t50_20_30.npz": "02d597aac169eaea3653993d6ca3f4b3b117a9132aab20d8ced3d645c7553c77",
+    "private_t50_30_20.npz": "318a47ebbf78ec4ac5ad54f1e81add3593106b1750b47946e271b7d420ab61db",
+    "results.json": "459391e8d5afa20fe5fc0f1e14bbdd006d1dde25cbd672f0d0f459b84331c604",
+    "source_snapshot.zip": "89075f82af4f54237add157a34a26ad5d08dc98bd9e728590e45bbc7c695ad4c"
+  },
+  "checkpoint_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+  "code_revision": "aef8c568f2f6fe11253c82153fec7868a29d4bc8",
+  "completed_at": "2026-11-14T04:04:38.008551+00:00",
+  "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "evaluation_id": "noise-ext-full-20261114T034843Z",
+  "gpu": "Tesla T4",
+  "held_out_test_used": false,
+  "index_sha256": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+  "method": "ddim20_30_noise_sweep_extension_t50_t400",
+  "mode": "full",
+  "model_repo_revision": "de97d764ef360742cb181346afbb9f0da59bc218",
+  "points": [
+    "t300_20_30",
+    "t50_20_30",
+    "t50_30_20",
+    "t400_20_30",
+    "t400_30_20"
+  ],
+  "progress": {
+    "completed_points": [
+      "t300_20_30",
+      "t50_20_30",
+      "t50_30_20",
+      "t400_20_30",
+      "t400_30_20"
+    ],
+    "control_replay": {
+      "max_abs_errors": {
+        "autoddpm_l1": 0.0,
+        "autoddpm_lpips": 0.0,
+        "autoddpm_lpips_residual": 0.0,
+        "brightness": 0.0,
+        "ddpm_l1": 0.0,
+        "finals": 0.0,
+        "initial_lpips_only": 0.0,
+        "initial_product": 0.0,
+        "initials": 0.0,
+        "naive_stitch_l1": 0.0
+      },
+      "threshold_abs_error": 0.0
+    }
+  },
+  "reference_run": "autoddpm-ddim2030-full83-t4-20261106T074200Z",
+  "source_snapshot_sha256": "89075f82af4f54237add157a34a26ad5d08dc98bd9e728590e45bbc7c695ad4c",
+  "split": "validation",
+  "started_at": "2026-11-14T03:49:02.056674+00:00",
+  "status": "completed",
+  "total_seconds": 934.045463087,
+  "training_performed": false,
+  "validation_partition_sha256": "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184",
+  "working_tree_dirty": false
+}

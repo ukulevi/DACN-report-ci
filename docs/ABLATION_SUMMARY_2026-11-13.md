@@ -171,8 +171,30 @@ Reading, consistent with the under-/over-noising hypothesis:
   L1 is zero outside the mask by construction, so LPIPS contrast rather than
   final L1 is the detection-relevant quantity.
 
+### Complete noise curve with t50 and t400 (added 14 Nov, AF-05)
+
+t50 and t400 were added with a producer-equivalent runner whose t300 control
+replays every producer array exactly (run `noise-ext-full-20261114T034843Z`,
+[evidence](evidence/2026-11-14-noise-ext-results.json)). DDIM20+30, Final LPIPS:
+
+| Phase-1 t | Initial normal L1 | Initial lesion/normal L1 | Final lesion/normal LPIPS | Mask lesion recall | Normal foreground masked | Cal. AP | Holdout AP | Holdout Dice | Image AUROC | Delta AP vs t300 [95% CI] | Source |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 50 | 0.061 | 0.91 | 2.06 | 0.806 | 0.509 | 0.2040 | 0.1912 | 0.2438 | 0.8333 | [-0.2640, -0.0114] | 14 Nov run |
+| 100 | 0.084 | 0.96 | 2.08 | 0.828 | 0.506 | 0.2646 | 0.2277 | 0.2778 | 0.8553 | [-0.1976, +0.0009] | 09 Nov producer |
+| 200 | 0.114 | 1.07 | 2.11 | 0.817 | 0.464 | 0.3067 | 0.2914 | 0.3472 | 0.8904 | [-0.0796, +0.0223] | 09 Nov producer |
+| **300** | 0.137 | 1.20 | 2.07 | 0.814 | 0.448 | 0.3130 | 0.3123 | 0.3712 | 0.9145 | – (reference) | 14 Nov run |
+| 400 | 0.159 | 1.39 | 2.02 | 0.800 | 0.430 | 0.3060 | 0.3479 | 0.3920 | 0.9035 | [-0.0013, +0.0544] | 14 Nov run |
+| 500 | 0.183 | 1.62 | 2.00 | 0.779 | 0.414 | 0.3202 | 0.3211 | 0.3734 | 0.8640 | [-0.1028, +0.0660] | 09 Nov producer |
+| 800 | 0.329 | 1.48 | 1.73 | 0.621 | 0.291 | 0.1297 | 0.1861 | 0.2661 | 0.7039 | [-0.2380, -0.0279] | 09 Nov producer |
+
+The curve is an inverted U. Too little noise (t50, t100) leaves the lesion in
+the initial reconstruction; too much (t800) destroys normal-tissue fidelity.
+t200–t500 form a plateau: t400 has the highest holdout AP (0.3479) but a lower
+calibration AP and image ROC-AUC than t300, and its interval touches zero.
+t300 is kept; the 30/20 split gives the same picture.
+
 **Not yet measured:** phase-2 start other than t50; total DDIM budget other
-than 50 calls; t50 and t400 at phase 1; more than one sampling seed. Mask
+than 50 calls; more than one sampling seed. Mask
 percentile/dilation sensitivity is in Section 1.
 
 ## 3. Alternative scores on the same Final reconstruction — validation only
@@ -201,8 +223,29 @@ PraNet-style and CGFF as negative or neutral results.
 
 Fixed 50/50 calibration-CDF fusion of LPIPS and residual on the *initial*
 DDIM20 reconstruction gave holdout AP 0.1531 vs raw initial LPIPS 0.1579
-([DDIM20 score fusion](DDIM20_SCORE_FUSION_VALIDATION.md)). Weighted fusion on the Final
-reconstruction has not been measured.
+([DDIM20 score fusion](DDIM20_SCORE_FUSION_VALIDATION.md)).
+
+### Weighted LPIPS + residual fusion on the Final reconstruction (added 14 Nov, AF-03)
+
+Hypothesis fixed before running: additive fusion in a common rank scale avoids
+the suppression of the LPIPS × residual product, so a small residual weight
+keeps or raises AP. Scores mapped by midrank CDFs fitted on normal calibration
+pixels; fused = (1 − w)·CDF(LPIPS) + w·CDF(L1). Run
+`final-fusion-full-20261114T034226Z`, [evidence](evidence/2026-11-14-final-fusion-results.json),
+paired bootstrap vs raw LPIPS (999 valid replicates).
+
+| Residual weight | Cal. AP | Holdout AP | Holdout Dice | Image AUROC | Delta AP [95% CI] |
+|---:|---:|---:|---:|---:|---|
+| raw LPIPS (reference) | 0.3130 | 0.3123 | 0.3712 | 0.9145 | – |
+| 0 (CDF only) | 0.3130 | 0.3123 | 0.3712 | 0.9145 | [−0.0001, +0.0000] |
+| 0.25 | 0.3155 | 0.2525 | 0.3514 | 0.9232 | [−0.1691, +0.0039] |
+| 0.5 | 0.2721 | 0.2143 | 0.2817 | 0.9189 | [−0.2463, −0.0032] |
+| 0.75 | 0.2081 | 0.1701 | 0.2163 | 0.9232 | [−0.3196, −0.0159] |
+| 1 (L1 only) | 0.1138 | 0.0996 | 0.2001 | 0.4627 | [−0.3987, −0.0425] |
+
+Not supported for pixel AP: no weight raises holdout AP, and w ≥ 0.5 lowers it
+beyond bootstrap uncertainty. A small residual weight slightly raises image
+ROC-AUC. Raw Final LPIPS remains the reference score.
 
 ## 4. Learned non-diffusion baselines — validation holdout only
 
@@ -225,10 +268,10 @@ results. No ConvAE/ConvVAE test evaluation exists.
    the LPIPS-only mask and the test-set rows.
 2. Noise level → reconstruction quality → detection: done descriptively from
    the cached per-t arrays (13 Nov, Section 2); no intervals for these aggregates.
-3. Validation-only completion of the sweep: phase-2 start, total DDIM budget,
-   t50/t400 and extra sampling seeds. Mask-rule ablation done (13 Nov,
-   Section 1); weighted LPIPS+residual fusion on the Final reconstruction
-   (AF-03) not yet run.
+3. Validation-only completion of the sweep: phase-2 start, total DDIM budget
+   and extra sampling seeds (t50/t400 done 14 Nov). Mask-rule ablation done (13 Nov,
+   Section 1); weighted LPIPS+residual fusion on the Final reconstruction done
+   (14 Nov, Section 3).
 4. No further test runs until a single configuration is frozen from
    validation; report the three post-freeze test uses as exploratory.
 5. Source for the 11–12 November runs is only in private source snapshots;

@@ -3632,3 +3632,95 @@ Observations (one seed, repeatedly inspected holdout, descriptive):
   highest for the control (0.9145), while several tighter rules look better on
   the holdout half; this disagreement is again within bootstrap uncertainty.
 - No rule is adopted. A calibration-AP selection rule would keep p95/d3.
+
+## 2026-11-14 — Weighted LPIPS + residual fusion on the Final reconstruction (AF-03)
+
+User-requested CPU analysis in Workspace `tanh1c` (Secret `huggingface`, value not
+inspected), code `625d017` clean (`--analysis fusion` in
+`dacn.cloud.modal_sweep_bootstrap`). Hypothesis fixed in
+`dacn.evaluation.final_fusion` before running: additive fusion in a common rank
+scale avoids the suppression seen with LPIPS × residual, so a small residual
+weight keeps or raises pixel AP and large weights drift toward L1. Each score is
+mapped through a midrank CDF fitted on pooled pixels of the 20 normal calibration
+slices; fused = (1 − w)·CDF(LPIPS) + w·CDF(L1) on the Final reconstruction of
+`autoddpm-ddim2030-full83-t4-20261106T074200Z` (SHA-verified). Max-F1 thresholds
+on 40 calibration images; 43-holdout metrics; paired bootstrap vs raw LPIPS, 999
+valid replicates. Raw LPIPS replays the producer holdout AP (abs error 0.0). No
+new model calls, no selection, no test access.
+
+- `final-fusion-smoke-20261114T034025Z` completed/uploaded, 20 replicates,
+  44.80 s, [Hub 1455267c](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/1455267cb666b245b3325db89d83968f7d6b6f8c/evaluations/final-fusion-smoke-20261114T034025Z).
+- `final-fusion-full-20261114T034226Z` completed/uploaded, 1000 replicates,
+  115.91 s, [Modal](https://modal.com/apps/tanh1c/main/ap-OFqa1oNtdXhx8LYeWKjqRK),
+  [Hub 4d1c554b](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/4d1c554b78ee3faa83e0e76e5487a917627cfff0/evaluations/final-fusion-full-20261114T034226Z),
+  results SHA-256 `f7bccb97f41d7ad0c3f7fc4b20b834cd68f737258ab20a65568ecb5c74713fd2`,
+  [evidence](evidence/2026-11-14-final-fusion-results.json),
+  [manifest](evidence/2026-11-14-final-fusion-manifest.json).
+
+| Arm | Residual weight | Cal. AP | Holdout AP | Holdout AUROC | Holdout Dice | Normal FPR | Image AUROC | Delta AP [95% CI] | Delta Dice [95% CI] |
+|---|---:|---:|---:|---:|---:|---:|---:|---|---|
+| lpips_l1_cdf_w000 | 0 | 0.3130 | 0.3123 | 0.9490 | 0.3712 | 0.0058 | 0.9145 | [-0.0001, +0.0000] | [-0.0000, +0.0000] |
+| lpips_l1_cdf_w025 | 0.25 | 0.3155 | 0.2525 | 0.9409 | 0.3514 | 0.0072 | 0.9232 | [-0.1691, +0.0039] | [-0.0453, +0.0124] |
+| lpips_l1_cdf_w050 | 0.5 | 0.2721 | 0.2143 | 0.9360 | 0.2817 | 0.0115 | 0.9189 | [-0.2463, -0.0032] | [-0.1599, +0.0045] |
+| lpips_l1_cdf_w075 | 0.75 | 0.2081 | 0.1701 | 0.9271 | 0.2163 | 0.0204 | 0.9232 | [-0.3196, -0.0159] | [-0.2638, -0.0154] |
+| lpips_l1_cdf_w100 | 1 | 0.1138 | 0.0996 | 0.8193 | 0.2001 | 0.0691 | 0.4627 | [-0.3987, -0.0425] | [-0.3075, -0.0257] |
+
+The CDF transform alone does not change the result (w = 0 equals raw LPIPS).
+Adding the residual does not raise holdout pixel AP: w = 0.25 is lower on the
+holdout (0.2525; interval touches zero) although slightly higher on calibration
+(0.3155), and w ≥ 0.5 is lower with intervals excluding zero. Image ROC-AUC
+rises slightly with w = 0.25–0.75 (0.919–0.923 vs 0.9145). The hypothesis is not
+supported for pixel AP; raw Final LPIPS remains the reference score.
+
+## 2026-11-14 — Noise sweep extension to t50 and t400 (AF-05, validation)
+
+User-authorized T4 GPU run in Workspace `tanh1c`, code `aef8c56` clean
+(`dacn.cloud.modal_noise_extension`). Producer-equivalent DDIM20+30 runner with
+phase-1 start t ∈ {50, 400} and both 20/30 and 30/20 splits; phase 2 from t50,
+p95/d3 mask refit per point on 20 normal calibration slices, seeds base17/UUID,
+checkpoint `d3e06d20…b946` and LPIPS state `18fed4d1…dffe6` verified. A t300
+20/30 control runs first and must replay the cached producer arrays. Registered
+40/43 partition rebuilt and SHA-verified. No training, selection or test access.
+
+- **`noise-ext-smoke-20261114T034725Z`** completed/uploaded; control and t400
+  20/30 on 2 output images (phase 1 also on the 20 normal calibration slices for
+  the mask threshold), 960 U-Net calls, 38.37 s. Control replay: initials,
+  finals, all eight score maps and the refitted mask threshold max abs error 0.0.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-FzzgWBh4qhND3yhDB9Hg1A),
+  [Hub 2ad06d09](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/2ad06d09eda9c6a5ac5a5556e781acca5f7aa7dc/evaluations/noise-ext-smoke-20261114T034725Z).
+- **`noise-ext-full-20261114T034843Z`** submitted detached after smoke acceptance;
+  completed/uploaded 2026-11-14T04:04:38Z, 934.05 s, 5 points × 83 images,
+  20750 U-Net calls (50 per image per point), peak CUDA allocated 104671232 B.
+  Control t300 20/30 replay over all 83 images: initials, finals, all eight score
+  maps and refitted mask threshold max abs error 0.0.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-9rtrFgMfkBnCnQ1P5fGw77),
+  [Hub acde267e](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/acde267e65af281544dcccb5420ae08caff46424/evaluations/noise-ext-full-20261114T034843Z)
+  (private per-point arrays in the producer format). Results SHA-256
+  `459391e8d5afa20fe5fc0f1e14bbdd006d1dde25cbd672f0d0f459b84331c604`,
+  [evidence](evidence/2026-11-14-noise-ext-results.json),
+  [manifest](evidence/2026-11-14-noise-ext-manifest.json).
+
+Combined Final LPIPS noise curve, DDIM20+30 (quality columns all 83 slices;
+metrics 43-holdout, calibration-fitted thresholds; paired bootstrap seed17 over
+the same 25 groups, 999 valid replicates; t100/200/500/800 from the 13 Nov
+bootstrap/quality runs on the 09 Nov producer arrays):
+
+| Phase-1 t | Initial normal L1 | Initial lesion/normal L1 | Final lesion/normal LPIPS | Mask lesion recall | Normal foreground masked | Cal. AP | Holdout AP | Holdout Dice | Image AUROC | Delta AP vs t300 [95% CI] | Source |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| 50 | 0.061 | 0.91 | 2.06 | 0.806 | 0.509 | 0.2040 | 0.1912 | 0.2438 | 0.8333 | [-0.2640, -0.0114] | 14 Nov run |
+| 100 | 0.084 | 0.96 | 2.08 | 0.828 | 0.506 | 0.2646 | 0.2277 | 0.2778 | 0.8553 | [-0.1976, +0.0009] | 09 Nov producer |
+| 200 | 0.114 | 1.07 | 2.11 | 0.817 | 0.464 | 0.3067 | 0.2914 | 0.3472 | 0.8904 | [-0.0796, +0.0223] | 09 Nov producer |
+| **300** | 0.137 | 1.20 | 2.07 | 0.814 | 0.448 | 0.3130 | 0.3123 | 0.3712 | 0.9145 | – (reference) | 14 Nov run |
+| 400 | 0.159 | 1.39 | 2.02 | 0.800 | 0.430 | 0.3060 | 0.3479 | 0.3920 | 0.9035 | [-0.0013, +0.0544] | 14 Nov run |
+| 500 | 0.183 | 1.62 | 2.00 | 0.779 | 0.414 | 0.3202 | 0.3211 | 0.3734 | 0.8640 | [-0.1028, +0.0660] | 09 Nov producer |
+| 800 | 0.329 | 1.48 | 1.73 | 0.621 | 0.291 | 0.1297 | 0.1861 | 0.2661 | 0.7039 | [-0.2380, -0.0279] | 09 Nov producer |
+
+The 30/20 split agrees: t50 holdout AP 0.1922, delta [-0.2620, -0.0107];
+t400 holdout AP 0.3485, delta [-0.0004, +0.0555].
+
+- t50 behaves like t100: the lesion is reproduced (initial lesion/normal L1
+  0.91) and Final AP is lower than t300 beyond bootstrap uncertainty.
+- t400 has the highest holdout AP observed (0.3479) but its interval touches
+  zero, its calibration AP (0.3060) is below t300 (0.3130) and its image ROC-AUC
+  is lower (0.9035 vs 0.9145). Not adopted; t200–t500 form a plateau that this
+  validation set cannot rank.

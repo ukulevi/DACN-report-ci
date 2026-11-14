@@ -2264,3 +2264,27 @@ tests passed locally with a numba import stub (numba is not installed in the
 local Python); Ruff check/format clean; evidence byte-identical to the Hub and
 free of UUID-like identifiers; summary tables generated from the evidence JSON
 and quoted claims checked by script. No training or test access.
+
+## 2026-11-14 — Final-reconstruction fusion (AF-03) and t50/t400 noise points (AF-05)
+
+- Added `dacn.evaluation.final_fusion` and `--analysis fusion` (CPU): fixed
+  residual weights 0–1 in a midrank-CDF rank scale fitted on normal calibration
+  pixels, hypothesis written in the module before running. Smoke and full runs
+  completed/uploaded in Workspace `tanh1c`; raw LPIPS replays the producer
+  (error 0.0). No weight raises holdout pixel AP; w ≥ 0.5 is lower beyond
+  bootstrap uncertainty. Raw Final LPIPS kept.
+- Added `dacn.evaluation.noise_extension` and the T4 launcher
+  `dacn.cloud.modal_noise_extension`, a producer-equivalent DDIM20+30 runner for
+  any phase-1 start. Its t300 control replayed initials, finals, all eight maps
+  and the refitted mask threshold exactly (smoke and full). Full run added t50
+  and t400 (20/30 and 30/20): t50 lower than t300 beyond uncertainty; t400 highest
+  holdout AP but interval touches zero and calibration AP is lower; t300 kept.
+- RESULT_TRACKING, ABLATION_SUMMARY §2/§3/§5 (combined t50–t800 curve generated
+  from evidence) and advisor rows AF-03/AF-05/AF-06 updated.
+
+Checks: 3 fusion and 3 noise-extension unit tests plus the mask-rule and
+noise-quality tests (14 total) passed with the local numba import stub; the stub
+guard was fixed so the files can share one pytest session. Ruff clean; evidence
+byte-identical to the Hub and UUID-free; tables generated from or checked against
+evidence by script. GPU time this round: about 16 minutes on a T4. No training or
+test access.
