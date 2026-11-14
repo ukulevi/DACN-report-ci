@@ -197,6 +197,41 @@ t300 is kept; the 30/20 split gives the same picture.
 than 50 calls; more than one sampling seed. Mask
 percentile/dilation sensitivity is in Section 1.
 
+### Seeds, DDIM budget, phase-2 start and LPIPS-only mask (added 14 Nov)
+
+Each variant changes one component of the t300 control and was run with the
+producer-equivalent runner (control replay error 0.0; t400 and the 12 Nov
+LPIPS-only mask reproduced). Run `variants-full-20261114T041258Z`,
+[evidence](evidence/2026-11-14-variants-results.json).
+
+| Variant | AF | Cal. AP | Holdout AP | Holdout AUROC | Holdout Dice | Normal FPR | Image AUROC | Mask lesion recall | Normal foreground masked | Delta AP vs control [95% CI] | Delta Dice [95% CI] |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| **Control t300, 20+30, phase 2 t50, seed 17** | – | 0.3130 | 0.3123 | 0.9490 | 0.3712 | 0.0058 | 0.9145 | 0.814 | 0.448 | – | – |
+| t400 (seed 17) | AF-05 | 0.3060 | 0.3479 | 0.9532 | 0.3920 | 0.0069 | 0.9035 | 0.800 | 0.430 | [-0.0013, +0.0544] | [-0.0092, +0.0430] |
+| Seed 18, t300 | AF-11 | 0.3677 | 0.2868 | 0.9434 | 0.3461 | 0.0037 | 0.8640 | 0.820 | 0.477 | [-0.0718, +0.0230] | [-0.0613, +0.0071] |
+| Seed 19, t300 | AF-11 | 0.3471 | 0.3070 | 0.9415 | 0.3489 | 0.0033 | 0.8904 | 0.798 | 0.465 | [-0.0618, +0.0165] | [-0.0861, +0.0348] |
+| Seed 18, t400 | AF-11 | 0.2944 | 0.3238 | 0.9487 | 0.3728 | 0.0047 | 0.8728 | 0.807 | 0.454 | [-0.0446, +0.0448] | [-0.0345, +0.0175] |
+| Seed 19, t400 | AF-11 | 0.3353 | 0.3340 | 0.9512 | 0.3870 | 0.0040 | 0.9013 | 0.789 | 0.444 | [-0.0349, +0.0503] | [-0.0132, +0.0518] |
+| DDIM budget 10+15 | AF-07 | 0.3155 | 0.2770 | 0.9454 | 0.3550 | 0.0058 | 0.8947 | 0.773 | 0.453 | [-0.0534, +0.0178] | [-0.0367, +0.0116] |
+| DDIM budget 40+50 | AF-07 | 0.3078 | 0.3328 | 0.9504 | 0.3833 | 0.0055 | 0.9013 | 0.837 | 0.447 | [-0.0078, +0.0344] | [-0.0016, +0.0222] |
+| Phase-2 start t30 | AF-07 | 0.3030 | 0.3034 | 0.9473 | 0.3660 | 0.0042 | 0.8991 | 0.814 | 0.448 | [-0.0250, +0.0018] | [-0.0162, +0.0089] |
+| Phase-2 start t100 | AF-07 | 0.3170 | 0.3182 | 0.9515 | 0.3765 | 0.0081 | 0.9013 | 0.814 | 0.448 | [-0.0158, +0.0216] | [-0.0163, +0.0167] |
+| LPIPS-only pseudo-mask | AF-02 | 0.2698 | 0.2873 | 0.9332 | 0.3504 | 0.0062 | 0.8662 | 0.690 | 0.242 | [-0.0576, +0.0028] | [-0.0576, -0.0027] |
+
+Sampling-seed summary (Final LPIPS pixel AP; seeds 17/18/19):
+
+| Partition | t300 | t400 | t400 − t300 per seed |
+|---|---|---|---|
+| 43-image holdout | 0.3123 / 0.2868 / 0.3070 (mean 0.3021, SD 0.0135) | 0.3479 / 0.3238 / 0.3340 (mean 0.3353, SD 0.0121) | +0.0356 / +0.0370 / +0.0270 |
+| 40-image calibration | 0.3130 / 0.3677 / 0.3471 (mean 0.3426, SD 0.0277) | 0.3060 / 0.2944 / 0.3353 (mean 0.3119, SD 0.0211) | −0.0070 / −0.0733 / −0.0118 |
+
+Sampling seeds alone move AP by about one to three hundredths, the same size as
+the differences between plateau configurations. t400 wins on the holdout and
+loses on calibration for all three seeds, so no noise level in t200–t500 can be
+preferred on this validation set. DDIM budget and phase-2 start do not change AP
+or Dice beyond uncertainty. The LPIPS-only mask lowers Dice reliably, which
+supports keeping the residual term inside the mask.
+
 ## 3. Alternative scores on the same Final reconstruction — validation only
 
 All rows reuse cached Final LPIPS maps or layers; zero new diffusion calls.
@@ -262,14 +297,14 @@ results. No ConvAE/ConvVAE test evaluation exists.
 
 ## 5. Open items for the advisor's priorities
 
-1. Patient-group paired bootstrap: done for the Section 2 sweep and its t300
-   controls on validation (13 Nov), and for Final/Initial/naive-stitch/
-   brightness on 6 Nov. Still missing for the Section 3 alternative scores,
-   the LPIPS-only mask and the test-set rows.
+1. Patient-group paired bootstrap: done on validation for the sweep, its t300
+   controls, mask rules, fusion, seeds/budget/phase-2 variants and the LPIPS-only
+   mask (6–14 Nov). Test-set intervals for the frozen four arms: run started
+   14 Nov. Not done for the Section 3 alternative scores (negative results).
 2. Noise level → reconstruction quality → detection: done descriptively from
    the cached per-t arrays (13 Nov, Section 2); no intervals for these aggregates.
-3. Validation-only completion of the sweep: phase-2 start, total DDIM budget
-   and extra sampling seeds (t50/t400 done 14 Nov). Mask-rule ablation done (13 Nov,
+3. Sweep completion done 14 Nov: t50/t400, DDIM budget, phase-2 start and
+   sampling seeds 18/19 at t300 and t400. Mask-rule ablation done (13 Nov,
    Section 1); weighted LPIPS+residual fusion on the Final reconstruction done
    (14 Nov, Section 3).
 4. No further test runs until a single configuration is frozen from

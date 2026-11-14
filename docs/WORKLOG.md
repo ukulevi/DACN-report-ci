@@ -2288,3 +2288,25 @@ guard was fixed so the files can share one pytest session. Ruff clean; evidence
 byte-identical to the Hub and UUID-free; tables generated from or checked against
 evidence by script. GPU time this round: about 16 minutes on a T4. No training or
 test access.
+
+## 2026-11-14 — Validation variants (AF-02/AF-07/AF-11) and frozen test CI job (AF-09/AF-10)
+
+- Generalized the producer-equivalent runner (optional phase-2 start, seed base,
+  mask score; defaults unchanged) and added a `variants` suite. Full T4 run
+  (`variants-full-20261114T041258Z`, 33 min) replayed the control exactly and
+  reproduced t400 and the 12 Nov LPIPS-only mask. Findings: seed SD ≈0.013
+  holdout AP; t400 beats t300 on holdout but loses on calibration for all three
+  seeds; DDIM budget and phase-2 start show no reliable change; LPIPS-only mask
+  lowers Dice beyond uncertainty. Budget variant 40+60 was replaced by 40+50
+  before running because phase 2 from t50 allows at most 50 steps.
+- After the user chose to recompute the frozen test protocol for uncertainty,
+  added `dacn.evaluation.frozen_test_ci` and `dacn.cloud.modal_test_ci`: the
+  unchanged `FrozenDDIMAdapter`, frozen thresholds (unit-tested against the
+  frozen config files), validation-only smoke (replay error 0.0, no test
+  access), resumable test chunks kept on the Volume, and a gate requiring the
+  published test metrics before any interval is reported. Full test run started.
+- RESULT_TRACKING, ABLATION_SUMMARY §2/§5 and advisor rows AF-02/AF-07/AF-11
+  updated; tables generated from evidence by script.
+
+Checks: noise-extension (3) and frozen-test-CI (4) unit tests passed, Ruff
+clean, evidence byte-identical to the Hub and UUID-free. No training.

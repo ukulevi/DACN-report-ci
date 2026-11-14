@@ -3743,8 +3743,56 @@ selection or test access; variant private outputs keep score maps and masks only
   replay max abs error 0.0 across initials, finals, eight maps and threshold.
   [Modal](https://modal.com/apps/tanh1c/main/ap-tfjFLNQ4Vhpz8eVM94Gkc4),
   [Hub 12cbd91b](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/12cbd91b1786dcc3ea5672674bb9a286c3bc27d3/evaluations/variants-smoke-20261114T041108Z).
-- **`variants-full-20261114T041258Z`** submitted detached after smoke acceptance; 11 variants × 83
-  images. Status: running.
+- **`variants-full-20261114T041258Z`** submitted detached after smoke acceptance;
+  completed/uploaded 2026-11-14T04:46:49Z, 1993.81 s, 11 variants × 83 images,
+  46895 U-Net calls. Replays: control max abs error 0.0 (all arrays and
+  threshold); t400 seed17 holdout AP equals `noise-ext-full-20261114T034843Z`
+  (error 0.0); LPIPS-only mask threshold equals the 12 Nov teammate run (error 0.0)
+  and holdout AP differs by 1.6e-8.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-qIFksHtMfp4l03v4VCuUBD),
+  [Hub c699b85d](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/c699b85d3025fb559e5fb68e9a8669c6f94a0b86/evaluations/variants-full-20261114T041258Z)
+  (private score maps and masks only). Results SHA-256
+  `305b3a36c5ff266c5a7f8f94e8efe27ba51154b06e0c1a1f812fc0ba89fcd204`,
+  [evidence](evidence/2026-11-14-variants-results.json),
+  [manifest](evidence/2026-11-14-variants-manifest.json).
+
+Final LPIPS, calibration-fitted thresholds, 43-holdout metrics (pixel global
+micro), mask columns over all 83 slices; paired bootstrap vs the control, 25
+groups, 999 valid replicates, seed17:
+
+| Variant | AF | Cal. AP | Holdout AP | Holdout AUROC | Holdout Dice | Normal FPR | Image AUROC | Mask lesion recall | Normal foreground masked | Delta AP vs control [95% CI] | Delta Dice [95% CI] |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| **Control t300, 20+30, phase 2 t50, seed 17** | – | 0.3130 | 0.3123 | 0.9490 | 0.3712 | 0.0058 | 0.9145 | 0.814 | 0.448 | – | – |
+| t400 (seed 17) | AF-05 | 0.3060 | 0.3479 | 0.9532 | 0.3920 | 0.0069 | 0.9035 | 0.800 | 0.430 | [-0.0013, +0.0544] | [-0.0092, +0.0430] |
+| Seed 18, t300 | AF-11 | 0.3677 | 0.2868 | 0.9434 | 0.3461 | 0.0037 | 0.8640 | 0.820 | 0.477 | [-0.0718, +0.0230] | [-0.0613, +0.0071] |
+| Seed 19, t300 | AF-11 | 0.3471 | 0.3070 | 0.9415 | 0.3489 | 0.0033 | 0.8904 | 0.798 | 0.465 | [-0.0618, +0.0165] | [-0.0861, +0.0348] |
+| Seed 18, t400 | AF-11 | 0.2944 | 0.3238 | 0.9487 | 0.3728 | 0.0047 | 0.8728 | 0.807 | 0.454 | [-0.0446, +0.0448] | [-0.0345, +0.0175] |
+| Seed 19, t400 | AF-11 | 0.3353 | 0.3340 | 0.9512 | 0.3870 | 0.0040 | 0.9013 | 0.789 | 0.444 | [-0.0349, +0.0503] | [-0.0132, +0.0518] |
+| DDIM budget 10+15 | AF-07 | 0.3155 | 0.2770 | 0.9454 | 0.3550 | 0.0058 | 0.8947 | 0.773 | 0.453 | [-0.0534, +0.0178] | [-0.0367, +0.0116] |
+| DDIM budget 40+50 | AF-07 | 0.3078 | 0.3328 | 0.9504 | 0.3833 | 0.0055 | 0.9013 | 0.837 | 0.447 | [-0.0078, +0.0344] | [-0.0016, +0.0222] |
+| Phase-2 start t30 | AF-07 | 0.3030 | 0.3034 | 0.9473 | 0.3660 | 0.0042 | 0.8991 | 0.814 | 0.448 | [-0.0250, +0.0018] | [-0.0162, +0.0089] |
+| Phase-2 start t100 | AF-07 | 0.3170 | 0.3182 | 0.9515 | 0.3765 | 0.0081 | 0.9013 | 0.814 | 0.448 | [-0.0158, +0.0216] | [-0.0163, +0.0167] |
+| LPIPS-only pseudo-mask | AF-02 | 0.2698 | 0.2873 | 0.9332 | 0.3504 | 0.0062 | 0.8662 | 0.690 | 0.242 | [-0.0576, +0.0028] | [-0.0576, -0.0027] |
+
+Sampling-seed summary (Final LPIPS pixel AP; seeds 17/18/19):
+
+| Partition | t300 | t400 | t400 − t300 per seed |
+|---|---|---|---|
+| 43-image holdout | 0.3123 / 0.2868 / 0.3070 (mean 0.3021, SD 0.0135) | 0.3479 / 0.3238 / 0.3340 (mean 0.3353, SD 0.0121) | +0.0356 / +0.0370 / +0.0270 |
+| 40-image calibration | 0.3130 / 0.3677 / 0.3471 (mean 0.3426, SD 0.0277) | 0.3060 / 0.2944 / 0.3353 (mean 0.3119, SD 0.0211) | −0.0070 / −0.0733 / −0.0118 |
+
+- **Seeds (AF-11):** sampling-seed variation alone moves holdout AP by about
+  ±0.013 (SD) and calibration AP by about ±0.028. t400 beats t300 on the holdout
+  for every seed but loses on the calibration half for every seed, so the t400
+  advantage is tied to the partition, not to sampling noise. t300 is kept.
+- **DDIM budget and phase-2 start (AF-07):** 10+15, 40+50, phase-2 t30 and t100
+  all have delta intervals that include zero. 40+50 costs about 1.8× the time
+  for no reliable gain; 10+15 halves the time with a non-significant drop.
+- **LPIPS-only pseudo-mask (AF-02):** lower holdout Dice than the LPIPS ×
+  residual mask with an interval excluding zero ([-0.0576, -0.0027]); AP
+  interval touches zero. Its mask covers less lesion (0.690 vs 0.814) and less
+  normal tissue (0.242 vs 0.448). Together with the 12 Nov test run (AP 0.2900 vs
+  0.3182), the residual term in the mask is the component with consistent support.
 
 ## 2026-11-14 — Frozen four-arm test recomputation for patient-group CIs (AF-09/AF-10)
 

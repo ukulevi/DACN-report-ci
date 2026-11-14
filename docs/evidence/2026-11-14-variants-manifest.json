@@ -1,0 +1,82 @@
+{
+  "artifacts": {
+    "private_budget_t300_10_15_maps.npz": "e090af17a61720e8c63ea4f58db562d52ad833b5ce4e46f1e95bfd27486ab46d",
+    "private_budget_t300_40_50_maps.npz": "e6b3d1536a43c13735c4001cf7d7824088cd9b7ceb2b03ac4bc442b68883456c",
+    "private_control_t300_20_30_maps.npz": "eb9d56805fb4cadddc354dd700b803cfa4f69fae9ea361b7de1e96ff194cdae3",
+    "private_lpips_mask_t300_20_30_maps.npz": "d534879e066eeba434e2428aaaa8f918593d7bd463ae95aa4a570d41e067982f",
+    "private_phase2_t100_t300_20_30_maps.npz": "e1f9f7712e79f8676939a24edbcac2bdbd73c0e75d1bf57701dab5486d16cee0",
+    "private_phase2_t30_t300_20_30_maps.npz": "83e246960d300f8dc0cde41a243c3d9888e4b04ac0678f86cd0b553afc4a6d0a",
+    "private_seed18_t300_20_30_maps.npz": "c980d9c3b517f3e1dbab978c0e969b13e32ba2cabe84e3df703afbdfac96e133",
+    "private_seed18_t400_20_30_maps.npz": "bea023f38e660aee9f670f96aedad73a4843f2ed75bb93b992b6c8970b7d7e2a",
+    "private_seed19_t300_20_30_maps.npz": "ea40d38506f2ce4366ec56e15ca1406c76c11d96d3bee0384fda7d52c9f3e16c",
+    "private_seed19_t400_20_30_maps.npz": "3c93655977bddd8c214fe4df6c3194d41928c5d2dfb39c3d6eee7edfe0a574db",
+    "private_t400_20_30_maps.npz": "0bcf42904c000ccb7e6ee48df9b33ec25db1cc6ae0f95c959c53d1c46c55fc4c",
+    "results.json": "305b3a36c5ff266c5a7f8f94e8efe27ba51154b06e0c1a1f812fc0ba89fcd204",
+    "source_snapshot.zip": "7a4c8c8f75e52e176277179ef3ff5306a1ffd67851f83fa857c2c668788ee552"
+  },
+  "checkpoint_sha256": "d3e06d2082e18234899b201718abd59078c8a800d66da3cc5d8b9e0d9ca9b946",
+  "code_revision": "f888e40d3b0e6281ddff49e7ca8bc5a9036973f5",
+  "completed_at": "2026-11-14T04:46:49.299436+00:00",
+  "dataset_repo_id": "dacn-bmad-team/bmad-flair-patient-disjoint-v1",
+  "dataset_revision": "350c74f2313e4e73ca65e7ffc6e9dcf74040b3b7",
+  "evaluation_id": "variants-full-20261114T041258Z",
+  "gpu": "Tesla T4",
+  "held_out_test_used": false,
+  "index_sha256": "57ad2e31df3ed4e625da00efaecd6fddc1e2a132329dfba6e60867caf1802db3",
+  "method": "ddim_validation_variants_seeds_budget_phase2_lpips_mask",
+  "mode": "full",
+  "model_repo_revision": "de97d764ef360742cb181346afbb9f0da59bc218",
+  "points": [
+    "control_t300_20_30",
+    "t400_20_30",
+    "seed18_t300_20_30",
+    "seed19_t300_20_30",
+    "seed18_t400_20_30",
+    "seed19_t400_20_30",
+    "budget_t300_10_15",
+    "budget_t300_40_50",
+    "phase2_t30_t300_20_30",
+    "phase2_t100_t300_20_30",
+    "lpips_mask_t300_20_30"
+  ],
+  "progress": {
+    "completed_points": [
+      "control_t300_20_30",
+      "t400_20_30",
+      "seed18_t300_20_30",
+      "seed19_t300_20_30",
+      "seed18_t400_20_30",
+      "seed19_t400_20_30",
+      "budget_t300_10_15",
+      "budget_t300_40_50",
+      "phase2_t30_t300_20_30",
+      "phase2_t100_t300_20_30",
+      "lpips_mask_t300_20_30"
+    ],
+    "control_replay": {
+      "max_abs_errors": {
+        "autoddpm_l1": 0.0,
+        "autoddpm_lpips": 0.0,
+        "autoddpm_lpips_residual": 0.0,
+        "brightness": 0.0,
+        "ddpm_l1": 0.0,
+        "finals": 0.0,
+        "initial_lpips_only": 0.0,
+        "initial_product": 0.0,
+        "initials": 0.0,
+        "naive_stitch_l1": 0.0
+      },
+      "threshold_abs_error": 0.0
+    }
+  },
+  "reference_run": "autoddpm-ddim2030-full83-t4-20261106T074200Z",
+  "source_snapshot_sha256": "7a4c8c8f75e52e176277179ef3ff5306a1ffd67851f83fa857c2c668788ee552",
+  "split": "validation",
+  "started_at": "2026-11-14T04:13:33.481288+00:00",
+  "status": "completed",
+  "suite": "variants",
+  "total_seconds": 1993.809441901,
+  "training_performed": false,
+  "validation_partition_sha256": "5e8a8ce1ad3a952293a6798ae72ef342aa23676e5559fd468acb76422a27d184",
+  "working_tree_dirty": false
+}
