@@ -468,8 +468,10 @@ def _diagnose(token, mode, groups, holdout, dataset):
     """Error analysis, pooled-83 contrasts and reconstruction ensembles (validation)."""
     import numpy as np
 
-    from dacn.evaluation import diagnostics
-    from dacn.evaluation.diagnostics import (
+    from dacn.evaluation import hybrid_diagnostics
+    from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.hybrid_diagnostics import (
         ENSEMBLE_NOISE_LEVELS,
         contrast_status,
         ensemble_improves,
@@ -477,8 +479,6 @@ def _diagnose(token, mode, groups, holdout, dataset):
         false_positive_breakdown,
         lesion_detection,
     )
-    from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
-    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
     from dacn.evaluation.postprocess_hybrid import HYBRID_REPLAY, SEED_VARIANTS
     from dacn.evaluation.score_refinement import normal_cdf_gate, slice_rank_gate
     from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN, SWEEP_RUNS
@@ -567,7 +567,7 @@ def _diagnose(token, mode, groups, holdout, dataset):
         }
     return {
         "method": METHODS["diagnose"],
-        "hypotheses_and_rules": diagnostics.__doc__,
+        "hypotheses_and_rules": hybrid_diagnostics.__doc__,
         "reference_run": REFERENCE_RUN,
         "producer_artifacts": {runs[t][0]: runs[t][3] for t in sorted(runs)},
         "variant_artifacts": {"t400": t400_sha, **{s: SEED_VARIANTS[s][1] for s in (18, 19)}},

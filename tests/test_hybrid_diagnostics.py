@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from dacn.evaluation import diagnostics as dg
+from dacn.evaluation import hybrid_diagnostics as dg
 
 
 def test_lesion_detection_bins_by_size_and_counts_touching_hits():
