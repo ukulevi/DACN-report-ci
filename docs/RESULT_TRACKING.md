@@ -3724,3 +3724,45 @@ t400 holdout AP 0.3485, delta [-0.0004, +0.0555].
   zero, its calibration AP (0.3060) is below t300 (0.3130) and its image ROC-AUC
   is lower (0.9035 vs 0.9145). Not adopted; t200–t500 form a plateau that this
   validation set cannot rank.
+
+## 2026-11-14 — Validation variants: seeds, DDIM budget, phase-2 start, LPIPS-only mask
+
+User-authorized T4 GPU run in Workspace `tanh1c`, code `f888e40` clean
+(`--suite variants` in `dacn.cloud.modal_noise_extension`). Each variant changes
+one component of the producer t300 DDIM20+30 control: sampling seed base 18/19 at
+t300 and t400 (AF-11), DDIM budget 10+15 and 40+50 (AF-07; 40+60 is impossible
+because phase 2 from t50 has at most 50 steps), phase-2 start t30/t100 (AF-07) and
+an LPIPS-only pseudo-mask (AF-02, reproducing the 12 Nov teammate method on
+validation). Mask threshold refitted per variant with the unchanged p95/d3 rule
+on 20 normal calibration slices. The control must replay the producer; t400 seed17
+and the LPIPS-only mask are compared with published holdout AP. No training,
+selection or test access; variant private outputs keep score maps and masks only.
+
+- **`variants-smoke-20261114T041108Z`** completed/uploaded; control, LPIPS-only
+  mask and budget 40+50 on 2 output images, 1900 U-Net calls, 67.62 s; control
+  replay max abs error 0.0 across initials, finals, eight maps and threshold.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-tfjFLNQ4Vhpz8eVM94Gkc4),
+  [Hub 12cbd91b](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/12cbd91b1786dcc3ea5672674bb9a286c3bc27d3/evaluations/variants-smoke-20261114T041108Z).
+- **`variants-full-20261114T041258Z`** submitted detached after smoke acceptance; 11 variants × 83
+  images. Status: running.
+
+## 2026-11-14 — Frozen four-arm test recomputation for patient-group CIs (AF-09/AF-10)
+
+User-authorized after an explicit question about test access (13–14 Nov): the
+frozen 10 Nov four-arm protocol is recomputed on the already inspected test split
+**only to obtain uncertainty**. Unchanged `FrozenDDIMAdapter` (DDIM20 t300 +
+DDIM30 t50, mask threshold 0.13344676792621613, base17/UUID seeds) and score
+thresholds from `configs/final_controls_frozen_20261110.json`; no fitting,
+selection or method change. Intervals are reported only if recomputed pixel AP,
+Dice and image ROC-AUC/AP of all four arms reproduce the published aggregate
+(`final4-test-20261110-b`, Hub `ddc715a7`) within 1e-6. Workspace `tanh1c`,
+Secret `huggingface`, code `e1ff711` clean (`dacn.cloud.modal_test_ci`).
+Private per-slice test maps stay in resumable chunks on this Workspace's Volume;
+only aggregates are uploaded.
+
+- **`test-ci-smoke-20261114T041938Z`** completed/uploaded; two VALIDATION
+  images, no test access; adapter replay of cached Final/Initial/brightness maps
+  max abs error 0.0. [Modal](https://modal.com/apps/tanh1c/main/ap-PfeXoU0PsIqYoRaREQoAhT),
+  [Hub 1ea8b6f8](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/1ea8b6f8eae07efea172e12b7ec07007acdeb789/evaluations/test-ci-smoke-20261114T041938Z).
+- **`test-ci-full-20261114T042202Z`** submitted detached on the 3665-slice test split after smoke
+  acceptance. Status: running.
