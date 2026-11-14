@@ -12,6 +12,7 @@ Analyses:
   quality    reconstruction-quality aggregates per noise level (smoke: reference run)
   fusion     LPIPS + residual rank fusion on the Final reconstruction (AF-03)
   hybrid     brain-mask post-processing and brightness hybrids on Final maps
+  gate       which reconstruction error to gate by brightness (Final vs Initial, L1)
 
     DACN_HF_SECRET=huggingface modal run -m dacn.cloud.modal_sweep_bootstrap \
         --analysis quality --evaluation-id sweep-quality-smoke-UNIQUE \
@@ -46,6 +47,7 @@ METHODS = {
     "quality": "reconstruction_quality_ddim_noise_step_sweep",
     "fusion": "weighted_rank_fusion_final_lpips_residual_t300",
     "hybrid": "brain_mask_postprocess_and_brightness_hybrid_final_lpips_t300",
+    "gate": "brightness_gated_reconstruction_ablation_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -238,29 +240,13 @@ def _fusion(token, mode, groups, holdout, dataset):
     }
 
 
-def _hybrid(token, mode, groups, holdout, dataset):
-    """Brain-mask post-processing and brightness hybrids on the Final maps."""
-    from dacn.evaluation import postprocess_hybrid
+def _evaluate_arms(maps, truth, labels, calibration, holdout, groups, results, mode, references):
+    """Calibration-fitted thresholds, holdout metrics, producer replay and paired CIs."""
     from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
     from dacn.evaluation.group_bootstrap import paired_group_bootstrap
-    from dacn.evaluation.postprocess_hybrid import (
-        BASELINE,
-        REFERENCE,
-        all_arms,
-        brain_mask_coverage,
-        passes_rule,
-    )
-    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+    from dacn.evaluation.postprocess_hybrid import BASELINE, REFERENCE
     from dacn.evaluation.validation import evaluate_maps
 
-    [(_, _, arrays, results, verified)] = list(
-        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
-    )
-    labels, calibration = arrays["labels"], dataset["calibration"]
-    truth = arrays["masks"][:, 8:-8, 8:-8]
-    maps, brain = all_arms(
-        arrays["autoddpm_lpips"], arrays["brightness"], arrays["images"], labels, calibration
-    )
     arms, holdout_maps, thresholds, summary = {}, {}, {}, {}
     for name, values in maps.items():
         fitted = evaluate_maps(
@@ -290,7 +276,6 @@ def _hybrid(token, mode, groups, holdout, dataset):
         )
     if max(replay.values()) > 1e-9:
         raise ValueError("Unprocessed references do not replay the producer holdout metrics")
-    del maps
     pixel = {
         ref: paired_group_bootstrap(
             truth[holdout],
@@ -301,7 +286,7 @@ def _hybrid(token, mode, groups, holdout, dataset):
             replicates=REPLICATES[mode],
             seed=17,
         )
-        for ref in (REFERENCE, BASELINE)
+        for ref in references
     }
     image_values = {name: image_scores(values) for name, values in holdout_maps.items()}
     image = {
@@ -313,8 +298,86 @@ def _hybrid(token, mode, groups, holdout, dataset):
             replicates=REPLICATES[mode],
             seed=17,
         )
-        for ref in (REFERENCE, BASELINE)
+        for ref in references
     }
+    return arms, summary, replay, pixel, image
+
+
+def _gate(token, mode, groups, holdout, dataset):
+    """Ablate the reconstruction gated by brightness (Final vs Initial LPIPS, L1)."""
+    from dacn.evaluation import postprocess_hybrid
+    from dacn.evaluation.postprocess_hybrid import (
+        GATE_KEY_CONTRAST,
+        GATE_REFERENCE,
+        GATE_SOURCES,
+        HYBRID_REPLAY,
+        credits_resampling,
+        gated_arms,
+    )
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    maps = gated_arms(arrays)
+    del arrays
+    arms, summary, replay, pixel, image = _evaluate_arms(
+        maps, truth, labels, calibration, holdout, groups, results, mode, (GATE_REFERENCE,)
+    )
+    held = arms[GATE_REFERENCE]["group_holdout"]
+    hybrid_error = max(
+        abs(held["pixel"]["auprc"] - HYBRID_REPLAY[0]),
+        abs(held["pixel"]["f1"] - HYBRID_REPLAY[1]),
+        abs(held["image"]["auroc"] - HYBRID_REPLAY[2]),
+    )
+    if hybrid_error > 1e-9:
+        raise ValueError("Final LPIPS x brightness does not replay the hybrid run")
+    return {
+        "method": METHODS["gate"],
+        "question_and_rule": postprocess_hybrid.__doc__.split("Arms")[0]
+        + "Gate ablation: see GATE_* in dacn.evaluation.postprocess_hybrid.",
+        "gate_sources": GATE_SOURCES,
+        "reference": GATE_REFERENCE,
+        "key_contrast": GATE_KEY_CONTRAST,
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {REFERENCE_RUN: verified},
+        "producer_replay_abs_error": replay,
+        "hybrid_replay_abs_error": hybrid_error,
+        "credits_resampling": credits_resampling(summary, pixel[GATE_REFERENCE]),
+        "selection": "none; all gates reported; rule fixed before running",
+        "scope": SCOPE,
+        "summary": summary,
+        "arms": arms,
+        "pixel_bootstrap": pixel,
+        "image_bootstrap": image,
+    }
+
+
+def _hybrid(token, mode, groups, holdout, dataset):
+    """Brain-mask post-processing and brightness hybrids on the Final maps."""
+    from dacn.evaluation import postprocess_hybrid
+    from dacn.evaluation.postprocess_hybrid import (
+        BASELINE,
+        REFERENCE,
+        all_arms,
+        brain_mask_coverage,
+        passes_rule,
+    )
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    maps, brain = all_arms(
+        arrays["autoddpm_lpips"], arrays["brightness"], arrays["images"], labels, calibration
+    )
+    arms, summary, replay, pixel, image = _evaluate_arms(
+        maps, truth, labels, calibration, holdout, groups, results, mode, (REFERENCE, BASELINE)
+    )
     candidates = [
         name
         for name in arms
@@ -447,6 +510,8 @@ def run_sweep_analysis_remote(
             report = _fusion(token, mode, groups, holdout, dataset)
         elif analysis == "hybrid":
             report = _hybrid(token, mode, groups, holdout, dataset)
+        elif analysis == "gate":
+            report = _gate(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)

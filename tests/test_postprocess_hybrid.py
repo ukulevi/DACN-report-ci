@@ -63,3 +63,29 @@ def test_coverage_counts_lesion_pixels_inside_brain():
     truth = np.zeros((1, 240, 240), np.uint8)
     truth[0, 0, 118:122] = 1
     assert ph.brain_mask_coverage(brain, truth) == 0.5
+
+
+def test_gated_arms_multiply_each_source_by_the_same_brightness():
+    rng = np.random.default_rng(1)
+    arrays = {key: rng.random((2, 240, 240)) for key in {*ph.GATE_SOURCES.values(), "brightness"}}
+    arms = ph.gated_arms(arrays)
+    assert set(arms) == {ph.REFERENCE, ph.BASELINE} | {f"{n}_x_brightness" for n in ph.GATE_SOURCES}
+    assert ph.GATE_REFERENCE in arms and ph.GATE_KEY_CONTRAST in arms
+    assert np.array_equal(
+        arms["initial_lpips_x_brightness"],
+        arrays["initial_lpips_only"] * arrays["brightness"],
+    )
+
+
+def test_resampling_credit_requires_holdout_and_calibration_agreement():
+    def boot(delta):
+        return {"candidates": {ph.GATE_KEY_CONTRAST: {"delta_ap_ci95": delta}}}
+
+    summary = {
+        ph.GATE_REFERENCE: {"calibration_ap": 0.5},
+        ph.GATE_KEY_CONTRAST: {"calibration_ap": 0.4},
+    }
+    assert ph.credits_resampling(summary, boot([-0.2, -0.05]))
+    assert not ph.credits_resampling(summary, boot([-0.2, 0.01]))
+    summary[ph.GATE_KEY_CONTRAST]["calibration_ap"] = 0.6
+    assert not ph.credits_resampling(summary, boot([-0.2, -0.05]))

@@ -99,6 +99,48 @@ def brain_mask_coverage(brain, truth):
     return float((lesion & brain).sum() / max(lesion.sum(), 1))
 
 
+# Gated-reconstruction ablation (fixed before running, after the hybrid run):
+# Question: is the gain of Final LPIPS x brightness due to the diffusion re-sampling,
+# or would any reconstruction error gated by brightness do as well? Each cached
+# producer map is multiplied by the same brightness map; no post-processing.
+# Credit to the re-sampling requires the Final LPIPS x brightness minus
+# Initial LPIPS x brightness holdout pixel-AP delta CI to exclude 0 in Final's
+# favour, with calibration AP agreeing in sign. Other gates are reported for context.
+GATE_SOURCES = {
+    "final_lpips": "autoddpm_lpips",
+    "initial_lpips": "initial_lpips_only",
+    "final_l1": "autoddpm_l1",
+    "initial_l1": "ddpm_l1",
+    "naive_stitch_l1": "naive_stitch_l1",
+}
+GATE_REFERENCE = "final_lpips_x_brightness"
+GATE_KEY_CONTRAST = "initial_lpips_x_brightness"
+# hybrid-full-20261114T103245Z, lpips_x_brightness__none holdout (pixel AP, Dice, image AUROC).
+HYBRID_REPLAY = (0.6558091692470411, 0.5879735387280586, 0.9320175438596492)
+
+
+def gated_arms(arrays):
+    """Each cached producer map x brightness, plus the two unprocessed references."""
+    brightness = np.asarray(arrays["brightness"], dtype=np.float64)
+    arms = {
+        REFERENCE: np.asarray(arrays["autoddpm_lpips"], dtype=np.float64),
+        BASELINE: brightness,
+    }
+    for name, key in GATE_SOURCES.items():
+        arms[f"{name}_x_brightness"] = np.asarray(arrays[key], dtype=np.float64) * brightness
+    return arms
+
+
+def credits_resampling(summary, pixel_vs_reference):
+    """Pre-registered gate-ablation rule (see GATE_* comment)."""
+    delta = pixel_vs_reference["candidates"][GATE_KEY_CONTRAST]["delta_ap_ci95"]
+    calibration = (
+        summary[GATE_REFERENCE]["calibration_ap"] - summary[GATE_KEY_CONTRAST]["calibration_ap"]
+    )
+    # Deltas are contrast - reference, so the reference wins when the CI is below 0.
+    return bool(delta[1] < 0 and calibration > 0)
+
+
 def passes_rule(name, holdout, pixel_vs_final, pixel_vs_brightness, image_vs_final):
     """The pre-registered candidate rule for one arm (see module docstring)."""
     if name in (REFERENCE, BASELINE):
