@@ -3912,3 +3912,25 @@ development rounds on validation.
   Evidence: `docs/evidence/2026-11-14-hybrid-test-results.json` (sha256 `5bcfdde3…d174`,
   matches manifest), `docs/evidence/2026-11-14-hybrid-test-manifest.json`; byte-identical
   to the Hub, LF, no UUIDs.
+
+## 2026-11-14 — Sampling-seed robustness of Final LPIPS × brightness (validation)
+
+Code `31d89644` (`--analysis seeds`), Modal CPU, Workspace `tanh1c`. Inputs are the
+SHA-checked seed-17/18/19 t300 map files of `variants-full-20261114T041258Z` (Hub
+`c699b85d`) and the producer brightness. No model calls; test unused. Rules were fixed in
+code before running.
+
+- **`seeds-smoke-20261114T120746Z`** completed/uploaded, 20 replicates; replays 0.0.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-TpUukfB0r0Y2xy2eSFOCXW),
+  [Hub f42c0019](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/f42c00193c733e51f7e5ee627613076b86946eba/evaluations/seeds-smoke-20261114T120746Z).
+- **`seeds-full-20261114T120916Z`** completed/uploaded, 1000 replicates (999 valid), 257 s.
+  [Modal](https://modal.com/apps/tanh1c/main/ap-tyt8A6jHCM2nHrmjdpWuon),
+  [Hub 0e892fd7](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/0e892fd7843e35166f4b234dec8832f820430162/evaluations/seeds-full-20261114T120916Z).
+  Producer replay 0.0; seed-17 hybrid replay 0.0. Final LPIPS × brightness holdout AP
+  0.656 / 0.610 / 0.659 (seeds 17/18/19; mean 0.642, SD 0.027). It beats brightness and the
+  same-seed Final LPIPS beyond uncertainty for every seed (`seed_robust: true`). The
+  re-sampling is credited for 3/3 seeds: Initial × brightness 0.530 / 0.482 / 0.529, with
+  CI upper bounds −0.014 / −0.023 / −0.042, and calibration agrees.
+  Evidence: `docs/evidence/2026-11-14-seeds-results.json` (sha256 `05f3ba56…82da`, matches
+  manifest), `docs/evidence/2026-11-14-seeds-manifest.json`; byte-identical to the Hub, LF, no UUIDs.
+

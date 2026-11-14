@@ -2401,3 +2401,17 @@ UUID-free. No training and no fitting on test.
 
 Lesson: run Ruff at CI's resolved version (`uvx ruff@<ci-version>`) before pushing. The
 local Ruff here is older and its defaults differ.
+
+## 2026-11-14 — Sampling-seed robustness of the hybrid (validation)
+
+- Added the `seeds` analysis. It uses the SHA-checked seed 17/18/19 t300 maps from the
+  variants run, gates on the producer and the hybrid run, and fixes its rules in code
+  before running.
+- `seeds-full-20261114T120916Z` (4 min CPU): the hybrid beats brightness and Final for all
+  3 sampling seeds (holdout AP 0.642 ± 0.027). The re-sampling credit holds for 3/3 seeds
+  (modest margins). Training-seed variability is still not measured.
+- ABLATION_SUMMARY §3, RESULT_TRACKING and AF-11 updated; table generated from evidence.
+
+Checks: ruff 0.17.5 check/format clean. postprocess-hybrid tests pass in a CI-equivalent
+venv (10) and locally with the related suites (19). Replays exact. Evidence byte-identical
+to the Hub, LF, UUID-free. No test access.

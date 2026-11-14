@@ -443,6 +443,37 @@ Reading:
   inspected before. The gate ablation for the re-sampling contribution
   (Initial vs Final LPIPS × brightness) exists on validation only.
 
+### Sampling-seed robustness of Final LPIPS × brightness (added 14 Nov, validation)
+
+`seeds-full-20261114T120916Z` (code `31d89644`, Modal CPU, 4 min) reused the
+SHA-checked t300 DDIM20+30 maps for sampling seed bases 17, 18 and 19 from
+`variants-full-20261114T041258Z`. There were no model calls and no test access; the
+trained model is unchanged. Thresholds were refit on calibration for each seed. Rules
+fixed in code before running (`SEED_*` in `dacn.evaluation.postprocess_hybrid`).
+Replays: the producer references and the seed-17 hybrid are exact (0.0). 999/1000
+valid replicates per seed. Every Δ is the other arm minus the hybrid, so a CI below 0
+means the hybrid wins. Evidence:
+[results](evidence/2026-11-14-seeds-results.json),
+[manifest](evidence/2026-11-14-seeds-manifest.json).
+
+| Seed | Final LPIPS × brightness: cal. AP / holdout AP [95% CI] | Δ brightness − hybrid | Δ Final LPIPS − hybrid (same seed) | Initial LPIPS × brightness: cal. / holdout AP | Δ Initial × brightness − hybrid | Holdout Dice | Holdout pixel AUROC | Image AUROC |
+|---|---|---|---|---|---|---:|---:|---:|
+| 17 | 0.496 / 0.656 [0.365, 0.783] | [-0.426, -0.109] | [-0.449, -0.153] | 0.421 / 0.530 | [-0.256, -0.014] | 0.588 | 0.979 | 0.932 |
+| 18 | 0.531 / 0.610 [0.287, 0.763] | [-0.348, -0.065] | [-0.430, -0.112] | 0.461 / 0.482 | [-0.231, -0.023] | 0.550 | 0.976 | 0.899 |
+| 19 | 0.519 / 0.659 [0.387, 0.777] | [-0.416, -0.124] | [-0.459, -0.156] | 0.460 / 0.529 | [-0.275, -0.042] | 0.599 | 0.976 | 0.910 |
+
+Reading:
+
+- **Seed-robust:** the hybrid beats brightness and Final LPIPS beyond uncertainty for
+  all three sampling seeds. Holdout AP is 0.642 ± 0.027 (mean ± SD), against a seed SD
+  of about 0.013 for Final LPIPS alone. The hybrid varies more in absolute AP but stays
+  far above both references.
+- **The re-sampling credit holds for all three seeds:** Initial × brightness is lower
+  beyond uncertainty and calibration agrees each time. The margins stay modest
+  (CI upper bounds −0.014 to −0.042).
+- This covers sampling-seed variability only. Variability from retraining the model
+  (AF-11) has not been measured.
+
 ## 4. Learned non-diffusion baselines — validation holdout only
 
 | Model / score | Holdout pixel AP | Holdout Dice | Holdout image AUROC |
