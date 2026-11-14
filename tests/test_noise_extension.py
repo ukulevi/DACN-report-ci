@@ -5,6 +5,8 @@ import types
 import numpy as np
 import pytest
 
+pytest.importorskip("torch", reason="Producer pipeline imports require the train extra")
+
 if "numba" not in sys.modules and importlib.util.find_spec("numba") is None:
     # Import-time dependency of the simplex module only; not used by these tests.
     stub = types.ModuleType("numba")
@@ -12,7 +14,7 @@ if "numba" not in sys.modules and importlib.util.find_spec("numba") is None:
     stub.prange = range
     sys.modules["numba"] = stub
 
-from dacn.evaluation import noise_extension as ne  # noqa: E402
+from dacn.evaluation import noise_extension as ne
 
 
 def test_points_keep_budget_and_control_runs_first():

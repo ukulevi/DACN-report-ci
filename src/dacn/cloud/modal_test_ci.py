@@ -80,8 +80,6 @@ def run_test_ci_remote(
     from dacn.evaluation.ddim_ablation import resolve_ablation_config
     from dacn.evaluation.ddim_inpainting import ddim_indices
     from dacn.evaluation.frozen_ddim import FrozenDDIMAdapter
-    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
-    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
     from dacn.evaluation.frozen_test_ci import (
         ARMS,
         FROZEN_THRESHOLDS,
@@ -92,6 +90,8 @@ def run_test_ci_remote(
         image_group_bootstrap,
         image_scores,
     )
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
     from dacn.training.ddpm_partial import build_diffusion, load_ema_checkpoint
 
     if mode not in {"smoke", "full"} or not re.fullmatch(
@@ -321,7 +321,7 @@ def run_test_ci_remote(
                 commit_message=f"Store test CI {evaluation_id}",
             )
             manifest.update(artifact_sync_status="uploaded", hub_commit=commit.oid)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - upload failure is recorded; results stay on the Volume
             manifest.update(artifact_sync_status="failed", artifact_sync_error=type(exc).__name__)
         persist()
         return {"manifest": manifest, "results": report}

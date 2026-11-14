@@ -5,6 +5,8 @@ import types
 import numpy as np
 import pytest
 
+pytest.importorskip("torch", reason="Producer pipeline imports require the train extra")
+
 if "numba" not in sys.modules and importlib.util.find_spec("numba") is None:
     # The producer import chain loads the simplex noise module, which needs numba
     # at import time only; the mask functions under test never call it.
@@ -13,8 +15,8 @@ if "numba" not in sys.modules and importlib.util.find_spec("numba") is None:
     stub.prange = range
     sys.modules["numba"] = stub
 
-from dacn.evaluation import mask_rule_ablation as mra  # noqa: E402
-from dacn.evaluation.autoddpm_lpips import fit_mask_threshold, pseudo_mask  # noqa: E402
+from dacn.evaluation import mask_rule_ablation as mra
+from dacn.evaluation.autoddpm_lpips import fit_mask_threshold, pseudo_mask
 
 
 def _heatmaps(seed=0, n=6):

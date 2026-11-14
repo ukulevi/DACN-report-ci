@@ -70,7 +70,7 @@ def reconstruction_quality(arrays, positions):
     masked_lesion = int((predicted & lesion_tissue).sum())
     masked = int(predicted.sum())
     return {
-        "samples": int(len(positions)),
+        "samples": len(positions),
         "normal_slices": int((~labels).sum()),
         "abnormal_slices": int(labels.sum()),
         "lesion_pixels": lesion_pixels,

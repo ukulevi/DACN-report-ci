@@ -269,7 +269,7 @@ def run_hybrid_test_remote(
                 commit_message=f"Store hybrid test {evaluation_id}",
             )
             manifest.update(artifact_sync_status="uploaded", hub_commit=commit.oid)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - upload failure is recorded; results stay on the Volume
             manifest.update(artifact_sync_status="failed", artifact_sync_error=type(exc).__name__)
         persist()
         return {"manifest": manifest, "results": report}

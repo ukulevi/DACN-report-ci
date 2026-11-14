@@ -171,7 +171,7 @@ def _bootstrap(token, mode, groups, holdout, dataset):
     )
     report.update(
         scope=SCOPE + " Intervals are conditional on this cohort and protocol.",
-        holdout_samples=int(len(holdout)),
+        holdout_samples=len(holdout),
         producer_artifacts=verified,
         reference_run=REFERENCE_RUN,
     )
@@ -532,7 +532,7 @@ def run_sweep_analysis_remote(
                 commit_message=f"Store sweep {analysis} {evaluation_id}",
             )
             manifest.update(artifact_sync_status="uploaded", hub_commit=commit.oid)
-        except Exception as exc:  # Results stay on the Volume and are returned.
+        except Exception as exc:  # noqa: BLE001 - upload failure is recorded; results stay on the Volume
             manifest.update(artifact_sync_status="failed", artifact_sync_error=type(exc).__name__)
         persist()
         return {"manifest": manifest, "results": report}
