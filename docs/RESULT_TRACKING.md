@@ -4019,5 +4019,8 @@ validation-calibration score thresholds (pixel 0.13543, image 0.15379). Workspac
   [Modal](https://modal.com/apps/tanh1c/main/ap-PZwUDXy0WjG7rA79ixvAP2),
   [Hub fd0c40c7](https://huggingface.co/dacn-bmad-team/dacn-runs/tree/fd0c40c703db34631f170b971be9101b0fdfbb2e/evaluations/ens-s18-smoke-20261114T141519Z).
 - **`ens-s18-full-20261114T141611Z`** and **`ens-s19-full-20261114T141617Z`** (T4, 3665 test slices each, resumable private chunks)
-  submitted detached in parallel. Status: running.
+  submitted detached in parallel. Status: **failed** (`InputCancellation`, 15:04 UTC) for both.
+  Claude Code stopped the local Modal clients because the host ran low on memory, and Modal
+  cancelled the detached inputs. Saved chunks: seed 18 1500/3665, seed 19 1750/3665.
+  Resumable with the same IDs, code revision and `--resume`. No results yet.
 
