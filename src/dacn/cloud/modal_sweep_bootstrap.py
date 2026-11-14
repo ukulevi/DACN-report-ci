@@ -42,6 +42,7 @@ REPLICATES = {"smoke": 20, "full": 1000}
 METHODS = {
     "bootstrap": "paired_patient_group_bootstrap_ddim_noise_step_sweep",
     "quality": "reconstruction_quality_ddim_noise_step_sweep",
+    "fusion": "weighted_rank_fusion_final_lpips_residual_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -172,6 +173,68 @@ def _bootstrap(token, mode, groups, holdout, dataset):
     return report
 
 
+def _fusion(token, mode, groups, holdout, dataset):
+    """AF-03: fixed-weight rank fusion of Final LPIPS and Final L1 (reference run)."""
+    from dacn.evaluation import final_fusion
+    from dacn.evaluation.final_fusion import REFERENCE, RESIDUAL_WEIGHTS, fused_maps
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+    from dacn.evaluation.validation import evaluate_maps
+
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    producer = results["metrics"]["autoddpm_lpips"]["group_holdout"]["pixel"]
+    maps = fused_maps(arrays["autoddpm_lpips"], arrays["autoddpm_l1"], labels, calibration)
+    arms, holdout_maps, thresholds = {}, {}, {}
+    for name, values in maps.items():
+        fitted = evaluate_maps(
+            values[calibration], truth[calibration], labels[calibration], split="validation"
+        )
+        frozen = {level: fitted[level]["threshold"] for level in ("pixel", "image")}
+        arms[name] = {
+            "score_thresholds": frozen,
+            "calibration": fitted,
+            "group_holdout": evaluate_maps(
+                values[holdout],
+                truth[holdout],
+                labels[holdout],
+                split="validation",
+                thresholds=frozen,
+            ),
+        }
+        holdout_maps[name], thresholds[name] = values[holdout], frozen["pixel"]
+    replay = abs(arms[REFERENCE]["group_holdout"]["pixel"]["auprc"] - producer["auprc"])
+    if (
+        replay > 1e-9
+        or abs(arms[REFERENCE]["group_holdout"]["pixel"]["f1"] - producer["f1"]) > 1e-9
+    ):
+        raise ValueError("Raw Final LPIPS does not replay the producer holdout metrics")
+    return {
+        "method": METHODS["fusion"],
+        "hypothesis_and_definition": final_fusion.__doc__,
+        "residual_weights": list(RESIDUAL_WEIGHTS),
+        "reference": REFERENCE,
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {REFERENCE_RUN: verified},
+        "producer_replay_ap_abs_error": replay,
+        "selection": "none; all fixed weights reported",
+        "scope": SCOPE,
+        "arms": arms,
+        "paired_bootstrap_vs_reference": paired_group_bootstrap(
+            truth[holdout],
+            holdout_maps,
+            groups[holdout],
+            thresholds,
+            reference=REFERENCE,
+            replicates=REPLICATES[mode],
+            seed=17,
+        ),
+    }
+
+
 def _quality(token, mode, holdout, dataset):
     import numpy as np
 
@@ -273,6 +336,8 @@ def run_sweep_analysis_remote(
         groups, holdout, dataset = _pinned_validation()
         if analysis == "bootstrap":
             report = _bootstrap(token, mode, groups, holdout, dataset)
+        elif analysis == "fusion":
+            report = _fusion(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)
