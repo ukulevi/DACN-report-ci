@@ -93,3 +93,14 @@ def test_variants_are_valid_single_component_changes_with_control_first():
             assert changed == 1, (name, base)
     assert set(ne.SMOKE_VARIANTS) <= set(names)
     assert set(ne.PUBLISHED_HOLDOUT_AP) <= set(names)
+
+
+def test_maskgate_variants_change_only_mask_and_seed_and_control_runs_first():
+    names = list(ne.MASKGATE_VARIANTS)
+    assert names[0] == ne.SMOKE_MASKGATE[0] == "control_t300_20_30"
+    assert ne.MASKGATE_VARIANTS["control_t300_20_30"] == ne.VARIANTS["control_t300_20_30"]
+    for name in names[1:]:
+        point, phase2_start, seed_base, mask_score = ne.MASKGATE_VARIANTS[name]
+        assert (point, phase2_start, mask_score) == (ne.CONTROL_POINT, 50, "lpips_brightness")
+        assert f"_s{seed_base}_" in name
+    assert "lpips_brightness" in ne.MASK_SCORES

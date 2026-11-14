@@ -27,6 +27,7 @@ CONTROL_POINT = (300, 20, 30)
 NEW_POINTS = ((50, 20, 30), (50, 30, 20), (400, 20, 30), (400, 30, 20))
 SMOKE_POINTS = (CONTROL_POINT, (400, 20, 30))
 PHASE2_START = 50
+MASK_SCORES = ("product", "lpips", "lpips_brightness")
 SCORE_NAMES = (
     "ddpm_l1",
     "autoddpm_l1",
@@ -65,11 +66,13 @@ def run_point(
 
     Defaults reproduce the producer. ``seed_base`` changes only the per-sample
     sampling seeds; ``mask_score="lpips"`` builds the pseudo-mask heatmap from raw
-    initial LPIPS instead of LPIPS x normalized residual (same threshold rule).
+    initial LPIPS instead of LPIPS x normalized residual, and
+    ``mask_score="lpips_brightness"`` from initial LPIPS x input brightness (same
+    threshold rule in every case).
     """
     start, steps1, steps2 = point
-    if mask_score not in ("product", "lpips"):
-        raise ValueError("mask_score must be 'product' or 'lpips'")
+    if mask_score not in MASK_SCORES:
+        raise ValueError(f"mask_score must be one of {MASK_SCORES}")
     phase1 = ddim_indices(start, steps1)
     phase2 = ddim_indices(phase2_start, steps2)
     normal_calibration = [int(i) for i in calibration if labels[i] == 0]
@@ -95,7 +98,11 @@ def run_point(
         initial_scores[index], _ = ablation_pair_scores(
             perceptual, images[index], initials[index], device, 1e-8
         )
-        heatmaps[index] = initial_scores[index][mask_score]
+        if mask_score == "lpips_brightness":
+            brightness = (images[index, 8:-8, 8:-8] + 1) / 2
+            heatmaps[index] = initial_scores[index]["lpips"] * brightness
+        else:
+            heatmaps[index] = initial_scores[index][mask_score]
         phase1_seconds.append(elapsed)
     stacked = np.zeros((len(images), 240, 240), dtype=np.float32)
     for index, value in heatmaps.items():
@@ -196,3 +203,15 @@ PUBLISHED_HOLDOUT_AP = {
     "lpips_mask_t300_20_30": ("lpips-only-mask-20261112T154126Z-d-validation", 0.2872849863588635),
 }
 PUBLISHED_LPIPS_MASK_THRESHOLD = 0.1989728808403015
+
+# Brightness-gated pseudo-mask (14 Nov, validation). Error analysis showed large lesions
+# under-segmented (pixel recall about 0.6); hypothesis: a phase-1 heatmap of initial
+# LPIPS x brightness marks hyperintense lesions more completely, so the masked
+# re-sampling covers more of each lesion. Control first; three sampling seeds.
+MASKGATE_VARIANTS = {
+    "control_t300_20_30": ((300, 20, 30), 50, 17, "product"),
+    "bmask_s17_t300_20_30": ((300, 20, 30), 50, 17, "lpips_brightness"),
+    "bmask_s18_t300_20_30": ((300, 20, 30), 50, 18, "lpips_brightness"),
+    "bmask_s19_t300_20_30": ((300, 20, 30), 50, 19, "lpips_brightness"),
+}
+SMOKE_MASKGATE = ("control_t300_20_30", "bmask_s17_t300_20_30")

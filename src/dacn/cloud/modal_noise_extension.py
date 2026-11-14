@@ -74,10 +74,12 @@ def run_noise_extension_remote(
     from dacn.evaluation.mask_rule_ablation import mask_statistics
     from dacn.evaluation.noise_extension import (
         CONTROL_POINT,
+        MASKGATE_VARIANTS,
         NEW_POINTS,
         PUBLISHED_HOLDOUT_AP,
         PUBLISHED_LPIPS_MASK_THRESHOLD,
         SCORE_NAMES,
+        SMOKE_MASKGATE,
         SMOKE_POINTS,
         SMOKE_VARIANTS,
         VARIANTS,
@@ -92,7 +94,7 @@ def run_noise_extension_remote(
 
     if (
         mode not in {"smoke", "full"}
-        or suite not in {"noise", "variants"}
+        or suite not in {"noise", "variants", "maskgate"}
         or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", evaluation_id)
     ):
         raise ValueError("Invalid noise-extension request")
@@ -100,10 +102,12 @@ def run_noise_extension_remote(
         points = SMOKE_POINTS if mode == "smoke" else (CONTROL_POINT, *NEW_POINTS)
         specs = [(point_name(*p), p, {}, p == CONTROL_POINT) for p in points]
     else:
-        names = SMOKE_VARIANTS if mode == "smoke" else tuple(VARIANTS)
+        table = VARIANTS if suite == "variants" else MASKGATE_VARIANTS
+        smoke = SMOKE_VARIANTS if suite == "variants" else SMOKE_MASKGATE
+        names = smoke if mode == "smoke" else tuple(table)
         specs = []
         for name in names:
-            point, phase2_start, seed_base, mask_score = VARIANTS[name]
+            point, phase2_start, seed_base, mask_score = table[name]
             kwargs = {
                 "phase2_start": phase2_start,
                 "seed_base": seed_base,
@@ -117,11 +121,11 @@ def run_noise_extension_remote(
     output.mkdir(parents=True, exist_ok=False)
     manifest = {
         "evaluation_id": evaluation_id,
-        "method": (
-            "ddim20_30_noise_sweep_extension_t50_t400"
-            if suite == "noise"
-            else "ddim_validation_variants_seeds_budget_phase2_lpips_mask"
-        ),
+        "method": {
+            "noise": "ddim20_30_noise_sweep_extension_t50_t400",
+            "variants": "ddim_validation_variants_seeds_budget_phase2_lpips_mask",
+            "maskgate": "ddim20_30_brightness_gated_pseudo_mask_seeds",
+        }[suite],
         "suite": suite,
         "mode": mode,
         "status": "running",
@@ -216,16 +220,19 @@ def run_noise_extension_remote(
         report = {
             "method": manifest["method"],
             "mode": mode,
-            "question": (
-                "Advisor AF-05: add the suggested t50 and t400 phase-1 noise levels with all "
-                "other components fixed (DDIM 50-call budget, phase 2 from t50, p95/d3 mask)."
-                if suite == "noise"
-                else "Advisor AF-11/AF-07/AF-02: sampling-seed stability (base 18/19 at t300 "
-                "and t400), total DDIM budget (10+15, 40+60), phase-2 start (t30, t100) and "
-                "an LPIPS-only pseudo-mask, each changing one component of the t300 control."
-            ),
+            "question": {
+                "noise": "Advisor AF-05: add the suggested t50 and t400 phase-1 noise levels "
+                "with all other components fixed (DDIM 50-call budget, phase 2 from t50, "
+                "p95/d3 mask).",
+                "variants": "Advisor AF-11/AF-07/AF-02: sampling-seed stability (base 18/19 "
+                "at t300 and t400), total DDIM budget (10+15, 40+60), phase-2 start (t30, "
+                "t100) and an LPIPS-only pseudo-mask, each changing one component of the "
+                "t300 control.",
+                "maskgate": "AF-07 follow-up: pseudo-mask from initial LPIPS x brightness "
+                "instead of LPIPS x residual (same p95/d3 rule), sampling seeds 17/18/19.",
+            }[suite],
             "variants": {
-                spec[0]: {"point": spec[1], **spec[2]} for spec in specs if suite == "variants"
+                spec[0]: {"point": spec[1], **spec[2]} for spec in specs if suite != "noise"
             },
             "control": control_name,
             "control_replay": replay,
