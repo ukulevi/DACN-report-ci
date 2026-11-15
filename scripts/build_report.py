@@ -68,14 +68,14 @@ def render_test_tables(payloads):
     )
     pixel_header = [
         "| Method | Pixel AP | AUROC | Precision | Recall | Dice |",
-        "|---|---:|---:|---:|---:|---:|",
+        "|--------------|-------:|-------:|-------:|-------:|-------:|",
     ]
     rows = []
     for title, cohort_methods in (
         ("Original frozen comparison (10 November)", methods[:4]),
         ("Post-development comparison (14 November)", methods[2:]),
     ):
-        rows += [f"**{title}**", "", *pixel_header]
+        rows += ["\\Needspace{14\\baselineskip}", "", f"**{title}**", "", *pixel_header]
         for label, result, _, _ in cohort_methods:
             rows.append(
                 "| "

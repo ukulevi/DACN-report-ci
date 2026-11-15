@@ -13,6 +13,10 @@ hashes. Updated the cover, release notes, and researcher handoff.
 BLK-20261113-01 is outside this report update. No new training or evaluation
 was performed. Focused report/hybrid/ensemble/retraining tests passed (22);
 repository Ruff and format checks also passed.
+The first hosted report build succeeded. PDF review found one table title
+separated from its rows and an overly narrow method column. Adjusted table
+pagination and widths, then recompiled the 19-page report locally and
+verified both captions and all metric rows on the same page.
 
 ## 2026-11-10 — Full English CO4029 report and private release pipeline (DAC-26)
 
