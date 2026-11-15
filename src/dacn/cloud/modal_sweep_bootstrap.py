@@ -16,6 +16,7 @@ Analyses:
   seeds      sampling-seed robustness of Final LPIPS x brightness (seeds 17/18/19)
   diagnose   hybrid error analysis, pooled-83 contrasts, seed/noise ensembles
   maskgate   brightness-gated pseudo-mask vs producer mask (needs the GPU maskgate run)
+  retrain    training-seed variability across retrained models (AF-11)
 
     DACN_HF_SECRET=huggingface modal run -m dacn.cloud.modal_sweep_bootstrap \
         --analysis quality --evaluation-id sweep-quality-smoke-UNIQUE \
@@ -54,6 +55,7 @@ METHODS = {
     "seeds": "sampling_seed_robustness_final_lpips_x_brightness_t300",
     "diagnose": "error_analysis_pooled83_and_reconstruction_ensembles_t300",
     "maskgate": "brightness_gated_pseudo_mask_seeds_and_ensembles_t300",
+    "retrain": "training_seed_variability_final_hybrid_ensemble_t300",
 }
 SCOPE = (
     "Exploratory validation; producer arrays, maps and thresholds fixed; one training "
@@ -729,6 +731,145 @@ def _maskgate(token, mode, groups, holdout, dataset):
     }
 
 
+def _retrain(token, mode, groups, holdout, dataset):
+    """Training-seed variability of final / hybrid / ensemble (rules: retrain_variability)."""
+    import io
+
+    import numpy as np
+    from huggingface_hub import hf_hub_download
+
+    from dacn.evaluation import retrain_variability
+    from dacn.evaluation.frozen_test_ci import image_group_bootstrap, image_scores
+    from dacn.evaluation.group_bootstrap import paired_group_bootstrap
+    from dacn.evaluation.postprocess_hybrid import HYBRID_REPLAY, SEED_VARIANTS
+    from dacn.evaluation.retrain_variability import (
+        MODELS,
+        RETRAIN_EVAL_RUNS,
+        SAMPLING_SEEDS,
+        arm,
+        model_arms,
+        verdict,
+    )
+    from dacn.evaluation.sweep_bootstrap import REFERENCE_RUN
+
+    if set(RETRAIN_EVAL_RUNS) != set(MODELS) - {"t4_s17"}:
+        raise ValueError("Retrain evaluation runs are not recorded yet")
+    [(_, _, arrays, results, verified)] = list(
+        _iter_verified_runs(token, dataset, run_ids={REFERENCE_RUN})
+    )
+    labels, calibration = arrays["labels"], dataset["calibration"]
+    truth = arrays["masks"][:, 8:-8, 8:-8]
+    brightness = np.asarray(arrays["brightness"], np.float64)
+    finals = {"t4_s17": {17: arrays["autoddpm_lpips"]}}
+    for seed in (18, 19):
+        finals["t4_s17"][seed] = _variant_maps(token, *SEED_VARIANTS[seed], truth.shape)[
+            "autoddpm_lpips"
+        ]
+    sources = {}
+    for model, (run_id, revision) in RETRAIN_EVAL_RUNS.items():
+
+        def hub(name, run_id=run_id, revision=revision):
+            path = hf_hub_download(
+                MODEL_REPO,
+                f"evaluations/{run_id}/{name}",
+                revision=revision,
+                token=token,
+                cache_dir="/tmp/hf-cache",
+            )
+            return Path(path).read_bytes()
+
+        source = json.loads(hub("run_manifest.json"))
+        if source.get("status") != "completed" or source.get("mode") != "full":
+            raise ValueError(f"Retrain evaluation is not a completed full run: {model}")
+        finals[model] = {}
+        for seed in SAMPLING_SEEDS:
+            file = f"private_{model}_s{seed}_maps.npz"
+            payload = hub(file)
+            if _sha_bytes(payload) != source["artifacts"][file]:
+                raise ValueError(f"Retrain map checksum differs: {file}")
+            with np.load(io.BytesIO(payload), allow_pickle=False) as archive:
+                finals[model][seed] = archive["autoddpm_lpips"].copy()
+            if finals[model][seed].shape != truth.shape:
+                raise ValueError("Retrain maps must cover all 83 validation slices")
+        sources[model] = {
+            "evaluation_run": run_id,
+            "hub_revision": revision,
+            "training_run": source.get("training_run"),
+            "checkpoint_sha256": source.get("checkpoint_sha256"),
+            "training_seed": source.get("training_seed"),
+            "training_gpu": source.get("training_gpu"),
+        }
+    maps = {"brightness": brightness}
+    for model in MODELS:
+        maps.update(model_arms(finals[model], brightness, model))
+    del finals
+    arms, summary, replay, pixel, image = _evaluate_arms(
+        maps,
+        truth,
+        labels,
+        calibration,
+        holdout,
+        groups,
+        results,
+        mode,
+        (arm("t4_s17", "hybrid"),),
+        replay_arms={arm("t4_s17", "final"): "autoddpm_lpips", "brightness": "brightness"},
+    )
+    held = arms[arm("t4_s17", "hybrid")]["group_holdout"]
+    hybrid_error = max(
+        abs(held["pixel"]["auprc"] - HYBRID_REPLAY[0]),
+        abs(held["pixel"]["f1"] - HYBRID_REPLAY[1]),
+        abs(held["image"]["auroc"] - HYBRID_REPLAY[2]),
+    )
+    if hybrid_error > 1e-9:
+        raise ValueError("t4_s17 hybrid does not replay the frozen hybrid")
+    thresholds = {name: a["score_thresholds"]["pixel"] for name, a in arms.items()}
+    pooled = {
+        model: paired_group_bootstrap(
+            truth,
+            maps,
+            groups,
+            thresholds,
+            reference=arm(model, "hybrid"),
+            replicates=REPLICATES[mode],
+            seed=17,
+        )
+        for model in MODELS
+    }
+    points = {name: c["pixel_ap"] for name, c in pooled["t4_s17"]["candidates"].items()}
+    pooled_image = image_group_bootstrap(
+        labels,
+        {name: image_scores(values) for name, values in maps.items()},
+        groups,
+        reference=arm("t4_s17", "hybrid"),
+        replicates=REPLICATES[mode],
+        seed=17,
+    )
+    hardware = pooled["t4_s17"]["candidates"][arm("a100_s17", "hybrid")]["delta_ap_ci95"]
+    return {
+        "method": METHODS["retrain"],
+        "rules": retrain_variability.__doc__,
+        "models": sources,
+        "reference_run": REFERENCE_RUN,
+        "producer_artifacts": {REFERENCE_RUN: verified},
+        "producer_replay_abs_error": replay,
+        "hybrid_replay_abs_error": hybrid_error,
+        "verdict": {
+            **verdict(summary, pooled, points),
+            "hardware_effect_hybrid_pooled_delta_ci95": hardware,
+        },
+        "selection": "none; all models reported; rules fixed before evaluation",
+        "scope": SCOPE + " Training seed and GPU vary; data and config fixed.",
+        "summary": summary,
+        "pooled83_ap": points,
+        "arms": arms,
+        "holdout_pixel_bootstrap": pixel[arm("t4_s17", "hybrid")],
+        "holdout_image_bootstrap": image[arm("t4_s17", "hybrid")],
+        "pooled83_pixel_bootstrap": pooled,
+        "pooled83_image_bootstrap": pooled_image,
+    }
+
+
 def _hybrid(token, mode, groups, holdout, dataset):
     """Brain-mask post-processing and brightness hybrids on the Final maps."""
     from dacn.evaluation import postprocess_hybrid
@@ -892,6 +1033,8 @@ def run_sweep_analysis_remote(
             report = _diagnose(token, mode, groups, holdout, dataset)
         elif analysis == "maskgate":
             report = _maskgate(token, mode, groups, holdout, dataset)
+        elif analysis == "retrain":
+            report = _retrain(token, mode, groups, holdout, dataset)
         else:
             report = _quality(token, mode, holdout, dataset)
         report = _json_safe(report)
