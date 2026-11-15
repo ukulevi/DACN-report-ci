@@ -14,7 +14,7 @@ INPUTS = (
     "report/thesis.md",
     "docs/evidence/2026-11-08-colab-registered-acceptance.json",
     "docs/evidence/2026-11-10-ddim-ablation-table.csv",
-    "configs/final_evaluation_candidate.json",
+    "configs/final_evaluation_frozen_20261110.json",
     "report/metadata.json",
     "report/header.tex",
     "report/references.bib",
@@ -24,6 +24,12 @@ INPUTS = (
     "report/figures/validation.pdf",
     "report/figures/ablations.pdf",
     "report/figures/provenance.json",
+    "docs/REPORT_METHOD_DECISION_2026-11-15.md",
+)
+TEST_INPUTS = (
+    "docs/evidence/2026-11-10-fourarm-test.json",
+    "docs/evidence/2026-11-14-hybrid-test-results.json",
+    "docs/evidence/2026-11-14-ensemble-test-results.json",
 )
 ARMS = {
     "final_lpips": "Final LPIPS",
@@ -40,12 +46,80 @@ def metric(value):
     return f"{value:.6f}"
 
 
+def render_test_tables(payloads):
+    original, hybrid, ensemble = (json.loads(payloads[name]) for name in TEST_INPUTS)
+    if original["split"] != "test" or original["sample_count"] != 3665:
+        raise ValueError("Expected the original 3,665-slice test aggregate")
+    for result in (hybrid, ensemble):
+        if result["test_accessed"] is not True or result["samples"] != 3665:
+            raise ValueError("Expected a follow-up aggregate on the 3,665-slice test cohort")
+    arms = original["arms"]
+    primary = hybrid["frozen_hybrid_test"]
+    variant = ensemble["frozen_ensemble_test"]
+    if primary != ensemble["frozen_hybrid_test"]:
+        raise ValueError("Hybrid metrics differ between the follow-up receipts")
+    methods = (
+        ("Initial LPIPS", arms["initial_lpips"], 20, None),
+        ("Naive-stitch LPIPS", arms["naive_stitch_lpips"], 20, None),
+        ("Final LPIPS", arms["final_lpips"], 50, "final_lpips"),
+        ("Brightness", arms["brightness"], 0, "brightness"),
+        ("Hybrid (primary)", primary, 50, "frozen_hybrid"),
+        ("Ensemble (3 seeds)", variant, 150, "seed_ensemble"),
+    )
+    pixel_header = [
+        "| Method | Pixel AP | AUROC | Precision | Recall | Dice |",
+        "|---|---:|---:|---:|---:|---:|",
+    ]
+    rows = []
+    for title, cohort_methods in (
+        ("Original frozen comparison (10 November)", methods[:4]),
+        ("Post-development comparison (14 November)", methods[2:]),
+    ):
+        rows += [f"**{title}**", "", *pixel_header]
+        for label, result, _, _ in cohort_methods:
+            rows.append(
+                "| "
+                + label
+                + " | "
+                + " | ".join(
+                    metric(result["pixel"][k])
+                    for k in ("auprc", "auroc", "precision", "recall", "f1")
+                )
+                + " |"
+            )
+        rows.append("")
+    rows += [
+        "",
+        "| Method | Image AUROC | Precision | Recall | F1 |",
+        "|---|---:|---:|---:|---:|",
+    ]
+    for label, result, _, _ in methods:
+        rows.append(
+            "| "
+            + label
+            + " | "
+            + " | ".join(metric(result["image"][k]) for k in ("auroc", "precision", "recall", "f1"))
+            + " |"
+        )
+    rows += [
+        "",
+        "| Method | Pixel AP (95% CI) | U-Net calls per slice |",
+        "|---|---:|---:|",
+    ]
+    for label, result, calls, name in methods:
+        if name is not None:
+            lo, hi = ensemble["pixel_bootstrap"]["candidates"][name]["ap_ci95"]
+            ap = metric(result["pixel"]["auprc"])
+            rows.append(f"| {label} | {ap} [{metric(lo)}, {metric(hi)}] | {calls} |")
+    return "\n".join(rows)
+
+
 def prepare(root, output):
     root, output = Path(root).resolve(), Path(output).resolve()
     if output == root or not output.is_relative_to(root):
         raise ValueError("Generated report output must be inside the repository")
     payloads = {}
-    for name in INPUTS:
+    for name in (*INPUTS, *TEST_INPUTS):
         path = root / name
         if path.is_symlink() or not path.resolve().is_relative_to(root):
             raise ValueError("Report input must stay inside the repository")
@@ -65,7 +139,7 @@ def prepare(root, output):
     appendix = [
         "# Automatically generated evidence appendix",
         "",
-        "**DRAFT — validation only; no held-out test results are included in this build.**",
+        "Historical validation evidence for the original reconstruction comparison.",
         "",
         "Source: verified 8 November evidence; 43 holdout slices, thresholds from 40 calibration slices, one sampling seed (17).",
         "",
@@ -163,10 +237,9 @@ def prepare(root, output):
             line = line[1:]
         lines.append(line)
     body = "\n".join(lines) + "\n"
-    body = (
-        "**DRAFT — validation only; no held-out test results are included in this build.**\n\n"
-        + body
-    )
+    if body.count("<!-- TEST_RESULTS -->") != 1:
+        raise ValueError("Report must contain one test results marker")
+    body = body.replace("<!-- TEST_RESULTS -->", render_test_tables(payloads))
     body += (
         "\n\n\\clearpage\n\n"
         + "\n".join(appendix)
@@ -185,7 +258,7 @@ def prepare(root, output):
     )
     receipt = {
         "status": "prepared",
-        "report_status": "draft_validation_only",
+        "report_status": "includes_post_development_test_results",
         "report_language": metadata["lang"],
         "built_at_utc": datetime.now(timezone.utc).isoformat(),
         "research_manifest_status": json.loads(payloads[INPUTS[3]])["status"],

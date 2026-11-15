@@ -1,5 +1,19 @@
 # Worklog
 
+## 2026-11-15 — Adopt brightness-weighted Final LPIPS in the report (DAC-26)
+
+Recorded the team's selection of the 50-call single-seed hybrid as the
+primary report/demo method and the 150-call three-seed ensemble as the
+higher-compute variant. The English report now distinguishes the original
+four-arm test from six total test accesses and includes the two
+post-development results, cohort-level uncertainty, error analysis, and
+validation results across four trained checkpoints. The builder generates
+pixel and image tables from committed aggregate receipts and records their
+hashes. Updated the cover, release notes, and researcher handoff.
+BLK-20261113-01 is outside this report update. No new training or evaluation
+was performed. Focused report/hybrid/ensemble/retraining tests passed (22);
+repository Ruff and format checks also passed.
+
 ## 2026-11-10 — Full English CO4029 report and private release pipeline (DAC-26)
 
 Moved canonical manuscript/layout into `report/`; legacy summary and `reports/`

@@ -8,9 +8,10 @@ record and prior reports. Proper names retain Vietnamese diacritics.
 
 The authored narrative has one source; generated LaTeX is not edited separately.
 
-The report remains a **validation draft**, not a completed submission or a
-held-out test result. Building the report does not freeze the protocol, select
-models/thresholds, access HF/Modal/Colab or load private arrays/checkpoints.
+The report includes validation and previously recorded test results. See the
+[method decision](../docs/REPORT_METHOD_DECISION_2026-11-15.md) for the
+selected hybrid and the three-seed variant. The build consumes committed
+aggregate files only.
 
 ## What is updated automatically
 
@@ -47,8 +48,10 @@ the evidence and narrative together.
   The build manifest separately preserves raw-byte hashes for exact provenance. The build
   rejects stale figures after either evidence file changes; regenerate figures
   and commit them with accepted evidence and manuscript updates.
-- Generated evidence appendix: accepted aggregate JSON and producer ablation CSV,
-  registered in INPUTS in `scripts/build_report.py`.
+- Generated test tables: original, hybrid and ensemble aggregate JSON files
+  registered in TEST_INPUTS in `scripts/build_report.py`.
+- Generated evidence appendix: historical validation aggregates and producer
+  ablation CSV registered in INPUTS.
 
 ## Build locally — Windows/Linux x86_64
 
@@ -144,17 +147,15 @@ credentials and requires no HF/Modal tokens. It uploads repository-scoped
 artifacts and does not publish GitHub Pages.
 
 On private satellite `main` push/manual builds, a separate job with contents-write
-permission publishes `report.pdf` and `build-manifest.json` as a **validation-draft
-prerelease**. Open [Releases](https://github.com/ukulevi/DACN-report-ci/releases)
+permission publishes `report.pdf` and `build-manifest.json` as a **report prerelease**. Open [Releases](https://github.com/ukulevi/DACN-report-ci/releases)
 and download the PDF directly under Assets, without unzipping an Actions artifact.
 The job checks repository privacy and never releases from pull requests or the
 original repository. Prerelease status does not mean scientific protocol freeze.
 
-**Original-repository blocker:** GitHub Actions in `tanh1c/DACN` still reports
-account-level startup failures before jobs are created. Its owner must address
-BLK-20261107-01 before a hosted build in that original repository can be verified.
-Hosted PDF and quality builds in the independent satellite have already succeeded;
-that evidence is separate from local PDF builds and the original account blocker.
+The original repository previously encountered billing-related startup failures
+(BLK-20261107-01). The report and quality jobs were successful again on
+original-repository commit `2f2c7726`. The private satellite remains the host for
+direct PDF releases.
 
 ## References
 

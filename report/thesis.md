@@ -2,31 +2,23 @@
 
 ## Abstract {.unnumbered}
 
-This project studies normal-only diffusion models for detecting and localizing
-abnormalities in two-dimensional brain FLAIR images. The implementation combines
-a Gaussian denoising diffusion probabilistic model, partial DDIM reconstruction,
-and perceptual anomaly scoring. A data audit identified patient and exact-pixel
-overlap in the downloaded source archive. A documented patient-disjoint derived
-split was therefore fixed before training. The final validation candidate uses
-an epoch-30 exponential-moving-average checkpoint and a two-phase reconstruction
-budget of 20 plus 30 U-Net evaluations per image. Its initial reconstruction
-produces a pseudo-mask; masked stitching and resampling produce the final image,
-which is compared with the input using spatial LPIPS.
+A Gaussian DDPM trained on 7,500 normal brain FLAIR slices supports
+reconstruction-based anomaly detection on a patient-disjoint BMAD-derived
+split. The pipeline runs DDIM20, constructs a pseudo-mask from initial LPIPS
+and normalized residual, and applies masked DDIM30. The selected primary
+method multiplies the final spatial LPIPS map by input brightness. On the
+3,665-slice test cohort, pixel average precision (AP) increased from 0.3182
+for raw Final LPIPS to 0.6505 for the primary method at 50 U-Net calls per
+slice. Pixel AUROC and micro Dice were 0.9759 and 0.5943, respectively.
+Averaging three sampling seeds before brightness weighting yielded AP
+0.7009, AUROC 0.9805 and Dice 0.6290 at 150 calls per slice. Validation
+experiments across four trained checkpoints showed consistent AP ordering.
+The test data informed the brightness hypothesis through earlier comparisons.
+The hybrid and ensemble results are post-development evaluations on that
+previously inspected cohort. Small lesions remain challenging.
 
-On 43 validation holdout slices, with thresholds calibrated separately on 40
-slices, the accepted final score obtained pixel AP 0.312330, ROC-AUC 0.949036,
-and micro Dice 0.371215. Image-level ROC-AUC was 0.914474. An independent Colab
-T4 execution reproduced the registered score maps within an absolute tolerance
-of $10^{-6}$, and CPU metric replay agreed within $10^{-10}$. Brightness alone
-obtained higher pixel AP, 0.389506, despite lower image-level ROC-AUC and Dice
-at its own calibrated operating point. The results support a reproducible
-validation pipeline, but do not establish superiority over simple controls or
-clinical generalization. This report includes one sampling seed, repeatedly
-examined validation data, and no held-out test results. Protocol freeze and
-live final-runtime verification remain prerequisites for final evaluation.
-
-**Keywords:** anomaly detection; diffusion models; brain MRI; DDIM; LPIPS;
-patient-disjoint evaluation; reproducibility.
+**Keywords:** anomaly detection, diffusion models, brain MRI, DDIM, LPIPS,
+brightness weighting, patient-group evaluation.
 
 ## Introduction
 
@@ -92,7 +84,7 @@ behavior and cannot by itself establish quality at inference level $t^*=300$.
 Partial reconstruction starts from a corrupted observation rather than pure
 noise. Low corruption can preserve both anatomy and lesions; stronger corruption
 can alter both. AnoDDPM motivates diffusion-based anomaly detection and studies
-noise structure [@wyatt2022]. The current accepted candidate uses Gaussian
+noise structure [@wyatt2022]. The selected method uses Gaussian
 noise and must not be described as the original Simplex-noise method.
 
 DDIM allows reverse evaluation on a reduced timestep grid [@song2021]. For
@@ -143,13 +135,13 @@ to the specific audited archive, not to every BMAD distribution. The derived
 test slice belonging to a validation patient. It neither moves examples between
 splits nor selects exclusions using model outputs. Fifty test slices belonging
 to ten patients were excluded. Counts below are dataset inventory statistics;
-they do not mean the test set was evaluated by this report.
+the test analyses reported below use this same cohort.
 
 | Derived split | Normal slices | Abnormal slices | Total | Patient groups |
 |---|---:|---:|---:|---:|
 | Training | 7,500 | 0 | 7,500 | 424 |
 | Validation | 39 | 44 | 83 | 50 |
-| Sealed test inventory | 640 | 3,025 | 3,665 | 767 |
+| Test | 640 | 3,025 | 3,665 | 767 |
 
 The immutable processed-dataset revision is:
 
@@ -200,9 +192,9 @@ evaluation procedure is therefore not label-free. Repeated examination of the
 
 ### Training and reconstruction contract
 
-The accepted validation candidate uses the Gaussian DDPM EMA epoch-30
+The original and improved methods use the Gaussian DDPM EMA epoch-30
 checkpoint. EMA parameters provide the inference weights; a checkpoint name
-alone is insufficient provenance, so the candidate pins checkpoint, source,
+alone is insufficient provenance, so the experimental record pins checkpoint, source,
 configuration, dataset and dependency evidence. Training state and model
 selection are documented separately from anomaly validation. The immutable
 execution-source archive for the accepted T4 run is `d5889d5`; the commit used
@@ -246,6 +238,27 @@ noise level 50, retaining original context at corresponding noise levels. There
 is exactly one phase-2 pass, not an implicit five-repeat loop. The final image
 equals the input outside the registered mask. Spatial LPIPS between the input
 and the actual final reconstruction defines the main final anomaly map.
+
+### Selected scoring method and sampling ensemble
+
+The primary method weights the final spatial LPIPS map by slice brightness.
+For cropped input $x$ in $[-1,1]$, define $B=(x+1)/2$. The primary pixel
+score is $S(p)=B(p)A_{17}(p)$, where $A_{17}$ is the Final LPIPS map at
+sampling seed 17. This continuous weight reduces the score at dark pixels.
+The original pseudo-mask, checkpoint, two DDIM stages and spatial SqueezeNet
+LPIPS stay fixed. No extra denoising call is required. Brightness alone
+serves as a zero-call control.
+
+The higher-compute variant uses the same checkpoint with sampling seeds
+17, 18 and 19 and averages their score maps before weighting:
+$$S_{\mathrm{ens}}(p)=B(p)\frac{A_{17}(p)+A_{18}(p)+A_{19}(p)}{3}.$$
+Each seed uses a pseudo-mask threshold fitted on normal calibration slices
+with the same p95/dilation rule. The three mask thresholds are approximately
+0.133447, 0.125878 and 0.129472. The primary pixel and image decision
+thresholds are 0.135423 and 0.176694. The ensemble thresholds are 0.135428
+and 0.153793. Published full-precision values are applied unchanged.
+The team selected the primary method and the higher-compute variant for the
+report and demo on 15 November. See the [method record](../docs/REPORT_METHOD_DECISION_2026-11-15.md).
 
 ### Paired controls and image aggregation
 
@@ -373,43 +386,114 @@ replayed. The highest observed holdout AP in that table was 0.328809 for
 20+30 at level 500. Reporting these rows does not authorize replacing the
 accepted 20+30/300 candidate using repeatedly inspected holdout outcomes.
 
+### Original test and post-development follow-ups
+
+The original four-arm protocol completed on 10 November. Hybrid and
+ensemble follow-ups used 3,665 slices (640 normal, 3,025 abnormal) from
+767 patient groups. Decision thresholds were selected on the 40-slice
+calibration split and applied unchanged. Pixel metrics pool the full
+240-by-240 crop, and pixel F1 equals micro Dice. Image metrics use the mean
+of the top 576 pixel scores and a slice-level label. The 10 November
+pixel table is the frozen comparison. The 14 November table repeats the
+Final LPIPS and brightness controls alongside the two follow-up methods.
+The intervals come from 1,000 paired patient-group bootstrap replicates.
+
+<!-- TEST_RESULTS -->
+
+The primary method improves pixel AP by 0.3323 over raw Final LPIPS at
+the same U-Net budget and by 0.1391 over brightness. The ensemble adds
+0.0504 AP over the primary (paired 95% CI [0.0454, 0.0551]) at three
+times the model-call budget. Image AUROC also improves, while at the
+calibrated image thresholds both improved methods have lower recall and
+F1 than raw Final LPIPS. On normal slices, the ensemble's pixel
+false-positive rate is 0.72% versus 1.01% for the primary. This rate
+counts pixels within normal slices. The call counts do not measure
+end-to-end latency.
+
+### Test-access history
+
+| Access | Date (November 2026) | Purpose |
+|---:|---|---|
+| 1 | 10 | Original frozen four-arm evaluation |
+| 2 | 11 | Exploratory DDIM50 comparison |
+| 3 | 12 | Exploratory LPIPS-only pseudo-mask comparison |
+| 4 | 14 | Replay of the original protocol for uncertainty intervals |
+| 5 | 14 | Evaluation of the validation-selected brightness hybrid |
+| 6 | 14 | Evaluation of the validation-selected three-seed ensemble |
+
+Earlier test comparisons suggested that brightness could complement
+Final LPIPS. The hybrid and ensemble configurations and operating
+thresholds were subsequently fixed from validation before their respective
+test runs. These are post-development evaluations on the previously
+inspected test cohort. Run provenance and original metrics are available
+in the [test record](../docs/FINAL_TEST_RESULTS_2026-11-10.md).
+
 ## Discussion
 
-### What improved, and what remains unresolved
+### Component contributions and remaining errors
 
-The final perceptual score improves upon initial and naive-stitch LPIPS in the
-accepted comparison, while brightness remains stronger in pixel AP. One
-plausible explanation is that FLAIR lesions correlate with brightness, but the
-present experiment does not establish a causal mechanism. Differences in
-reconstruction, mask coverage, perceptual features and threshold calibration
-can all affect the final result. New score fusion or postprocessing should be
-preregistered and tested on independent evidence rather than optimized against
-the most favorable observed holdout row.
+In the original test comparison, Initial LPIPS reached AP 0.224625 and
+naive stitching reached 0.269516. Full masked resampling reached 0.318226.
+Initial and naive-stitch use 20 U-Net calls. Final uses 50, so the comparison
+against stitching measures the benefit of adding phase two at extra
+compute. The submitted report also included the exploratory LPIPS-only mask
+variant at the same 50-call budget (AP 0.289999, AUROC 0.925694, Dice
+0.347241). This comparison isolates the mask recipe more closely. The
+variant uses separately calibrated mask and decision thresholds, and its
+test result has no paired interval. Adding the residual to the final score
+instead reduced validation holdout AP from 0.3123 to 0.1968.
 
-Early low epsilon-MSE and weak localization are compatible: training optimizes
-noise prediction, while inference must remove abnormal content and preserve
-normal structure. Increasing epochs alone need not repair the score map. The
-validated approach separates data integrity, checkpoint provenance, trajectory
-correctness, reconstruction discrepancy and calibration before considering
-additional expensive training. This is particularly relevant under a limited
-student GPU budget.
+On validation holdout, brightness alone reached AP 0.390 and brightness
+weighted Initial LPIPS reached 0.530. Weighting Final LPIPS reached 0.656,
+while brightness weighted L1 variants reached about 0.17 to 0.18. These
+paired comparisons support a contribution from perceptual scoring and the
+second reconstruction phase within the tried configurations. Changing the
+pseudo-mask to use brightness gave worse results at all three sampled
+seeds. AlexNet and VGG16 also underperformed the SqueezeNet hybrid in
+the comparative run. Rank fusion with the residual, the normal-tissue CDF
+gate and a within-slice brightness rank did not yield a consistent holdout
+advantage. See the [controlled ablation results](../docs/ABLATION_SUMMARY_2026-11-13.md).
 
-### Limitations and responsible interpretation
+The noise sweep fixed the remaining pipeline settings. AP was lower at
+levels 50 and 800 than at 300. Differences between levels 200 and 500 were
+less clear, and level 400 did not give a consistent calibration advantage.
+Changing the DDIM budget, phase-two start or mask dilation showed no
+reliable basis for replacing the selected configuration in these trials.
 
-There is one training/sampling seed, one rendered MRI contrast and a small
-validation cohort. Multiple slices per patient are correlated, and repeated
-validation inspection creates selection bias. The processed PNG intensity
-domain, incomplete scanner/site metadata and lack of an independent healthy
-cohort restrict generalization. The original archive audit does not establish
-that the official BMAD benchmark is defective. The derived split prevents the
-identified overlap, but does not prove absence of all near-duplicates or hidden
-confounding.
+At the hybrid's calibration threshold, about 22% of the 32 annotated
+components smaller than 50 pixels on validation holdout overlapped at least
+one predicted pixel. Large lesions can be detected while still being
+undersegmented. About 99% of hybrid false-positive pixels were inside the
+estimated brain region on this holdout. These descriptive figures give a
+clearer account of remaining errors than selecting a single visual example.
 
-No supervised tumor-segmentation baseline or DAE result is claimed without an
-accepted artifact. No cross-method state-of-the-art ranking is justified across
-different datasets, splits, supervision or inference budgets. Raw medical images
-and sample identities remain private. Research-use permission and attribution
-do not automatically grant rights to redistribute derived medical data.
+### Robustness across trained checkpoints
+
+The original T4 checkpoint and three EMA epoch-30 checkpoints trained on an
+A100 under the same training configuration were evaluated on validation.
+The A100 runs used training seeds 17, 18 and 19. For each checkpoint the
+method was applied with the same sampling-seed protocol and recalibrated
+on its validation calibration partition. Across the four checkpoints,
+43-slice holdout AP was 0.324 ± 0.027 for Final LPIPS, 0.653 ± 0.007 for
+the primary hybrid, and 0.725 ± 0.012 for the ensemble (mean ± sample SD).
+The prespecified rules used pooled-83 validation AP and favored the
+hybrid over its controls and the ensemble over the hybrid for all four
+checkpoints. The 43-slice holdout and pooled-83 summaries answer different
+questions. The latter includes calibration examples. The cross-GPU
+contrast did not resolve a hardware effect, and the follow-up test results
+use the original trained checkpoint. See the [retraining comparison](../docs/ABLATION_SUMMARY_2026-11-13.md).
+
+### Limits of the evidence
+
+Patient-group bootstrap intervals capture resampling variation within
+the measured cohort, conditional on the evaluated checkpoint and score maps.
+Earlier test results contributed to the brightness hypothesis, so the
+follow-up test estimates have an adaptive development history even though
+their thresholds were fixed on validation. The repeatedly inspected
+validation split, rendered 2D intensity domain and limited scanner/site
+metadata restrict generalization. In particular, brightness weighting can
+suppress a lesion with low displayed intensity. Independent patient data
+would be needed to establish transfer across cohorts.
 
 ## Engineering reproducibility and project delivery
 
@@ -429,27 +513,20 @@ exclusive ownership. The final contribution statement requires team review.
 The English manuscript in `report/thesis.md`, bibliography, layout and aggregate
 figures are version-controlled. Pandoc generates LaTeX and Tectonic compiles the
 PDF without shell escape. CI rebuilds each satellite push, attaches provenance,
-and publishes a labeled private validation-draft prerelease on main. The
+and publishes a private report prerelease on main. The
 private build host is independent of the original owner's payment restriction;
 source synchronization currently uses an explicit Git push, with no broad PAT
 or automatic merge. Successful document CI is not evidence that a new model
 experiment was run or that the scientific protocol is frozen.
 
-## Conclusion and final-evaluation boundary
+## Conclusion
 
-The project delivers a reproducible normal-only diffusion anomaly-detection
-pipeline and a transparent validation comparison. The accepted DDIM20+30 final
-LPIPS score improves over its initial and naive-stitch controls on the measured
-cohort, but does not outperform brightness in pixel AP. The strongest supported
-claim is successful independent validation reproduction with documented
-limitations, not a clinically validated detector or a universally superior
-segmentation method.
-
-Before final-test execution, the team must record protocol approval, verify the
-live runtime and immutable inputs, and run the completed launcher against the
-fixed validation contract. Only then may the sealed test be evaluated once
-under the approved rules, without subsequent test-based tuning. Until those
-steps have evidence, this document is a complete account of the available
-validation study and remains a submission draft. The final submission also
-requires team-reviewed contributions, any required institution-specific template
-checks, presentation materials and the reproducible demonstration.
+Final LPIPS weighted by input brightness is the team's primary method.
+It improves pixel AP from 0.3182 to 0.6505 at 50 U-Net calls per slice on
+the reported test cohort. A three-sampling-seed ensemble reaches 0.7009
+at 150 calls. Ablations support retaining the residual-weighted
+pseudo-mask and the second reconstruction stage. The validation
+retraining comparison supports the ordering across four checkpoints.
+Further confirmation requires an independent cohort. The present
+evidence includes six recorded accesses to the same test split and
+shows a remaining performance gap for small lesions.

@@ -74,11 +74,11 @@ jobs:
           test "$(gh api "repos/$GH_REPO" --jq '.private')" = true
           release_date="$(date -u +%Y.%m.%d)"
           tag="report-v${release_date}-${GITHUB_RUN_NUMBER}"
-          title="DACN Validation Report ${release_date} (#${GITHUB_RUN_NUMBER})"
+          title="DACN Experimental Report ${release_date} (#${GITHUB_RUN_NUMBER})"
           if gh release view "$tag" >/dev/null 2>&1; then
             gh release upload "$tag" artifact/report.pdf artifact/build-manifest.json --clobber
           else
             gh release create "$tag" artifact/report.pdf artifact/build-manifest.json \
               --target "$GITHUB_SHA" --title "$title" --prerelease \
-              --notes "English CO4029 validation-study report built from ${GITHUB_SHA}. Candidate protocol: not yet frozen. No held-out test results. Source, input hashes and PDF checksum are recorded in the attached manifest."
+              --notes "English CO4029 report built from ${GITHUB_SHA}. Includes the original protocol and post-development test evaluations on a previously inspected cohort. Source, input hashes and PDF checksum are recorded in the attached manifest."
           fi

@@ -19,7 +19,7 @@ def fixture(root):
     (root / "report/assets/hcmut-logo.png").write_bytes(b"image fixture")
     (root / "configs").mkdir()
     (root / "report/thesis.md").write_text(
-        "# Report\nEnglish narrative.\n## Dataset\n```python\n## code comment\n```\n",
+        "# Report\nEnglish narrative.\n<!-- TEST_RESULTS -->\n## Dataset\n```python\n## code comment\n```\n",
         encoding="utf-8",
     )
     (root / "report/metadata.json").write_text('{"title":"DACN","lang":"en-US"}')
@@ -27,7 +27,14 @@ def fixture(root):
     (root / "report/references.bib").write_text("@article{example, title={Example}, year={2020}}")
     for name in ("pipeline", "validation", "ablations"):
         (root / f"report/figures/{name}.pdf").write_bytes(b"%PDF-fixture")
-    (root / "configs/final_evaluation_candidate.json").write_text('{"status":"candidate"}')
+    (root / "configs/final_evaluation_frozen_20261110.json").write_text('{"status":"frozen"}')
+    (root / "docs/REPORT_METHOD_DECISION_2026-11-15.md").write_text("Method decision")
+    for name in (
+        "2026-11-10-fourarm-test.json",
+        "2026-11-14-hybrid-test-results.json",
+        "2026-11-14-ensemble-test-results.json",
+    ):
+        (root / "docs/evidence" / name).write_bytes((PROJECT / "docs/evidence" / name).read_bytes())
     data = {"status": "verified", "arms": {}}
     for name in ("final_lpips", "initial_lpips", "naive_stitch_lpips", "brightness"):
         data["arms"][name] = {"metrics": {}}
@@ -73,13 +80,15 @@ def fixture(root):
     return path
 
 
-def test_prepare_uses_evidence_and_preserves_candidate(tmp_path):
+def test_prepare_uses_evidence_and_preserves_original_protocol(tmp_path):
     fixture(tmp_path)
     prepare = runpy.run_path(str(PROJECT / "scripts/build_report.py"))["prepare"]
     receipt = prepare(tmp_path, tmp_path / "report/build")
     body = (tmp_path / "report/build/report.md").read_text(encoding="utf-8")
     assert "0.312330" in body and "0.321148" in body
-    assert "DRAFT" in body and "no held-out test results" in body
+    assert "| Hybrid (primary) | 0.650505 |" in body
+    assert "| Ensemble (3 seeds) | 0.700897 |" in body
+    assert receipt["report_status"] == "includes_post_development_test_results"
     assert "English narrative" in body
     assert "Automatically generated evidence appendix" in body
     assert "\n# Dataset\n" in body and "\n## code comment\n" in body
@@ -90,8 +99,10 @@ def test_prepare_uses_evidence_and_preserves_candidate(tmp_path):
     after = prepare(tmp_path, tmp_path / "report/build")["inputs"]["report/header.tex"]
     assert before != after
     assert (
-        json.loads((tmp_path / "configs/final_evaluation_candidate.json").read_text())["status"]
-        == "candidate"
+        json.loads((tmp_path / "configs/final_evaluation_frozen_20261110.json").read_text())[
+            "status"
+        ]
+        == "frozen"
     )
 
 

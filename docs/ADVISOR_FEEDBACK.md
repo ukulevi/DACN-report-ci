@@ -72,6 +72,13 @@ nhiễu, số bước DDIM và cách chọn vùng tái tạo; chạy bao nhiêu 
 **Nhóm — Kênh liên lạc:** "Nhóm có thể trao đổi với thầy qua email. Thầy sẽ đọc
 và trả lời dần nhé, vì thầy cũng rất bận."
 
+### Report decision (15 November)
+
+The group selected the single-seed hybrid as the primary report and demo
+method and the three-seed ensemble as a higher-compute variant. See the
+[method decision](REPORT_METHOD_DECISION_2026-11-15.md) and the revised
+[manuscript](../report/thesis.md) for metric scope and all six test accesses.
+
 ### Tracker
 
 | ID | Request | Status | Evidence / where | Next action |
