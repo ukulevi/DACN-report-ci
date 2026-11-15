@@ -4042,3 +4042,19 @@ validation-calibration score thresholds (pixel 0.13543, image 0.15379). Workspac
   matches manifest), `docs/evidence/2026-11-14-ensemble-test-manifest.json`; byte-identical to
   the Hub, LF, no UUIDs.
 
+## 2026-11-15 — Training-seed variability (AF-11): retrain the partial DDPM on A100
+
+User-approved GPU work. Purpose: measure how much the method's results depend on the
+trained model. The method, data and hyperparameters are unchanged; only the training seed
+and the GPU differ. The validation partition and test split are not used for training.
+Config = `configs/ddpm_partial_t4_batch8_epoch30.json` with `seed` overridden (batch 8, 30
+epochs, EMA 0.9992, lr 1e-4). Code `46c6a52a` (adds `DACN_HF_SECRET` to `modal_train`).
+`working_tree_dirty=true` only because of the untracked `.claude/` folder; the source
+snapshot hash is recorded by the trainer. Workspace `tanh1c`, A100-SXM4-40GB.
+
+- **`ddpm-partial-a100-b8-s18-smoke-20261115T020643Z`** completed/uploaded: 1 epoch, 2000
+  training slices, 277 steps in 34.2 s (0.12 s/step vs about 0.44 s/step on the T4, about
+  3.6× faster). [Modal](https://modal.com/apps/tanh1c/main/ap-KWx3iqvPIAhWCxnPY27eMe).
+- **`ddpm-partial-a100-b8-e30-s17-20261115T020858Z`** (seed 17 on A100, hardware control for
+  the original T4 seed-17 model), **`…-s18-…`** and **`…-s19-…`** were spawned on the deployed
+  app `dacn-bmad-flair` (`Function.spawn`, independent of the local client). Status: running.

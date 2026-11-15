@@ -2500,3 +2500,13 @@ than `modal run --detach` from a background shell.
 
 Checks: seed-ensemble tests (frozen values against evidence) pass in the CI-equivalent
 venv. Ruff 0.17.5 clean. Gates exact. Evidence byte-identical to the Hub, LF, UUID-free.
+
+## 2026-11-15 — Training-seed variability (AF-11): A100 retraining started
+
+- Made the training Hub Secret configurable (`DACN_HF_SECRET`, default unchanged), so that
+  `modal_train` can run in Workspace `tanh1c`.
+- An A100 smoke measured 0.12 s/step vs about 0.44 s/step on the T4 (about 3.6× faster, about
+  the same cost per model). At the user's request the A100 was used.
+- Spawned 3 full 30-epoch trainings (seeds 17/18/19) on the deployed app, which does not
+  depend on the local machine. Seed 17 on the A100 separates the hardware effect from the
+  seed effect relative to the original T4 model.
