@@ -22,6 +22,8 @@ import modal
 from dacn.training.checkpoint_artifacts import capture_continuation, write_continuation
 
 app = modal.App("dacn-bmad-flair")
+# Hub Secret name differs between members' Workspaces; default keeps the team name.
+HF_SECRET = os.environ.get("DACN_HF_SECRET", "huggingface-secret-2")
 
 DATA_ROOT = "/mnt/dacn/datasets"
 RUN_ROOT = "/mnt/dacn/runs"
@@ -393,9 +395,7 @@ def _train_remote_impl(
         persist_stage("hub_authentication")
         token = os.environ.get("HF_TOKEN")
         if not token:
-            raise RuntimeError(
-                "Modal Secret 'huggingface-secret-2' must contain a write-capable HF_TOKEN"
-            )
+            raise RuntimeError(f"Modal Secret '{HF_SECRET}' must contain a write-capable HF_TOKEN")
         api = HfApi(token=token)
 
         # Verify private destination access before any GPU training is invoked.
@@ -612,7 +612,7 @@ def _train_remote_impl(
     gpu="A100",
     timeout=10 * 60 * 60,
     volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
-    secrets=[modal.Secret.from_name("huggingface-secret-2")],
+    secrets=[modal.Secret.from_name(HF_SECRET)],
 )
 def train_remote(
     dataset_repo_id: str,
@@ -646,7 +646,7 @@ def train_remote(
     gpu="T4",
     timeout=10 * 60 * 60,
     volumes={DATA_ROOT: dataset_volume, RUN_ROOT: run_volume},
-    secrets=[modal.Secret.from_name("huggingface-secret-2")],
+    secrets=[modal.Secret.from_name(HF_SECRET)],
 )
 def train_remote_t4(
     dataset_repo_id: str,
