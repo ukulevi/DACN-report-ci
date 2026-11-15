@@ -4071,4 +4071,19 @@ snapshot hash is recorded by the trainer. Workspace `tanh1c`, A100-SXM4-40GB.
   2 images, sampling seed 17, checkpoint SHA and config checks passed, training seed 18.
   Hub `5be48d43`. [Modal](https://modal.com/apps/tanh1c/main/ap-dfgEoCBE02SdsIlMVlwQBV).
 - **`retrain-eval-a100-s{17,18,19}-full-20261115T034252Z`** spawned on the deployed app
-  `dacn-retrain-eval` (code `a1969d0e`, clean): 83 slices × sampling seeds 17/18/19. Status: running.
+  `dacn-retrain-eval` (code `a1969d0e`, clean): 83 slices × sampling seeds 17/18/19. All three
+  completed/uploaded (about 6.5 min each). Hub: s17 `47df4be2`, s18 `5566ab3b`, s19 `5aad935c`.
+  The app was stopped.
+
+### CPU analysis (`modal_sweep_bootstrap --analysis retrain`, rules in
+`dacn.evaluation.retrain_variability`, fixed in `5145cace` before any retrained map existed)
+
+- **`retrain-smoke-20261115T035140Z`** completed/uploaded (code `5eaf4cf3`, clean, 2 min).
+  Hub `358ff753`. [Modal](https://modal.com/apps/tanh1c/main/ap-WqBYuKlWlJ80MqLhmaBArO).
+- **`retrain-full-20261115T035414Z`** completed/uploaded (code `5eaf4cf3`, clean, 12 min, deployed
+  app + spawn; app stopped). Hub `011172af`. Gates: producer replay 0.0, frozen hybrid replay
+  0.0; 1000/1000 valid replicates. **V1 holds for all 4 models, V2 holds for all 4 models.**
+  Across models (mean ± SD), holdout AP: Final 0.324 ± 0.027, hybrid 0.653 ± 0.007, ensemble
+  0.725 ± 0.012; pooled-83 AP: 0.322 ± 0.027, 0.596 ± 0.013, 0.662 ± 0.018. Hardware effect
+  (A100-s17 − T4-s17 hybrid, pooled) Δ [−0.016, +0.067]: not resolved. No test access.
+  Evidence: `docs/evidence/2026-11-15-retrain-{results,manifest}.json`.

@@ -471,8 +471,8 @@ Reading:
 - **The re-sampling credit holds for all three seeds:** Initial × brightness is lower
   beyond uncertainty and calibration agrees each time. The margins stay modest
   (CI upper bounds −0.014 to −0.042).
-- This covers sampling-seed variability only. Variability from retraining the model
-  (AF-11) has not been measured.
+- This covers sampling-seed variability only. Training-seed variability (AF-11) was
+  measured on 15 Nov; see "Training-seed variability" below.
 
 ### LPIPS backbone and normalised brightness gate (added 14 Nov, validation)
 
@@ -660,6 +660,46 @@ Reading:
 - Scope: one trained model, three sampling seeds, one cohort. The configuration was
   chosen after many validation rounds, and this is the sixth access to an
   already-inspected test set.
+
+### Training-seed variability: three retrained models (added 15 Nov, validation, AF-11)
+
+The partial DDPM was retrained three times on an A100 with the unchanged config
+(`configs/ddpm_partial_t4_batch8_epoch30.json`, only `seed` changed; EMA epoch-30
+checkpoint). Seed 17 on the A100 repeats the original T4 training seed, to separate the
+hardware effect. For every model the frozen pipeline (t300 DDIM20+30, producer mask,
+p95/d3 rule refit on that model's calibration normals) produced maps for sampling seeds
+17/18/19 (`retrain-eval-a100-s{17,18,19}-full-20261115T034252Z`, T4). Rules V1/V2 were fixed
+in code `5145cace` before any retrained map existed. Analysis `retrain-full-20261115T035414Z`
+(CPU, 12 min): producer and frozen-hybrid replays 0.0, 1000/1000 valid replicates. No test
+access. Evidence: [results](evidence/2026-11-15-retrain-results.json),
+[manifest](evidence/2026-11-15-retrain-manifest.json).
+
+| Model | Holdout AP Final / hybrid / ensemble | Pooled-83 AP Final / hybrid / ensemble | Ensemble holdout Dice / image AUROC / normal FPR | Pooled Δ AP hybrid − brightness | Pooled Δ AP hybrid − Final | Pooled Δ AP ensemble − hybrid |
+|---|---|---|---|---|---|---|
+| T4, seed 17 (original) | 0.312 / 0.656 / 0.711 | 0.312 / 0.588 / 0.646 | 0.635 / 0.934 / 0.0073 | [+0.187, +0.429] | [+0.110, +0.391] | [+0.033, +0.093] |
+| A100, seed 17 | 0.364 / 0.661 / 0.740 | 0.360 / 0.611 / 0.676 | 0.662 / 0.943 / 0.0056 | [+0.225, +0.434] | [+0.101, +0.361] | [+0.031, +0.118] |
+| A100, seed 18 | 0.307 / 0.651 / 0.728 | 0.297 / 0.582 / 0.647 | 0.651 / 0.930 / 0.0078 | [+0.190, +0.407] | [+0.116, +0.400] | [+0.026, +0.119] |
+| A100, seed 19 | 0.315 / 0.645 / 0.722 | 0.320 / 0.602 / 0.679 | 0.643 / 0.919 / 0.0062 | [+0.205, +0.430] | [+0.123, +0.379] | [+0.051, +0.119] |
+| **Mean ± SD (4 models)** | 0.324 ± 0.027 / **0.653 ± 0.007** / **0.725 ± 0.012** | 0.322 ± 0.027 / 0.596 ± 0.013 / 0.662 ± 0.018 | | | | |
+
+The bootstrap stores candidate − reference with each model's hybrid as reference; the
+hybrid − brightness and hybrid − Final columns are those CIs negated. Brightness: holdout AP 0.390, pooled 0.272 (shared by all models).
+
+Reading:
+
+- **V1 holds for all 4 models:** the hybrid beats brightness and that model's own Final
+  LPIPS beyond uncertainty. **V2 holds for all 4 models:** the ensemble is above the
+  hybrid every time, and the CI excludes 0 for each model.
+- **Retraining moves the hybrid less than resampling does.** The hybrid's holdout AP SD
+  across trained models is 0.007, against 0.027 across sampling seeds of one model. The
+  ensemble, which averages out sampling noise, varies by 0.012.
+- Final LPIPS alone varies more (SD 0.027). Multiplying by brightness removes most of
+  that spread.
+- **Hardware effect not resolved:** A100-s17 − T4-s17 hybrid, pooled Δ [−0.016, +0.067].
+  The same training seed does not reproduce the same model across GPUs (Final holdout AP
+  0.364 vs 0.312), so the A100-s17 model is effectively a fourth training run.
+- Scope: four models, one cohort, the same data and config. Training cost about 57 min per
+  model on an A100 (about 3.6× faster than the T4).
 
 ## 4. Learned non-diffusion baselines — validation holdout only
 

@@ -2510,3 +2510,14 @@ venv. Ruff 0.17.5 clean. Gates exact. Evidence byte-identical to the Hub, LF, UU
 - Spawned 3 full 30-epoch trainings (seeds 17/18/19) on the deployed app, which does not
   depend on the local machine. Seed 17 on the A100 separates the hardware effect from the
   seed effect relative to the original T4 model.
+
+## 2026-11-15 — Training-seed variability (AF-11): done
+
+- The 3 A100 trainings completed (about 57 min each); the training app was stopped.
+- Fixed the retrain-eval config guard to compare in JSON form (the trainer stores tuples);
+  the first smoke failed on this and is recorded.
+- Generated validation maps for each retrained model (3 sampling seeds, T4, about 6.5 min each),
+  then ran the pre-registered CPU analysis (`retrain-full-20261115T035414Z`).
+- V1 and V2 hold for all 4 models. Across-model holdout AP SD is 0.007 for the hybrid, smaller
+  than the 0.027 sampling-seed SD. The hardware effect is not resolved. AF-11 set to Done.
+  No test access. All deployed apps were stopped.
