@@ -134,7 +134,9 @@ def run_retrain_eval_remote(
         # SHA-verified checkpoint written by this team's trainer; same loader contract.
         config = torch.load(checkpoint_path, map_location="cpu", weights_only=False)["config"]
         reference = json.loads(reference_config_json)
-        differing = sorted(k for k, v in reference.items() if k != "seed" and config.get(k) != v)
+        # Compare in JSON form: the trainer normalises lists to tuples.
+        saved = json.loads(json.dumps(config))
+        differing = sorted(k for k, v in reference.items() if k != "seed" and saved.get(k) != v)
         if differing:
             raise ValueError(f"Retrained config differs from the reference: {differing}")
         manifest.update(
