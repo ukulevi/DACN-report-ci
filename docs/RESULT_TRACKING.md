@@ -4057,4 +4057,18 @@ snapshot hash is recorded by the trainer. Workspace `tanh1c`, A100-SXM4-40GB.
   3.6× faster). [Modal](https://modal.com/apps/tanh1c/main/ap-KWx3iqvPIAhWCxnPY27eMe).
 - **`ddpm-partial-a100-b8-e30-s17-20261115T020858Z`** (seed 17 on A100, hardware control for
   the original T4 seed-17 model), **`…-s18-…`** and **`…-s19-…`** were spawned on the deployed
-  app `dacn-bmad-flair` (`Function.spawn`, independent of the local client). Status: running.
+  app `dacn-bmad-flair` (`Function.spawn`, independent of the local client). All three
+  completed/uploaded at 03:05 UTC (30 epochs, 28140 optimizer steps, about 57 min each).
+  Hub revisions: s17 `8f5ee84a`, s18 `8734c959`, s19 `38692b69`; `ddpm_epoch_030.pt` SHA-256
+  prefixes s17 `404955c2`, s18 `2a0a652e`, s19 `b3ab0d76`. The training app was stopped.
+
+### Validation maps of the retrained models (`dacn.cloud.modal_retrain_eval`, T4)
+
+- **`retrain-eval-a100-s18-smoke-20261115T034045Z`** failed (code `5145cace`): the config guard
+  reported `channel_mults`/`checkpoint_epochs` as different only because the trainer stores
+  lists as tuples. Fixed by comparing in JSON form (`a1969d0e`); no values differ.
+- **`retrain-eval-a100-s18-smoke-20261115T034145Z`** completed/uploaded (code `a1969d0e`, clean):
+  2 images, sampling seed 17, checkpoint SHA and config checks passed, training seed 18.
+  Hub `5be48d43`. [Modal](https://modal.com/apps/tanh1c/main/ap-dfgEoCBE02SdsIlMVlwQBV).
+- **`retrain-eval-a100-s{17,18,19}-full-20261115T034252Z`** spawned on the deployed app
+  `dacn-retrain-eval` (code `a1969d0e`, clean): 83 slices × sampling seeds 17/18/19. Status: running.

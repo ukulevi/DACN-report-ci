@@ -40,7 +40,20 @@ TRAINING_RUNS = {
 CHECKPOINT_NAME = "ddpm_epoch_030.pt"
 # GPU map runs per retrained model: (evaluation run ID, Hub revision); filled in after
 # they complete. Their maps are SHA-checked against each run's own manifest.
-RETRAIN_EVAL_RUNS = {}
+RETRAIN_EVAL_RUNS = {
+    "a100_s17": (
+        "retrain-eval-a100-s17-full-20261115T034252Z",
+        "47df4be2e5ca1d113e4e37332c92619453aa2278",
+    ),
+    "a100_s18": (
+        "retrain-eval-a100-s18-full-20261115T034252Z",
+        "5566ab3bb130e26a5d24b42d2d3f6b6f21857018",
+    ),
+    "a100_s19": (
+        "retrain-eval-a100-s19-full-20261115T034252Z",
+        "5aad935cbb1b0268eb0bc21f8568d038ddbabf8b",
+    ),
+}
 
 
 def arm(model, kind):
